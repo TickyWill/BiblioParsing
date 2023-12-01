@@ -1,0 +1,2 @@
+include BiblioParsing/BiblioParsing_RefFiles/*.*
+include LICENSE
