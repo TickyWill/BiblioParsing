@@ -1,5 +1,6 @@
 '''The BiblioGlobals module defines global parameters 
    used in other BiblioAnalysis modules.
+   modidied 04/12/2023
 
 '''
 
