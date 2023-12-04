@@ -87,8 +87,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
 import re
 
 # Local imports 
-from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol
-from BiblioAnalysis_Utils.BiblioParsingUtils import read_towns_per_country
+from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+from BiblioParsing.BiblioParsingUtils import read_towns_per_country
 
 
 #####################
@@ -454,7 +454,7 @@ RE_YEAR = re.compile(r'\d{4}')                            # Captures "dddd" as t
 RE_YEAR_JOURNAL = re.compile(r'\s\d{4}\s')               # Captures " dddd " as the year in journal name
 
 
-REP_UTILS = 'BiblioAnalysis_RefFiles'
+REP_UTILS = 'BiblioParsing_RefFiles'
 
 
 RE_ZIP_CODE = re.compile(',\s[a-zA-Z]?[\-]?\d+.*',)     # Captures text begining with ', '                                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

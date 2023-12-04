@@ -23,7 +23,7 @@ LIGHT_TEXT = '\033[0m'
 # Countries normalized names and GPS coordinates
 COUNTRIES_INFO = 'Countries.xlsx'
         
-REP_UTILS = 'BiblioAnalysis_RefFiles'                         # !!!! Defined also in BiblioSpecificGlobals  !!!!!
+REP_UTILS = 'BiblioParsing_RefFiles'                         # !!!! Defined also in BiblioSpecificGlobals  !!!!!
 
 def build_countries_globals():
         
@@ -44,8 +44,8 @@ def build_countries_globals():
         (list,dict,dict,dict): tuple of countries, countries_gps, countries_codes and zip_codes.
         
     Notes:
-        The global 'COUNTRIES_INFO' is imported from 'BiblioGeneralGlobals' module of the 'BiblioAnalysis_Utils' package.
-        The global 'REP_UTILS' is imported from 'BiblioSpecificGlobals' module of the 'BiblioAnalysis_Utils' package.
+        The global 'COUNTRIES_INFO' is imported from 'BiblioGeneralGlobals' module of the 'BiblioParsing' package.
+        The global 'REP_UTILS' is imported from 'BiblioSpecificGlobals' module of the 'BiblioParsing' package.
         
     '''
 
@@ -57,8 +57,8 @@ def build_countries_globals():
     import pandas as pd
     
     # Local imports
-    #from BiblioAnalysis_Utils.BiblioGeneralGlobals import COUNTRIES_INFO
-    #from BiblioAnalysis_Utils.BiblioSpecificGlobals import REP_UTILS
+    #from BiblioParsing.BiblioGeneralGlobals import COUNTRIES_INFO
+    #from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
 
     # Setting the specific file paths for countries information    
     path_countries_info = Path(__file__).parent / Path(REP_UTILS) / Path(COUNTRIES_INFO)

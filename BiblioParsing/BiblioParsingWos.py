@@ -1,7 +1,7 @@
 __all__ = ['biblio_parser_wos','read_database_wos']
 
-# Globals used from BiblioAnalysis_Utils.BiblioGeneralGlobals: DASHES_CHANGE, LANG_CHAR_CHANGE,PONCT_CHANGE 
-# Globals used from BiblioAnalysis_Utils.BiblioSpecificGlobals: DIC_OUTDIR_PARSING, DIC_DOCTYPE, 
+# Globals used from BiblioParsing.BiblioGeneralGlobals: DASHES_CHANGE, LANG_CHAR_CHANGE,PONCT_CHANGE 
+# Globals used from BiblioParsing.BiblioSpecificGlobals: DIC_OUTDIR_PARSING, DIC_DOCTYPE, 
 #                                                               ENCODING, FIELD_SIZE_LIMIT,
 #                                                               RE_ADDRESS, RE_AUTHOR,
 #                                                               RE_REF_AUTHOR_WOS, RE_REF_JOURNAL_WOS,
@@ -9,9 +9,9 @@ __all__ = ['biblio_parser_wos','read_database_wos']
 #                                                               RE_REF_YEAR_WOS, RE_SUB, RE_SUB_FIRST, 
 #                                                               SYMBOL, UNKNOWN, USECOLS_WOS, WOS
 
-# Functions used from BiblioAnalysis_Utils.BiblioParsingInstitutions: address_inst_full_list, build_institutions_dic
+# Functions used from BiblioParsing.BiblioParsingInstitutions: address_inst_full_list, build_institutions_dic
 #                                                               
-# Functions used from BiblioAnalysis_Utils.BiblioParsingUtils: build_title_keywords, country_normalization, 
+# Functions used from BiblioParsing.BiblioParsingUtils: build_title_keywords, country_normalization, 
 #                                                              normalize_journal_names, name_normalizer, remove_special_symbol 
                                                               
 
@@ -39,10 +39,10 @@ def _build_authors_wos(df_corpus):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import name_normalizer
+    from BiblioParsing.BiblioParsingUtils import name_normalizer
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     
     co_author = namedtuple('co_author',COL_NAMES['authors'] )
     
@@ -101,11 +101,11 @@ def _build_keywords_wos(df_corpus,dic_failed):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import build_title_keywords 
+    from BiblioParsing.BiblioParsingUtils import build_title_keywords 
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
 
     key_word = namedtuple('key_word',COL_NAMES['keywords'] )
     
@@ -220,7 +220,7 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
         
     Notes:
         The globals 'COL_NAMES', 'COLUMN_LABEL_WOS', 'RE_ADDRESS', 'RE_AUTHOR', 'RE_SUB', 'RE_SUB_FIRST'
-        and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioAnalysis_Utils` package.
+        and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol`, `address_inst_full_list`, `build_institutions_dic` and `country_normalization` 
         are imported from `BiblioParsingUtils` of `BiblioAnalysis_utils` package.
         
@@ -235,16 +235,16 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol
-    from BiblioAnalysis_Utils.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+    from BiblioParsing.BiblioParsingUtils import country_normalization
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_ADDRESS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_AUTHOR
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB_FIRST
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_ADDRESS
+    from BiblioParsing.BiblioSpecificGlobals import RE_AUTHOR
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
 
     address = namedtuple('address',COL_NAMES['address'] )
     country = namedtuple('country',COL_NAMES['country'] )
@@ -405,7 +405,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
         
     Notes:
         The globals 'COL_NAMES', 'COLUMN_LABEL_WOS', 'RE_ADDRESS', 'RE_AUTHOR', 'RE_SUB', 'RE_SUB_FIRST',
-        'SYMBOL' and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioAnalysis_Utils` package.
+        'SYMBOL' and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol` and `country_normalization` are imported from `BiblioParsingUtils` 
         of `BiblioAnalysis_utils` package.
         The functions `address_inst_full_list` and `build_institutions_dic` are imported 
@@ -425,20 +425,20 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     from fuzzywuzzy import process
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingInstitutions import address_inst_full_list
-    from BiblioAnalysis_Utils.BiblioParsingInstitutions import build_institutions_dic
+    from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list
+    from BiblioParsing.BiblioParsingInstitutions import build_institutions_dic
     
-    from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol
-    from BiblioAnalysis_Utils.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+    from BiblioParsing.BiblioParsingUtils import country_normalization
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_ADDRESS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_AUTHOR
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB_FIRST
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import SYMBOL
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_ADDRESS
+    from BiblioParsing.BiblioSpecificGlobals import RE_AUTHOR
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
+    from BiblioParsing.BiblioSpecificGlobals import SYMBOL
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
     # Setting namedtuples
     addr_country_inst = namedtuple('address',COL_NAMES['auth_inst'][:-1] )
@@ -588,8 +588,8 @@ def _build_subjects_wos(df_corpus,dic_failed):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
   
     subject = namedtuple('subject',COL_NAMES['subject'] )
     
@@ -641,8 +641,8 @@ def _build_sub_subjects_wos(df_corpus,dic_failed):
     import pandas as pd
 
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
 
     keyword = namedtuple('keyword',COL_NAMES['sub_subject'])
     
@@ -686,16 +686,16 @@ def _build_articles_wos(df_corpus):
     '''
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import name_normalizer
+    from BiblioParsing.BiblioParsingUtils import name_normalizer
     
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import DASHES_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import LANG_CHAR_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import PONCT_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import LANG_CHAR_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL         #####################################
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_DOCTYPE
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL         #####################################
+    from BiblioParsing.BiblioSpecificGlobals import DIC_DOCTYPE
 
     def _str_int_convertor(x):
         if x:
@@ -777,16 +777,16 @@ def _build_references_wos(df_corpus):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import name_normalizer
+    from BiblioParsing.BiblioParsingUtils import name_normalizer
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_REF_AUTHOR_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_REF_JOURNAL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_REF_PAGE_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_REF_VOL_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_REF_YEAR_WOS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_REF_AUTHOR_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_REF_JOURNAL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_REF_PAGE_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_REF_VOL_WOS
+    from BiblioParsing.BiblioSpecificGlobals import RE_REF_YEAR_WOS
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
  
     ref_article = namedtuple('ref_article', COL_NAMES['references'])
  
@@ -857,9 +857,9 @@ def read_database_wos(filename):
        
     Note:
         The functions 'check_and_drop_columns' and 'normalize_journal_names' are imported from the `BiblioParsingUtils`module 
-        of the `BiblioAnalysis_Utils` package.
+        of the `BiblioParsing` package.
         The globals 'ENCODING', 'FIELD_SIZE_LIMIT', 'UNKNOWN' and 'WOS' are imported from the `BiblioSpecificGlobals` module 
-        of the `BiblioAnalysis_Utils` package.
+        of the `BiblioParsing` package.
         
     '''
     # Standard library imports
@@ -871,13 +871,13 @@ def read_database_wos(filename):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import check_and_drop_columns
-    from BiblioAnalysis_Utils.BiblioParsingUtils import normalize_journal_names
+    from BiblioParsing.BiblioParsingUtils import check_and_drop_columns
+    from BiblioParsing.BiblioParsingUtils import normalize_journal_names
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import ENCODING
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import FIELD_SIZE_LIMIT
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import WOS
+    from BiblioParsing.BiblioSpecificGlobals import ENCODING
+    from BiblioParsing.BiblioSpecificGlobals import FIELD_SIZE_LIMIT
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import WOS
         
     csv.field_size_limit(FIELD_SIZE_LIMIT) # To extend the field size limit for reading .txt files
 
@@ -934,10 +934,10 @@ def biblio_parser_wos(in_dir_parsing, out_dir_parsing, inst_filter_list):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingInstitutions import saving_raw_institutions
+    from BiblioParsing.BiblioParsingInstitutions import saving_raw_institutions
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
     
     pub_id_alias = COL_NAMES['keywords'][0]
     keyword_alias = COL_NAMES['keywords'][1]
