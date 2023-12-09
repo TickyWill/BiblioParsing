@@ -21,9 +21,9 @@ def parsing_concatenate_deduplicate(useful_path_list, inst_filter_list = None):
         
     Note:
         The globals 'COL_NAMES', 'CONCATENATED_XLSX', 'DEDUPLICATED_XLSX' and 'DIC_OUTDIR_PARSING' 
-        are imported from 'BiblioSpecificGlobals' module of 'BiblioParsing' package.
+        are imported from 'BiblioSpecificGlobals' module of 'BiblioAnalysis_Utils' package.
         The function 'extend_author_institutions' is imported from 'BiblioParsingInstitutions' module 
-        of 'BiblioParsing' package.
+        of 'BiblioAnalysis_Utils' package.
                                   
     '''
     
@@ -35,13 +35,13 @@ def parsing_concatenate_deduplicate(useful_path_list, inst_filter_list = None):
     import pandas as pd
 
     # Local imports
-    from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
+    from BiblioAnalysis_Utils.BiblioParsingInstitutions import extend_author_institutions
     
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL
-    from BiblioParsing.BiblioSpecificGlobals import CONCATENATED_XLSX
-    from BiblioParsing.BiblioSpecificGlobals import DEDUPLICATED_XLSX
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import CONCATENATED_XLSX
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DEDUPLICATED_XLSX
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
     
     # Setting global aliases
     articles_dat_alias = DIC_OUTDIR_PARSING['A']
@@ -147,7 +147,7 @@ def _concatenate_dat(filename, path_first_corpus, path_second_corpus, path_conca
         None.
         
     Note:
-        The global 'COL_NAMES' are imported from 'BiblioSpecificGlobals' module of 'BiblioParsing' package.
+        The global 'COL_NAMES' are imported from 'BiblioSpecificGlobals' module of 'BiblioAnalysis_Utils' package.
     
     '''
     # Standard libraries import
@@ -157,7 +157,7 @@ def _concatenate_dat(filename, path_first_corpus, path_second_corpus, path_conca
     import pandas as pd
     
     # Local imports
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
     
     pub_id_alias = COL_NAMES['pub_id']
     
@@ -194,9 +194,9 @@ def _deduplicate_articles(path_in):
                 and a list of the duplicate indices.
         
     Notes:
-       The globals `BOLD_TEXT` and `LIGHT_TEXT` are imported from 'BiblioGeneralGlobals' module of 'BiblioParsing' package. 
+       The globals `BOLD_TEXT` and `LIGHT_TEXT` are imported from 'BiblioGeneralGlobals' module of 'BiblioAnalysis_Utils' package. 
        The globals `COL_NAMES`, `DIC_OUTDIR_PARSING`, `LENGTH_THRESHOLD`, `SIMILARITY_THRESHOLD` and `UNKNOWN` 
-       are imported from 'BiblioSpecificGlobals' module of 'BiblioParsing' package.
+       are imported from 'BiblioSpecificGlobals' module of 'BiblioAnalysis_Utils' package.
     
     '''
     # Standard library imports
@@ -208,16 +208,16 @@ def _deduplicate_articles(path_in):
     import pandas as pd
     
     # Local imports
-    from BiblioParsing.BiblioGeneralGlobals import BOLD_TEXT
-    from BiblioParsing.BiblioGeneralGlobals import LIGHT_TEXT
+    from BiblioAnalysis_Utils.BiblioGeneralGlobals import BOLD_TEXT
+    from BiblioAnalysis_Utils.BiblioGeneralGlobals import LIGHT_TEXT
     
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL
-    from BiblioParsing.BiblioSpecificGlobals import DIC_DOCTYPE
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
-    from BiblioParsing.BiblioSpecificGlobals import LENGTH_THRESHOLD
-    from BiblioParsing.BiblioSpecificGlobals import SIMILARITY_THRESHOLD
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_DOCTYPE
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import LENGTH_THRESHOLD
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import SIMILARITY_THRESHOLD
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
     
     # Internal functions
     
@@ -383,6 +383,7 @@ def _deduplicate_articles(path_in):
         df_articles_concat_author = pd.concat(df_list)
     else:
         df_articles_concat_author = df_articles_concat_title.copy()
+    df_articles_concat_author.sort_values(by=[pub_id_alias], inplace = True)
     
     # Keeping copy of df_articles_concat with completed norm_journal_alias, issn_alias, doi_alias and doc_type_alias columns
     df_articles_concat_full = df_articles_concat_author.copy()
@@ -429,7 +430,7 @@ def _deduplicate_articles(path_in):
     else:
         df_articles_dedup = df_articles_concat
     df_articles_dedup = df_articles_dedup.drop([lc_title_alias, lc_doc_type_alias], axis = 1)
-    df_articles_dedup.sort_values([pub_id_alias], inplace=True)
+    df_articles_dedup.sort_values(by=[pub_id_alias], inplace=True)
     
     # Identifying the set of articles IDs to drop in the other parsing files of the concatenated corpus
     pub_id_set_init =  set(df_articles_concat_full[pub_id_alias].to_list())
@@ -467,7 +468,7 @@ def _deduplicate_dat(file_name, pub_id_to_drop, path_in, path_out ):
         
     Notes:
        The globals `COL_NAMES` and `DIC_OUTDIR_PARSING` from 'BiblioSpecificGlobals' module 
-       of 'BiblioParsing' package are used.
+       of 'BiblioAnalysis_Utils' package are used.
        
     '''
     
@@ -476,8 +477,8 @@ def _deduplicate_dat(file_name, pub_id_to_drop, path_in, path_out ):
     from pathlib import Path
     
     # Local imports
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
+    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
     
     # Defining aliases for column names of the file_name file 
     pub_id_alias = COL_NAMES['pub_id']

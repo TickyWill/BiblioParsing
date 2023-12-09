@@ -6,7 +6,7 @@ __all__ = ['add_site_packages_path',
            'DISPLAYS',
            'GUI_DISP',]
 
-# Globals used from BiblioParsing.BiblioGeneralGlobals: IN_TO_MM
+# Globals used from BiblioAnalysis_Utils.BiblioGeneralGlobals: IN_TO_MM
 
 
 def add_site_packages_path(venv = False ):
@@ -58,7 +58,7 @@ def _get_displays(in_to_mm=None):
     from screeninfo import get_monitors
     
     # Local imports
-    from BiblioParsing.BiblioGeneralGlobals import IN_TO_MM
+    from BiblioAnalysis_Utils.BiblioGeneralGlobals import IN_TO_MM
 
     if in_to_mm==None: in_to_mm = IN_TO_MM
     
