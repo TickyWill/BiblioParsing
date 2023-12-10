@@ -8,23 +8,22 @@ __all__ = ['address_inst_full_list',          #
            'getting_secondary_inst_list',     #
            'read_inst_types',
            'saving_raw_institutions',         #
-           'setting_secondary_inst_filter',   #
            ]
 
 # To do: def the internal functions and the deprecated ones
 
 
-# Globals used from BiblioAnalysis_Utils.BiblioGeneralGlobals:  DASHES_CHANGE, SYMB_CHANGE,
+# Globals used from BiblioParsing.BiblioGeneralGlobals:  DASHES_CHANGE, SYMB_CHANGE,
 #                                                                                                                                
-# Globals used from BiblioAnalysis_Utils.BiblioSpecificGlobals: COL_NAMES, DIC_AMB_WORDS,
+# Globals used from BiblioParsing.BiblioSpecificGlobals: COL_NAMES, DIC_AMB_WORDS,
 #                                                               DIC_INST_FILENAME, DIC_OUTDIR_PARSING , 
 #                                                               EMPTY, INST_BASE_LIST,            
 #                                                               INST_FILTER_LIST, RAW_INST_FILENAME, REP_UTILS, 
 #                                                               RE_SUB, RE_SUB_FIRST, RE_ZIP_CODE,                                                               
 
 
-# Functions used from BiblioAnalysis_Utils.BiblioGui: Select_multi_items
-# Functions used from BiblioAnalysis_Utils.BiblioParsingUtils: country_normalization
+# Functions used from BiblioParsing.BiblioGui: Select_multi_items
+# Functions used from BiblioParsing.BiblioParsingUtils: country_normalization
 #                                                              special_symbol_remove
 
 
@@ -47,7 +46,7 @@ def address_inst_full_list(full_address, inst_dic):
         
     Notes:
         The globals 'RE_ZIP_CODE' and 'EMPTY' are imported from `BiblioSpecificGlobals` module 
-        of `BiblioAnalysis_Utils` package.
+        of `BiblioParsing` package.
         The function `country_normalization` is imported from `BiblioParsingUtils` module
         of `BiblioAnalysis_utils` package.
         
@@ -63,10 +62,10 @@ def address_inst_full_list(full_address, inst_dic):
     from fuzzywuzzy import process
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import country_normalization
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import INST_BASE_LIST
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_ZIP_CODE
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import EMPTY
+    from BiblioParsing.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioSpecificGlobals import INST_BASE_LIST
+    from BiblioParsing.BiblioSpecificGlobals import RE_ZIP_CODE
+    from BiblioParsing.BiblioSpecificGlobals import EMPTY
 
     inst_full_list_ntup = namedtuple('inst_full_list_ntup',['norm_inst_list','raw_inst_list'])
     
@@ -152,9 +151,9 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
         
     Notes:
         The globals 'DASHES_CHANGE' and 'SYMB_CHANGE' are imported
-        from `BiblioGeneralGlobals` module of `BiblioAnalysis_Utils` package.
+        from `BiblioGeneralGlobals` module of `BiblioParsing` package.
         The globals 'RE_SUB',and 'RE_SUB_FIRST' are imported
-        from `BiblioSpecificGlobals` module of `BiblioAnalysis_Utils` package.
+        from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The function `special_symbol_remove` is used from `BiblioParsingUtils` 
         of `BiblioAnalysis_utils` package.
         
@@ -164,12 +163,12 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     import re
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import special_symbol_remove
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import DASHES_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import SYMB_CHANGE
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_AMB_WORDS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RE_SUB_FIRST
+    from BiblioParsing.BiblioParsingUtils import special_symbol_remove
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
+    from BiblioParsing.BiblioSpecificGlobals import DIC_AMB_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
+    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
     
     def _normalize_amb_words(text): 
         for amb_word in DIC_AMB_WORDS.keys():
@@ -215,8 +214,8 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals  import DIC_INST_FILENAME
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import REP_UTILS    
+    from BiblioParsing.BiblioSpecificGlobals  import DIC_INST_FILENAME
+    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS    
     
     if dic_inst_filename == None: dic_inst_filename = DIC_INST_FILENAME
     if rep_utils == None: rep_utils = REP_UTILS 
@@ -352,7 +351,7 @@ def extend_author_institutions(in_dir,inst_filter_list):
         
     Notes:
         The globals 'COL_NAMES' and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
-        of `BiblioAnalysis_Utils` package are used.
+        of `BiblioParsing` package are used.
     
     '''
     
@@ -363,8 +362,8 @@ def extend_author_institutions(in_dir,inst_filter_list):
     import pandas as pd
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
     
     def _address_inst_list(inst_names_list,institutions):
 
@@ -427,7 +426,7 @@ def getting_secondary_inst_list(out_dir_parsing):
        
     Notes:
         The globals 'COL_NAMES'and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
-        of `BiblioAnalysis_Utils` package are used.       
+        of `BiblioParsing` package are used.       
     '''
    
     # Standard library imports
@@ -438,8 +437,8 @@ def getting_secondary_inst_list(out_dir_parsing):
     import pandas as pd
    
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
    
     
     institutions_alias = COL_NAMES['auth_inst'][4]
@@ -474,7 +473,7 @@ def saving_raw_institutions(df_I2,out_dir):
     
     Note:
         The globals `COL_NAMES`and `RAW_INST_FILENAME` are imported from `BiblioSpecificGlobals` module 
-        of `BiblioAnalysis_Utils` package.
+        of `BiblioParsing` package.
     
     '''
     # Standard libraries import
@@ -484,8 +483,8 @@ def saving_raw_institutions(df_I2,out_dir):
     import pandas as pd
 
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import RAW_INST_FILENAME
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import RAW_INST_FILENAME
     
     raw_institutions_alias = COL_NAMES['auth_inst'][5]
     raw_institutions_authors_lists = df_I2[raw_institutions_alias].to_list()
@@ -502,64 +501,6 @@ def saving_raw_institutions(df_I2,out_dir):
     df_raw_inst.to_csv(Path(out_dir) / Path(RAW_INST_FILENAME),
                        index=False,
                        sep='\t')
-
-    
-def setting_secondary_inst_filter(out_dir_parsing):
-    
-    '''The `setting_secondary_inst_filter` function allows building the affiliation filter "inst_filter_list"
-    from the institutions list of the corpus using the `Select_multi_items` GUI.
-    
-    Args:
-        out_dir_parsing (path): the corpus parsing path for reading the "DIC_OUTDIR_PARSING['I2']" file.
-        
-    Returns:
-        (list): list of tuples (institution,country) selected by the user.
-        
-    Notes:
-        The globals 'COL_NAMES' and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` 
-        of `BiblioAnalysis_utils` package are used.
-        The function `Select_multi_items` from `BiblioGui module` of `BiblioAnalysis_utils` package is used.
-        
-    '''
-    
-    # Standard library imports
-    from pathlib import Path
-    
-    # 3rd party imports
-    import numpy as np
-    import pandas as pd
-    
-    # Local imports
-    from BiblioAnalysis_Utils.BiblioGui import Select_multi_items
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
-    
-    
-    institutions_alias = COL_NAMES['auth_inst'][4]
-    country_alias = COL_NAMES['country'][2]    
-    
-    df_auth_inst = pd.read_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING['I2']),
-                                sep = '\t')
-    raw_institutions_list = []
-    for auth_inst in df_auth_inst[institutions_alias]:
-        raw_institutions_list.append(auth_inst.strip())
-        
-    institutions_list = list(np.concatenate([raw_inst.split(';') for raw_inst in raw_institutions_list]))
-    institutions_list  = sorted(list(set(institutions_list)))
-
-    country_institution_list = [x.split('_')[1] + ':' + x.split('_')[0] for x in institutions_list]
-    country_institution_list = sorted(country_institution_list)
-
-    selected_list = Select_multi_items(country_institution_list,
-                                       mode='multiple',
-                                       fact=2,
-                                       win_widthmm=80,
-                                       win_heightmm=100,
-                                       font_size=16)
-
-    inst_filter_list = [(x.split(':')[1].strip(),x.split(':')[0].strip()) for x in selected_list]
-    
-    return inst_filter_list
 
 
 ################################### New functions for address parsing and affiliations normalization ###################################
@@ -589,11 +530,11 @@ def standardize_address(raw_address):
         
     Notes:
         The global 'DIC_WORD_RE_PATTERN' and 'UNKNOWN' are imported from the module `BiblioSpecificGlobals`  
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
         The globals 'DASHES_CHANGE' and 'APOSTROPHE_CHANGE' are imported from the module `BiblioGeneralGlobals`  
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
         The function `country_normalization` is imported from the module `BiblioParsingInstitutions`
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
         
     '''
     
@@ -601,11 +542,11 @@ def standardize_address(raw_address):
     import re
     
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingUtils import country_normalization
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import APOSTROPHE_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import DASHES_CHANGE
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
     # Uniformizing words
     standard_address = raw_address
@@ -670,11 +611,11 @@ def search_items(affiliation, country, verbose = False):
     
     Notes:
         The function `remove_special_symbol` is imported from the module `BiblioParsingUtils` 
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
         The globals 'DROPING_SUFFIX', 'DROPING_WORDS', 'KEEPING_PREFIX' are imported from the module `BiblioSpecificGlobals`  
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
         The globals 'COUNTRY_TOWNS' and 'ZIP_CODES' are imported from the module `BiblioGeneralGlobals`  
-        of the package `BiblioAnalysis_Utils`.
+        of the package `BiblioParsing`.
     
     '''
     
@@ -683,20 +624,20 @@ def search_items(affiliation, country, verbose = False):
     from string import Template
     
     # Local imports 
-    from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol
-    from BiblioAnalysis_Utils.BiblioParsingUtils import rationalize_town_names
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+    from BiblioParsing.BiblioParsingUtils import rationalize_town_names
     
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import ZIP_CODES
+    from BiblioParsing.BiblioGeneralGlobals import ZIP_CODES
         
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import BASIC_KEEPING_WORDS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COUNTRY_TOWNS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DROPING_SUFFIX
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DROPING_WORDS    
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import FR_DROPING_WORDS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import GEN_KEEPING_WORDS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import KEEPING_PREFIX
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import KEEPING_WORDS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import USER_KEEPING_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import BASIC_KEEPING_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import COUNTRY_TOWNS
+    from BiblioParsing.BiblioSpecificGlobals import DROPING_SUFFIX
+    from BiblioParsing.BiblioSpecificGlobals import DROPING_WORDS    
+    from BiblioParsing.BiblioSpecificGlobals import FR_DROPING_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import GEN_KEEPING_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import KEEPING_PREFIX
+    from BiblioParsing.BiblioSpecificGlobals import KEEPING_WORDS
+    from BiblioParsing.BiblioSpecificGlobals import USER_KEEPING_WORDS
     
     
     ################################### Internal functions start ###################################
@@ -1041,11 +982,11 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
         
     Notes:
         The function `search_droping_items` is imported from the module `BiblioParsingInstitutions`  
-        of the package`BiblioAnalysis_Utils`.
+        of the package`BiblioParsing`.
         The function `country_normalization` is imported from the module `BiblioParsingInstitutions` 
-        of the package`BiblioAnalysis_Utils`.
+        of the package`BiblioParsing`.
         The globals 'KEEPING_WORDS', 'KEEPING_PREFIX' and 'UNKNOWN' are imported from the module `BiblioSpecificGlobals` 
-        of the package`BiblioAnalysis_Utils`.        
+        of the package`BiblioParsing`.        
         
     '''
     
@@ -1054,7 +995,7 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
     from string import Template
     
     # Local imports
-    #from BiblioAnalysis_Utils.BiblioParsingInstitutions import search_items  (check used outside ?)
+    #from BiblioParsing.BiblioParsingInstitutions import search_items  (check used outside ?)
     
     # Splitting by coma the standard address in chuncks listed in an initial-affiliations list
     init_raw_affiliations_list = std_address.split(',')
@@ -1241,7 +1182,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
 
     Note:
         internalfunctions : _build_words_set, _build_words_sets_list       
-        remove_special_symbol from BiblioAnalysis_Utils.BiblioParsingUtils
+        remove_special_symbol from BiblioParsing.BiblioParsingUtils
         COUNTRY_AFFILIATIONS_FILE, DIC_WORD_RE_PATTERN, MISSING_SPACE_ACRONYMS, SMALL_WORDS_DROP, REP_UTILS
         APOSTROPHE_CHANGE, DASHES_CHANGE, SYMB_DROP, SYMB_CHANGE
     
@@ -1255,19 +1196,19 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     import pandas as pd
 
     # Local imports 
-    import BiblioAnalysis_Utils as bau
-    from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol
+    import BiblioParsing as bau
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import APOSTROPHE_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import DASHES_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import SYMB_CHANGE
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import SYMB_DROP
+    from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN    
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import MISSING_SPACE_ACRONYMS
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import SMALL_WORDS_DROP    
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import REP_UTILS
+    from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
+    from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN    
+    from BiblioParsing.BiblioSpecificGlobals import MISSING_SPACE_ACRONYMS
+    from BiblioParsing.BiblioSpecificGlobals import SMALL_WORDS_DROP    
+    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
 
 
     ################################################ Local functions start ################################################
@@ -1294,7 +1235,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
         Note:
             The globals... are imported from...
             The function `remove_special_symbols` is imported from the module `Biblio....`  
-            of the package`BiblioAnalysis_Utils`.
+            of the package`BiblioParsing`.
 
         '''
         # Standard library imports
@@ -1467,10 +1408,10 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
     import pandas as pd
 
     # Local imports
-    import BiblioAnalysis_Utils as bau
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import INST_TYPES_FILE 
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import INST_TYPES_USECOLS 
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import REP_UTILS
+    import BiblioParsing as bau
+    from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_FILE 
+    from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_USECOLS 
+    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     
     # Setting the full path for the 'Inst_types.xlsx' file
     if not inst_types_file_path:
@@ -1503,9 +1444,9 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, af
     # 3rd party imports
 
     # Local imports
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import REP_UTILS
-    from BiblioAnalysis_Utils.BiblioParsingUtils import remove_special_symbol    
+    from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
+    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol    
             
     set_words_template = Template(r'[\s]$word[\s)]'     # For instence capturing "word" in "word of set" 
                                                         # or " word" in "set with word".
@@ -1638,7 +1579,7 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
         The function 'get_norm_affiliations_list' is imported from    .
     '''
 
-    from BiblioAnalysis_Utils.BiblioGeneralGlobals import SYMB_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
     
     std_address = standardize_address(raw_address)
     if verbose:
@@ -1685,7 +1626,7 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
         
     Notes:
         The globals 'COL_NAMES' and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
-        of `BiblioAnalysis_Utils` package are used.
+        of `BiblioParsing` package are used.
     
     '''
     
@@ -1696,10 +1637,10 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
     import pandas as pd
 
     # Local imports
-    from BiblioAnalysis_Utils.BiblioParsingInstitutions import build_address_affiliations_lists
+    from BiblioParsing.BiblioParsingInstitutions import build_address_affiliations_lists
     
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import COL_NAMES
-    from BiblioAnalysis_Utils.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
 
     def _address_aff_list(raw_address):
         # get the tuple (country, addresse_norm_affiliations_list, address_unknown_affiliations_list)

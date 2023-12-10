@@ -12,8 +12,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'COLUMN_LABEL_WOS_PLUS',
            'COLUMN_TYPE_SCOPUS',
            'CONCATENATED_XLSX',
-           'COOC_AUTHORIZED_ITEMS',
-           'COOC_AUTHORIZED_ITEMS_DICT',
            'COUNTRY_TOWNS',
            'DEDUPLICATED_XLSX',
            'DIC_DOCTYPE',
@@ -28,18 +26,11 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'DROPING_SUFFIX',
            'EMPTY',
            'ENCODING',
-           'FIELD_SIZE_LIMIT',
-           'FOLDER_SELECTION_HELP_TEXT',
            'FR_DROPING_WORDS',
-           'GEN_KEEPING_WORDS',
-           'GUI_BUTTON_RATIO',
-           'GUI_TEXT_MAX_LINES_NB',
-           'GUI_WIDGET_RATIO',
            'INST_BASE_LIST',
            'INST_FILTER_LIST',
            'KEEPING_WORDS',
            'KEEPING_PREFIX',
-           'LABEL_MEANING',
            'LENGTH_THRESHOLD',
            'MISSING_SPACE_ACRONYMS',
            'NLTK_VALID_TAG_LIST',
@@ -252,9 +243,6 @@ INST_TYPES_FILE = "Inst_types.xlsx"
 INST_TYPES_USECOLS = ['Level', 'Abbreviation']
 
 
-COOC_AUTHORIZED_ITEMS = ['AU','CU','AK','IK','TK','S','S2']
-
-
 DEDUPLICATED_XLSX = 'articles_dedup.xlsx'
 
 
@@ -332,38 +320,7 @@ EMPTY = 'empty'
 ENCODING = 'iso-8859-1' # encoding used by the function read_database_wos
 
 
-FIELD_SIZE_LIMIT = 256<<10 # extend maximum field size for wos file reading
-
-
-FOLDER_SELECTION_HELP_TEXT ='''The selected folder is edited.
-                               For changing the selection, just make a new selection.
-                               If the selection is valid, please close the window'''
-
-
-GUI_BUTTON_RATIO = 2.5
-
-
-GUI_TEXT_MAX_LINES_NB = 3
-
-
-GUI_WIDGET_RATIO = 1.2                                                                                    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-LABEL_MEANING = {'AU':'Authors',              # ex: Nom1 J, Nom2 E, Nom3 J-P
-                 'CU':'Countries',            # ex: France, United States
-                 'I' :'Institutions',         # ex: Acronyme1, Acronyme2
-                 'DT':'Document types',       # ex: Review, Article, Proceeding
-                 'J' :'Journals',          
-                 'AK':'Authors keywords',     # ex: BIOMASS, SOLAR FUEL
-                 'IK':'Journal keywords',
-                 'TK':'Title keywords',
-                 'S' :'Subjects',             # ex: Chemical Engineering,Engineering 
-                 'S2':'Sub-subjects',         # ex: Applied Mathematics, Organic Chemistry     
-                 'R' :'References',
-                 'RJ':'References journals',
-                 'LA':'Languages',            # ex: English, French
-                 'Y' :'Years',                # ex: 2019
-                } 
+FIELD_SIZE_LIMIT = 256<<10 # extend maximum field size for wos file reading                                                                                 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 LENGTH_THRESHOLD = 30
@@ -488,10 +445,6 @@ WOS = 'wos'
 #################
 
 COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS, DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS)
-
-
-COOC_AUTHORIZED_ITEMS_DICT = {label:name for name,label in LABEL_MEANING.items() 
-                              if name in COOC_AUTHORIZED_ITEMS}
 
 
 # This global is used in merge_database function

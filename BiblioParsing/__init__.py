@@ -6,7 +6,6 @@ from BiblioParsing.BiblioNltk import *
 from BiblioParsing.BiblioGeneralGlobals import *
 from BiblioParsing.BiblioSpecificGlobals import *
 from BiblioParsing.BiblioSys import *
-from BiblioParsing.BiblioGui import *
 from BiblioParsing.BiblioParsingUtils import *
 from BiblioParsing.BiblioParsingWos import *
 from BiblioParsing.BiblioRefs import *
