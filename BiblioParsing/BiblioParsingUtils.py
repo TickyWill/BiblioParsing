@@ -70,7 +70,7 @@ def build_title_keywords(df):
     import nltk
     import numpy as np
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import BLACKLISTED_WORDS
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import NLTK_VALID_TAG_LIST
@@ -128,7 +128,7 @@ def normalize_country(country):
     '''
     # To Do: update docstring
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import ALIAS_UK
     from BiblioParsing.BiblioGeneralGlobals import COUNTRIES
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
@@ -179,10 +179,11 @@ def merge_database(database,filename,in_dir,out_dir):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingScopus import read_database_scopus
     from BiblioParsing.BiblioParsingWos import read_database_wos
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     #from BiblioParsing.BiblioSpecificGlobals import USECOLS_SCOPUS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     from BiblioParsing.BiblioSpecificGlobals import WOS
@@ -236,7 +237,7 @@ def name_normalizer(text):
     # Standard library imports
     import re
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE    
     from BiblioParsing.BiblioGeneralGlobals import LANG_CHAR_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE
@@ -294,13 +295,13 @@ def normalize_journal_names(database,df_corpus):
    
     '''
    
-    # Local imports
+    # Globals imports
+    from BiblioParsing.BiblioRegexpGlobals import RE_NUM_CONF
+    from BiblioParsing.BiblioRegexpGlobals import RE_YEAR_JOURNAL
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import DIC_LOW_WORDS
-    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL
-    from BiblioParsing.BiblioSpecificGlobals import RE_NUM_CONF
-    from BiblioParsing.BiblioSpecificGlobals import RE_YEAR_JOURNAL
+    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL    
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import WOS
    
@@ -336,27 +337,36 @@ def normalize_journal_names(database,df_corpus):
     return df_corpus
 
 
-def biblio_parser(in_dir_parsing, out_dir_parsing, database, expert, rep_utils=None, inst_filter_list=None):
+def biblio_parser(in_dir, database, rep_utils = None, inst_filter_list = None):
     
-    '''Chooses the appropriate parser to parse wos or scopus databases.
+    '''The `biblio_parser` function parse wos or scopus databases using the appropriate parser.
+    
+    Args:
+    
+    
+    Returns:
+        (dict): The dict of dataframes resulting from the parsing.
     '''
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingScopus import biblio_parser_scopus
     from BiblioParsing.BiblioParsingWos import biblio_parser_wos
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import INST_FILTER_LIST
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import WOS
     
     if database == WOS:
-        biblio_parser_wos(in_dir_parsing, out_dir_parsing, inst_filter_list)
+        parsing_dict, dic_failed = biblio_parser_wos(in_dir, inst_filter_list)
     elif database == SCOPUS:
         if rep_utils == None: rep_utils = REP_UTILS
-        biblio_parser_scopus(in_dir_parsing, out_dir_parsing, rep_utils, inst_filter_list)
+        parsing_dict, dic_failed = biblio_parser_scopus(in_dir, rep_utils, inst_filter_list)
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be wos or scopus ")
+        
+    return parsing_dict, dic_failed
 
         
 def check_and_drop_columns(database,df,filename):
@@ -522,7 +532,7 @@ def read_towns_per_country(country_towns_file, rep_utils, dic_town_symbols, dic_
 ################################# Functions replacing deprecated ones ##########################################
 # To Do: 2022-12-08
 #    - Update All with functions replacing deprecated ones
-#    - Search for calls of deprecated functions in all BiblioAnalysis modules
+#    - Search for calls of deprecated functions in all BiblioParsing modules
 #    - Replace calls of deprecated functions by replacing functions and check args, returns and imports including globals
 
 def remove_special_symbol(text, only_ascii = True, strip = True):
@@ -576,11 +586,11 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     '''
     
     if dic_town_symbols==None: 
-        # Local imports
+        # Globals imports
         from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS    
         dic_town_symbols=DIC_TOWN_SYMBOLS
     if dic_town_words==None: 
-        # Local imports
+        # Globals imports
         from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
         dic_town_words=DIC_TOWN_WORDS
     
@@ -605,10 +615,9 @@ def country_normalization(country):                                             
     '''
     # To Do: update docstring
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import ALIAS_UK
-    from BiblioParsing.BiblioGeneralGlobals import COUNTRIES
-    
+    from BiblioParsing.BiblioGeneralGlobals import COUNTRIES    
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
     country_clean = country
@@ -647,7 +656,7 @@ def town_names_uniformization(text):                                            
         `BiblioSpecificGlobals` module of `BiblioParsing' package.
     
     '''
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS
     from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
     

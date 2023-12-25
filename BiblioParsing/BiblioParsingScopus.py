@@ -225,15 +225,18 @@ def _build_addresses_countries_institutions_scopus(df_corpus,dic_failed):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     from BiblioParsing.BiblioParsingUtils import country_normalization
     
+    # Globals imports
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    
+    
 
     address = namedtuple('address',COL_NAMES['address'] )
     ref_country = namedtuple('country',COL_NAMES['country'] )
@@ -407,17 +410,17 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list
-    from BiblioParsing.BiblioParsingInstitutions import build_institutions_dic
-    
+    from BiblioParsing.BiblioParsingInstitutions import build_institutions_dic    
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     from BiblioParsing.BiblioParsingUtils import country_normalization
     
+    # Globals imports
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS     
     from BiblioParsing.BiblioSpecificGlobals import SYMBOL
     
     addr_country_inst  = namedtuple('address',COL_NAMES['auth_inst'][:-1])
@@ -768,9 +771,10 @@ def _build_articles_scopus(df_corpus):
     # Standard library imports
     import re
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import name_normalizer
-    
+
+    # Globals imorts
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import LANG_CHAR_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE
@@ -876,20 +880,21 @@ def _build_references_scopus(df_corpus):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import name_normalizer
     
+    # Globals imports
+    from BiblioParsing.BiblioRegexpGlobals import RE_DETECT_SCOPUS_NEW
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_AUTHOR_SCOPUS
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_AUTHOR_SCOPUS_NEW
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_JOURNAL_SCOPUS
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_JOURNAL_SCOPUS_NEW
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_PAGE_SCOPUS
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_PAGE_SCOPUS_NEW
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_VOL_SCOPUS
+    from BiblioParsing.BiblioRegexpGlobals import RE_REF_YEAR_SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_DETECT_SCOPUS_NEW
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_AUTHOR_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_AUTHOR_SCOPUS_NEW
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_JOURNAL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_JOURNAL_SCOPUS_NEW
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_PAGE_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_PAGE_SCOPUS_NEW
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_VOL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import RE_REF_YEAR_SCOPUS
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS    
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
 
     ref_article = namedtuple('ref_article',COL_NAMES['references'])
@@ -1000,9 +1005,10 @@ def _check_affiliation_column_scopus(df):
     # Standard library imports
     from colorama import Fore
     
-    # Local imports
+    # Local local imports
     from BiblioParsing.BiblioParsingUtils import country_normalization
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
         
     def _valid_affiliation(row):
@@ -1059,10 +1065,11 @@ def read_database_scopus(filename):
     import numpy as np
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import check_and_drop_columns
     from BiblioParsing.BiblioParsingUtils import normalize_journal_names
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_TYPE_SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS    
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
@@ -1076,21 +1083,11 @@ def read_database_scopus(filename):
     return df
 
 
-def biblio_parser_scopus(in_dir_parsing, out_dir_parsing, rep_utils, inst_filter_list):
+def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list):
     
-    '''Using the files xxxx.csv stored in the folder rawdata, the function biblio_parser_scopus
-    generates the tsv files xxxx.dat stored in the folder parsing.
-    home path//BiblioAnalysis Data/
-    |-- myprojectname/
-    |   |-- rawdata/
-    |   |   |-- xxxx.txt
-    |   |-- parsing/
-    |   |   |-- addresses.dat, articles.dat, authors.dat, countries.dat, database.dat  
-    |   |   |-- institutions.dat, keywords.dat, references.dat, subjects.dat, subjects2.dat 
-    
-    The columns of the tsv file xxxx.csv are read and parsed using the 
-    functions:
-        _build_references_scopus which parses the column 'References'
+    '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
+    The columns of the csv file are read and parsed using the functions:
+        _build_references_scopus which parses the column 'References',
         _build_authors_scopus which parses the column 'Authors'
         _build_keywords_scopus which parses the column 'Author Keywords' (for author keywords AK),
                                         the column 'Index Keywords' (for journal keywords IK),
@@ -1100,33 +1097,57 @@ def biblio_parser_scopus(in_dir_parsing, out_dir_parsing, rep_utils, inst_filter
         _build_subjects_scopus which parses the column 'Source title', 'ISSN'
         _build_sub_subjects_scopus which parses the column 'Source title', 'ISSN'
         _build_articles_scopus which parses the columns 'Authors','Year','Source title','Volume',
-            'Page start','DOI','Document Type','Language of Original Document','Title','ISSN'
+            'Page start','DOI','Document Type','Language of Original Document','Title','ISSN'.
+            
+    Args:
+    
+    
+    Returns:
+    
+    
+    Note:
+    
 
     '''
-    #To Do: Doc string update
     
     # Standard library imports
     import json
     import os
     from pathlib import Path
     
-    # 3rd party imports
-    import numpy as np
-    import pandas as pd 
-    
-    # Local imports
+    # Local globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_CAT_CODES
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_JOURNALS_ISSN_CAT
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
-    pub_id_alias = COL_NAMES['keywords'][0]
+    # Internal functions    
+    def _keeping_item_parsing_results(item, item_df):
+        scopus_parsing_dict[item] = item_df
+    
+    # Setting useful alias
+    pub_id_alias  = COL_NAMES['keywords'][0]
     keyword_alias = COL_NAMES['keywords'][1]
+    articles_item_alias     = PARSING_ITEMS["articles"]
+    authors_item_alias      = PARSING_ITEMS["authors"]
+    authors_kw_item_alias   = PARSING_ITEMS["authors_keywords"]
+    index_kw_item_alias     = PARSING_ITEMS["indexed_keywords"]
+    title_kw_item_alias     = PARSING_ITEMS["title_keywords"]
+    addresses_item_alias    = PARSING_ITEMS["addresses"]
+    countries_item_alias    = PARSING_ITEMS["countries"]
+    institutions_item_alias = PARSING_ITEMS["institutions"]
+    auth_inst_item_alias    = PARSING_ITEMS["authors_institutions"]
+    raw_inst_item_alias     = PARSING_ITEMS["raw_institutions"]
+    subjects_item_alias     = PARSING_ITEMS["subjects"]
+    sub_subjects_item_alias = PARSING_ITEMS["sub_subjects"]
+    references_item_alias   = PARSING_ITEMS["references"]    
+    
 
+    # Listing the available csv files
     list_data_base = []
-    for path, _, files in os.walk(in_dir_parsing):
+    for path, _, files in os.walk(in_dir):
         list_data_base.extend(Path(path) / Path(file) for file in files 
                                                       if file.endswith(".csv"))
     
@@ -1140,96 +1161,62 @@ def biblio_parser_scopus(in_dir_parsing, out_dir_parsing, rep_utils, inst_filter
     # Reading and checking the corpus file
     df_corpus = read_database_scopus(filename)
 
-    # Initializing the dic_failed dict for the parsing control
-    dic_failed = {}
-    dic_failed['number of article'] = len(df_corpus)
+    # Initializing the scopus_dic_failed dict for the parsing control
+    scopus_dic_failed = {}
+    scopus_dic_failed['number of article'] = len(df_corpus)
     
-    # Building the file for authors (.dat)
-    item = 'AU' 
-    df_AU = _build_authors_scopus(df_corpus)
-    df_AU.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]), 
-                 index=False,
-                 sep='\t')
-
-    # Building and saving the files for keywords
-    df_keyword_AK,df_keyword_IK, df_keyword_TK = _build_keywords_scopus(df_corpus,dic_failed=dic_failed)    
-      # Saving author keywords file (.dat)
-    item = 'AK'  
-    df_keyword_AK.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')
-      # Saving journal (indexed) keywords file (.dat)
-    item = 'IK' 
-    df_keyword_IK.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')
-      # Saving title keywords file (.dat)
-    item = 'TK'  
-    df_keyword_TK.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')
+    # Initializing the dict of dataframes resulting from the parsing
+    scopus_parsing_dict = {}    
     
-    # Building and saving the files for addresses, countries and institutions
-    item = 'AD'  
-    df_AD, df_CU, df_I  = _build_addresses_countries_institutions_scopus(df_corpus, dic_failed)
-      # Saving addresses file (.dat)
-    df_AD.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                 index=False,
-                 sep='\t')
-      # Saving countries file (.dat)  
-    item = 'CU'       
-    df_CU.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                 index=False, 
-                 sep='\t')
-      # Saving institutions file (.dat)    
-    item = 'I'   
-    df_I.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')    
-
-    # Building and saving the file for authors and their institutions (.dat) 
-    item = 'I2'
-    df_I2 = _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list)
-    df_I2.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item] ), 
-                 index=False,
-                 sep='\t')
-
-    # Building and saving the file for subjects (.dat)
-    item = 'S'
-    df_S = _build_subjects_scopus(df_corpus,
-                                  path_scopus_cat_codes,
-                                  path_scopus_journals_issn_cat,
-                                  dic_failed=dic_failed)
-    df_S.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')
-
-    # Building and saving the file for sub-subjects (.dat)
-    item = 'S2'  
-    df_S2 = _build_sub_subjects_scopus(df_corpus,
-                                       path_scopus_cat_codes,
-                                       path_scopus_journals_issn_cat,
-                                       dic_failed=dic_failed)
-    df_S2.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                 index=False, 
-                 sep='\t')
-
-    # Building and saving the file for articles (.dat)
-    item = 'A'  
-    df_A = _build_articles_scopus(df_corpus)
-    df_A.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False,
-                sep='\t')
-
-    # Building and saving the file for references (.dat)
-    item = 'R'  
-    df_R = _build_references_scopus(df_corpus)
-    df_R.to_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING[item]),
-                index=False, 
-                sep='\t')
+    # Building the dataframe and saving the file for articles (.dat)
+    articles_df = _build_articles_scopus(df_corpus)
+    _keeping_item_parsing_results(articles_item_alias, articles_df)
     
-    # Saving the dic_failed dict for the parsing control (.json)
-    with open(Path(out_dir_parsing) / Path('failed.json'), 'w') as write_json:
-        json.dump(dic_failed, write_json,indent=4)
+    # Building the dataframe and saving the file for authors (.dat)
+    authors_df = _build_authors_scopus(df_corpus)
+    _keeping_item_parsing_results(authors_item_alias, authors_df)
+
+    # Building the dataframe and saving the files for keywords
+    AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_scopus(df_corpus, scopus_dic_failed)   
+      # Keeping author keywords df and saving file (.dat)
+    _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
+      # Keeping journal (indexed) keywords df and saving file (.dat)
+    _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
+      # Keeping title keywords df and saving file (.dat)
+    _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
+    
+    # Building the dataframe and saving the files for addresses, countries and institutions
+    addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_scopus(df_corpus,
+                                                                                                 scopus_dic_failed)
+      # Keeping addresses df and saving file (.dat)
+    _keeping_item_parsing_results(addresses_item_alias, addresses_df)
+      # Keeping countries df and saving file (.dat) 
+    _keeping_item_parsing_results(countries_item_alias, countries_df)
+      # Keeping institutions df and saving file (.dat)
+    _keeping_item_parsing_results(institutions_item_alias, institutions_df)
+    
+    # Building the dataframe and saving the file for authors and their institutions (.dat)
+    authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, inst_filter_list)
+    _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
+    
+    # Building the dataframe and saving the file for subjects (.dat)
+    subjects_df = _build_subjects_scopus(df_corpus,
+                                         path_scopus_cat_codes,
+                                         path_scopus_journals_issn_cat,
+                                         scopus_dic_failed)
+    _keeping_item_parsing_results(subjects_item_alias, subjects_df)
+
+    # Building the dataframe and saving the file for sub-subjects (.dat)
+    sub_subjects_df = _build_sub_subjects_scopus(df_corpus,
+                                                 path_scopus_cat_codes,
+                                                 path_scopus_journals_issn_cat,
+                                                 scopus_dic_failed)
+    _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
+    
+    # Building the dataframe and saving the file for references (.dat) 
+    references_df = _build_references_scopus(df_corpus)
+    _keeping_item_parsing_results(references_item_alias, references_df)  
+    
+    return scopus_parsing_dict, scopus_dic_failed
         
         

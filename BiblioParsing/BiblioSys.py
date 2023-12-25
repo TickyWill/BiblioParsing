@@ -9,7 +9,7 @@ __all__ = ['add_site_packages_path',
 # Globals used from BiblioParsing.BiblioGeneralGlobals: IN_TO_MM
 
 
-def add_site_packages_path(venv = False ):
+def add_site_packages_path(venv = False):
     ''' The function `add_site_packages_path` adds `site_packages` path to `sys.path`
     for MacOs when not working with virtual environment.
     
@@ -25,16 +25,17 @@ def add_site_packages_path(venv = False ):
     import sys
     
     ## Get the information of current operating system
-    if venv==False:
+    mac_packages = None
+    if venv == False:
         # Add path of 'site-packages' where useful packages are stored on MacOS;
         # no impact for Windows
         packages_dir = 'site-packages'
         search_path = '/Library/Frameworks/Python.framework/Versions/current/lib'
         for root, dirs, files in os.walk(search_path):
-            list_packages = [os.path.abspath(os.path.join(root, name)) for name in dirs if name == packages_dir ]
+            list_packages = [os.path.abspath(os.path.join(root, name)) for name in dirs if name == packages_dir]
             if list_packages != []: mac_packages = list_packages[0]   
-        sys.path.append(mac_packages)
-        print('Added paths:         ',mac_packages)
+        sys.path.append(mac_packages)        
+    return mac_packages
         
 
 def _get_displays(in_to_mm=None): 
@@ -68,14 +69,14 @@ def _get_displays(in_to_mm=None):
                  'is_primary':m.is_primary} for m in get_monitors()]
     
     for disp in range(len(displays)):
-        width_px = displays[disp]['width']
+        width_px  = displays[disp]['width']
         height_px = displays[disp]['height']
-        diag_px = math.sqrt(int(width_px)**2 + int(height_px)**2)    
-        width_mm = displays[disp]['width_mm']
+        diag_px   = math.sqrt(int(width_px)**2 + int(height_px)**2)    
+        width_mm  = displays[disp]['width_mm']
         height_mm = displays[disp]['height_mm']
-        if width_mm is None or height_mm is None: 
+        if width_mm is None or height_mm is None:
             diag_in = float(input('Enter the diagonal size of the screen n°' + str(disp) + ' (inches)'))
-            width_mm = round(int(width_px) * (diag_in/diag_px) * in_to_mm,1)
+            width_mm  = round(int(width_px) * (diag_in/diag_px) * in_to_mm,1)
             height_mm = round(int(height_px) * (diag_in/diag_px) * in_to_mm,1)
             displays[disp]['width_mm'] = str(width_mm)
             displays[disp]['height_mm'] = str(height_mm)
@@ -86,6 +87,7 @@ def _get_displays(in_to_mm=None):
     return displays
 
 ######################## Definition of display globals ###########################
+
 DISPLAYS = _get_displays()
 # Select the prime display
 displays_nb = len(DISPLAYS) 

@@ -7,10 +7,12 @@ __all__ = ['address_inst_full_list',          #
            'extend_author_institutions',      #
            'getting_secondary_inst_list',     #
            'read_inst_types',
-           'saving_raw_institutions',         #
+           'build_raw_institutions',         #
            ]
 
-# To do: def the internal functions and the deprecated ones
+# To do: 
+#   - def the internal functions and the deprecated ones
+#   - Replace use of .dat files by dfs
 
 
 # Globals used from BiblioParsing.BiblioGeneralGlobals:  DASHES_CHANGE, SYMB_CHANGE,
@@ -61,10 +63,12 @@ def address_inst_full_list(full_address, inst_dic):
     import pandas as pd
     from fuzzywuzzy import process
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import country_normalization
+    
+    # Globals imports
+    from BiblioParsing.BiblioRegexpGlobals import RE_ZIP_CODE
     from BiblioParsing.BiblioSpecificGlobals import INST_BASE_LIST
-    from BiblioParsing.BiblioSpecificGlobals import RE_ZIP_CODE
     from BiblioParsing.BiblioSpecificGlobals import EMPTY
 
     inst_full_list_ntup = namedtuple('inst_full_list_ntup',['norm_inst_list','raw_inst_list'])
@@ -162,13 +166,16 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     # Standard library imports
     import re
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import special_symbol_remove
+    
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB
+    from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST    
     from BiblioParsing.BiblioSpecificGlobals import DIC_AMB_WORDS
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB
-    from BiblioParsing.BiblioSpecificGlobals import RE_SUB_FIRST
+
     
     def _normalize_amb_words(text): 
         for amb_word in DIC_AMB_WORDS.keys():
@@ -213,7 +220,7 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals  import DIC_INST_FILENAME
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS    
     
@@ -337,8 +344,8 @@ def _check_institute(address,raw_inst_split):
         return False
 
 
-def extend_author_institutions(in_dir,inst_filter_list):
-    ''' The `extend_author_institutions` function extends the .dat file of authors with institutions 
+def extend_author_institutions(item, item_df, inst_filter_list):
+    ''' The `extend_author_institutions` function extends the df of authors with institutions 
     initialy obtained by the parsing of the corpus, with complementary information about institutions
     selected by the user.
     
@@ -350,20 +357,16 @@ def extend_author_institutions(in_dir,inst_filter_list):
         None
         
     Notes:
-        The globals 'COL_NAMES' and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
-        of `BiblioParsing` package are used.
+        The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module 
+        of `BiblioParsing` package.
     
     '''
-    
-    # Standard library imports
-    from pathlib import Path
     
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
     
     def _address_inst_list(inst_names_list,institutions):
 
@@ -375,43 +378,36 @@ def extend_author_institutions(in_dir,inst_filter_list):
                 secondary_institutions.append(0)  
              
         return secondary_institutions
-    
-    institutions_alias = COL_NAMES['auth_inst'][4]
+
+    # Setting aliases
+    institutions_alias     = COL_NAMES['auth_inst'][4]
     sec_institutions_alias = COL_NAMES['auth_inst'][5]
     
-    # Setting the key for the name of the '.dat' file of authors with institutions 
-    # obtained by parsing the corpus
-    item = 'I2' 
-    
-    # Reading the '.dat' file                   
-    read_usecols = [COL_NAMES['auth_inst'][x] for x in [0,1,2,3,4]]     
-    df_I2= pd.read_csv(in_dir / Path(DIC_OUTDIR_PARSING[item]),
-                     sep='\t',
-                     usecols=read_usecols)
+    # Getting the useful columns of the item df                   
+    read_usecols = [COL_NAMES['auth_inst'][x] for x in [0,1,2,3,4]] 
+    item_df      = item_df[read_usecols]
     
     # Setting an institution name for each of the institutions indicated in the institutions filter
     inst_names_list = [f'{x[0]}_{x[1]}' for x in inst_filter_list]   
     
     # Building the "sec_institution_alias" column in the 'df_I2' dataframe using "inst_filter_list"
-    df_I2[sec_institutions_alias] = df_I2.apply(lambda row:
-                                             _address_inst_list(inst_names_list,row[institutions_alias]),
-                                             axis = 1)
+    item_df[sec_institutions_alias] = item_df.apply(lambda row:
+                                                    _address_inst_list(inst_names_list,row[institutions_alias]),
+                                                    axis = 1)
+    item_df.reset_index(inplace=True, drop=True)
 
-    # Distributing in a 'df_inst_split' df the value lists of 'df_I2[sec_institutions_alias]' column  
+    # Distributing in a 'inst_split_df' df the value lists of 'df_I2[sec_institutions_alias]' column  
     # into columns which names are in 'inst_names_list' list     
-    df_inst_split = pd.DataFrame(df_I2[sec_institutions_alias].sort_index().to_list(),
-                                          columns=inst_names_list)
+    inst_split_df = pd.DataFrame(item_df[sec_institutions_alias].sort_index().to_list(),
+                                 columns = inst_names_list)
     
-    # Extending the 'df' dataframe with 'df_inst_split' dataframe
-    df_I2 = pd.concat([df_I2, df_inst_split], axis=1)
+    # Extending the 'df' dataframe with 'inst_split_df' dataframe
+    item_df = pd.concat([item_df, inst_split_df], axis = 1)
 
-    # Droping the 'df[sec_institutions_alias]' column which is no more usefull
-    df_I2.drop([sec_institutions_alias], axis=1, inplace=True)
+    # Droping the 'df[sec_institutions_alias]' column which is no more useful
+    item_df.drop([sec_institutions_alias], axis = 1, inplace = True)
     
-    # Saving the extended 'df_I2' dataframe in the same '.dat' file 
-    df_I2.to_csv(in_dir/ Path(DIC_OUTDIR_PARSING[item]), 
-                 index=False,
-                 sep='\t') 
+    return item_df
 
 
 def getting_secondary_inst_list(out_dir_parsing):
@@ -436,7 +432,7 @@ def getting_secondary_inst_list(out_dir_parsing):
     import numpy as np
     import pandas as pd
    
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
    
@@ -459,20 +455,19 @@ def getting_secondary_inst_list(out_dir_parsing):
     return country_institution_list
 
 
-def saving_raw_institutions(df_I2,out_dir):
-    '''The `saving_raw_institutions`function allows to save the list of raw institutions of a corpus.
+def build_raw_institutions(auth_inst_df):
+    '''The `build_raw_institutions`function allows to built the list of raw institutions of a corpus.
     The raw institutions are the ones that have not been complitly replaced by the normalized names 
     of institutions given in a specific file.
     
     Args:
-        df_I2 (dataframe): a dataframe resulting from the corpus parsing containing the raw-institutions column.
-        out_dir (str): a string for setting the the folder where the file of raw institutions is saved
-                       as a csv file which name is given by the global `RAW_INST_FILENAME`.
+        auth_inst_df (dataframe): A dataframe resulting from the corpus parsing containing the raw-institutions column.
     
     Returns:
+        (dataframe): 'df_raw_inst'
     
     Note:
-        The globals `COL_NAMES`and `RAW_INST_FILENAME` are imported from `BiblioSpecificGlobals` module 
+        The global `COL_NAMES`is imported from `BiblioSpecificGlobals` module 
         of `BiblioParsing` package.
     
     '''
@@ -482,12 +477,11 @@ def saving_raw_institutions(df_I2,out_dir):
     # 3rd party imports
     import pandas as pd
 
-    # Local imports
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import RAW_INST_FILENAME
     
     raw_institutions_alias = COL_NAMES['auth_inst'][5]
-    raw_institutions_authors_lists = df_I2[raw_institutions_alias].to_list()
+    raw_institutions_authors_lists = auth_inst_df[raw_institutions_alias].to_list()
 
     raw_institutions_full_lists = [x.split(';') for x in raw_institutions_authors_lists]
 
@@ -497,10 +491,8 @@ def saving_raw_institutions(df_I2,out_dir):
     raw_institutions_full_list = list(set(raw_institutions_full_list))
     raw_institutions_full_list.sort()
 
-    df_raw_inst = pd.DataFrame(raw_institutions_full_list, columns = [raw_institutions_alias])
-    df_raw_inst.to_csv(Path(out_dir) / Path(RAW_INST_FILENAME),
-                       index=False,
-                       sep='\t')
+    raw_inst_df = pd.DataFrame(raw_institutions_full_list, columns = [raw_institutions_alias])
+    return raw_inst_df
 
 
 ################################### New functions for address parsing and affiliations normalization ###################################
@@ -541,8 +533,10 @@ def standardize_address(raw_address):
     # Standard library imports
     import re
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import country_normalization
+    
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
     from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
@@ -623,12 +617,12 @@ def search_items(affiliation, country, verbose = False):
     import re
     from string import Template
     
-    # Local imports 
+    # Local library imports 
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     from BiblioParsing.BiblioParsingUtils import rationalize_town_names
     
-    from BiblioParsing.BiblioGeneralGlobals import ZIP_CODES
-        
+    # Globals imports
+    from BiblioParsing.BiblioGeneralGlobals import ZIP_CODES        
     from BiblioParsing.BiblioSpecificGlobals import BASIC_KEEPING_WORDS
     from BiblioParsing.BiblioSpecificGlobals import COUNTRY_TOWNS
     from BiblioParsing.BiblioSpecificGlobals import DROPING_SUFFIX
@@ -994,7 +988,7 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
     import re
     from string import Template
     
-    # Local imports
+    # Local library imports
     #from BiblioParsing.BiblioParsingInstitutions import search_items  (check used outside ?)
     
     # Splitting by coma the standard address in chuncks listed in an initial-affiliations list
@@ -1195,15 +1189,15 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     import openpyxl
     import pandas as pd
 
-    # Local imports 
+    # Local library imports 
     import BiblioParsing as bau
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
-    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
-    
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP   
     from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
     from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN    
     from BiblioParsing.BiblioSpecificGlobals import MISSING_SPACE_ACRONYMS
@@ -1409,6 +1403,8 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
 
     # Local imports
     import BiblioParsing as bau
+    
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_FILE 
     from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_USECOLS 
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
@@ -1441,12 +1437,13 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, af
     import re
     from string import Template
 
-    # 3rd party imports
-
-    # Local imports
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+    
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
-    from BiblioParsing.BiblioParsingUtils import remove_special_symbol    
+        
             
     set_words_template = Template(r'[\s]$word[\s)]'     # For instence capturing "word" in "word of set" 
                                                         # or " word" in "set with word".
@@ -1578,7 +1575,8 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
         The functions 'standardize_address' and 'get_affiliations_list' are imported from    .
         The function 'get_norm_affiliations_list' is imported from    .
     '''
-
+    
+    # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
     
     std_address = standardize_address(raw_address)
@@ -1636,9 +1634,10 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
     # 3rd party imports
     import pandas as pd
 
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingInstitutions import build_address_affiliations_lists
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
 
