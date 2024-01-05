@@ -277,18 +277,19 @@ def name_normalizer(text):
     return text
 
 
-def normalize_journal_names(database,df_corpus):
-    '''The function `normalize_journal_names` normalizes the journal names in a new journals specific column
-    of the corpus dataframe through the replace of low words defined in the global 'DIC_LOW_WORDS'
-    and the drop of particular items using the regular expressions defined by 'RE_ADDS_JOURNAL' and 'RE_YEAR_JOURNAL'
+def normalize_journal_names(database,corpus_df):
+    '''Tadds the column `normalize_journal_names` to the corpus `corpus_df`. The journal normalized names are expurgated from unecessary
+	pieces of information such as : small words defined in a global dict (`DIC_LOW_WORDS`), year, conference edition... These normalized
+	and simplified journal names are mainly uses when concatenating two corpus (wos, scpus, ...) using slightly different name for the same
+	journal.
     globals.
    
     Args:
         database (string): type of database among the ones defined by SCOPUS and WOS globals.
-        df_corpus (dataframe): corpus dataframe to be normalized in terms of journal names.
+        corpus_df (dataframe): corpus dataframe to be normalized in terms of journal names.
        
     Returns:
-        (dataframe): the dataframe with normalized journal names.
+        (dataframe): the dataframe with an additional columns containing the normalized journal names.
        
     Note:
         The globals 'COLUMN_LABEL_WOS', 'COLUMN_LABEL_SCOPUS','DIC_LOW_WORDS', 'RE_YEAR_JOURNAL', 'SCOPUS' and 'WOS' are used.
@@ -306,24 +307,18 @@ def normalize_journal_names(database,df_corpus):
     from BiblioParsing.BiblioSpecificGlobals import WOS
    
    
-    def _normalize_low_words(text):
-        for low_word in DIC_LOW_WORDS.keys():
-            text = text.replace(low_word, DIC_LOW_WORDS[low_word]).strip()
-        text = " ".join(text.split())
-        return text
- 
+    import re
     def _journal_normalizer(journal):
-        journal = ' ' + journal + ' '
+        journal = ' ' + journal + ' ' # a lazzy trick to simplefy the regexp
         journal = journal.lower()
-        journal_list = [" " + x + " " for x in journal.split()]
-        new_journal = " ".join(journal_list)
-        if RE_YEAR_JOURNAL.findall(journal) or RE_NUM_CONF.findall(journal):
-            to_remove = [x for x in journal_list if (RE_YEAR_JOURNAL.findall(x) or RE_NUM_CONF.findall(x))]
-            for x in to_remove: new_journal = new_journal.replace(x,'')
-        new_journal = " ".join(new_journal.split())
-        new_journal = _normalize_low_words(new_journal)
-        return new_journal
-   
+        journal = re.sub(RE_YEAR_JOURNAL, ' ', journal)
+        journal = re.sub(RE_NUM_CONF, ' ', journal)
+        for old_str, new_str in DIC_LOW_WORDS.items():
+            journal = journal.replace(old_str, new_str)
+        journal = re.sub('\s+',' ',journal)
+        journal = journal.strip()
+        return journal
+
     if database == WOS:
         journal_alias = COLUMN_LABEL_WOS['journal']
     elif database == SCOPUS:
@@ -332,9 +327,9 @@ def normalize_journal_names(database,df_corpus):
         raise Exception(f"Sorry, unrecognized database {database}: should be {WOS} or {SCOPUS} ")
     
     norm_journal_alias = NORM_JOURNAL_COLUMN_LABEL
-    df_corpus[norm_journal_alias] = df_corpus[journal_alias].apply(_journal_normalizer)
-   
-    return df_corpus
+    corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
+    
+    return corpus_df
 
 
 def biblio_parser(in_dir, database, rep_utils = None, inst_filter_list = None):
@@ -374,6 +369,7 @@ def check_and_drop_columns(database,df,filename):
     import numpy as np
     
     # Local imports
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS 
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS_PLUS    
@@ -383,7 +379,8 @@ def check_and_drop_columns(database,df,filename):
     
     # Setting useful aliases
     wos_col_issn_alias  = COLUMN_LABEL_WOS["issn"]
-    wos_col_eissn_alias = COLUMN_LABEL_WOS_PLUS["e_issn"] 
+    wos_col_eissn_alias = COLUMN_LABEL_WOS_PLUS["e_issn"]
+    pub_id_col_alias    = COL_NAMES["pub_id"] 
 
     # Check for missing mandatory columns
     if database == WOS:
@@ -396,7 +393,9 @@ def check_and_drop_columns(database,df,filename):
     cols_available = set(df.columns)
     missing_columns = cols_mandatory.difference(cols_available)
     if missing_columns:
-        raise Exception(f'The mandarory columns: {",".join(missing_columns)} are missing from {filename}\nplease correct before proceeding')
+        error_text  = f'The mandarory columns: {",".join(missing_columns)} are missing '
+        error_text += f'from {filename}\nplease correct before proceeding'
+        raise Exception(error_text)
     
     # Setting issn to e_issn if issn not available for wos
     if database == WOS:
@@ -410,8 +409,9 @@ def check_and_drop_columns(database,df,filename):
     cols_to_drop = list(cols_available.difference(cols_mandatory))
     df.drop(cols_to_drop,
             axis=1,
-            inplace=True)                    # Drops unused columns
+            inplace=True)                    # Drops unused columns    
     df.index = range(len(df))                # Sets the pub_id in df index
+    df = df.rename_axis(pub_id_col_alias).reset_index() # Sets the pub-id as a column
     return df
 
                     

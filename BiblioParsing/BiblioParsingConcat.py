@@ -87,16 +87,16 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     # Internal functions
     def _setting_same_journal_name(df_articles_concat_init):
         journals_list = df_articles_concat_init[journal_alias].to_list()
-        df_journal = pd.DataFrame(journals_list, columns = [norm_journal_alias])
-        for j1 in df_journal[norm_journal_alias]:     
-            for j2 in df_journal[norm_journal_alias]:
+        df_journal = pd.DataFrame(journals_list, columns = [same_journal_alias])
+        for j1 in df_journal[same_journal_alias]:     
+            for j2 in df_journal[same_journal_alias]:
                 if j2 != j1 and (len(j1) > LENGTH_THRESHOLD and len(j2) > LENGTH_THRESHOLD):
                     j1_set, j2_set = set(j1.split()), set(j2.split())
                     common_words =  j2_set.intersection(j1_set)
                     j1_specific_words, j2_specific_words = (j1_set - common_words), (j2_set - common_words)
                     similarity = round(similar(j1,j2)*100)    
                     if (similarity > SIMILARITY_THRESHOLD) or (j1_specific_words == set() or j2_specific_words == set()):
-                        df_journal.loc[df_journal[norm_journal_alias] == j2] = j1
+                        df_journal.loc[df_journal[same_journal_alias] == j2] = j1
         df_articles_concat_init.reset_index(inplace=True, drop=True)
         df_articles_concat_inter1 = pd.concat([df_articles_concat_init, df_journal], axis = 1)
         return df_articles_concat_inter1
@@ -121,7 +121,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     
     def _setting_issn(df_articles_concat_inter2):
         df_list = []
-        for _, journal_dg in df_articles_concat_inter2.groupby(norm_journal_alias):
+        for _, journal_dg in df_articles_concat_inter2.groupby(same_journal_alias):
             if UNKNOWN in journal_dg[issn_alias].to_list(): # Modification on 08-2023
                 journal_dg[issn_alias] = _find_value_to_keep(journal_dg, issn_alias)             
             df_list.append(journal_dg)
@@ -207,7 +207,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     
     def _dropping_duplicate_article2(df_articles_concat):
         df_list = []   
-        for idx, dg in df_articles_concat.groupby([lc_title_alias,lc_doc_type_alias,norm_journal_alias]): 
+        for idx, dg in df_articles_concat.groupby([lc_title_alias,lc_doc_type_alias,same_journal_alias]): 
             if len(dg) < 3:
                 # Deduplicating article lines with same title, document type, first author and journal
                 # and also with same DOI if not UNKNOWN
@@ -281,7 +281,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     
     # Setting the name of a temporal column of journals normalized 
     # to be added to working dataframes for dropping of duplicates
-    norm_journal_alias = COL_NAMES['temp_col'][1]
+    same_journal_alias = COL_NAMES['temp_col'][1]
     
     # Setting initial articles df
     df_articles_concat_init = concat_parsing_dict[articles_item_alias]
@@ -321,7 +321,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     # Modification on 09-2023
     df_articles_concat_author = _setting_same_first_author_name(df_articles_concat_title)
     
-    # Keeping copy of df_articles_concat with completed norm_journal_alias, issn_alias, doi_alias and doc_type_alias columns
+    # Keeping copy of df_articles_concat with completed same_journal_alias, issn_alias, doi_alias and doc_type_alias columns
     df_articles_concat_full = df_articles_concat_author.copy()
         
     # Dropping duplicated article lines after merging by doi or, for unknown doi, by title and document type 
@@ -510,11 +510,9 @@ def parsing_concatenate_deduplicate(first_parsing_dict, second_parsing_dict, ins
     # Concatenating the two parsings
     concat_parsing_dict = _concatenate_parsing(first_parsing_dict, second_parsing_dict,  
                                                inst_filter_list = inst_filter_list)
-    print(f'\nParsings successfully concatenated')
 
     # Deduplicating the concatenation of the two parsings
     dedup_parsing_dict = _deduplicate_parsing(concat_parsing_dict)
-    print(f'\nParsings successfully deduplicated')
     
     return (concat_parsing_dict, dedup_parsing_dict)
 

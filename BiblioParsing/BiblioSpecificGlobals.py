@@ -39,6 +39,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'PARSING_FILES',
            'PARSING_FOLDER_NAME',
            'PARSING_ITEMS',
+           'PARTIAL',
            'RAW_INST_FILENAME',
            'REP_UTILS',
            'SCOPUS',
@@ -130,7 +131,7 @@ COL_NAMES = {'pub_id'      : pub_id,
              'sub_subject' : [pub_id,
                               'Sub_subject',],
              'temp_col'    : ['Title_LC', 
-                              'Journal_norm',
+                              'Dedup_Same_Journal',
                               'Title',
                               'title_tokens',
                               'kept_tokens',
@@ -314,6 +315,7 @@ DIC_LOW_WORDS = {'proceedings of'        : '',
                  '('                     : ' ',                  # parenthese to space
                  ')'                     : ' ',                  # parenthese to space
                  '/'                     : ' ',                  # slash to space
+                 ';'                     : ' ',
                 }
 
 
@@ -328,8 +330,9 @@ NLTK_VALID_TAG_LIST = ['NN','NNS','VBG','JJ'] # you can find help on the nltk ta
 NOUN_MINIMUM_OCCURRENCES = 3 # Minimum occurrences of a noun to be retained when 
                              # building the set of title keywords see build_title_keywords function
 
-SYMBOL = '\s,;:.\-\/'
-EMPTY = 'empty'
+SYMBOL  = '\s,;:.\-\/'
+PARTIAL = 'partial'    # For unparsed partial references
+EMPTY   = 'empty'
 UNKNOWN = 'unknown'
 
 

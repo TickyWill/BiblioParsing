@@ -38,18 +38,22 @@ def _build_authors_wos(df_corpus):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import name_normalizer
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     
+    # Setting named tuple
     co_author = namedtuple('co_author',COL_NAMES['authors'] )
     
+    # Setting useful aliases
+    pub_id_alias  = COL_NAMES['pub_id']
     authors_alias = COL_NAMES['authors'][2]
     
     list_author = []
-    for pub_id,x in zip(df_corpus.index,
+    for pub_id,x in zip(df_corpus[pub_id_alias],
                         df_corpus[COLUMN_LABEL_WOS['authors']]):
         idx_author = 0
         for y in x.split(';'):
@@ -100,23 +104,26 @@ def _build_keywords_wos(df_corpus,dic_failed):
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
+    # Local library imports
     from BiblioParsing.BiblioParsingUtils import build_title_keywords 
     
+    # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
-
+    
+    # Setting named tuple
     key_word = namedtuple('key_word',COL_NAMES['keywords'] )
     
-    pub_id_alias = COL_NAMES['keywords'][0]
-    keyword_alias = COL_NAMES['keywords'][1]
-    title_alias = COL_NAMES['temp_col'][2]
+    # Setting useful aliases
+    pub_id_alias      = COL_NAMES['pub_id']
+    keyword_alias     = COL_NAMES['keywords'][1]
+    title_alias       = COL_NAMES['temp_col'][2]
     kept_tokens_alias = COL_NAMES['temp_col'][4]    
     
     list_keyword_AK = [] 
     df_AK = df_corpus[COLUMN_LABEL_WOS['author_keywords']].fillna('')
-    for pub_id,keywords_AK in zip(df_AK.index,df_AK):
+    for pub_id,keywords_AK in zip(df_corpus[pub_id_alias],df_AK):
         list_keywords_AK = keywords_AK.split(';')      
         for keyword_AK in list_keywords_AK:
             keyword_AK = keyword_AK.lower().strip()
@@ -125,7 +132,7 @@ def _build_keywords_wos(df_corpus,dic_failed):
 
     list_keyword_IK = []
     df_IK = df_corpus[COLUMN_LABEL_WOS['index_keywords']].fillna('')
-    for pub_id,keywords_IK in zip(df_IK.index,df_IK):
+    for pub_id,keywords_IK in zip(df_corpus[pub_id_alias],df_IK):
         list_keywords_IK = keywords_IK.split(';')
         for keyword_IK in list_keywords_IK:
             keyword_IK = keyword_IK.lower().strip()
@@ -137,7 +144,7 @@ def _build_keywords_wos(df_corpus,dic_failed):
     df_title = pd.DataFrame(df_corpus[COLUMN_LABEL_WOS['title']].fillna('')) # Tranform a data list into dataframe
     df_title.columns = [title_alias]  # To be coherent with the convention of function build_title_keywords 
     df_TK,list_of_words_occurrences = build_title_keywords(df_title)
-    for pub_id in df_TK.index:
+    for pub_id in df_corpus[pub_id_alias]:
         for token in df_TK.loc[pub_id,kept_tokens_alias]:
             token = token.lower().strip()
             list_keyword_TK.append(key_word(pub_id,
@@ -169,7 +176,7 @@ def _build_keywords_wos(df_corpus,dic_failed):
     df_keyword_IK = df_keyword_IK[df_keyword_IK[keyword_alias] != '']
     df_keyword_TK = df_keyword_TK[df_keyword_TK[keyword_alias] != '']    
     
-    return df_keyword_AK,df_keyword_IK, df_keyword_TK
+    return df_keyword_AK, df_keyword_IK, df_keyword_TK
 
 
 def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
@@ -246,21 +253,23 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
-
-    address = namedtuple('address',COL_NAMES['address'] )
-    country = namedtuple('country',COL_NAMES['country'] )
+    
+    # Setting named tuples 
+    address     = namedtuple('address',COL_NAMES['address'] )
+    country     = namedtuple('country',COL_NAMES['country'] )
     institution = namedtuple('institution', COL_NAMES['institution'] )
       
-    pub_id_alias = COL_NAMES['address'][0]
-    address_alias = COL_NAMES['address'][2]
-    country_alias = COL_NAMES['country'][2]
+    # Setting useful aliases
+    pub_id_alias      = COL_NAMES['pub_id']
+    address_alias     = COL_NAMES['address'][2]
+    country_alias     = COL_NAMES['country'][2]
     institution_alias = COL_NAMES['institution'][2]
 
     list_addresses = []
     list_countries = []
     list_institutions = []
 
-    for pub_id, affiliation in zip(df_corpus.index,
+    for pub_id, affiliation in zip(df_corpus[pub_id_alias],
                                    df_corpus[COLUMN_LABEL_WOS['authors_with_affiliations']]):
         
         try:
@@ -464,19 +473,20 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
             else:
                 secondary_institutions.append(0)               
         return secondary_institutions
-        
-    pub_id_alias = COL_NAMES['auth_inst'][0]
-    pub_idx_author_alias = COL_NAMES['auth_inst'][1]
-    address_alias = COL_NAMES['auth_inst'][2]
+
+    # Setting useful aliases
+    pub_id_alias           = COL_NAMES['pub_id']
+    pub_idx_author_alias   = COL_NAMES['auth_inst'][1]
+    address_alias          = COL_NAMES['auth_inst'][2]
     norm_institution_alias = COL_NAMES['auth_inst'][4]
-    raw_institution_alias = COL_NAMES['auth_inst'][5]
-    sec_institution_alias = COL_NAMES['auth_inst'][6]
+    raw_institution_alias  = COL_NAMES['auth_inst'][5]
+    sec_institution_alias  = COL_NAMES['auth_inst'][6]
     
     # Building the inst_dic dict
     inst_dic = build_institutions_dic(rep_utils = None, dic_inst_filename = None)    
     
     list_addr_country_inst = []
-    for pub_id, affiliation in zip(df_corpus.index,
+    for pub_id, affiliation in zip(df_corpus[pub_id_alias],
                                    df_corpus[COLUMN_LABEL_WOS['authors_with_affiliations']]):
         if '['  in affiliation:  # Proceed if the field author is present in affiliation.
            
@@ -591,14 +601,16 @@ def _build_subjects_wos(df_corpus,dic_failed):
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-  
+    
+    # Setting named tuple
     subject = namedtuple('subject',COL_NAMES['subject'] )
     
-    pub_id_alias = COL_NAMES['subject'][0]
+    # Setting useful aliases
+    pub_id_alias  = COL_NAMES['pub_id']
     subject_alias = COL_NAMES['subject'][1]
     
     list_subject = []
-    for pub_id,scs in zip(df_corpus.index,df_corpus[COLUMN_LABEL_WOS['sub_subjects']]):
+    for pub_id,scs in zip(df_corpus[pub_id_alias],df_corpus[COLUMN_LABEL_WOS['sub_subjects']]):
         for sc in scs.split(';'):
             list_subject.append(subject(pub_id,
                                         sc.strip()))
@@ -645,13 +657,15 @@ def _build_sub_subjects_wos(df_corpus,dic_failed):
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
 
+    # Setting named tuple
     keyword = namedtuple('keyword',COL_NAMES['sub_subject'])
     
-    pub_id_alias = COL_NAMES['sub_subject'][0]
+    # Setting useful aliases
+    pub_id_alias  = COL_NAMES['pub_id']
     sub_subject_alias = COL_NAMES['sub_subject'][1]
 
     list_sub_subject = []
-    for pub_id, sub_subjects in zip(df_corpus.index,df_corpus[COLUMN_LABEL_WOS['subjects']]):
+    for pub_id, sub_subjects in zip(df_corpus[pub_id_alias],df_corpus[COLUMN_LABEL_WOS['subjects']]):
         if isinstance(sub_subjects,str):
             for sub_subject in sub_subjects.split(';'):
                 list_sub_subject.append(keyword(pub_id,
@@ -667,7 +681,7 @@ def _build_sub_subjects_wos(df_corpus,dic_failed):
     
     df_sub_subject = df_sub_subject[df_sub_subject[sub_subject_alias] != '']
     
-    return  df_sub_subject
+    return df_sub_subject
 
 
 def _build_articles_wos(df_corpus):
@@ -695,7 +709,7 @@ def _build_articles_wos(df_corpus):
     from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE    
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL         #####################################
+    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL 
     from BiblioParsing.BiblioSpecificGlobals import DIC_DOCTYPE
 
     def _str_int_convertor(x):
@@ -719,11 +733,12 @@ def _build_articles_wos(df_corpus):
         title = title.translate(PONCT_CHANGE)
         return title
     
-    pub_id_alias = COL_NAMES['articles'][0]
-    author_alias = COL_NAMES['articles'][1]
-    year_alias = COL_NAMES['articles'][2]
+    # Setting useful aliases
+    pub_id_alias   = COL_NAMES['pub_id']
+    author_alias   = COL_NAMES['articles'][1]
+    year_alias     = COL_NAMES['articles'][2]
     doc_type_alias = COL_NAMES['articles'][7] 
-    title_alias = COL_NAMES['articles'][9] 
+    title_alias    = COL_NAMES['articles'][9] 
 
     wos_columns = [COLUMN_LABEL_WOS['authors'],
                    COLUMN_LABEL_WOS['year'],
@@ -735,7 +750,7 @@ def _build_articles_wos(df_corpus):
                    COLUMN_LABEL_WOS['language'],
                    COLUMN_LABEL_WOS['title'],
                    COLUMN_LABEL_WOS['issn'],
-                   NORM_JOURNAL_COLUMN_LABEL]         #####################################
+                   NORM_JOURNAL_COLUMN_LABEL]
                    
     df_article = df_corpus.loc[:,wos_columns].astype(str)
 
@@ -747,7 +762,7 @@ def _build_articles_wos(df_corpus):
     df_article[doc_type_alias] = df_article[doc_type_alias].apply(_treat_doctype)
     df_article[title_alias] = df_article[title_alias].apply(_treat_title)
     
-    df_article.insert(0, pub_id_alias, list(df_corpus.index))
+    df_article.insert(0, pub_id_alias, list(df_corpus[pub_id_alias]))
    
     return df_article
 
@@ -790,10 +805,14 @@ def _build_references_wos(df_corpus):
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
  
+    # Setting named tuple
     ref_article = namedtuple('ref_article', COL_NAMES['references'])
- 
+    
+    # Setting useful alias
+    pub_id_alias  = COL_NAMES['pub_id']
+    
     list_ref_article =[]
-    for pub_id, row in zip(list(df_corpus.index),
+    for pub_id, row in zip(list(df_corpus[pub_id_alias]),
                                 df_corpus[COLUMN_LABEL_WOS['references']]):
  
         if isinstance(row, str): # if the reference field is not empty and not an URL
@@ -942,9 +961,7 @@ def biblio_parser_wos(in_dir, inst_filter_list):
     def _keeping_item_parsing_results(item, item_df):
         wos_parsing_dict[item] = item_df
             
-    # Setting useful alias
-    pub_id_alias  = COL_NAMES['keywords'][0]
-    keyword_alias = COL_NAMES['keywords'][1]
+    # Setting useful aliases
     articles_item_alias     = PARSING_ITEMS["articles"]
     authors_item_alias      = PARSING_ITEMS["authors"]
     authors_kw_item_alias   = PARSING_ITEMS["authors_keywords"]
@@ -978,49 +995,49 @@ def biblio_parser_wos(in_dir, inst_filter_list):
     # Initializing the dict of dataframes resulting from the parsing
     wos_parsing_dict = {}
     
-    # Building the dataframe and saving the file for articles (.dat)
+    # Building the dataframe of articles
     articles_df = _build_articles_wos(df_corpus)
     _keeping_item_parsing_results(articles_item_alias, articles_df)    
     
-    # Building the dataframe and saving the file for authors (.dat)
+    # Building the dataframe of authors
     authors_df = _build_authors_wos(df_corpus)
     _keeping_item_parsing_results(authors_item_alias, authors_df)
     
-    # Building the dataframe and saving the files for keywords
+    # Building the dataframes of keywords
     AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus,wos_dic_failed)   
-      # Keeping author keywords df and saving file (.dat)
+      # Keeping author keywords df
     _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
-      # Keeping journal (indexed) keywords df and saving file (.dat)
+      # Keeping journal (indexed) keywords df
     _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
-      # Keeping title keywords df and saving file (.dat)
+      # Keeping title keywords df
     _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
     
-    # Building the dataframe and saving the files for addresses, countries and institutions
+    # Building the dataframe of addresses, countries and institutions
     addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_wos(df_corpus,
                                                                                               wos_dic_failed)
-      # Keeping addresses df and saving file (.dat)
+      # Keeping addresses df
     _keeping_item_parsing_results(addresses_item_alias, addresses_df)
-      # Keeping countries df and saving file (.dat) 
+      # Keeping countries df
     _keeping_item_parsing_results(countries_item_alias, countries_df)
-      # Keeping institutions df and saving file (.dat)
+      # Keeping institutions df
     _keeping_item_parsing_results(institutions_item_alias, institutions_df)
     
-    # Building the dataframe and saving the file for authors and their institutions (.dat)
+    # Building the dataframe of authors and their institutions
     authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, inst_filter_list)
     _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
-        # Saving raw institutions file (.csv) for further expending normalized institutions list                 ! To be checked
+        # Building raw institutions file for further expending normalized institutions list                 ! To be checked
     raw_institutions_df = build_raw_institutions(authors_institutions_df)
     _keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)
     
-    # Building the dataframe and saving the file for subjects (.dat)
+    # Building the dataframe of subjects
     subjects_df = _build_subjects_wos(df_corpus,wos_dic_failed)
     _keeping_item_parsing_results(subjects_item_alias, subjects_df)
 
-    # Building the dataframe and saving the file for sub-subjects (.dat)
+    # Building the dataframe of sub-subjects
     sub_subjects_df = _build_sub_subjects_wos(df_corpus,wos_dic_failed)
     _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
     
-    # Building the dataframe and saving the file for references (.dat) 
+    # Building the dataframe of references 
     references_df = _build_references_wos(df_corpus)
     _keeping_item_parsing_results(references_item_alias, references_df)
         
