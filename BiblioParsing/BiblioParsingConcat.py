@@ -66,7 +66,6 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     
     '''
     # Standard library imports
-    from colorama import Fore
     from pathlib import Path
     from difflib import SequenceMatcher
     
@@ -225,7 +224,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
                                       f'called by "parsing_concatenate_deduplicate" function '
                                       f'of "BiblioParsingConcat.py" module.\n'
                                       f'Article lines with DOIs "{UNKNOWN}" has been droped.')                      
-                print(Fore.BLUE + warning + Fore.WHITE)
+                print(warning)
             df_list.append(dg) 
         if df_list != []:
             df_articles_dedup = pd.concat(df_list)
@@ -345,7 +344,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
         print(f'    Initial articles number: {articles_nb_init}')
         print(f'    Final articles number: {articles_nb_end}')
         warning = (f'    WARNING: {articles_nb_drop} articles have been dropped as duplicates')
-        print(Fore.BLUE +  bold_text + warning + light_text + Fore.WHITE)
+        print(bold_text + warning + light_text)
                                 
     return (df_articles_dedup, pub_id_to_drop)
 
