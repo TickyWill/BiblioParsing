@@ -39,7 +39,7 @@ def _build_authors_scopus(df_corpus):
     # Standard library imports
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local libray imports
@@ -112,7 +112,7 @@ def _build_keywords_scopus(df_corpus,dic_failed):
     from collections import Counter
     from operator import attrgetter
     
-    # 3rd party imports
+    # 3rd party library imports
     import nltk
     import pandas as pd
     
@@ -229,7 +229,7 @@ def _build_addresses_countries_institutions_scopus(df_corpus,dic_failed):
     from colorama import Fore
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -408,7 +408,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     from collections import namedtuple
     from string import Template
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -568,7 +568,7 @@ def _build_subjects_scopus(df_corpus,
     # Standard library imports
     from pathlib import Path
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Globals imports
@@ -676,7 +676,7 @@ def _build_sub_subjects_scopus(df_corpus,
     # Standard library imports
     from pathlib import Path
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Globals imports
@@ -881,7 +881,7 @@ def _build_references_scopus(df_corpus):
     import re
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -1068,7 +1068,7 @@ def read_database_scopus(filename):
     # Standard library imports
     from pathlib import Path
     
-    # 3rd party imports
+    # 3rd party library imports
     import numpy as np
     import pandas as pd
     

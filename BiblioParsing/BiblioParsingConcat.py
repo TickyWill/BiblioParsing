@@ -41,7 +41,7 @@ def _concatenate_item_dfs(item, first_corpus_df, second_corpus_df):
     # Concatenating the two dataframes
     dfs_list  = [first_corpus_df, new_second_corpus_df]
     concat_df = pd.concat(dfs_list)
-    concat_df.sort_values([pub_id_alias], inplace = True)
+    concat_df.sort_values(by = [pub_id_alias], inplace = True)
     
     return concat_df
     
@@ -70,7 +70,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     from pathlib import Path
     from difflib import SequenceMatcher
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Globals imports
@@ -186,7 +186,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             df_articles_concat_author = pd.concat(df_list)
         else:
             df_articles_concat_author = df_articles_concat_title.copy()
-        df_articles_concat_author.sort_values(by=[pub_id_alias], inplace = True)
+        df_articles_concat_author.sort_values(by = [pub_id_alias], inplace = True)
         return df_articles_concat_author
     
     def _dropping_duplicate_article1(df_articles_concat_author):
@@ -381,8 +381,8 @@ def _deduplicate_item_df(pub_id_to_drop, item, item_df):
     auth_inst_item_alias    = PARSING_ITEMS["authors_institutions"]
 
     filt = (item_df[pub_id_alias].isin(pub_id_to_drop))
-    item_df = item_df[~filt]
-    item_df.sort_values([pub_id_alias], inplace = True)
+    item_dg = item_df[~filt].copy()
+    item_dg.sort_values(by = [pub_id_alias], inplace = True)
     
     second_col_sorting_dict = {authors_item_alias      : COL_NAMES['authors'][1],
                                addresses_item_alias    : COL_NAMES['address'][1],
@@ -392,9 +392,9 @@ def _deduplicate_item_df(pub_id_to_drop, item, item_df):
                               }
     
     if item in second_col_sorting_dict.keys():
-        item_df.sort_values([pub_id_alias,second_col_sorting_dict[item]], inplace = True)
+        item_dg.sort_values(by = [pub_id_alias,second_col_sorting_dict[item]], inplace = True)
         
-    return item_df
+    return item_dg
 
 
 def _concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_list = None):

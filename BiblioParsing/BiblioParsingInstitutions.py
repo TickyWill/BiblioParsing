@@ -59,7 +59,7 @@ def address_inst_full_list(full_address, inst_dic):
     from collections import namedtuple
     from string import Template
 
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     from fuzzywuzzy import process
     

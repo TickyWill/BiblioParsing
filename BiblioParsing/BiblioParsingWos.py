@@ -35,7 +35,7 @@ def _build_authors_wos(df_corpus):
     # Standard library imports
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -101,7 +101,7 @@ def _build_keywords_wos(df_corpus,dic_failed):
     # Standard library imports
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -238,7 +238,7 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
     from colorama import Fore
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -430,7 +430,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     from collections import namedtuple
     from string import Template
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     from fuzzywuzzy import process
     
@@ -595,7 +595,7 @@ def _build_subjects_wos(df_corpus,dic_failed):
     # Standard library imports
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Globals imports
@@ -650,7 +650,7 @@ def _build_sub_subjects_wos(df_corpus,dic_failed):
     # Standard library imports
     from collections import namedtuple
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
 
     # Globals imports
@@ -789,7 +789,7 @@ def _build_references_wos(df_corpus):
     import re
     from collections import namedtuple
  
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -888,7 +888,7 @@ def read_database_wos(filename):
     import csv
     import sys
     
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports

@@ -66,7 +66,7 @@ def build_title_keywords(df):
     import operator
     from collections import Counter
        
-    # 3rd party imports
+    # 3rd party library imports
     import nltk
     import numpy as np
     
@@ -173,10 +173,10 @@ def merge_database(database,filename,in_dir,out_dir):
     '''
     # Standard library imports
     import os
-    from pathlib import Path
     import sys
+    from pathlib import Path   
 
-    # 3rd party imports
+    # 3rd party library imports
     import pandas as pd
     
     # Local library imports
@@ -431,12 +431,8 @@ def upgrade_col_names(corpus_folder):
     # Standard library imports
     import os
     
-    # 3rd party imports
-    import colorama
+    # 3rd party library imports
     import pandas as pd
-    from colorama import Back
-    from colorama import Fore
-    from colorama import Style
     from pandas.core.groupby.groupby import DataError
     
     # Local imports
@@ -470,13 +466,13 @@ def upgrade_col_names(corpus_folder):
                     else:
                         df.columns = COL_NAMES[dict_filename_conversion[file]]
                         df.to_csv(os.path.join(dirpath,file),sep='\t',index=False)
-                        print(Fore.GREEN + f'*** The file {os.path.join(dirpath,file)} has been upgraded ***' + Style.RESET_ALL)
+                        print(f'*** The file {os.path.join(dirpath,file)} has been upgraded ***')
                 except  pd.errors.EmptyDataError:
                     df = pd.DataFrame(columns=COL_NAMES[dict_filename_conversion[file]])
                     df.to_csv(os.path.join(dirpath,file),sep='\t',index=False)
-                    print(Fore.BLUE + f'*** The EMPTY file {os.path.join(dirpath,file)} has been upgraded ***' + Style.RESET_ALL)
+                    print(f'*** The EMPTY file {os.path.join(dirpath,file)} has been upgraded ***')
                 except:
-                    print(Fore.WHITE + Back.RED + f'Warning: File {os.path.join(dirpath,file)} not recognized as a parsing file' + Style.RESET_ALL)
+                    print(f'Warning: File {os.path.join(dirpath,file)} not recognized as a parsing file')
 
 
 def read_towns_per_country(country_towns_file, rep_utils, dic_town_symbols, dic_town_words):
@@ -500,7 +496,7 @@ def read_towns_per_country(country_towns_file, rep_utils, dic_town_symbols, dic_
     # Standard library imports
     from pathlib import Path
 
-    # 3rd party imports
+    # 3rd party library imports
     import openpyxl
     import pandas as pd
 
