@@ -430,7 +430,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     
     # 3rd party library imports
     import pandas as pd
-    from fuzzywuzzy import process
+    from thefuzz import process
     
     # Local library imports
     from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list

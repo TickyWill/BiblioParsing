@@ -14,8 +14,6 @@ def add_site_packages_path(venv = False):
         venv (bool): status of virtual environment use.
         
     '''
-    # To Do: convert prints and inputs to gui displays and inputs
-    
     # Standard library imports
     import os
     import sys

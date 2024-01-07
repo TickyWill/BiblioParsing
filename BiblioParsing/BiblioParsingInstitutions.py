@@ -61,7 +61,7 @@ def address_inst_full_list(full_address, inst_dic):
 
     # 3rd party library imports
     import pandas as pd
-    from fuzzywuzzy import process
+    from thefuzz import process
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import country_normalization
