@@ -291,9 +291,7 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
                 author_institution_raw = author_address.split(',')[0]
                 author_institution_raw = re.sub(RE_SUB_FIRST,'University' + ', ', author_institution_raw)                 
                 author_institution = re.sub(RE_SUB,'University' + ' ', author_institution_raw)
-                list_institutions.append(institution(pub_id,
-                                                     idx,
-                                                     author_institution))
+                list_institutions.append(institution(pub_id, idx, author_institution))
 
                 author_country_raw = author_address.split(',')[-1].replace(';','').strip()
                 author_country = country_normalization(author_country_raw)
@@ -304,19 +302,11 @@ def _build_addresses_countries_institutions_wos(df_corpus,dic_failed):
                                f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
                     print(warning)
 
-                list_countries.append(country(pub_id,
-                                              idx,
-                                              author_country))
+                list_countries.append(country(pub_id, idx, author_country))
         else:
-            list_addresses.append(address(pub_id,
-                                          0,
-                                          ''))
-            list_institutions.append(institution(pub_id,
-                                                 0,
-                                                 ''))
-            list_countrieslist_countries.append(country(pub_id,
-                                                        0,
-                                                        ''))
+            list_addresses.append(address(pub_id, 0, ''))
+            list_institutions.append(institution(pub_id, 0, ''))
+            list_countrieslist_countries.append(country(pub_id, 0, ''))
             
     df_address = pd.DataFrame.from_dict({label:[s[idx] for s in list_addresses] 
                                          for idx,label in enumerate(COL_NAMES['address'])})
@@ -430,7 +420,6 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     
     # 3rd party library imports
     import pandas as pd
-    from thefuzz import process
     
     # Local library imports
     from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list
@@ -451,13 +440,11 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     # Setting namedtuples
     addr_country_inst = namedtuple('address',COL_NAMES['auth_inst'][:-1] )
     author_address_tup = namedtuple('author_address','author address')
-    author_address_tup = namedtuple('author_address','author address')
     
     # Setting regexp templates
     template_inst = Template('[$symbol1]?($inst)[$symbol2].*($country)(?:$$|;)')  
     
     # Definition of internal functions
-
     def _address_inst_list(inst_filter_list,address):
         secondary_institutions = []
         for inst,country in inst_filter_list:
@@ -497,40 +484,38 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
             # Builds the list of tuples [(Author<0>, address<0>),(Author<0>, address<1>),...,(Author<i>, address<j>)...]
             list_author_address_tup = [author_address_tup(y,x[1]) for x in list_tuples for y in x[0]]            
             
-            # Build the dict {author:idx_author} preserving the author index in the author list
-            authors_list = list(itertools.chain(*list_authors)) # flatten a list of lists of authors.
-            authors_list = list(dict.fromkeys(authors_list)) # Drops duplicate preserving the author rank.
-            
-            authors_list_ordered = df_corpus.loc[pub_id,COLUMN_LABEL_WOS['authors']].split(';')                                                    
-            dict_idx = {}
-            for author in authors_list:
-                results = process.extract(author,authors_list_ordered,limit=3)
-                dict_idx[author] = authors_list_ordered.index(results[0][0])
-                        
+            # Build the list of ordered authors full names
+            authors_list_ordered = df_corpus.loc[pub_id,COLUMN_LABEL_WOS['authors_fullnames']].split(';')
+            authors_list_ordered = [author_ordered.strip() for author_ordered in authors_list_ordered]
+                
             for tup in list_author_address_tup:
-                idx_author = dict_idx[tup.author]
-                
-                author_country_raw = tup.address.split(',')[-1].replace(';','').strip()
-                author_country = country_normalization(author_country_raw)
-                if author_country == '':
-                    author_country = UNKNOWN
-                    warning = (f'WARNING: the invalid country name "{author_country_raw}" '
-                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
-                               f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
-                    print(warning)
-                
-                author_address_raw = tup.address
-                author_address_raw = remove_special_symbol(author_address_raw, only_ascii=True, strip=True)
-                author_address = re.sub(RE_SUB_FIRST,'University' + ', ', author_address_raw) 
-                author_address = re.sub(RE_SUB,'University' + ' ', author_address_raw)
-                author_institutions_tup = address_inst_full_list(author_address, inst_dic)
+                # check the case of an author in list_author_address_tup not an effective author name (ex: a team name or anonymous)
+                if tup.author in authors_list_ordered: 
+                    idx_author = authors_list_ordered.index(tup.author)
 
-                list_addr_country_inst.append(addr_country_inst(pub_id,
-                                                                idx_author,
-                                                                tup.address,
-                                                                author_country,
-                                                                author_institutions_tup.norm_inst_list,
-                                                                author_institutions_tup.raw_inst_list,))
+                    author_country_raw = tup.address.split(',')[-1].replace(';','').strip()
+                    author_country = country_normalization(author_country_raw)
+                    if author_country == '':
+                        author_country = UNKNOWN
+                        warning = (f'WARNING: the invalid country name "{author_country_raw}" '
+                                   f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
+                                   f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
+                        print(warning)
+
+                    author_address_raw = tup.address
+                    author_address_raw = remove_special_symbol(author_address_raw, only_ascii=True, strip=True)
+                    author_address = re.sub(RE_SUB_FIRST,'University' + ', ', author_address_raw) 
+                    author_address = re.sub(RE_SUB,'University' + ' ', author_address_raw)
+                    author_institutions_tup = address_inst_full_list(author_address, inst_dic)
+
+                    list_addr_country_inst.append(addr_country_inst(pub_id,
+                                                                    idx_author,
+                                                                    tup.address,
+                                                                    author_country,
+                                                                    author_institutions_tup.norm_inst_list,
+                                                                    author_institutions_tup.raw_inst_list,))
+                else:
+                    pass
                 
         else:  # If the field author is not present in affiliation complete namedtuple with the global UNKNOWN
             list_addr_country_inst.append(addr_country_inst(pub_id,
@@ -552,9 +537,11 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
                                                                                  axis = 1)
 
         # Adding a column in the return dataframe for each of the institutions indicated in the institutions filter
-        col_names = [f'{x[0]}_{x[1]}' for x in inst_filter_list]        
-        df_addr_country_inst_split = pd.DataFrame(df_addr_country_inst['Secondary_institutions'].sort_index().to_list(),
+        col_names = [f'{x[0]}_{x[1]}' for x in inst_filter_list]
+        
+        df_addr_country_inst_split = pd.DataFrame(df_addr_country_inst[sec_institution_alias].sort_index().to_list(),
                                               columns=col_names)
+        
         df_addr_country_inst = pd.concat([df_addr_country_inst, df_addr_country_inst_split], axis=1)
 
         df_addr_country_inst.drop([sec_institution_alias], axis=1, inplace=True)

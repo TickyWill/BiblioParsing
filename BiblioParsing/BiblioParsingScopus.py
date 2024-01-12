@@ -448,7 +448,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     address_alias          = COL_NAMES['auth_inst'][2]
     norm_institution_alias = COL_NAMES['auth_inst'][4]
     raw_institution_alias  = COL_NAMES['auth_inst'][5]
-    sec_institution_alias  = COL_NAMES['auth_inst'][5]
+    sec_institution_alias  = COL_NAMES['auth_inst'][6]
 
     inst_dic = build_institutions_dic(rep_utils = None, dic_inst_filename = None)
     
@@ -509,12 +509,12 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
         # Adding a column in the return dataframe for each of the institutions indicated in the institutions filter
         col_names = [f'{x[0]}_{x[1]}' for x in inst_filter_list]
         
-        df_addr_country_inst_split = pd.DataFrame(df_addr_country_inst['Secondary_institutions'].sort_index().to_list(),
+        df_addr_country_inst_split = pd.DataFrame(df_addr_country_inst[sec_institution_alias].sort_index().to_list(),
                                                   columns=col_names)
 
         df_addr_country_inst = pd.concat([df_addr_country_inst, df_addr_country_inst_split], axis=1)
 
-        df_addr_country_inst.drop(['Secondary_institutions'], axis=1, inplace=True)
+        df_addr_country_inst.drop([sec_institution_alias], axis=1, inplace=True)
     
     # Sorting the values in the dataframe returned by two columns
     df_addr_country_inst.sort_values(by=[pub_id_alias,pub_idx_author_alias], inplace=True)

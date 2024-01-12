@@ -61,7 +61,6 @@ def address_inst_full_list(full_address, inst_dic):
 
     # 3rd party library imports
     import pandas as pd
-    from thefuzz import process
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import country_normalization
@@ -391,23 +390,24 @@ def extend_author_institutions(item, item_df, inst_filter_list):
     inst_names_list = [f'{x[0]}_{x[1]}' for x in inst_filter_list]   
     
     # Building the "sec_institution_alias" column in the 'df_I2' dataframe using "inst_filter_list"
-    item_df[sec_institutions_alias] = item_df.apply(lambda row:
+    item_dg = item_df.copy()
+    item_dg[sec_institutions_alias] = item_dg.apply(lambda row:
                                                     _address_inst_list(inst_names_list,row[institutions_alias]),
                                                     axis = 1)
-    item_df.reset_index(inplace=True, drop=True)
+    item_dg.reset_index(inplace=True, drop=True)
 
     # Distributing in a 'inst_split_df' df the value lists of 'df_I2[sec_institutions_alias]' column  
     # into columns which names are in 'inst_names_list' list     
-    inst_split_df = pd.DataFrame(item_df[sec_institutions_alias].sort_index().to_list(),
+    inst_split_df = pd.DataFrame(item_dg[sec_institutions_alias].sort_index().to_list(),
                                  columns = inst_names_list)
     
     # Extending the 'df' dataframe with 'inst_split_df' dataframe
-    item_df = pd.concat([item_df, inst_split_df], axis = 1)
+    new_item_df = pd.concat([item_dg, inst_split_df], axis = 1)
 
     # Droping the 'df[sec_institutions_alias]' column which is no more useful
-    item_df.drop([sec_institutions_alias], axis = 1, inplace = True)
+    new_item_df.drop([sec_institutions_alias], axis = 1, inplace = True)
     
-    return item_df
+    return new_item_df
 
 
 def getting_secondary_inst_list(out_dir_parsing):
