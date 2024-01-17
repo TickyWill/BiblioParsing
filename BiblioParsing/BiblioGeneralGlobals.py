@@ -1,7 +1,6 @@
 __all__ = ['ACCENT_CHANGE',
            'ALIAS_UK',
            'APOSTROPHE_CHANGE',
-           'BOLD_TEXT',
            'CHANGE',
            'COUNTRIES',
            'COUNTRIES_CODES',
@@ -9,16 +8,12 @@ __all__ = ['ACCENT_CHANGE',
            'DASHES_CHANGE',
            'IN_TO_MM',
            'LANG_CHAR_CHANGE',
-           'LIGHT_TEXT',
            'PONCT_CHANGE',
            'SYMB_CHANGE',
            'SYMB_DROP',
            'USA_STATES',
            'ZIP_CODES',]
 
-# Text format control
-BOLD_TEXT = '\033[1m'
-LIGHT_TEXT = '\033[0m'
 
 # Countries normalized names and GPS coordinates
 COUNTRIES_INFO = 'Countries.xlsx'

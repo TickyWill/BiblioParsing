@@ -1,0 +1,48 @@
+{   "Description": [
+        "The field 'PARSING_FOLDER_ARCHI' sets the default architecture of the working folder for BiblioParsing assuming two databases to be parsed: Scopus and Wos.",
+        "The field 'PARSING_FILE_NAMES' sets the default file names for each of the parsed items."
+    ],
+    "PARSING_FOLDER_ARCHI" : {
+        "folder_root"      : "BiblioParsing_Files",
+        "corpus"           : {
+            "corpus_root"  : "Corpus",
+            "databases"    : {
+                "1"           : {
+                    "root"    : "scopus",
+                    "rawdata" : "rawdata",
+                    "parsing" : "parsing"
+                },
+                "2"           : {
+                    "root"    : "wos",
+                    "rawdata" : "rawdata",
+                    "parsing" : "parsing"
+                }
+            },
+            "concat"       : {
+                "root"     : "concatenation",
+                "parsing"  : "parsing"
+            },
+            "dedup"        : {         
+                "root"     : "deduplication",
+                "parsing"  : "parsing"
+            }
+        }
+    },
+    "PARSING_FILE_NAMES" : {
+        "articles"               : "articles",
+        "authors"                : "authors",
+        "addresses"              : "addresses",
+        "addresses_institutions" : "addressesinst",
+        "countries"              : "countries",
+        "institutions"           : "institutions",
+        "authors_institutions"   : "authorsinst",
+        "authors_keywords"       : "authorskeywords",
+        "indexed_keywords"       : "journalkeywords",
+        "title_keywords"         : "titlekeywords",
+        "subjects"               : "subjects",
+        "sub_subjects"           : "subjects2",
+        "raw_institutions"       : "rawinstitutions",
+        "references"             : "references"
+    }
+
+}

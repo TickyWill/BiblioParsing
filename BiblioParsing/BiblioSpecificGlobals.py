@@ -1,5 +1,5 @@
 '''The BiblioGlobals module defines global parameters 
-   used in other BiblioAnalysis modules.
+   used in other BiblioParsing modules.
    modidied 04/12/2023
 
 '''
@@ -36,8 +36,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'NLTK_VALID_TAG_LIST',
            'NORM_JOURNAL_COLUMN_LABEL',
            'NOUN_MINIMUM_OCCURRENCES',
-           'PARSING_FILES',
-           'PARSING_FOLDER_NAME',
            'PARSING_ITEMS',
            'PARTIAL',
            'RAW_INST_FILENAME',
@@ -240,32 +238,6 @@ PARSING_ITEMS =  {"addresses"              : "AD",
                   "raw_institutions"       : "I3",
                   "references"             : "R"
                  }
-
-
-PARSING_FILES = {PARSING_ITEMS["articles"]               : 'articles',
-                 PARSING_ITEMS["authors"]                : 'authors',
-                 PARSING_ITEMS["addresses"]              : 'addresses',
-                 PARSING_ITEMS["addresses_institutions"] : 'addressesinst',
-                 PARSING_ITEMS["countries"]              : 'countries',
-                 PARSING_ITEMS["institutions"]           : 'institutions',
-                 PARSING_ITEMS["authors_institutions"]   : 'authorsinst',
-                 PARSING_ITEMS["authors_keywords"]       : 'authorskeywords',
-                 PARSING_ITEMS["indexed_keywords"]       : 'journalkeywords',
-                 PARSING_ITEMS["title_keywords"]         : 'titlekeywords',
-                 PARSING_ITEMS["subjects"]               : 'subjects',
-                 PARSING_ITEMS["sub_subjects"]           : 'subjects2',
-                 PARSING_ITEMS["references"]             : 'references',
-                }
-
-
-PARSING_FOLDER_NAME = {'corpus'  : 'Corpus',
-                       'concat'  : 'concatenation',
-                       'dedup'   : 'deduplication',
-                       'parsing' : 'parsing',
-                       'rawdata' : 'rawdata',
-                       'scopus'  : 'scopus',
-                       'wos'     : 'wos',
-                      }    
 
 
 # Folder of useful additionnal files    

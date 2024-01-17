@@ -12,6 +12,8 @@ from BiblioParsing.BiblioParsingWos import *
 from BiblioParsing.BiblioParsingScopus import *
 from BiblioParsing.BiblioParsingInstitutions import *
 from BiblioParsing.BiblioParsingConcat import *
+from BiblioParsing.DemoGlobals import *
+from BiblioParsing.DemoUtils import *
 
 
 

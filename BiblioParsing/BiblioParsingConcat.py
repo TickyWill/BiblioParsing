@@ -60,7 +60,6 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
                 and a list of the duplicate indices.
         
     Notes:
-       The globals `BOLD_TEXT` and `LIGHT_TEXT` are imported from 'BiblioGeneralGlobals' module of 'BiblioParsing' package. 
        The globals `COL_NAMES`, `DIC_OUTDIR_PARSING`, `LENGTH_THRESHOLD`, `SIMILARITY_THRESHOLD` and `UNKNOWN` 
        are imported from 'BiblioSpecificGlobals' module of 'BiblioParsing' package.
     
@@ -72,9 +71,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     # 3rd party library imports
     import pandas as pd
     
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import BOLD_TEXT
-    from BiblioParsing.BiblioGeneralGlobals import LIGHT_TEXT    
+    # Globals imports   
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import DIC_DOCTYPE
     from BiblioParsing.BiblioSpecificGlobals import LENGTH_THRESHOLD    
@@ -258,10 +255,6 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     lc_dic_doctype = {}
     for key, values in DIC_DOCTYPE.items(): lc_dic_doctype[key.lower()] = [x.lower() for x in values]
     
-    # Defining aliases for text format control
-    bold_text = BOLD_TEXT
-    light_text = LIGHT_TEXT
-    
     # Defining aliases for column names of the articles file (.dat)
     pub_id_alias   = COL_NAMES['pub_id']
     author_alias   = COL_NAMES['articles'][1]
@@ -344,7 +337,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
         print(f'    Initial articles number: {articles_nb_init}')
         print(f'    Final articles number: {articles_nb_end}')
         warning = (f'    WARNING: {articles_nb_drop} articles have been dropped as duplicates')
-        print(bold_text + warning + light_text)
+        print(warning)
                                 
     return (df_articles_dedup, pub_id_to_drop)
 
