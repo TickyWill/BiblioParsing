@@ -1,6 +1,7 @@
 {   "Description": [
         "The field 'PARSING_FOLDER_ARCHI' sets the default architecture of the working folder for BiblioParsing assuming two databases to be parsed: Scopus and Wos.",
-        "The field 'PARSING_FILE_NAMES' sets the default file names for each of the parsed items."
+        "The field 'PARSING_FILE_NAMES' sets the default file names for each of the parsed items.",
+        "Fields names should not be modified."
     ],
     "PARSING_FOLDER_ARCHI" : {
         "folder_root"      : "BiblioParsing_Files",

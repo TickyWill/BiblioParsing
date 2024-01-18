@@ -348,7 +348,6 @@ def biblio_parser(in_dir, database, rep_utils = None, inst_filter_list = None):
     from BiblioParsing.BiblioParsingWos import biblio_parser_wos
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import INST_FILTER_LIST
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import WOS

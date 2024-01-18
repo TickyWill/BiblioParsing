@@ -188,7 +188,7 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
     return message
 
 
-def save_parsing_xlsx(parsing_name, parsing_dict, parsing_path, 
+def save_parsing_xlsx(parsing_dict, parsing_path, 
                       item_filename_dict):
     """
     """
@@ -211,7 +211,7 @@ def save_parsing_xlsx(parsing_name, parsing_dict, parsing_path,
         else:
             pass
 
-    message = f"All {parsing_name} parsing results saved as xlsx files"
+    message = f"All parsing results saved as xlsx files"
     return message  
 
 

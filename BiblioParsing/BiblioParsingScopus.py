@@ -1084,7 +1084,7 @@ def read_database_scopus(filename):
     return df
 
 
-def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list):
+def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list = None):
     
     '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns of the csv file are read and parsed using the functions:

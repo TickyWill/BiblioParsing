@@ -905,7 +905,7 @@ def read_database_wos(filename):
     return df
 
 
-def biblio_parser_wos(in_dir, inst_filter_list):
+def biblio_parser_wos(in_dir, inst_filter_list = None):
     
     '''The function `biblio_parser_wos` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns USECOLS_WOS of the tsv file xxxx.txt are read and parsed using the functions:
