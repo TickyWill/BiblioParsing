@@ -381,7 +381,7 @@ from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 DIC_INST_FILENAME = 'Inst_dic.csv'
 RAW_INST_FILENAME = 'Raw_inst.csv'                                                    
 
-# Authors affiliations filter (default: None) as a list of tuples (instituion,country)
+# Authors affiliations filter (default: None) as a list of tuples (institution,country)
 INST_FILTER_LIST = [('LITEN','France'),('INES','France')]
 
 # To Do: Check if still used

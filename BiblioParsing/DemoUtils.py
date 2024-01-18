@@ -3,7 +3,9 @@
 __all__ = ['build_files_paths',
            'build_item_filename_dict',
            'parse_to_dedup',
-           'save_parsing_dicts',    
+           'save_parsing_dicts',
+           'save_parsing_tsv',
+           'save_parsing_xlsx',
           ]
 
     
@@ -126,7 +128,7 @@ def build_item_filename_dict(parsing_filenames_dict):
     return item_filename_dict
 
 
-def _save_parsing(parsing_name, parsing_dict, parsing_path, 
+def save_parsing_tsv(parsing_name, parsing_dict, parsing_path, 
                  item_filename_dict, tsv_extent):
     """
     """
@@ -167,17 +169,16 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
     """
     
     Note:
-        Uses `save_corpus_parsing` function.
+        Uses `save_parsing_tsv` function.
     """
 
     # Standard library imports
     import json
-    import os
     from pathlib import Path
 
     for parsing_name, parsing_dict in parsing_dicts_dict.items():
         parsing_path = parsing_path_dict[parsing_name]
-        _save_parsing(parsing_name, parsing_dict, parsing_path, item_filename_dict, tsv_extent)
+        save_parsing_tsv(parsing_name, parsing_dict, parsing_path, item_filename_dict, tsv_extent)
         
         if parsing_name in fails_dicts.keys():
             parsing_failed_dict = fails_dicts[parsing_name]
@@ -185,5 +186,32 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
                 json.dump(parsing_failed_dict, write_json, indent=4)
     message = f"All results saved"
     return message
+
+
+def save_parsing_xlsx(parsing_name, parsing_dict, parsing_path, 
+                      item_filename_dict):
+    """
+    """
+    # Standard library imports
+    from pathlib import Path
+    
+    # Globals imports
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    
+    # Setting useful variables
+    xlsx_extent = "xlsx"
+    
+    # Cycling on parsing items 
+    for item_key,item in PARSING_ITEMS.items():
+        if item in parsing_dict.keys():
+            item_df = parsing_dict[item]
+            item_xlsx_file = item_filename_dict[item] + "." + xlsx_extent
+            item_xlsx_path = parsing_path / Path(item_xlsx_file)
+            item_df.to_excel(item_xlsx_path, index = False)
+        else:
+            pass
+
+    message = f"All {parsing_name} parsing results saved as xlsx files"
+    return message  
 
 
