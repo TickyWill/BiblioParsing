@@ -1,7 +1,7 @@
 __all__ = ['biblio_parser_wos','read_database_wos']
 
 # Globals used from BiblioParsing.BiblioGeneralGlobals: DASHES_CHANGE, LANG_CHAR_CHANGE,PONCT_CHANGE 
-# Globals used from BiblioParsing.BiblioSpecificGlobals: DIC_OUTDIR_PARSING, DIC_DOCTYPE, 
+# Globals used from BiblioParsing.BiblioSpecificGlobals: DIC_DOCTYPE, 
 #                                                               ENCODING, FIELD_SIZE_LIMIT,
 #                                                               RE_ADDRESS, RE_AUTHOR,
 #                                                               RE_REF_AUTHOR_WOS, RE_REF_JOURNAL_WOS,

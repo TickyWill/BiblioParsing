@@ -17,7 +17,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'DIC_DOCTYPE',
            'DIC_AMB_WORDS',
            'DIC_LOW_WORDS',
-           'DIC_OUTDIR_PARSING',
            'DIC_INST_FILENAME',
            'DIC_TOWN_SYMBOLS',
            'DIC_TOWN_WORDS',
@@ -205,23 +204,6 @@ COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
 #################
 # Parsing dicts #
 #################
-
-# To Do: Check if still used by new parsing
-DIC_OUTDIR_PARSING = {'A'  : 'articles.dat',
-                      'AU' : 'authors.dat',
-                      'AD' : 'addresses.dat',
-                      'ADI': 'addressesinst.dat',
-                      'CU' : 'countries.dat',
-                      'I'  : 'institutions.dat',
-                      'I2' : 'authorsinst.dat',
-                      'AK' : 'authorskeywords.dat',
-                      'IK' : 'journalkeywords.dat',
-                      'TK' : 'titlekeywords.dat',
-                      'S'  : 'subjects.dat',
-                      'S2' : 'subjects2.dat',
-                      'R'  : 'references.dat',
-                     }
-
 
 PARSING_ITEMS =  {"addresses"              : "AD",
                   "addresses_institutions" : "ADI",

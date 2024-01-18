@@ -19,7 +19,7 @@ __all__ = ['accent_remove',                 # To remove after calls check in mod
 # Globals used from BiblioParsing.BiblioGeneralGlobals:  ALIAS_UK, COUNTRIES, 
 #                                                               DASHES_CHANGE, LANG_CHAR_CHANGE, PONCT_CHANGE, SYMB_CHANGE  
 # Globals used from BiblioParsing.BiblioSpecificGlobals: BLACKLISTED_WORDS, COL_NAMES,
-#                                                               DIC_LOW_WORDS, DIC_OUTDIR_PARSING ,
+#                                                               DIC_LOW_WORDS,
 #                                                               DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS,
 #                                                               INST_FILTER_LIST, REP_UTILS, 
 #                                                               NLTK_VALID_TAG_LIST, NOUN_MINIMUM_OCCURRENCES,

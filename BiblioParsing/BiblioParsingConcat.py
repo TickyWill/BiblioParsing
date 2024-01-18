@@ -62,7 +62,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
                 and a list of the duplicate indices.
         
     Notes:
-       The globals `COL_NAMES`, `DIC_OUTDIR_PARSING`, `LENGTH_THRESHOLD`, `SIMILARITY_THRESHOLD` and `UNKNOWN` 
+       The globals `COL_NAMES`, `LENGTH_THRESHOLD`, `SIMILARITY_THRESHOLD` and `UNKNOWN` 
        are imported from 'BiblioSpecificGlobals' module of 'BiblioParsing' package.
     
     '''

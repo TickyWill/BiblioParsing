@@ -28,6 +28,21 @@ __all__ = ['address_inst_full_list',          #
 # Functions used from BiblioParsing.BiblioParsingUtils: country_normalization
 #                                                              special_symbol_remove
 
+DIC_OUTDIR_PARSING = {'A'  : 'articles.dat',
+                      'AU' : 'authors.dat',
+                      'AD' : 'addresses.dat',
+                      'ADI': 'addressesinst.dat',
+                      'CU' : 'countries.dat',
+                      'I'  : 'institutions.dat',
+                      'I2' : 'authorsinst.dat',
+                      'AK' : 'authorskeywords.dat',
+                      'IK' : 'journalkeywords.dat',
+                      'TK' : 'titlekeywords.dat',
+                      'S'  : 'subjects.dat',
+                      'S2' : 'subjects2.dat',
+                      'R'  : 'references.dat',
+                     }
+
 
 def address_inst_full_list(full_address, inst_dic):
 
@@ -434,7 +449,6 @@ def getting_secondary_inst_list(out_dir_parsing):
    
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
    
     
     institutions_alias = COL_NAMES['auth_inst'][4]
@@ -1639,7 +1653,6 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import DIC_OUTDIR_PARSING
 
     def _address_aff_list(raw_address):
         # get the tuple (country, addresse_norm_affiliations_list, address_unknown_affiliations_list)

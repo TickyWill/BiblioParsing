@@ -1,8 +1,7 @@
 __all__ = ['biblio_parser_scopus','read_database_scopus']
 
 # Globals used from BiblioParsing.BiblioGeneralGlobals:  DASHES_CHANGE, LANG_CHAR_CHANGE, PONCT_CHANGE
-# Globals used from BiblioParsing.BiblioSpecificGlobals: COL_NAMES, COLUMN_LABEL_SCOPUS,
-#                                                               DIC_OUTDIR_PARSING, DIC_DOCTYPE,
+# Globals used from BiblioParsing.BiblioSpecificGlobals: COL_NAMES, COLUMN_LABEL_SCOPUS, DIC_DOCTYPE,
 #                                                               RE_REF_AUTHOR_SCOPUS, RE_REF_JOURNAL_SCOPUS,
 #                                                               RE_REF_PAGE_SCOPUS, RE_REF_VOL_SCOPUS,
 #                                                               RE_REF_YEAR_SCOPUS, RE_SUB, RE_SUB_FIRST,SCOPUS
