@@ -1,13 +1,47 @@
 '''
 '''
-__all__ = ['build_files_paths',
+__all__ = ['set_user_config',
            'parse_to_dedup',
+           'save_fails_dict',
            'save_parsing_dict',
            'save_parsing_dicts',
           ]
 
+def _get_demo_config():
+    # Standard library imports
+    import json
+    from pathlib import Path
     
-def build_files_paths(year, parsing_folder_dict, root_path):
+    config_json_file_name = 'BiblioParsing_config.json'
+    
+    # Reads the default json_file_name config file
+    pck_config_file_path = Path(__file__).parent / Path('CONFIG') / Path(config_json_file_name)
+    with open(pck_config_file_path) as file:
+        config_dict = json.load(file)       
+
+    return config_dict
+
+def _build_effective_config(parsing_folder_dict, db_list):
+    parsing_folder_dict_init = parsing_folder_dict
+    parsing_folder_dict = {}
+    parsing_folder_dict['folder_root'] = parsing_folder_dict_init['folder_root']
+    parsing_folder_dict['corpus'] = {}
+    parsing_folder_dict['corpus']['corpus_root'] = parsing_folder_dict_init['corpus']['corpus_root']
+    parsing_folder_dict['corpus']['concat'] = parsing_folder_dict_init['corpus']['concat']
+    parsing_folder_dict['corpus']['dedup'] = parsing_folder_dict_init['corpus']['dedup']
+    parsing_folder_dict['corpus']['databases'] = {}
+    for db_num, db_label in enumerate(db_list):
+        parsing_folder_dict['corpus']['databases'][str(db_num)]= {}
+        parsing_folder_dict['corpus']['databases'][str(db_num)]['root'] = db_label
+        rawdata_folder_name = parsing_folder_dict_init['corpus']['database']['rawdata']
+        parsing_folder_dict['corpus']['databases'][str(db_num)]['rawdata'] = rawdata_folder_name
+        parsing_folder_name = parsing_folder_dict_init['corpus']['database']['parsing']
+        parsing_folder_dict['corpus']['databases'][str(db_num)]['parsing'] = parsing_folder_name    
+
+    return parsing_folder_dict
+
+
+def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     
     # Standard library imports
     import os
@@ -21,6 +55,9 @@ def build_files_paths(year, parsing_folder_dict, root_path):
         folder_path = folder_root / Path(folder_name)
         if not os.path.exists(folder_path): os.makedirs(folder_path)
         return (folder_path, folder_name)
+    
+    # Updating 'parsing_folder_dict' using the list of databases 'db_list'
+    parsing_folder_dict = _build_effective_config(parsing_folder_dict, db_list)
     
     # Creating the 'Biblioparsing_files' if not available
     keys_list = ['folder_root']
@@ -36,13 +73,11 @@ def build_files_paths(year, parsing_folder_dict, root_path):
     
     rawdata_path_dict = {}
     parsing_path_dict = {}
-    db_dict           = {}
     # Creating the databases folders if not available
     for db_num in list(parsing_folder_dict['corpus']['databases'].keys()):          
         
         keys_list = ['corpus', 'databases', db_num, 'root']
         db_root_path, db_root_name = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
-        db_dict[db_num] = db_root_name
         
         keys_list = ['corpus', 'databases', db_num, 'rawdata']
         db_rawdata_path, _ = _create_folder(parsing_folder_dict, keys_list, db_root_path)
@@ -68,7 +103,44 @@ def build_files_paths(year, parsing_folder_dict, root_path):
     dedup_parsing_path, _ = _create_folder(parsing_folder_dict, keys_list, dedup_root_path)
     parsing_path_dict['dedup'] = dedup_parsing_path       
     
-    return (rawdata_path_dict, parsing_path_dict, db_dict)
+    return (rawdata_path_dict, parsing_path_dict)
+
+
+def set_user_config(year = None, db_list = None):
+    '''
+    '''
+    
+    # Standard library imports
+    from pathlib import Path
+    
+    # default values :
+    rawdata_path_dict, parsing_path_dict, item_filename_dict = None, None, None
+    
+    # Getting the configuration dict
+    config_dict = _get_demo_config()
+    
+    # Getting the working folder architecture base
+    parsing_folder_dict = config_dict['PARSING_FOLDER_ARCHI']
+    
+    # Setting the working folder name 
+    working_folder_name = parsing_folder_dict['folder_root']
+    
+    # Getting the user's root path
+    root_path = Path.home()
+    
+    # Setting the working folder path
+    working_folder_path = root_path / Path(working_folder_name)
+    
+    if year and db_list:
+
+        # Building the working folder architecture for a corpus single year "year" and getting useful paths
+        rawdata_path_dict, parsing_path_dict = _build_files_paths(year, parsing_folder_dict, root_path, db_list)
+    
+        # Getting the filenames for each parsing item
+        item_filename_dict = config_dict['PARSING_FILE_NAMES']
+
+    return (working_folder_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
+
 
 def parse_to_dedup(year, db_raw_dict, verbose = False):
     """
@@ -146,6 +218,28 @@ def save_parsing_dict(parsing_dict, parsing_path,
     message = f"All parsing results saved as {file_extent} files"
     return message  
 
+def save_fails_dict(fails_dict, parsing_path):
+    '''The function `save_fails_dict` saves parsing fails in a json file
+    named "failed.json".
+    
+    Args:
+        fails_dict (dict): The dict of parsing fails.
+        parsing_path (path): The full path of the parsing results folder 
+        where the json file is being saved.
+        
+    Returns:
+        None
+        
+    '''
+    # Standard library imports
+    import json
+    from pathlib import Path
+    
+    with open(parsing_path / Path('failed.json'), 'w') as write_json:
+        json.dump(fails_dict, write_json, indent=4)
+        
+    message = f"Parsing-fails results saved as json file"
+    return message  
 
 def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, 
                        item_filename_dict, file_extent, fails_dicts): 
@@ -155,20 +249,19 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
         Uses `save_parsing_dict` function.
     """
 
-    # Standard library imports
-    import json
-    from pathlib import Path
-
     for parsing_name, parsing_dict in parsing_dicts_dict.items():
         parsing_path = parsing_path_dict[parsing_name]
-        save_parsing_dict(parsing_dict, parsing_path, item_filename_dict, file_extent)
+        _ = save_parsing_dict(parsing_dict, parsing_path, item_filename_dict, file_extent)
         
         if parsing_name in fails_dicts.keys():
-            parsing_failed_dict = fails_dicts[parsing_name]
-            with open(parsing_path / Path('failed.json'), 'w') as write_json:
-                json.dump(parsing_failed_dict, write_json, indent = 4)
-    message = f"All results saved"
+            parsing_fails_dict = fails_dicts[parsing_name]
+            _ = save_fails_dict(parsing_fails_dict, parsing_path)
+
+    message  = f"All parsing-to-deduplication results saved as text files with .{file_extent} extension."
+    message += f"\n Parsing-fails results of Scopus and WoS saved as json files."
     return message
+
+
 
 
 
