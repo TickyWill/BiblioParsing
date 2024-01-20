@@ -78,7 +78,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     from BiblioParsing.BiblioSpecificGlobals import DIC_DOCTYPE
     from BiblioParsing.BiblioSpecificGlobals import LENGTH_THRESHOLD    
     from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL    
-    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     from BiblioParsing.BiblioSpecificGlobals import SIMILARITY_THRESHOLD
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
@@ -266,7 +266,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     title_alias    = COL_NAMES['articles'][9]
     issn_alias     = COL_NAMES['articles'][10]
     journal_alias  = NORM_JOURNAL_COLUMN_LABEL
-    articles_item_alias = PARSING_ITEMS["articles"]
+    articles_item_alias = PARSING_ITEMS_LIST[0]
     
     # Setting the name of a temporal column of titles in lower case 
     # to be added to working dataframes for case unsensitive dropping of duplicates
@@ -357,22 +357,22 @@ def _deduplicate_item_df(pub_id_to_drop, item, item_df):
        (df): Dataframe where the lines corresponding to `pub_id_to_drop' has been dropped.
         
     Notes:
-       The globals 'COL_NAMES' and 'PARSING_ITEMS' are imported from 'BiblioSpecificGlobals' module 
+       The globals 'COL_NAMES' and 'PARSING_ITEMS_LIST' are imported from 'BiblioSpecificGlobals' module 
        of 'BiblioParsing' package.
        
     '''
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     
     # Setting useful aliases
     pub_id_alias = COL_NAMES['pub_id']
-    authors_item_alias      = PARSING_ITEMS["authors"]
-    addresses_item_alias    = PARSING_ITEMS["addresses"]
-    countries_item_alias    = PARSING_ITEMS["countries"]
-    institutions_item_alias = PARSING_ITEMS["institutions"]
-    auth_inst_item_alias    = PARSING_ITEMS["authors_institutions"]
+    authors_item_alias      = PARSING_ITEMS_LIST[1]
+    addresses_item_alias    = PARSING_ITEMS_LIST[2]
+    countries_item_alias    = PARSING_ITEMS_LIST[3]
+    institutions_item_alias = PARSING_ITEMS_LIST[4]
+    auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
 
     filt = (item_df[pub_id_alias].isin(pub_id_to_drop))
     item_dg = item_df[~filt].copy()
@@ -419,10 +419,10 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     
     # Setting useful aliases
-    sec_inst_item_alias = PARSING_ITEMS["authors_institutions"]
+    sec_inst_item_alias = PARSING_ITEMS_LIST[5]
     
     # Getting a list of the common items of the parsing dicts
     first_items_set   = set(first_parsing_dict.keys())
@@ -458,10 +458,10 @@ def deduplicate_parsing(concat_parsing_dict):
     '''
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     
     # Setting useful aliases
-    articles_item_alias = PARSING_ITEMS["articles"]
+    articles_item_alias = PARSING_ITEMS_LIST[0]
     
     # Getting a list of the items of the parsing dict to deduplicate
     items_list = list(concat_parsing_dict.keys())    

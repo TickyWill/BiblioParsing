@@ -11,9 +11,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'COLUMN_LABEL_WOS',
            'COLUMN_LABEL_WOS_PLUS',
            'COLUMN_TYPE_SCOPUS',
-           'CONCATENATED_XLSX',
+           'COUNTRY_AFFILIATIONS_FILE',
            'COUNTRY_TOWNS',
-           'DEDUPLICATED_XLSX',
            'DIC_DOCTYPE',
            'DIC_AMB_WORDS',
            'DIC_LOW_WORDS',
@@ -28,6 +27,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'FR_DROPING_WORDS',
            'INST_BASE_LIST',
            'INST_FILTER_LIST',
+           'INST_TYPES_FILE',
+           'INST_TYPES_USECOLS',
            'KEEPING_WORDS',
            'KEEPING_PREFIX',
            'LENGTH_THRESHOLD',
@@ -35,9 +36,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'NLTK_VALID_TAG_LIST',
            'NORM_JOURNAL_COLUMN_LABEL',
            'NOUN_MINIMUM_OCCURRENCES',
-           'PARSING_ITEMS',
+           'PARSING_ITEMS_LIST',
            'PARTIAL',
-           'RAW_INST_FILENAME',
            'REP_UTILS',
            'SCOPUS',
            'SCOPUS_CAT_CODES',
@@ -201,34 +201,17 @@ COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
                         }
 
 
-#################
-# Parsing dicts #
-#################
+###############################
+# Globals specific to parsing #
+###############################
 
-PARSING_ITEMS =  {"addresses"              : "AD",
-                  "addresses_institutions" : "ADI",
-                  "articles"               : "A",
-                  "authors"                : "AU",
-                  "authors_institutions"   : "I2",
-                  "authors_keywords"       : "AK",
-                  "countries"              : "CU",
-                  "institutions"           : "I",
-                  "indexed_keywords"       : "IK",
-                  "title_keywords"         : "TK",
-                  "subjects"               : "S",
-                  "sub_subjects"           : "S2",
-                  "raw_institutions"       : "I3",
-                  "references"             : "R"
-                 }
-
+PARSING_ITEMS_LIST = ["articles", "authors", "addresses", "countries", 
+                      "institutions", "authors_institutions", "raw_institutions", 
+                      "authors_keywords", "indexed_keywords", "title_keywords", 
+                      "subjects", "sub_subjects", "references"]
 
 # Folder of useful additionnal files    
 REP_UTILS = 'BiblioParsing_RefFiles'
-
-# File names for additionnal saving : To Do: Check if still used by new parsing
-CONCATENATED_XLSX = 'articles_concat.xlsx'
-DEDUPLICATED_XLSX = 'articles_dedup.xlsx'
-
 
 # For uniformization of document types
 DIC_DOCTYPE = {'Article'              : ['Article'],
@@ -352,16 +335,14 @@ import re
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 
 # Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
-#COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'                                                                          #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'                                                                         
 
 # Setting the file name for the file of institutions types description and order level with the useful columns
-#INST_TYPES_FILE    = "Inst_types.xlsx"                                                                                          #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#INST_TYPES_USECOLS = ['Level', 'Abbreviation']                                                                                  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+INST_TYPES_FILE    = "Inst_types.xlsx"                                                                                         
+INST_TYPES_USECOLS = ['Level', 'Abbreviation']                                                                                 
 
-# To Do: Check if still used
-DIC_INST_FILENAME = 'Inst_dic.csv'
-RAW_INST_FILENAME = 'Raw_inst.csv'                                                    
+# To Do: convert to json ???
+DIC_INST_FILENAME = 'Inst_dic.csv'                                                  
 
 # Authors affiliations filter (default: None) as a list of tuples (institution,country)
 INST_FILTER_LIST = [('LITEN','France'),('INES','France')]

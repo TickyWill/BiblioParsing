@@ -18,31 +18,15 @@ __all__ = ['address_inst_full_list',          #
 # Globals used from BiblioParsing.BiblioGeneralGlobals:  DASHES_CHANGE, SYMB_CHANGE,
 #                                                                                                                                
 # Globals used from BiblioParsing.BiblioSpecificGlobals: COL_NAMES, DIC_AMB_WORDS,
-#                                                               DIC_INST_FILENAME, DIC_OUTDIR_PARSING , 
+#                                                               DIC_INST_FILENAME,
 #                                                               EMPTY, INST_BASE_LIST,            
-#                                                               INST_FILTER_LIST, RAW_INST_FILENAME, REP_UTILS, 
+#                                                               INST_FILTER_LIST, REP_UTILS, 
 #                                                               RE_SUB, RE_SUB_FIRST, RE_ZIP_CODE,                                                               
 
 
 # Functions used from BiblioParsing.BiblioGui: Select_multi_items
 # Functions used from BiblioParsing.BiblioParsingUtils: country_normalization
 #                                                              special_symbol_remove
-
-DIC_OUTDIR_PARSING = {'A'  : 'articles.dat',
-                      'AU' : 'authors.dat',
-                      'AD' : 'addresses.dat',
-                      'ADI': 'addressesinst.dat',
-                      'CU' : 'countries.dat',
-                      'I'  : 'institutions.dat',
-                      'I2' : 'authorsinst.dat',
-                      'AK' : 'authorskeywords.dat',
-                      'IK' : 'journalkeywords.dat',
-                      'TK' : 'titlekeywords.dat',
-                      'S'  : 'subjects.dat',
-                      'S2' : 'subjects2.dat',
-                      'R'  : 'references.dat',
-                     }
-
 
 def address_inst_full_list(full_address, inst_dic):
 
@@ -425,19 +409,19 @@ def extend_author_institutions(item, item_df, inst_filter_list):
     return new_item_df
 
 
-def getting_secondary_inst_list(out_dir_parsing):
+def getting_secondary_inst_list(parsing_dict):
     '''The `getting_secondary_inst_list` function provides the list of institutions of the corpus.
    
     Args:
-        out_dir_parsing (path): the corpus parsing path for reading the "DIC_OUTDIR_PARSING['I2']" file 
-                                that lists the authors with their institutions for each article.
+        auth_inst_df (dataframe): dedup_parsing_dict['authors_institutions'] 
+                                  that lists the authors with their institutions for each article.
        
     Returns:
         (list): list of strings 'country:institution'
        
     Notes:
-        The globals 'COL_NAMES'and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
-        of `BiblioParsing` package are used.       
+        The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module 
+        of `BiblioParsing` package.       
     '''
    
     # Standard library imports
@@ -450,14 +434,17 @@ def getting_secondary_inst_list(out_dir_parsing):
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
    
-    
+    # Setting useful aliases
     institutions_alias = COL_NAMES['auth_inst'][4]
-    country_alias = COL_NAMES['country'][2]   
+    country_alias      = COL_NAMES['country'][2]   
     
-    df_auth_inst = pd.read_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING['I2']),
-                                sep = '\t')
+    # Setting the df of 'authors_institutions' item
+    auth_inst_df = parsing_dict['authors_institutions']
+    #auth_inst_df = pd.read_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING['I2']),
+    #                            sep = '\t')
+    
     raw_institutions_list = []
-    for auth_inst in df_auth_inst[institutions_alias]:
+    for auth_inst in auth_inst_df[institutions_alias]:
         raw_institutions_list.append(auth_inst.strip())
        
     institutions_list = list(np.concatenate([raw_inst.split(';') for raw_inst in raw_institutions_list]))
@@ -494,7 +481,9 @@ def build_raw_institutions(auth_inst_df):
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     
+    # Setting useful aliases
     raw_institutions_alias = COL_NAMES['auth_inst'][5]
+    
     raw_institutions_authors_lists = auth_inst_df[raw_institutions_alias].to_list()
 
     raw_institutions_full_lists = [x.split(';') for x in raw_institutions_authors_lists]
@@ -1455,7 +1444,6 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, af
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
         
             
@@ -1618,7 +1606,7 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
     return (country, address_norm_affiliation_list, address_unknown_affiliations_list)
 
 
-def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict):
+def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict):
     '''The function `build_addresses_institutions` builds a dataframe of addresses
     with the corresponding country, normalized institutions and unknown institutions 
     and saves it in a new .dat file which name is given by the global 'DIC_OUTDIR_PARSING[ADI]'. 
@@ -1663,8 +1651,8 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
         return tup 
 
     # Setting global aliases
-    addresses_dat_alias     = DIC_OUTDIR_PARSING['AD']
-    add_inst_dat_alias      = DIC_OUTDIR_PARSING['ADI']
+    #addresses_dat_alias     = DIC_OUTDIR_PARSING['AD']
+    #add_inst_dat_alias      = DIC_OUTDIR_PARSING['ADI']
     pub_id_alias            = COL_NAMES['address'][0]
     idx_address_alias       = COL_NAMES['address'][1]
     address_alias           = COL_NAMES['address'][2]
@@ -1676,41 +1664,43 @@ def build_addresses_institutions(path_parsing, norm_raw_aff_dict, aff_type_dict)
     temp_institutions_alias = "Full institutions"
 
     # Reading the '.dat' file                   
-    read_usecols = [pub_id_alias, idx_address_alias, address_alias]     
-    df_AD= pd.read_csv(Path(path_parsing) / Path(addresses_dat_alias),
-                       sep='\t',
-                       usecols=read_usecols)
+    AD_usecols = [pub_id_alias, idx_address_alias, address_alias]     
+    #df_AD= pd.read_csv(Path(path_parsing) / Path(addresses_dat_alias),
+    #                   sep='\t',
+    #                   usecols=AD_usecols)
+    AD_df = parsing_dict['addresses'][AD_usecols].copy()
 
 
-    # Building the "institutions_alias" column in the 'df_AD' dataframe
-    #df_AD[country_alias], df_AD[norm_institutions_alias], df_AD[raw_institutions_alias]  = df_AD.apply(lambda row:
-    df_AD[temp_institutions_alias] = df_AD.apply(lambda row:
+    # Building the "institutions_alias" column in the 'AD_df' dataframe
+    #AD_df[country_alias], AD_df[norm_institutions_alias], AD_df[raw_institutions_alias]  = AD_df.apply(lambda row:
+    AD_df[temp_institutions_alias] = AD_df.apply(lambda row:
                                                  _address_aff_list(row[address_alias]),
                                                  axis = 1)
 
     # Splitting in 3 columns the tupple of each item of the column named temp_institutions_alias of dg
-    df_inst_split = pd.DataFrame(df_AD[temp_institutions_alias].sort_index().to_list(),
+    df_inst_split = pd.DataFrame(AD_df[temp_institutions_alias].sort_index().to_list(),
                                  columns=[country_alias,norm_institutions_alias,raw_institutions_alias])
 
     # Converting the list of strings of each item of a given column of df_inst_split, in a string of items joined by ';'
     norm_inst_list = ['; '.join(item) for item in df_inst_split[norm_institutions_alias]]
     raw_inst_list = ['; '.join(item) for item in df_inst_split[raw_institutions_alias]]
 
-    # Building dataframes convenient for adding  the 3 columns splitted from column named temp_institutions_alias to df_AD
+    # Building dataframes convenient for adding  the 3 columns splitted from column named temp_institutions_alias to AD_df
     df_countries = df_inst_split[country_alias]
     df_norm_institutions = pd.DataFrame(norm_inst_list, columns = [norm_institutions_alias])
     df_raw_institutions = pd.DataFrame(raw_inst_list, columns = [raw_institutions_alias])
 
-    # Adding to df_AD the 3 columns splitted from column named temp_institutions_alias
-    df_AD = pd.concat([df_AD, df_countries, df_norm_institutions, df_raw_institutions], axis = 1)
+    # Adding to AD_df the 3 columns splitted from column named temp_institutions_alias
+    AD_df = pd.concat([AD_df, df_countries, df_norm_institutions, df_raw_institutions], axis = 1)
 
-    # Droping in df_AD the column named temp_institutions_alias which is no more useful
-    df_AD.drop([temp_institutions_alias], axis=1, inplace=True)
+    # Droping in AD_df the column named temp_institutions_alias which is no more useful
+    AD_df.drop([temp_institutions_alias], axis=1, inplace=True)
 
-    # Saving the extended 'df_AD' dataframe in a new '.dat' file 
-    df_AD.to_csv(Path(path_parsing) / Path(add_inst_dat_alias), 
-                 index=False,
-                 sep='\t') 
+    # Saving the extended 'AD_df' dataframe in a new '.dat' file 
+    #AD_df.to_csv(Path(path_parsing) / Path(add_inst_dat_alias), 
+    #             index=False,
+    #             sep='\t')
+    parsing_dict['addresses_institutions'] = AD_df
     
-    message = 'File "'+ add_inst_dat_alias + '" created or updated in: \n      ' + str(Path(path_parsing) / Path(addresses_dat_alias))
+    message = "Dataframe of parsing dict['addresses_institutions'] created"
     return message

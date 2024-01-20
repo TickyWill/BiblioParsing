@@ -1037,7 +1037,7 @@ def _check_affiliation_column_scopus(df):
     return df
 
 
-def read_database_scopus(filename):
+def read_database_scopus(rawdata_path):
     
     '''The `read_database_scopus`function reads the raw scopus-database file `filename`,
        checks columns and drops unuseful columns using the `check_and_drop_columns` function.
@@ -1059,7 +1059,8 @@ def read_database_scopus(filename):
         of `BiblioParsing`module are used.
         
     '''
-    # Standard library imports
+    # Standard library imports    
+    import os
     from pathlib import Path
     
     # 3rd party library imports
@@ -1075,6 +1076,15 @@ def read_database_scopus(filename):
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS    
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
+    # Listing the available csv files
+    # ToDo: Management of multiple files to merge with 'merge_database' function
+    list_data_base = []
+    for path, _, files in os.walk(rawdata_path):
+        list_data_base.extend(Path(path) / Path(file) for file in files 
+                                                      if file.endswith(".csv"))    
+    # Selecting the first csv file
+    filename = list_data_base[0]
+    
     df = pd.read_csv(Path(filename), dtype = COLUMN_TYPE_SCOPUS)    
     df = check_and_drop_columns(SCOPUS,df,filename)    
     df = _check_affiliation_column_scopus(df)
@@ -1084,7 +1094,7 @@ def read_database_scopus(filename):
     return df
 
 
-def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list = None):
+def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
     
     '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns of the csv file are read and parsed using the functions:
@@ -1113,12 +1123,12 @@ def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list = None):
     
     # Standard library imports
     import json
-    import os
     from pathlib import Path
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS
+    from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
+    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_CAT_CODES
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_JOURNALS_ISSN_CAT
@@ -1128,36 +1138,26 @@ def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list = None):
         scopus_parsing_dict[item] = item_df
     
     # Setting useful aliases
-    articles_item_alias     = PARSING_ITEMS["articles"]
-    authors_item_alias      = PARSING_ITEMS["authors"]
-    authors_kw_item_alias   = PARSING_ITEMS["authors_keywords"]
-    index_kw_item_alias     = PARSING_ITEMS["indexed_keywords"]
-    title_kw_item_alias     = PARSING_ITEMS["title_keywords"]
-    addresses_item_alias    = PARSING_ITEMS["addresses"]
-    countries_item_alias    = PARSING_ITEMS["countries"]
-    institutions_item_alias = PARSING_ITEMS["institutions"]
-    auth_inst_item_alias    = PARSING_ITEMS["authors_institutions"]
-    raw_inst_item_alias     = PARSING_ITEMS["raw_institutions"]
-    subjects_item_alias     = PARSING_ITEMS["subjects"]
-    sub_subjects_item_alias = PARSING_ITEMS["sub_subjects"]
-    references_item_alias   = PARSING_ITEMS["references"]    
-    
-
-    # Listing the available csv files
-    list_data_base = []
-    for path, _, files in os.walk(in_dir):
-        list_data_base.extend(Path(path) / Path(file) for file in files 
-                                                      if file.endswith(".csv"))
-    
-    # Selecting the first csv file
-    filename = list_data_base[0]
+    articles_item_alias     = PARSING_ITEMS_LIST[0]
+    authors_item_alias      = PARSING_ITEMS_LIST[1]
+    addresses_item_alias    = PARSING_ITEMS_LIST[2]
+    countries_item_alias    = PARSING_ITEMS_LIST[3]
+    institutions_item_alias = PARSING_ITEMS_LIST[4]
+    auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
+    raw_inst_item_alias     = PARSING_ITEMS_LIST[6]
+    authors_kw_item_alias   = PARSING_ITEMS_LIST[7]
+    index_kw_item_alias     = PARSING_ITEMS_LIST[8]
+    title_kw_item_alias     = PARSING_ITEMS_LIST[9]    
+    subjects_item_alias     = PARSING_ITEMS_LIST[10]
+    sub_subjects_item_alias = PARSING_ITEMS_LIST[11]
+    references_item_alias   = PARSING_ITEMS_LIST[12]  
     
     # Setting the specific file paths for subjects ans sub-subjects assignement for scopus corpuses    
-    path_scopus_cat_codes = Path(__file__).parent / Path(rep_utils) / Path(SCOPUS_CAT_CODES)
-    path_scopus_journals_issn_cat = Path(__file__).parent / Path(rep_utils) / Path(SCOPUS_JOURNALS_ISSN_CAT)
+    path_scopus_cat_codes = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_CAT_CODES)
+    path_scopus_journals_issn_cat = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_JOURNALS_ISSN_CAT)
 
     # Reading and checking the corpus file
-    df_corpus = read_database_scopus(filename)
+    df_corpus = read_database_scopus(rawdata_path)
 
     # Initializing the scopus_dic_failed dict for the parsing control
     scopus_dic_failed = {}
@@ -1166,52 +1166,55 @@ def biblio_parser_scopus(in_dir, rep_utils, inst_filter_list = None):
     # Initializing the dict of dataframes resulting from the parsing
     scopus_parsing_dict = {}    
     
-    # Building the dataframe and saving the file for articles (.dat)
+    # Building the dataframe of articles
     articles_df = _build_articles_scopus(df_corpus)
     _keeping_item_parsing_results(articles_item_alias, articles_df)
     
-    # Building the dataframe and saving the file for authors (.dat)
+    # Building the dataframe of authors
     authors_df = _build_authors_scopus(df_corpus)
     _keeping_item_parsing_results(authors_item_alias, authors_df)
-
-    # Building the dataframe and saving the files for keywords
-    AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_scopus(df_corpus, scopus_dic_failed)   
-      # Keeping author keywords df and saving file (.dat)
-    _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
-      # Keeping journal (indexed) keywords df and saving file (.dat)
-    _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
-      # Keeping title keywords df and saving file (.dat)
-    _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
     
-    # Building the dataframe and saving the files for addresses, countries and institutions
+    # Building the dataframe of addresses, countries and institutions
     addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_scopus(df_corpus,
                                                                                                  scopus_dic_failed)
-      # Keeping addresses df and saving file (.dat)
+      # Keeping addresses df
     _keeping_item_parsing_results(addresses_item_alias, addresses_df)
-      # Keeping countries df and saving file (.dat) 
+      # Keeping countries df 
     _keeping_item_parsing_results(countries_item_alias, countries_df)
-      # Keeping institutions df and saving file (.dat)
+      # Keeping institutions df
     _keeping_item_parsing_results(institutions_item_alias, institutions_df)
     
-    # Building the dataframe and saving the file for authors and their institutions (.dat)
+    # Building the dataframe of authors and their institutions
     authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, inst_filter_list)
     _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
+        # Building raw institutions file for further expending normalized institutions list               
+    #raw_institutions_df = build_raw_institutions(authors_institutions_df)               # Not yet used for Scopus
+    #_keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)    
+
+    # Building the dataframes of keywords
+    AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_scopus(df_corpus, scopus_dic_failed)   
+      # Keeping author keywords df 
+    _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
+      # Keeping journal (indexed) keywords df
+    _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
+      # Keeping title keywords df 
+    _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
     
-    # Building the dataframe and saving the file for subjects (.dat)
+    # Building the dataframe of subjects
     subjects_df = _build_subjects_scopus(df_corpus,
                                          path_scopus_cat_codes,
                                          path_scopus_journals_issn_cat,
                                          scopus_dic_failed)
     _keeping_item_parsing_results(subjects_item_alias, subjects_df)
 
-    # Building the dataframe and saving the file for sub-subjects (.dat)
+    # Building the dataframe of sub-subjects
     sub_subjects_df = _build_sub_subjects_scopus(df_corpus,
                                                  path_scopus_cat_codes,
                                                  path_scopus_journals_issn_cat,
                                                  scopus_dic_failed)
     _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
     
-    # Building the dataframe and saving the file for references (.dat) 
+    # Building the dataframe of references
     references_df = _build_references_scopus(df_corpus)
     _keeping_item_parsing_results(references_item_alias, references_df)  
     

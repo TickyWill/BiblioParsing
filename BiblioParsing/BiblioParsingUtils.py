@@ -332,7 +332,7 @@ def normalize_journal_names(database,corpus_df):
     return corpus_df
 
 
-def biblio_parser(in_dir, database, rep_utils = None, inst_filter_list = None):
+def biblio_parser(rawdata_path, database, inst_filter_list = None):
     
     '''The `biblio_parser` function parse wos or scopus databases using the appropriate parser.
     
@@ -348,15 +348,13 @@ def biblio_parser(in_dir, database, rep_utils = None, inst_filter_list = None):
     from BiblioParsing.BiblioParsingWos import biblio_parser_wos
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import WOS
     
     if database == WOS:
-        parsing_dict, dic_failed = biblio_parser_wos(in_dir, inst_filter_list)
+        parsing_dict, dic_failed = biblio_parser_wos(rawdata_path, inst_filter_list)
     elif database == SCOPUS:
-        if rep_utils == None: rep_utils = REP_UTILS
-        parsing_dict, dic_failed = biblio_parser_scopus(in_dir, rep_utils, inst_filter_list)
+        parsing_dict, dic_failed = biblio_parser_scopus(rawdata_path, inst_filter_list)
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be wos or scopus ")
         
