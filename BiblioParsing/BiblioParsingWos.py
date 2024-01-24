@@ -13,8 +13,7 @@ __all__ = ['biblio_parser_wos','read_database_wos']
 #                                                               
 # Functions used from BiblioParsing.BiblioParsingUtils: build_title_keywords, country_normalization, 
 #                                                              normalize_journal_names, name_normalizer, remove_special_symbol 
-                                                              
-
+                                                            
 
 def _build_authors_wos(df_corpus):
     
@@ -871,14 +870,13 @@ def read_database_wos(rawdata_path):
     # Standard library imports
     import csv
     import numpy as np
-    import os
-    from pathlib import Path
     
     # 3rd party library imports
     import pandas as pd
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import check_and_drop_columns
+    from BiblioParsing.BiblioParsingUtils import check_and_get_rawdata_file_path
     from BiblioParsing.BiblioParsingUtils import normalize_journal_names
     
     # Globals imports
@@ -886,33 +884,29 @@ def read_database_wos(rawdata_path):
     from BiblioParsing.BiblioSpecificGlobals import FIELD_SIZE_LIMIT
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     from BiblioParsing.BiblioSpecificGlobals import WOS
+    from BiblioParsing.BiblioSpecificGlobals import WOS_RAWDATA_EXTENT
     
-    # Listing the available txt files
-    # ToDo: Management of multiple files to merge with 'merge_database' function
-    list_data_base = []
-    for path, _, files in os.walk(rawdata_path):
-        list_data_base.extend(Path(path) / Path(file) for file in files
-                                                      if file.endswith(".txt"))
-    
-    # Selecting the first txt file 
-    filename = list_data_base[0]        
-        
-    csv.field_size_limit(FIELD_SIZE_LIMIT) # To extend the field size limit for reading .txt files
+    # Check if rawdata file is available and get its full path if is
+    rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, WOS_RAWDATA_EXTENT)
 
-    with open(filename,'rt',encoding = ENCODING) as csv_file: 
-        csv_reader = csv.reader(csv_file, delimiter = '\t')
-        csv_list = []
-        for row in csv_reader:
-            csv_list.append(row)
+    if rawdata_file_path: 
+        # Extending the field size limit for reading .txt files
+        csv.field_size_limit(FIELD_SIZE_LIMIT)
 
-    df = pd.DataFrame(csv_list)
-    df.columns = df.iloc[0]                  # Sets columns name to raw 0
-    df = df.drop(0)                          # Drops the raw 0 from df 
+        with open(rawdata_file_path ,'rt',encoding = ENCODING) as csv_file: 
+            csv_reader = csv.reader(csv_file, delimiter = '\t')
+            csv_list = []
+            for row in csv_reader:
+                csv_list.append(row)
 
-    df = check_and_drop_columns("wos",df,filename)
-    df = df.replace(np.nan,UNKNOWN,regex=True)
-    df = normalize_journal_names(WOS,df)
-        
+        df = pd.DataFrame(csv_list)
+        df.columns = df.iloc[0]                  # Sets columns name to raw 0
+        df = df.drop(0)                          # Drops the raw 0 from df 
+        df = check_and_drop_columns(WOS, df)
+        df = df.replace(np.nan, UNKNOWN, regex = True)
+        df = normalize_journal_names(WOS, df)
+    else:
+        df = None          
     return df
 
 
@@ -982,56 +976,60 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
     df_corpus = read_database_wos(rawdata_path)
     
     # Initializing the dic_failed dict for the parsing control
-    wos_dic_failed = {}
-    wos_dic_failed['number of article'] = len(df_corpus)
+    wos_dic_failed = {}    
     
     # Initializing the dict of dataframes resulting from the parsing
     wos_parsing_dict = {}
     
-    # Building the dataframe of articles
-    articles_df = _build_articles_wos(df_corpus)
-    _keeping_item_parsing_results(articles_item_alias, articles_df)    
+    if df_corpus is not None:
+        
+        # Keeping the number of articles in wos_dic_failed dict
+        wos_dic_failed['number of article'] = len(df_corpus)
     
-    # Building the dataframe of authors
-    authors_df = _build_authors_wos(df_corpus)
-    _keeping_item_parsing_results(authors_item_alias, authors_df)
-    
-    # Building the dataframe of addresses, countries and institutions
-    addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_wos(df_corpus,
-                                                                                              wos_dic_failed)
-      # Keeping addresses df
-    _keeping_item_parsing_results(addresses_item_alias, addresses_df)
-      # Keeping countries df
-    _keeping_item_parsing_results(countries_item_alias, countries_df)
-      # Keeping institutions df
-    _keeping_item_parsing_results(institutions_item_alias, institutions_df)
-    
-    # Building the dataframe of authors and their institutions
-    authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, inst_filter_list)
-    _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
-        # Building raw institutions file for further expending normalized institutions list               
-    raw_institutions_df = build_raw_institutions(authors_institutions_df)
-    _keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)
-    
-    # Building the dataframes of keywords
-    AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus,wos_dic_failed)   
-      # Keeping author keywords df
-    _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
-      # Keeping journal (indexed) keywords df
-    _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
-      # Keeping title keywords df
-    _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
-    
-    # Building the dataframe of subjects
-    subjects_df = _build_subjects_wos(df_corpus,wos_dic_failed)
-    _keeping_item_parsing_results(subjects_item_alias, subjects_df)
+        # Building the dataframe of articles
+        articles_df = _build_articles_wos(df_corpus)
+        _keeping_item_parsing_results(articles_item_alias, articles_df)    
 
-    # Building the dataframe of sub-subjects
-    sub_subjects_df = _build_sub_subjects_wos(df_corpus,wos_dic_failed)
-    _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
-    
-    # Building the dataframe of references 
-    references_df = _build_references_wos(df_corpus)
-    _keeping_item_parsing_results(references_item_alias, references_df)
+        # Building the dataframe of authors
+        authors_df = _build_authors_wos(df_corpus)
+        _keeping_item_parsing_results(authors_item_alias, authors_df)
+
+        # Building the dataframe of addresses, countries and institutions
+        addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_wos(df_corpus,
+                                                                                                  wos_dic_failed)
+          # Keeping addresses df
+        _keeping_item_parsing_results(addresses_item_alias, addresses_df)
+          # Keeping countries df
+        _keeping_item_parsing_results(countries_item_alias, countries_df)
+          # Keeping institutions df
+        _keeping_item_parsing_results(institutions_item_alias, institutions_df)
+
+        # Building the dataframe of authors and their institutions
+        authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, inst_filter_list)
+        _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
+            # Building raw institutions file for further expending normalized institutions list               
+        raw_institutions_df = build_raw_institutions(authors_institutions_df)
+        _keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)
+
+        # Building the dataframes of keywords
+        AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus,wos_dic_failed)   
+          # Keeping author keywords df
+        _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
+          # Keeping journal (indexed) keywords df
+        _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
+          # Keeping title keywords df
+        _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
+
+        # Building the dataframe of subjects
+        subjects_df = _build_subjects_wos(df_corpus,wos_dic_failed)
+        _keeping_item_parsing_results(subjects_item_alias, subjects_df)
+
+        # Building the dataframe of sub-subjects
+        sub_subjects_df = _build_sub_subjects_wos(df_corpus,wos_dic_failed)
+        _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
+
+        # Building the dataframe of references 
+        references_df = _build_references_wos(df_corpus)
+        _keeping_item_parsing_results(references_item_alias, references_df)
         
     return wos_parsing_dict, wos_dic_failed

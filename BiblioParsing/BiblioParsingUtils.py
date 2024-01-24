@@ -2,6 +2,7 @@ __all__ = ['accent_remove',                 # To remove after calls check in mod
            'biblio_parser',
            'build_title_keywords',
            'check_and_drop_columns',
+           'check_and_get_rawdata_file_path',
            'country_normalization',         # To remove after replace by 'normalize_country' when called in modules
            'merge_database',
            'name_normalizer',
@@ -10,6 +11,7 @@ __all__ = ['accent_remove',                 # To remove after calls check in mod
            'rationalize_town_names',
            'read_towns_per_country',
            'remove_special_symbol',
+           'set_rawdata_error',
            'special_symbol_remove',         # To remove after replace by 'remove_special_symbol' when called in modules (done in this module BiblioParsingWos and BiblioParsingScopus)
            'town_names_uniformization',     # To remove after replace  by 'rationalize_town_names' when called in modules
            'upgrade_col_names',
@@ -29,6 +31,34 @@ __all__ = ['accent_remove',                 # To remove after calls check in mod
 # Functions used from BiblioParsing.BiblioParsingScopus: biblio_parser_scopus
 # Functions used from BiblioParsing.BiblioParsingWos: biblio_parser_wos
 
+
+def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
+    '''
+    '''
+    # Standard library imports
+    import os
+    from pathlib import Path
+    
+    # Listing the available files with raw_extent extension
+    # ToDo: Management of multiple files to merge with 'merge_database' function
+    list_data_base = []
+    for path, _, files in os.walk(rawdata_path):
+        list_data_base.extend(Path(path) / Path(file) for file in files 
+                              if file.endswith(raw_extent))
+    if list_data_base:
+        # Selecting the first file with raw_extent extension
+        rawdata_file_path = list_data_base[0]
+    else:
+        rawdata_file_path = None
+    return rawdata_file_path
+
+
+def set_rawdata_error(database, rawdata_path, raw_extent):
+    error_text  = f"\n   !!! No {database} raw-data file available !!! \n"
+    error_text += f"\nBefore new launch of the cell, "
+    error_text += f"please make available a {database} raw-data file "
+    error_text += f"with {raw_extent} extension in:\n   {rawdata_path}."
+    return error_text
 
 def build_title_keywords(df):
     
@@ -361,7 +391,7 @@ def biblio_parser(rawdata_path, database, inst_filter_list = None):
     return parsing_dict, dic_failed
 
         
-def check_and_drop_columns(database,df,filename):
+def check_and_drop_columns(database, df):
     # Standard libraries import
     import numpy as np
     
@@ -391,7 +421,7 @@ def check_and_drop_columns(database,df,filename):
     missing_columns = cols_mandatory.difference(cols_available)
     if missing_columns:
         error_text  = f'The mandarory columns: {",".join(missing_columns)} are missing '
-        error_text += f'from {filename}\nplease correct before proceeding'
+        error_text += f'in rawdata extracted from {database}.\nPlease correct before proceeding.'
         raise Exception(error_text)
     
     # Setting issn to e_issn if issn not available for wos

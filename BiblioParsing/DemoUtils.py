@@ -148,12 +148,15 @@ def parse_to_dedup(year, db_raw_dict, verbose = False):
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import biblio_parser
+    from BiblioParsing.BiblioParsingUtils import set_rawdata_error
     from BiblioParsing.BiblioParsingConcat import parsing_concatenate_deduplicate
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import INST_FILTER_LIST
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
+    from BiblioParsing.BiblioSpecificGlobals import SCOPUS_RAWDATA_EXTENT
     from BiblioParsing.BiblioSpecificGlobals import WOS
+    from BiblioParsing.BiblioSpecificGlobals import WOS_RAWDATA_EXTENT
     
     # Parsing Scopus rawdata
     scopus_raw_path = db_raw_dict[SCOPUS]
@@ -163,31 +166,42 @@ def parse_to_dedup(year, db_raw_dict, verbose = False):
     wos_raw_path = db_raw_dict[WOS]
     wos_parsing_dict, wos_fails_dict =  biblio_parser(wos_raw_path, WOS, inst_filter_list = None)
     
-    # Concatenating and deduplicating the Scopus and WoS parsings
-    concat_parsing_dict, dedup_parsing_dict = parsing_concatenate_deduplicate(scopus_parsing_dict, 
-                                                                                 wos_parsing_dict, 
-                                                                                 inst_filter_list = INST_FILTER_LIST)
-    
-    # Building parsing performances dict
+    # Initializing results dicts
+    parsing_dicts_dict = {} 
     fails_dicts = {}
-    fails_dicts[SCOPUS] = scopus_fails_dict
-    fails_dicts[WOS]    = wos_fails_dict  
     
-    # Building results dict
-    parsing_dicts_dict = {}
-    parsing_dicts_dict[SCOPUS] = scopus_parsing_dict
-    if verbose: print(f'\nScopus corpus successfully parsed in parsing_dicts_dict[{SCOPUS}]')
-    parsing_dicts_dict[WOS]    = wos_parsing_dict
-    if verbose: print(f'\nWos corpus successfully parsed in parsing_dicts_dict[{WOS}]')
-    parsing_dicts_dict["concat"] = concat_parsing_dict
-    if verbose: print(f'\nParsings successfully concatenated in parsing_dicts_dict["concat"]')
-    parsing_dicts_dict["dedup"]  = dedup_parsing_dict
-    if verbose: print(f'\nParsings successfully deduplicated in parsing_dicts_dict["dedup"]')
+    if scopus_parsing_dict and wos_parsing_dict:
+    
+        # Concatenating and deduplicating the Scopus and WoS parsings
+        concat_parsing_dict, dedup_parsing_dict = parsing_concatenate_deduplicate(scopus_parsing_dict, 
+                                                                                  wos_parsing_dict, 
+                                                                                  inst_filter_list = INST_FILTER_LIST)
+
+        # Building parsing performances dict
+        fails_dicts[SCOPUS] = scopus_fails_dict
+        fails_dicts[WOS]    = wos_fails_dict  
+
+        # Building results dict
+        
+        parsing_dicts_dict[SCOPUS] = scopus_parsing_dict
+        if verbose: print(f'\nScopus corpus successfully parsed in parsing_dicts_dict[{SCOPUS}]')
+        parsing_dicts_dict[WOS]    = wos_parsing_dict
+        if verbose: print(f'\nWos corpus successfully parsed in parsing_dicts_dict[{WOS}]')
+        parsing_dicts_dict["concat"] = concat_parsing_dict
+        if verbose: print(f'\nParsings successfully concatenated in parsing_dicts_dict["concat"]')
+        parsing_dicts_dict["dedup"]  = dedup_parsing_dict
+        if verbose: print(f'\nParsings successfully deduplicated in parsing_dicts_dict["dedup"]')
+        
+    else:
+        if not scopus_parsing_dict:
+            print(set_rawdata_error(SCOPUS, scopus_raw_path, SCOPUS_RAWDATA_EXTENT))
+        if not wos_parsing_dict:
+            print(set_rawdata_error(WOS, wos_raw_path, WOS_RAWDATA_EXTENT))
     
     return parsing_dicts_dict, fails_dicts
 
 def save_parsing_dict(parsing_dict, parsing_path, 
-                      item_filename_dict, file_extent):
+                      item_filename_dict, save_extent):
     """
     """
     # Standard library imports
@@ -200,11 +214,11 @@ def save_parsing_dict(parsing_dict, parsing_path,
     for item in PARSING_ITEMS_LIST:
         if item in parsing_dict.keys():
             item_df = parsing_dict[item]
-            if file_extent == "xlsx":
+            if save_extent == "xlsx":
                 item_xlsx_file = item_filename_dict[item] + ".xlsx"
                 item_xlsx_path = parsing_path / Path(item_xlsx_file)
                 item_df.to_excel(item_xlsx_path, index = False)
-            elif file_extent == "dat":
+            elif save_extent == "dat":
                 item_tsv_file = item_filename_dict[item] + ".dat"
                 item_tsv_path = parsing_path / Path(item_tsv_file)
                 item_df.to_csv(item_tsv_path, index = False, sep = '\t')
@@ -215,7 +229,7 @@ def save_parsing_dict(parsing_dict, parsing_path,
         else:
             pass
 
-    message = f"All parsing results saved as {file_extent} files"
+    message = f"All parsing results saved as {save_extent} files"
     return message  
 
 def save_fails_dict(fails_dict, parsing_path):
@@ -242,7 +256,7 @@ def save_fails_dict(fails_dict, parsing_path):
     return message  
 
 def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, 
-                       item_filename_dict, file_extent, fails_dicts): 
+                       item_filename_dict, save_extent, fails_dicts): 
     """
     
     Note:
@@ -251,13 +265,13 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
 
     for parsing_name, parsing_dict in parsing_dicts_dict.items():
         parsing_path = parsing_path_dict[parsing_name]
-        _ = save_parsing_dict(parsing_dict, parsing_path, item_filename_dict, file_extent)
+        _ = save_parsing_dict(parsing_dict, parsing_path, item_filename_dict, save_extent)
         
         if parsing_name in fails_dicts.keys():
             parsing_fails_dict = fails_dicts[parsing_name]
             _ = save_fails_dict(parsing_fails_dict, parsing_path)
 
-    message  = f"All parsing-to-deduplication results saved as text files with .{file_extent} extension."
+    message  = f"All parsing-to-deduplication results saved as files with .{save_extent} extension."
     message += f"\n Parsing-fails results of Scopus and WoS saved as json files."
     return message
 

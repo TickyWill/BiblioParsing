@@ -42,6 +42,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'SCOPUS',
            'SCOPUS_CAT_CODES',
            'SCOPUS_JOURNALS_ISSN_CAT',
+           'SCOPUS_RAWDATA_EXTENT',
            'SIMILARITY_THRESHOLD',
            'SMALL_WORDS_DROP',
            'SYMBOL',
@@ -50,6 +51,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'USECOLS_WOS',
            'USER_KEEPING_WORDS',
            'WOS',
+           'WOS_RAWDATA_EXTENT',
           ]
 
 # Local imports 
@@ -281,6 +283,7 @@ UNKNOWN = 'unknown'
 SCOPUS = 'scopus'
 SCOPUS_CAT_CODES = 'scopus_cat_codes.txt'
 SCOPUS_JOURNALS_ISSN_CAT = 'scopus_journals_issn_cat.txt'
+SCOPUS_RAWDATA_EXTENT = 'csv'
 
 # This global is used in merge_database function
 _USECOLS_SCOPUS = '''Abstract,Affiliations,Authors,Author Keywords,Authors with affiliations,
@@ -294,7 +297,8 @@ USECOLS_SCOPUS  = [x.strip() for x in _USECOLS_SCOPUS.split(',')]
 ####################################
 WOS = 'wos'
 ENCODING = 'iso-8859-1' # encoding used by the function read_database_wos
-FIELD_SIZE_LIMIT = 256<<10 # extend maximum field size for wos file reading 
+FIELD_SIZE_LIMIT = 256<<10 # extend maximum field size for wos file reading
+WOS_RAWDATA_EXTENT = 'txt'
 
 # To Do: Check if this global is still used
 _USECOLS_WOS ='''AB,AU,BP,BS,C1,CR,DE,DI,DT,ID,IS,LA,PY,RP,
