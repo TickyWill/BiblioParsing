@@ -135,9 +135,9 @@ def set_user_config(year = None, db_list = None):
 
         # Building the working folder architecture for a corpus single year "year" and getting useful paths
         rawdata_path_dict, parsing_path_dict = _build_files_paths(year, parsing_folder_dict, root_path, db_list)
-    
-        # Getting the filenames for each parsing item
-        item_filename_dict = config_dict['PARSING_FILE_NAMES']
+        
+    # Getting the filenames for each parsing item
+    item_filename_dict = config_dict['PARSING_FILE_NAMES']    
 
     return (working_folder_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
 
