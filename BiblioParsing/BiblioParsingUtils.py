@@ -1,35 +1,18 @@
-__all__ = ['accent_remove',                 # To remove after calls check in modules
-           'biblio_parser',
+__all__ = ['biblio_parser',
+           'build_item_df_from_tup',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
-           'country_normalization',         # To remove after replace by 'normalize_country' when called in modules
            'merge_database',
-           'name_normalizer',
            'normalize_country',
            'normalize_journal_names',
+           'normalize_name',
            'rationalize_town_names',
            'read_towns_per_country',
            'remove_special_symbol',
            'set_rawdata_error',
-           'special_symbol_remove',         # To remove after replace by 'remove_special_symbol' when called in modules (done in this module BiblioParsingWos and BiblioParsingScopus)
-           'town_names_uniformization',     # To remove after replace  by 'rationalize_town_names' when called in modules
            'upgrade_col_names',
            ]
-
-
-# Globals used from BiblioParsing.BiblioGeneralGlobals:  ALIAS_UK, COUNTRIES, 
-#                                                               DASHES_CHANGE, LANG_CHAR_CHANGE, PONCT_CHANGE, SYMB_CHANGE  
-# Globals used from BiblioParsing.BiblioSpecificGlobals: BLACKLISTED_WORDS, COL_NAMES,
-#                                                               DIC_LOW_WORDS,
-#                                                               DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS,
-#                                                               INST_FILTER_LIST, REP_UTILS, 
-#                                                               NLTK_VALID_TAG_LIST, NOUN_MINIMUM_OCCURRENCES,
-#                                                               RE_NUM_CONF,RE_YEAR_JOURNAL,
-#                                                               SCOPUS, USECOLS_SCOPUS, UNKNOWN, WOS
-
-# Functions used from BiblioParsing.BiblioParsingScopus: biblio_parser_scopus
-# Functions used from BiblioParsing.BiblioParsingWos: biblio_parser_wos
 
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
@@ -44,9 +27,11 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     list_data_base = []
     for path, _, files in os.walk(rawdata_path):
         list_data_base.extend(Path(path) / Path(file) for file in files 
-                              if file.endswith(raw_extent))
+                              if file.endswith(raw_extent))        
+        
     if list_data_base:
-        # Selecting the first file with raw_extent extension
+        # Selecting the most recent file with raw_extent extension
+        list_data_base.sort(key=lambda x: os.path.getmtime(x),reverse=True)
         rawdata_file_path = list_data_base[0]
     else:
         rawdata_file_path = None
@@ -59,6 +44,25 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     error_text += f"please make available a {database} raw-data file "
     error_text += f"with {raw_extent} extension in:\n   {rawdata_path}."
     return error_text
+
+
+def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed):
+    '''Building a clean item dataframe from a tuple 
+    and accordingly updating the parsing success rate dict.'''
+    
+    # Standard library imports
+    import pandas as pd
+    
+    item_df = pd.DataFrame.from_dict({label:[s[idx] for s in item_list] 
+                                      for idx,label in enumerate(item_col_names)})
+    list_id = item_df[item_df[item_col] == ''][pub_id_alias].values
+    list_id = list(set(list_id))
+    df_corpus_len = dic_failed['number of article']
+    dic_failed[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
+                            pub_id_alias:[int(x) for x in list(list_id)]}    
+    item_df = item_df[item_df[item_col] != '']
+    return item_df, dic_failed
+
 
 def build_title_keywords(df):
     
@@ -241,15 +245,15 @@ def merge_database(database,filename,in_dir,out_dir):
     result = pd.concat(list_df,ignore_index=True)
     result.to_csv(out_dir / Path(filename),sep='\t')
 
-def name_normalizer(text):
+def normalize_name(text):
     
-    '''The `name_normalizer` function normalizes the author name spelling according the three debatable rules:
+    '''The `normalize_name` function normalizes the author name spelling according the three debatable rules:
             - replacing none ascii letters by ascii ones,
             - capitalizing first name, 
             - capitalizing surnames,
             - supressing comma and dot.
        It uses the internal funtion `remove_special_symbol`of this module "BiblioParsingUtils".    
-       ex: name_normalizer(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
+       ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
         >>> "Grol-Bica-Velu D'Aillon E-KJ".
         
     Args:

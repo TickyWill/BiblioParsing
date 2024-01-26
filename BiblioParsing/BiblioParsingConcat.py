@@ -395,7 +395,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     ''' The `concatenate_parsing` function concatenates parsing dfs of two corpuses 
     using the `_concatenate_item_dfs` internal functions. 
     Then it proceeds with extending the "author with institutions" parsing df 
-    using the `extend_author_institutions function.
+    using the `extend_author_institutions` function.
     The outputs are the parsing dfs of the concatenated corpus.
     
     Args:
@@ -422,7 +422,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     
     # Setting useful aliases
-    sec_inst_item_alias = PARSING_ITEMS_LIST[5]
+    auth_inst_item_alias = PARSING_ITEMS_LIST[5]
     
     # Getting a list of the common items of the parsing dicts
     first_items_set   = set(first_parsing_dict.keys())
@@ -436,9 +436,8 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
 
     # Extending the author with institutions parsing df
     if inst_filter_list: 
-        concat_parsing_dict[sec_inst_item_alias] = extend_author_institutions(sec_inst_item_alias,
-                                                                              concat_parsing_dict[sec_inst_item_alias],
-                                                                              inst_filter_list)    
+        concat_parsing_dict[auth_inst_item_alias] = extend_author_institutions(concat_parsing_dict[auth_inst_item_alias],
+                                                                               inst_filter_list)    
     return concat_parsing_dict
 
 

@@ -10,23 +10,6 @@ __all__ = ['address_inst_full_list',          #
            'build_raw_institutions',         #
            ]
 
-# To do: 
-#   - def the internal functions and the deprecated ones
-#   - Replace use of .dat files by dfs
-
-
-# Globals used from BiblioParsing.BiblioGeneralGlobals:  DASHES_CHANGE, SYMB_CHANGE,
-#                                                                                                                                
-# Globals used from BiblioParsing.BiblioSpecificGlobals: COL_NAMES, DIC_AMB_WORDS,
-#                                                               DIC_INST_FILENAME,
-#                                                               EMPTY, INST_BASE_LIST,            
-#                                                               INST_FILTER_LIST, REP_UTILS, 
-#                                                               RE_SUB, RE_SUB_FIRST, RE_ZIP_CODE,                                                               
-
-
-# Functions used from BiblioParsing.BiblioGui: Select_multi_items
-# Functions used from BiblioParsing.BiblioParsingUtils: country_normalization
-#                                                              special_symbol_remove
 
 def address_inst_full_list(full_address, inst_dic):
 
@@ -48,7 +31,7 @@ def address_inst_full_list(full_address, inst_dic):
     Notes:
         The globals 'RE_ZIP_CODE' and 'EMPTY' are imported from `BiblioSpecificGlobals` module 
         of `BiblioParsing` package.
-        The function `country_normalization` is imported from `BiblioParsingUtils` module
+        The function `normalize_country` is imported from `BiblioParsingUtils` module
         of `BiblioAnalysis_utils` package.
         
     '''
@@ -62,7 +45,7 @@ def address_inst_full_list(full_address, inst_dic):
     import pandas as pd
     
     # Local library imports
-    from BiblioParsing.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioParsingUtils import normalize_country
     
     # Globals imports
     from BiblioParsing.BiblioRegexpGlobals import RE_ZIP_CODE
@@ -72,7 +55,7 @@ def address_inst_full_list(full_address, inst_dic):
     inst_full_list_ntup = namedtuple('inst_full_list_ntup',['norm_inst_list','raw_inst_list'])
     
     country_raw = full_address.split(",")[-1].strip()
-    country = country_normalization(country_raw)
+    country = normalize_country(country_raw)
     add_country = "_" + country
     
     if RE_ZIP_CODE.findall(full_address):
@@ -143,7 +126,7 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     using 'DASHES_CHANGE' and 'SYMB_CHANGE' globals.
     Then, it substitutes by 'University' its aliases using specific 
     regular expressions set in 'RE_SUB',and 'RE_SUB_FIRST' globals.
-    Finally, it removes accents using `special_symbol_remove` function.
+    Finally, it removes accents using `remove_special_symbol` function.
     
     Args:
         affiliation_raw (str): the raw affiliation to be normalized.
@@ -156,7 +139,7 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
         from `BiblioGeneralGlobals` module of `BiblioParsing` package.
         The globals 'RE_SUB',and 'RE_SUB_FIRST' are imported
         from `BiblioSpecificGlobals` module of `BiblioParsing` package.
-        The function `special_symbol_remove` is used from `BiblioParsingUtils` 
+        The function `remove_special_symbol` is used from `BiblioParsingUtils` 
         of `BiblioAnalysis_utils` package.
         
     '''
@@ -165,7 +148,7 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     import re
     
     # Local library imports
-    from BiblioParsing.BiblioParsingUtils import special_symbol_remove
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
@@ -186,7 +169,7 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     affiliation_raw = affiliation_raw.translate(SYMB_CHANGE)
     affiliation_raw = re.sub(RE_SUB_FIRST,'University' + ', ',affiliation_raw)
     affiliation_raw = re.sub(RE_SUB,'University' + ' ',affiliation_raw)
-    affiliation = special_symbol_remove(affiliation_raw, only_ascii=True, skip=True)
+    affiliation = remove_special_symbol(affiliation_raw, only_ascii=True, skip=True)
     
     return affiliation
 
@@ -342,17 +325,17 @@ def _check_institute(address,raw_inst_split):
         return False
 
 
-def extend_author_institutions(item, item_df, inst_filter_list):
+def extend_author_institutions(item_df, inst_filter_list):
     ''' The `extend_author_institutions` function extends the df of authors with institutions 
     initialy obtained by the parsing of the corpus, with complementary information about institutions
     selected by the user.
     
     Args:
-        in_dir (path): path to the .dat file of authors with institutions.
+        item_df (df): Dataframe of authors with institutions.
         inst_filter_list (list): the affiliations filter list of tuples (institution, country). 
 
     Retruns:
-        None
+        (df): The extended dataframe.
         
     Notes:
         The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module 
@@ -367,19 +350,17 @@ def extend_author_institutions(item, item_df, inst_filter_list):
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     
     def _address_inst_list(inst_names_list,institutions):
-
         secondary_institutions = []
         for inst in inst_names_list:
             if inst in institutions:
                 secondary_institutions.append(1)
             else:
-                secondary_institutions.append(0)  
-             
+                secondary_institutions.append(0)               
         return secondary_institutions
 
-    # Setting aliases
-    institutions_alias     = COL_NAMES['auth_inst'][4]
-    sec_institutions_alias = COL_NAMES['auth_inst'][5]
+    # Setting useful column names aliases
+    institutions_alias = COL_NAMES['auth_inst'][4]
+    temp_col_alias     = "temp_col"
     
     # Getting the useful columns of the item df                   
     read_usecols = [COL_NAMES['auth_inst'][x] for x in [0,1,2,3,4]] 
@@ -388,23 +369,22 @@ def extend_author_institutions(item, item_df, inst_filter_list):
     # Setting an institution name for each of the institutions indicated in the institutions filter
     inst_names_list = [f'{x[0]}_{x[1]}' for x in inst_filter_list]   
     
-    # Building the "sec_institution_alias" column in the 'df_I2' dataframe using "inst_filter_list"
+    # Building the "sec_institution_alias" column in the 'item_df' dataframe using "inst_filter_list"
     item_dg = item_df.copy()
-    item_dg[sec_institutions_alias] = item_dg.apply(lambda row:
-                                                    _address_inst_list(inst_names_list,row[institutions_alias]),
-                                                    axis = 1)
-    item_dg.reset_index(inplace=True, drop=True)
+    item_dg[temp_col_alias] = item_dg.apply(lambda row: _address_inst_list(inst_names_list,
+                                                                           row[institutions_alias]), axis = 1)
+    item_dg.reset_index(inplace = True, drop = True)
 
-    # Distributing in a 'inst_split_df' df the value lists of 'df_I2[sec_institutions_alias]' column  
+    # Distributing in a 'inst_split_df' df the value lists of 'item_dg[temp_col_alias]' column  
     # into columns which names are in 'inst_names_list' list     
-    inst_split_df = pd.DataFrame(item_dg[sec_institutions_alias].sort_index().to_list(),
+    inst_split_df = pd.DataFrame(item_dg[temp_col_alias].sort_index().to_list(),
                                  columns = inst_names_list)
     
     # Extending the 'df' dataframe with 'inst_split_df' dataframe
     new_item_df = pd.concat([item_dg, inst_split_df], axis = 1)
 
-    # Droping the 'df[sec_institutions_alias]' column which is no more useful
-    new_item_df.drop([sec_institutions_alias], axis = 1, inplace = True)
+    # Droping the 'df[temp_col_alias]' column which is no more useful
+    new_item_df.drop([temp_col_alias], axis = 1, inplace = True)
     
     return new_item_df
 
@@ -528,7 +508,7 @@ def standardize_address(raw_address):
         of the package `BiblioParsing`.
         The globals 'DASHES_CHANGE' and 'APOSTROPHE_CHANGE' are imported from the module `BiblioGeneralGlobals`  
         of the package `BiblioParsing`.
-        The function `country_normalization` is imported from the module `BiblioParsingInstitutions`
+        The function `normalize_country` is imported from the module `BiblioParsingInstitutions`
         of the package `BiblioParsing`.
         
     '''
@@ -537,7 +517,7 @@ def standardize_address(raw_address):
     import re
     
     # Local library imports
-    from BiblioParsing.BiblioParsingUtils import country_normalization
+    from BiblioParsing.BiblioParsingUtils import normalize_country
     
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
@@ -563,7 +543,7 @@ def standardize_address(raw_address):
     first_raw_affiliations_list = standard_address.split(',')
     # This split below is just for country finding even if affiliation may be separated by dashes
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list],[])        
-    country = country_normalization(raw_affiliations_list[country_pos].strip())
+    country = normalize_country(raw_affiliations_list[country_pos].strip())
     space = " "
     if country != UNKNOWN:
         standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
@@ -980,7 +960,7 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
     Notes:
         The function `search_droping_items` is imported from the module `BiblioParsingInstitutions`  
         of the package`BiblioParsing`.
-        The function `country_normalization` is imported from the module `BiblioParsingInstitutions` 
+        The function `normalize_country` is imported from the module `BiblioParsingInstitutions` 
         of the package`BiblioParsing`.
         The globals 'KEEPING_WORDS', 'KEEPING_PREFIX' and 'UNKNOWN' are imported from the module `BiblioSpecificGlobals` 
         of the package`BiblioParsing`.        
