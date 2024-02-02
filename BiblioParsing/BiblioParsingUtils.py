@@ -80,18 +80,21 @@ def build_title_keywords(df):
        2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
     the set of the tokenized and lemmelized (using the nltk WordNetLemmatizer) title. The column
     'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'
-       3- Buids the list of tuples 'list_of_words_occurrences.sort'
+       3- Builds the list of tuples 'list_of_words_occurrences.sort'
     [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
     of # occurrences token_i.
-       4- Suppress words pertening to BLACKLISTED_WORDS to the list  from the bag of words
+       4- Suppress words pertening to BLACKLISTED_WORDS to the list from the bag of words
     
     Args:
        df (dataframe): pub_id | title_alias 
 
     Returns:
-       df (dataframe): pub_id | title_tokens_alias | kept_tokens_alias where title_tokens is the list of tokens of the title
-         and kept_tokens the list of tokens with a frequency occurrence >= NOUN_MINIMUM_OCCURRENCES
-       bag_of_words_occurrences (list of tuples): [(word_1,# occurrence_1), (word_2,# occurrence_2), ...]
+       (tup): tuple (df, bag_of_words_occurrences) with df a dataframe 
+       which colums are [pub_id, title_tokens_alias, kept_tokens_alias]  
+       where title_tokens_alias contains the list of tokens of the title 
+       and kept_tokens_alias the list of tokens with an occurrence frequency 
+       >= NOUN_MINIMUM_OCCURRENCES, and bag_of_words_occurrences a list of tuples
+       where tuple i is (word_i,# occurrence_i).
         
     '''
     # To Do: update docstring
@@ -152,7 +155,7 @@ def build_title_keywords(df):
     
     df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(keywords_TK.intersection(set(x))))
    
-    return df,bag_of_words_occurrences
+    return (df, bag_of_words_occurrences)
 
 
 def normalize_country(country):

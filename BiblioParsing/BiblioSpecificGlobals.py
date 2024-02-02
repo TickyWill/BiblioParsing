@@ -268,7 +268,7 @@ NLTK_VALID_TAG_LIST = ['NN','NNS','VBG','JJ'] # you can find help on the nltk ta
                                               # using nltk.help.upenn_tagset() 
 
 NOUN_MINIMUM_OCCURRENCES = 3 # Minimum occurrences of a noun to be retained when 
-                             # building the set of title keywords see build_title_keywords function
+                             # building the set of title keywords see "build_title_keywords" function
 
 SYMBOL  = '\s,;:.\-\/'
 PARTIAL = 'partial'    # For unparsed partial references

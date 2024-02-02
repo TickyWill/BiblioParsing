@@ -176,7 +176,7 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
 
 def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     
-    '''The `builds_institutions_dic` fuction builds the dict 'inst_dic' 
+    '''The `builds_institutions_dic` function builds the dict 'inst_dic' 
     giving the mormalized names of institutions from a csv file `dic_inst_filename`.
     The name of the csv file is set in the `DIC_INST_FILENAME` global.
     
@@ -285,7 +285,8 @@ def _check_institute(address,raw_inst_split):
     raw_inst_split = [x.replace("&","and") for x in raw_inst_split]    
     raw_inst_split_init = raw_inst_split.copy()
 
-    # Removing small words
+    # Removing small words 
+    #(To Do : check adding small word "la" and replacing .remove to delete all occurences)
     small_words_list = ['a','et','de','and','for','of','the']
     for word in small_words_list:
         if word in raw_inst_split_init:

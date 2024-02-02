@@ -96,7 +96,6 @@ def _build_keywords_scopus(df_corpus, dic_failed):
     from operator import attrgetter
     
     # 3rd party library imports
-    import nltk
     import pandas as pd
     
     # Local libary imports
