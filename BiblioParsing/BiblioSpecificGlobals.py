@@ -26,7 +26,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'ENCODING',
            'FR_DROPING_WORDS',
            'INST_BASE_LIST',
-           'INST_FILTER_LIST',
            'INST_TYPES_FILE',
            'INST_TYPES_USECOLS',
            'KEEPING_WORDS',
@@ -347,9 +346,6 @@ INST_TYPES_USECOLS = ['Level', 'Abbreviation']
 
 # To Do: convert to json ???
 DIC_INST_FILENAME = 'Inst_dic.csv'                                                  
-
-# Authors affiliations filter (default: None) as a list of tuples (institution,country)
-INST_FILTER_LIST = [('LITEN','France'),('INES','France')]
 
 # To Do: Check if still used
 INST_BASE_LIST = ['UMR', 'CNRS', 'University']

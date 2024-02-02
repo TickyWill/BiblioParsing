@@ -43,7 +43,7 @@ concat_parsing_dict = bp.concatenate_parsing(scopus_parsing_dict, wos_parsing_di
                                              inst_filter_list = user_inst_filter_list)
 bp.save_parsing_dict(concat_parsing_dict, concat_parsing_path, item_filename_dict, save_extent)
 
-# Parsings dediplication
+# Parsings deduplication and saving results
 dedup_parsing_path = Path(<your_fullpath_for_parsings_dedup_results>)
 dedup_parsing_dict = bp.deduplicate_parsing(concat_parsing_dict)
 bp.save_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict, save_extent)

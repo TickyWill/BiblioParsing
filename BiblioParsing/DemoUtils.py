@@ -15,7 +15,7 @@ def _get_demo_config():
     config_json_file_name = 'BiblioParsing_config.json'
     
     # Reads the default json_file_name config file
-    pck_config_file_path = Path(__file__).parent / Path('CONFIG') / Path(config_json_file_name)
+    pck_config_file_path = Path(__file__).parent / Path('DemoConfig') / Path(config_json_file_name)
     with open(pck_config_file_path) as file:
         config_dict = json.load(file)       
 
@@ -142,17 +142,18 @@ def set_user_config(year = None, db_list = None):
     return (working_folder_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
 
 
-def parse_to_dedup(year, db_raw_dict, verbose = False):
+def parse_to_dedup(year, db_raw_dict, user_inst_filter_list, verbose = False):
     """
     """
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import biblio_parser
     from BiblioParsing.BiblioParsingUtils import set_rawdata_error
-    from BiblioParsing.BiblioParsingConcat import parsing_concatenate_deduplicate
+    from BiblioParsing.BiblioParsingConcat import concatenate_parsing
+    from BiblioParsing.BiblioParsingConcat import deduplicate_parsing
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import INST_FILTER_LIST
+    #from BiblioParsing.BiblioSpecificGlobals import INST_FILTER_LIST
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_RAWDATA_EXTENT
     from BiblioParsing.BiblioSpecificGlobals import WOS
@@ -171,11 +172,13 @@ def parse_to_dedup(year, db_raw_dict, verbose = False):
     fails_dicts = {}
     
     if scopus_parsing_dict and wos_parsing_dict:
-    
-        # Concatenating and deduplicating the Scopus and WoS parsings
-        concat_parsing_dict, dedup_parsing_dict = parsing_concatenate_deduplicate(scopus_parsing_dict, 
-                                                                                  wos_parsing_dict, 
-                                                                                  inst_filter_list = INST_FILTER_LIST)
+        
+        # Concatenating the two parsings
+        concat_parsing_dict = concatenate_parsing(scopus_parsing_dict, wos_parsing_dict,  
+                                                  inst_filter_list = user_inst_filter_list)
+
+        # Deduplicating the concatenation of the two parsings
+        dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict)
 
         # Building parsing performances dict
         fails_dicts[SCOPUS] = scopus_fails_dict

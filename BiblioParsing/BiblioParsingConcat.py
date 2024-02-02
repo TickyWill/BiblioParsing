@@ -1,6 +1,5 @@
 __all__ = ['concatenate_parsing', 
-           'deduplicate_parsing', 
-           'parsing_concatenate_deduplicate']
+           'deduplicate_parsing',]
     
 
 def _concatenate_item_dfs(item, first_corpus_df, second_corpus_df):
@@ -477,37 +476,6 @@ def deduplicate_parsing(concat_parsing_dict):
 
     return dedup_parsing_dict
 
-
-def parsing_concatenate_deduplicate(first_parsing_dict, second_parsing_dict, inst_filter_list = None):
-    ''' The `parsing_concatenate_deduplicate` function concatenates the parsing dataframes of two corpuses 
-    using the `concatenate_parsing` local function. Then it proceeds with deduplication of the concatenated dataframes 
-    using the `deduplicate_parsing` local function.
-    
-    Args:
-        first_parsing_dict (dict): Dict with keys as items parsing and values as the dfs 
-                                   resulting from the parsing of the first corpus.
-        second_parsing_dict (dict): Dict with keys as items parsing and values as the dfs 
-                                    resulting from the parsing of the second corpus.
-        inst_filter_list (list): The affiliations filter list of tuples (institution, country)
-                                 with default value set to None. 
-        
-    Returns: 
-        (tuple): A tuple of two dicts with keys as items parsing and values, for the first dict 
-                 as the concatenated dfs and for the second dict as the deduplicated dfs.
-        
-    Note:
-    
-                                  
-    '''     
-    
-    # Concatenating the two parsings
-    concat_parsing_dict = concatenate_parsing(first_parsing_dict, second_parsing_dict,  
-                                              inst_filter_list = inst_filter_list)
-
-    # Deduplicating the concatenation of the two parsings
-    dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict)
-    
-    return (concat_parsing_dict, dedup_parsing_dict)
 
 
     
