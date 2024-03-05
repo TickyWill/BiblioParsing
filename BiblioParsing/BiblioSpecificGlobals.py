@@ -133,7 +133,8 @@ COL_NAMES = {'pub_id'      : pub_id,
                               'Title',
                               'title_tokens',
                               'kept_tokens',
-                              'doc_type_lc',],             
+                              'doc_type_lc',
+                              'doi_lc',],             
             } 
 
             

@@ -82,6 +82,14 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
     # Internal functions
+        
+    def _find_value_to_keep(dg, column_name):
+        col_values_list = dg[column_name].to_list()
+        col_values_list = list(dict.fromkeys(col_values_list)) 
+        if UNKNOWN in col_values_list: col_values_list.remove(UNKNOWN) 
+        value_to_keep = col_values_list[0] if len(col_values_list)>0 else UNKNOWN
+        return value_to_keep 
+    
     def _setting_same_journal_name(df_articles_concat_init):
         journals_list = df_articles_concat_init[journal_alias].to_list()
         df_journal = pd.DataFrame(journals_list, columns = [same_journal_alias])
@@ -165,6 +173,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             df_articles_concat_title = pd.concat(df_list)
         else:
             df_articles_concat_title = df_articles_concat_doctype.copy()
+        df_articles_concat_title[lc_doi_alias] = df_articles_concat_title[doi_alias].str.lower()
         return df_articles_concat_title
     
     def _setting_same_first_author_name(df_articles_concat_title):
@@ -173,11 +182,11 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             pub_ids      = list(set(sub_df[pub_id_alias].to_list()))
             authors_list = list(set(sub_df[author_alias].to_list()))
             authors_nb   = len(authors_list)
-            dois_list    = list(set(sub_df[doi_alias].to_list()))
+            dois_list    = list(set(sub_df[lc_doi_alias].to_list()))
             dois_nb      = len(dois_list)       
             if authors_nb >1 and UNKNOWN in dois_list :                        
-                sub_df[author_alias] = _find_value_to_keep(sub_df,author_alias)
-                sub_df[doi_alias]    = _find_value_to_keep(sub_df,doi_alias)
+                sub_df[author_alias] = _find_value_to_keep(sub_df, author_alias)
+                sub_df[lc_doi_alias]    = _find_value_to_keep(sub_df, lc_doi_alias)
             df_list.append(sub_df) 
         if df_list != []:
             df_articles_concat_author = pd.concat(df_list)
@@ -188,16 +197,16 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     
     def _dropping_duplicate_article1(df_articles_concat_author):
         df_list = []
-        for doi, dg in  df_articles_concat_author.groupby(doi_alias):
+        for doi, dg in  df_articles_concat_author.groupby(lc_doi_alias):
             if doi != UNKNOWN:
                 # Deduplicating article lines by DOI
-                dg[title_alias]    = _find_value_to_keep(dg,title_alias)
-                dg[doc_type_alias] = _find_value_to_keep(dg,doc_type_alias)
-                dg.drop_duplicates(subset = [doi_alias], keep = 'first', inplace = True)
+                dg[title_alias]    = _find_value_to_keep(dg, title_alias)
+                dg[doc_type_alias] = _find_value_to_keep(dg, doc_type_alias)
+                dg.drop_duplicates(subset = [lc_doi_alias], keep = 'first', inplace = True)
 
             else:
                 # Deduplicating article lines without DOI by title and document type
-                dg.drop_duplicates(subset = [lc_title_alias,lc_doc_type_alias], keep = 'first', inplace = True)
+                dg.drop_duplicates(subset = [lc_title_alias, lc_doc_type_alias], keep = 'first', inplace = True)
             df_list.append(dg)
         df_articles_concat = pd.concat(df_list)
         return df_articles_concat
@@ -208,12 +217,12 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             if len(dg) < 3:
                 # Deduplicating article lines with same title, document type, first author and journal
                 # and also with same DOI if not UNKNOWN
-                dg[doi_alias] = _find_value_to_keep(dg,doi_alias)
-                dg.drop_duplicates(subset = [doi_alias],keep = 'first',inplace=True)          
+                dg[lc_doi_alias] = _find_value_to_keep(dg, lc_doi_alias)
+                dg.drop_duplicates(subset = [lc_doi_alias], keep = 'first', inplace=True)          
             else:   
                 # Dropping article lines with DOI UNKNOWN from group of articles with same title, 
                 # document type, first author and journal but different DOIs 
-                unkown_indices = dg[dg[doi_alias] == UNKNOWN].index
+                unkown_indices = dg[dg[lc_doi_alias] == UNKNOWN].index
                 dg.drop(unkown_indices,inplace = True)
                 pub_id_list = [x for x in dg[pub_id_alias]]
                 warning = (f'WARNING: Multiple DOI values for same title, document type, first author and journal '
@@ -228,7 +237,7 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             df_articles_dedup = pd.concat(df_list)
         else:
             df_articles_dedup = df_articles_concat
-        df_articles_dedup = df_articles_dedup.drop([lc_title_alias, lc_doc_type_alias], axis = 1)
+        df_articles_dedup = df_articles_dedup.drop([lc_title_alias, lc_doc_type_alias, lc_doi_alias], axis = 1)
         df_articles_dedup.sort_values(by = [pub_id_alias], inplace = True)
         return df_articles_dedup
 
@@ -240,13 +249,6 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
             else:
                 pass
         return norm_doctype
-        
-    def _find_value_to_keep(dg, column_name):
-        col_values_list = dg[column_name].to_list()
-        col_values_list = list(dict.fromkeys(col_values_list)) 
-        if UNKNOWN in col_values_list: col_values_list.remove(UNKNOWN) 
-        value_to_keep = col_values_list[0] if len(col_values_list)>0 else UNKNOWN
-        return value_to_keep 
     
     similar = lambda a,b:SequenceMatcher(None, a, b).ratio()
     
@@ -270,7 +272,8 @@ def _deduplicate_articles(concat_parsing_dict, verbose = False):
     # Setting the name of a temporal column of titles in lower case 
     # to be added to working dataframes for case unsensitive dropping of duplicates
     lc_title_alias    = COL_NAMES['temp_col'][0] 
-    lc_doc_type_alias = COL_NAMES['temp_col'][5] 
+    lc_doc_type_alias = COL_NAMES['temp_col'][5]
+    lc_doi_alias      = COL_NAMES['temp_col'][6]                                    
     
     # Setting the name of a temporal column of journals normalized 
     # to be added to working dataframes for dropping of duplicates
