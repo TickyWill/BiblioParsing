@@ -626,7 +626,8 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     
     return text
 
-def build_norm_raw_institutions(df_address, verbose = False):
+def build_norm_raw_institutions(df_address, inst_types_file_path = None,
+                                country_affiliations_file_path = None, verbose = False):
     
     '''The function `build_norm_raw_institutions_wos` parses the addresses 
     of each publication of the Wos corpus to retrieve the country, 
@@ -679,8 +680,8 @@ def build_norm_raw_institutions(df_address, verbose = False):
     institution = namedtuple('institution', inst_col_list_alias )
     
     # Getting useful dicts for affiliation normalization
-    aff_type_dict = read_inst_types() 
-    norm_raw_aff_dict = build_norm_raw_affiliations_dict()
+    aff_type_dict = read_inst_types(inst_types_file_path,)
+    norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path)
     
     list_countries    = []
     list_norm_institutions = []
