@@ -208,9 +208,10 @@ COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
 ###############################
 
 PARSING_ITEMS_LIST = ["articles", "authors", "addresses", "countries", 
-                      "institutions", "authors_institutions", "raw_institutions", 
+                      "institutions", "authors_institutions",  
                       "authors_keywords", "indexed_keywords", "title_keywords", 
-                      "subjects", "sub_subjects", "references"]
+                      "subjects", "sub_subjects", "references",
+                      "norm_institutions","raw_institutions",]
 
 # Folder of useful additionnal files    
 REP_UTILS = 'BiblioParsing_RefFiles'
@@ -326,6 +327,7 @@ DIC_TOWN_WORDS = {" lez " : " les ",
 COUNTRY_TOWNS_FILE = 'Country_towns.xlsx'
 
 COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS, DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS)
+#COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS) #???
 
 
 #############################################
@@ -350,7 +352,6 @@ DIC_INST_FILENAME = 'Inst_dic.csv'
 
 # To Do: Check if still used
 INST_BASE_LIST = ['UMR', 'CNRS', 'University']
-
 
 # Potentialy ambiguous words in institutions names
 DIC_AMB_WORDS = {' des ': ' ', # Conflict with DES institution
@@ -377,23 +378,27 @@ DIC_WORD_RE_PATTERN['School']     = re.compile(r"\bSch[ol]{0,3}\b\.?")
     # Setting a list of keeping words
         # Setting a list of general keeping words
 _GEN_KEEPING_WORDS = list(DIC_WORD_RE_PATTERN.keys())
-GEN_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _GEN_KEEPING_WORDS]
+GEN_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, 
+                                            strip = False).lower() for x in _GEN_KEEPING_WORDS]
 
         # Setting a list of basic keeping words only for country = 'France'
 _BASIC_KEEPING_WORDS = ['Beamline', 'CRG', 'EA', 'ED', 'Equipe', 'ULR', 'UMR', 'UMS', 'UPR']
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-BASIC_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _BASIC_KEEPING_WORDS]
+BASIC_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, 
+                                              strip = False).lower() for x in _BASIC_KEEPING_WORDS]
 
         # Setting a user list of keeping words
 _USER_KEEPING_WORDS  = ['CEA', 'CEMHTI', 'CNRS', 'ESRF', 'FEMTO ST', 'IMEC', 'INES', 'INSA', 'INSERM', 'IRCELYON', 
                         'KU Leuven', 'LaMCoS', 'LEPMI', 'LITEN', 'LOCIE', 'spLine', 'STMicroelectronics', 'TNO', 'UMI', 'VTT']
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-USER_KEEPING_WORDS   = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _USER_KEEPING_WORDS]
+USER_KEEPING_WORDS   = [remove_special_symbol(x, only_ascii = False, 
+                                              strip = False).lower() for x in _USER_KEEPING_WORDS]
 
         # Setting a total list of keeping words
 _KEEPING_WORDS = _GEN_KEEPING_WORDS + _BASIC_KEEPING_WORDS + _USER_KEEPING_WORDS
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-KEEPING_WORDS  =[remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _KEEPING_WORDS]
+KEEPING_WORDS  =[remove_special_symbol(x, only_ascii = False, 
+                                       strip = False).lower() for x in _KEEPING_WORDS]
 
 
 # For keeping chunks of addresses with these prefixes followed by 3 or 4 digits for country France
@@ -408,7 +413,8 @@ _DROPING_SUFFIX = ["campus", "laan", "park", "platz", "staal", "strae", "strasse
 
         # added "ring" but drops chunks containing "Engineering"
         # Removing accents keeping non adcii characters and converting to lower case the droping suffixes, by default
-DROPING_SUFFIX = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _DROPING_SUFFIX]
+DROPING_SUFFIX = [remove_special_symbol(x, only_ascii = False, 
+                                        strip = False).lower() for x in _DROPING_SUFFIX]
 
 
     # Setting a list of droping words for country different from France
@@ -424,7 +430,8 @@ _DROPING_WORDS = ["alle", "alleen", "area", "avda", "avda.",
                   "tietotie", "vei", "veien", "vej", "via", "viale", "vialle", "voc.", "w", "way", "west", "zona"]
 
         # Removing accents keeping non adcii characters and converting to lower case the droping words, by default
-_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _DROPING_WORDS]
+_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, 
+                                        strip = False).lower() for x in _DROPING_WORDS]
         # Escaping the regex meta-character "." from the droping words, by default
 _DROPING_WORDS = [x.replace(".", r"\.") for x in _DROPING_WORDS]
 DROPING_WORDS  = [x.replace("/", r"\/") for x in _DROPING_WORDS]
@@ -440,7 +447,8 @@ _FR_DROPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue",
                      "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
 
         # Removing accents keeping non adcii characters and converting to lower case the droping words, by default
-_FR_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, strip = False).lower() for x in _FR_DROPING_WORDS]
+_FR_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, 
+                                           strip = False).lower() for x in _FR_DROPING_WORDS]
         # Escaping the regex meta-character "." from the droping words, by default
 _FR_DROPING_WORDS = [x.replace(".", r"\.") for x in _FR_DROPING_WORDS]
 FR_DROPING_WORDS  = [x.replace("/", r"\/") for x in _FR_DROPING_WORDS]

@@ -142,7 +142,10 @@ def set_user_config(year = None, db_list = None):
     return (working_folder_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
 
 
-def parse_to_dedup(year, db_raw_dict, user_inst_filter_list, verbose = False):
+def parse_to_dedup(year, db_raw_dict, 
+                   user_inst_filter_list, 
+                   user_norm_inst_status, 
+                   verbose = False):
     """
     """
     
@@ -165,7 +168,7 @@ def parse_to_dedup(year, db_raw_dict, user_inst_filter_list, verbose = False):
         
     # Parsing WoS rawdata 
     wos_raw_path = db_raw_dict[WOS]
-    wos_parsing_dict, wos_fails_dict =  biblio_parser(wos_raw_path, WOS, inst_filter_list = None)
+    wos_parsing_dict, wos_fails_dict = biblio_parser(wos_raw_path, WOS, inst_filter_list = None)
     
     # Initializing results dicts
     parsing_dicts_dict = {} 
@@ -178,7 +181,8 @@ def parse_to_dedup(year, db_raw_dict, user_inst_filter_list, verbose = False):
                                                   inst_filter_list = user_inst_filter_list)
 
         # Deduplicating the concatenation of the two parsings
-        dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict)
+        dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict, 
+                                                 norm_inst_status = user_norm_inst_status)
 
         # Building parsing performances dict
         fails_dicts[SCOPUS] = scopus_fails_dict

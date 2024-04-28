@@ -259,8 +259,9 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
                 if country == '':
                     country = UNKNOWN
                     warning = (f'WARNING: the invalid country name "{country_raw}" '
-                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN}"'
-                               f'in "_build_addresses_countries_institutions_scopus" function of "BiblioParsingScopus.py" module')
+                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
+                               f'in "_build_addresses_countries_institutions_scopus" '
+                               f'function of "BiblioParsingScopus.py" module.')
                     print(warning)
 
                 list_countries.append(ref_country(pub_id,
@@ -1080,13 +1081,12 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
     countries_item_alias    = PARSING_ITEMS_LIST[3]
     institutions_item_alias = PARSING_ITEMS_LIST[4]
     auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
-    raw_inst_item_alias     = PARSING_ITEMS_LIST[6]
-    authors_kw_item_alias   = PARSING_ITEMS_LIST[7]
-    index_kw_item_alias     = PARSING_ITEMS_LIST[8]
-    title_kw_item_alias     = PARSING_ITEMS_LIST[9]    
-    subjects_item_alias     = PARSING_ITEMS_LIST[10]
-    sub_subjects_item_alias = PARSING_ITEMS_LIST[11]
-    references_item_alias   = PARSING_ITEMS_LIST[12]  
+    authors_kw_item_alias   = PARSING_ITEMS_LIST[6]
+    index_kw_item_alias     = PARSING_ITEMS_LIST[7]
+    title_kw_item_alias     = PARSING_ITEMS_LIST[8]    
+    subjects_item_alias     = PARSING_ITEMS_LIST[9]
+    sub_subjects_item_alias = PARSING_ITEMS_LIST[10]
+    references_item_alias   = PARSING_ITEMS_LIST[11]
     
     # Setting the specific file paths for subjects ans sub-subjects assignement for scopus corpuses    
     path_scopus_cat_codes = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_CAT_CODES)
@@ -1127,9 +1127,6 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
         # Building the dataframe of authors and their institutions
         authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, inst_filter_list)
         _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
-            # Building raw institutions file for further expending normalized institutions list               
-        #raw_institutions_df = build_raw_institutions(authors_institutions_df)               # Not yet used for Scopus
-        #_keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)    
 
         # Building the dataframes of keywords
         AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_scopus(df_corpus, scopus_dic_failed)   

@@ -443,7 +443,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     return concat_parsing_dict
 
 
-def deduplicate_parsing(concat_parsing_dict):
+def deduplicate_parsing(concat_parsing_dict, norm_inst_status = False):
     ''' The `deduplicate_parsing` function deduplicate parsing dfs of two corpuses. 
     It proceeds with deduplication of article lines using the `_deduplicate_articles` internal function.
     Then, it rationalizes the content of the other parsing dfs using the IDs of the droped articles lines
@@ -457,12 +457,17 @@ def deduplicate_parsing(concat_parsing_dict):
         (dict): Dict with keys as items parsing and values as the deduplicated dfs.
                                   
     '''
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import build_norm_raw_institutions
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     
     # Setting useful aliases
-    articles_item_alias = PARSING_ITEMS_LIST[0]
+    articles_item_alias  = PARSING_ITEMS_LIST[0]
+    addresses_item_alias = PARSING_ITEMS_LIST[2]
+    norm_inst_alias      = PARSING_ITEMS_LIST[12]
+    raw_inst_alias       = PARSING_ITEMS_LIST[13]
     
     # Getting a list of the items of the parsing dict to deduplicate
     items_list = list(concat_parsing_dict.keys())    
@@ -476,9 +481,15 @@ def deduplicate_parsing(concat_parsing_dict):
     items_list_wo_articles.remove(articles_item_alias)
     for item in items_list_wo_articles:
         dedup_parsing_dict[item] = _deduplicate_item_df(pub_id_to_drop, item, concat_parsing_dict[item])
-
+    
+    if norm_inst_status:
+        # Creating dataframes of normalized institutions and of not-yet normalized institions
+        df_address = dedup_parsing_dict[addresses_item_alias]
+        _, df_norm_institution, df_raw_institution = build_norm_raw_institutions(df_address, verbose = False)
+        dedup_parsing_dict[norm_inst_alias] = df_norm_institution
+        dedup_parsing_dict[raw_inst_alias]  = df_raw_institution
+    
     return dedup_parsing_dict
-
 
 
     

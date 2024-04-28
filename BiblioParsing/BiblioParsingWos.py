@@ -289,7 +289,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
         else:
             list_addresses.append(address(pub_id, 0, ''))
             list_institutions.append(institution(pub_id, 0, ''))
-            list_countrieslist_countries.append(country(pub_id, 0, ''))
+            list_countries.append(country(pub_id, 0, ''))
     
     # Building a clean addresses dataframe and accordingly updating the parsing success rate dict
     df_address, dic_failed = build_item_df_from_tup(list_addresses, address_col_List_alias, 
@@ -302,34 +302,6 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
     df_institution, dic_failed = build_item_df_from_tup(list_institutions, inst_col_list_alias, 
                                                         institution_alias, pub_id_alias, dic_failed)
-            
-    #df_address     = pd.DataFrame.from_dict({label:[s[idx] for s in list_addresses] 
-    #                                         for idx,label in enumerate(address_col_List_alias)})
-    #
-    #df_country     = pd.DataFrame.from_dict({label:[s[idx] for s in list_countries] 
-    #                                         for idx,label in enumerate(country_col_list_alias)})
-    #
-    #df_institution = pd.DataFrame.from_dict({label:[s[idx] for s in list_institutions] 
-    #                                         for idx,label in enumerate(inst_col_list_alias)})
-    #
-    #list_id = df_address[df_address[address_alias] == ''][pub_id_alias].values
-    #list_id = list(set(list_id))
-    #dic_failed[address_alias] = {'success (%)':100*(1-len(list_id)/len(df_corpus)),
-    #                             pub_id_alias:[int(x) for x in list(list_id)]}
-    #
-    #df_address = df_address[df_address[address_alias] != '']
-    #
-    #list_id = df_country[df_country[country_alias] == ''][pub_id_alias].values
-    #list_id = list(set(list_id))
-    #dic_failed[country_alias] = {'success (%)':100*(1-len(list_id)/len(df_corpus)),
-    #                             pub_id_alias:[int(x) for x in list(list_id)]}
-    #df_country = df_country[df_country[country_alias] != '']
-    #
-    #list_id = df_institution[df_institution[institution_alias] == ''][pub_id_alias].values
-    #list_id = list(set(list_id))
-    #dic_failed[institution_alias] = {'success (%)':100*(1-len(list_id)/len(df_corpus)),
-    #                                 pub_id_alias:[int(x) for x in list(list_id)]}
-    #df_institution = df_institution[df_institution[institution_alias] != '']
     
     if not(len(df_address)==len(df_country)==len(df_institution)):
         warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal'
@@ -500,15 +472,6 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
     df_addr_country_inst, dic_failed = build_item_df_from_tup(list_addr_country_inst, auth_inst_col_list_alias[:-1], 
                                                               norm_institution_alias, pub_id_alias, dic_failed)
-    ## Building a first version of the returned dataframe with 'list_addr_country_inst'      
-    ## with columns "COL_NAMES['auth_inst'][:-1]"
-    #df_addr_country_inst = pd.DataFrame.from_dict({label:[s[idx] for s in list_addr_country_inst] 
-    #                                               for idx,label in enumerate(auth_inst_col_list_alias[:-1])})    
-    #
-    ## Updating the dic_failed dict
-    #list_id = df_addr_country_inst[df_addr_country_inst[norm_institution_alias] == ''][pub_id_alias].values
-    #dic_failed['authors_inst'] = {'success (%)':100 * (1 - len(list_id) / len(df_corpus)),
-    #                              pub_id_alias:[int(x) for x in list(list_id)]} 
     
     if inst_filter_list is not None:
         df_addr_country_inst = extend_author_institutions(df_addr_country_inst, inst_filter_list)
@@ -634,17 +597,7 @@ def _build_sub_subjects_wos(df_corpus,dic_failed):
     
     # Building a clean sub_subjects dataframe and accordingly updating the parsing success rate dict
     df_sub_subject, dic_failed = build_item_df_from_tup(list_sub_subject, sub_subject_col_list_alias, 
-                                                        sub_subject_alias, pub_id_alias, dic_failed)  
-    
-    #df_sub_subject = pd.DataFrame.from_dict({label:[s[idx] for s in list_sub_subject] 
-    #                                         for idx,label in enumerate(sub_subject_col_list_alias)})            
-    #
-    #list_id = df_sub_subject[df_sub_subject[sub_subject_alias] == ''][pub_id_alias].values
-    #list_id = list(set(list_id))
-    #dic_failed[sub_subject_alias] = {'success (%)':100*(1-len(list_id)/len(df_corpus)),
-    #                                 pub_id_alias:[int(x) for x in list(list_id)]}
-    #
-    #df_sub_subject = df_sub_subject[df_sub_subject[sub_subject_alias] != '']
+                                                        sub_subject_alias, pub_id_alias, dic_failed)
     
     return df_sub_subject
 
@@ -870,7 +823,7 @@ def read_database_wos(rawdata_path):
     from BiblioParsing.BiblioSpecificGlobals import WOS
     from BiblioParsing.BiblioSpecificGlobals import WOS_RAWDATA_EXTENT
     
-    # Check if rawdata file is available and get its full path if is
+    # Check if rawdata file is available and get its full path if it is
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, WOS_RAWDATA_EXTENT)
 
     if rawdata_file_path: 
@@ -928,10 +881,7 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
     # Standard library imports
     import os
     import json
-    from pathlib import Path   
-
-    # Local library imports
-    from BiblioParsing.BiblioParsingInstitutions import build_raw_institutions
+    from pathlib import Path 
     
     # Local globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
@@ -940,7 +890,7 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
     # Internal functions    
     def _keeping_item_parsing_results(item, item_df):
         wos_parsing_dict[item] = item_df
-            
+    
     # Setting useful aliases
     articles_item_alias     = PARSING_ITEMS_LIST[0]
     authors_item_alias      = PARSING_ITEMS_LIST[1]
@@ -948,13 +898,12 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
     countries_item_alias    = PARSING_ITEMS_LIST[3]
     institutions_item_alias = PARSING_ITEMS_LIST[4]
     auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
-    raw_inst_item_alias     = PARSING_ITEMS_LIST[6]
-    authors_kw_item_alias   = PARSING_ITEMS_LIST[7]
-    index_kw_item_alias     = PARSING_ITEMS_LIST[8]
-    title_kw_item_alias     = PARSING_ITEMS_LIST[9]    
-    subjects_item_alias     = PARSING_ITEMS_LIST[10]
-    sub_subjects_item_alias = PARSING_ITEMS_LIST[11]
-    references_item_alias   = PARSING_ITEMS_LIST[12]    
+    authors_kw_item_alias   = PARSING_ITEMS_LIST[6]
+    index_kw_item_alias     = PARSING_ITEMS_LIST[7]
+    title_kw_item_alias     = PARSING_ITEMS_LIST[8]    
+    subjects_item_alias     = PARSING_ITEMS_LIST[9]
+    sub_subjects_item_alias = PARSING_ITEMS_LIST[10]
+    references_item_alias   = PARSING_ITEMS_LIST[11]
     
     # Reading and checking the raw corpus file
     df_corpus = read_database_wos(rawdata_path)
@@ -991,9 +940,6 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
         # Building the dataframe of authors and their institutions
         authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, inst_filter_list)
         _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
-            # Building raw institutions file for further expending normalized institutions list               
-        raw_institutions_df = build_raw_institutions(authors_institutions_df)
-        _keeping_item_parsing_results(raw_inst_item_alias, raw_institutions_df)
 
         # Building the dataframes of keywords
         AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus, wos_dic_failed)   

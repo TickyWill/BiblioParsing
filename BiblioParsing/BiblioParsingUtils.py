@@ -1,5 +1,6 @@
 __all__ = ['biblio_parser',
            'build_item_df_from_tup',
+           'build_norm_raw_institutions',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
@@ -27,11 +28,10 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     list_data_base = []
     for path, _, files in os.walk(rawdata_path):
         list_data_base.extend(Path(path) / Path(file) for file in files 
-                              if file.endswith(raw_extent))        
-        
+                              if file.endswith(raw_extent))                
     if list_data_base:
         # Selecting the most recent file with raw_extent extension
-        list_data_base.sort(key=lambda x: os.path.getmtime(x),reverse=True)
+        list_data_base.sort(key = lambda x: os.path.getmtime(x), reverse=True)
         rawdata_file_path = list_data_base[0]
     else:
         rawdata_file_path = None
@@ -46,7 +46,7 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     return error_text
 
 
-def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed):
+def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed = None):
     '''Building a clean item dataframe from a tuple 
     and accordingly updating the parsing success rate dict.'''
     
@@ -57,9 +57,10 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, di
                                       for idx,label in enumerate(item_col_names)})
     list_id = item_df[item_df[item_col] == ''][pub_id_alias].values
     list_id = list(set(list_id))
-    df_corpus_len = dic_failed['number of article']
-    dic_failed[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
-                            pub_id_alias:[int(x) for x in list(list_id)]}    
+    if dic_failed:
+        df_corpus_len = dic_failed['number of article']
+        dic_failed[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
+                                pub_id_alias:[int(x) for x in list(list_id)]}    
     item_df = item_df[item_df[item_col] != '']
     return item_df, dic_failed
 
@@ -222,7 +223,6 @@ def merge_database(database,filename,in_dir,out_dir):
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
-    #from BiblioParsing.BiblioSpecificGlobals import USECOLS_SCOPUS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     from BiblioParsing.BiblioSpecificGlobals import WOS
 
     list_data_base = []
@@ -239,14 +239,12 @@ def merge_database(database,filename,in_dir,out_dir):
             list_data_base.extend(Path(path) / Path(file) for file in files
                                                           if file.endswith(".csv"))
         for file in list_data_base:
-            #df = pd.read_csv(file,usecols=USECOLS_SCOPUS) # reads the database     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #list_df.append(df)                                                     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
             list_df.append(read_database_scopus(file))
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be {WOS} or {SCOPUS} ")
         
-    result = pd.concat(list_df,ignore_index=True)
-    result.to_csv(out_dir / Path(filename),sep='\t')
+    result = pd.concat(list_df, ignore_index = True)
+    result.to_csv(out_dir / Path(filename), sep = '\t')
 
 def normalize_name(text):
     
@@ -558,12 +556,6 @@ def read_towns_per_country(country_towns_file, rep_utils, dic_town_symbols, dic_
     
     return towns_dic
 
-                    
-################################# Functions replacing deprecated ones ##########################################
-# To Do: 2022-12-08
-#    - Update All with functions replacing deprecated ones
-#    - Search for calls of deprecated functions in all BiblioParsing modules
-#    - Replace calls of deprecated functions by replacing functions and check args, returns and imports including globals
 
 def remove_special_symbol(text, only_ascii = True, strip = True):
     '''The function `remove_special_symbol` removes accentuated characters in the string 'text'
@@ -634,121 +626,114 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     
     return text
 
-
-################################# Deprecated functions ##########################################
-
-
-def country_normalization(country):                                                                            # Deprecated, replaced by "normalize_country"
+def build_norm_raw_institutions(df_address, verbose = False):
     
-    '''
-    Normalize the country name for coherence seeking between wos and scopus corpuses.
-    '''
-    # To Do: update docstring
-    
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import ALIAS_UK
-    from BiblioParsing.BiblioGeneralGlobals import COUNTRIES    
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
-    
-    country_clean = country
-    if country not in COUNTRIES:
-        if country in  ALIAS_UK:
-            country_clean = 'United Kingdom'
-        elif 'USA' in country:
-            country_clean = 'United States'
-        elif ('china' in country) or ('China' in country):
-            country_clean = 'China'
-        elif country == 'Russia':    
-            country_clean = 'Russian Federation'
-        elif country == 'U Arab Emirates':    
-            country_clean = 'United Arab Emirates'
-        elif country == 'Vietnam':   
-            country_clean = 'Viet Nam'
-        else:
-            country_clean = UNKNOWN
+    '''The function `build_norm_raw_institutions_wos` parses the addresses 
+    of each publication of the Wos corpus to retrieve the country, 
+    the normalized institutions and the institutions not yet normalized for each address.
 
-    return country_clean
-
-
-def town_names_uniformization(text):                                                                            # Deprecated, replaced by "rationalize_town_names"
-    '''the `town_names_uniformization` function replaces in the string 'text'
-    symbols and words defined by the keys of the dictionaries 'DIC_TOWN_SYMBOLS'
-    and 'DIC_TOWN_WORDS' by their corresponding values in these dictionaries.
-    
     Args:
-        text (str): The string where changes will be done.
-        
+        df_address (dataframe): the dataframe of the addresses resulting
+        from the concatenation/deduplication of databases.
+        verbose (bool): If set to 'True' allows prints for code control (default: False).
+
     Returns:
-        (str): the modified string.
+        (tuple): The tuple of the dataframes df_country, df_norm_institutions, df_raw_institutions.
         
     Notes:
-        The globals 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' are imported from
-        `BiblioSpecificGlobals` module of `BiblioParsing' package.
-    
-    '''
-    # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS
-    from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
-    
-    # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
-    for town_symb in DIC_TOWN_SYMBOLS.keys():
-        text = text.replace(town_symb, DIC_TOWN_SYMBOLS[town_symb])
-
-    # Uniformizing words in town names using the dict 'DIC_TOWN_WORDS'
-    for town_word in DIC_TOWN_WORDS.keys():
-        text = text.replace(town_word, DIC_TOWN_WORDS[town_word])
-    
-    return text
-
-
-def accent_remove(text, strip = True):                                                                                  # Deprecated, replaced by "remove_special_symbol"
-    ''' The function `accent_remove` is deprecated and has been replaced by the function `special_symbol_remove` 
-     imported from 'BiblioParsingUtils' module of 'BiblioAnalysis' package
-     with the optional parameters "only_ascii" and "skip" set at the default value True.
+        The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
+        The functions `build_address_affiliations_lists`, `build_norm_raw_affiliations_dict` and `read_inst_types`  
+        are imported from `BiblioParsingInstitutions` module of `BiblioParsing` package.
+        The function `build_item_df_from_tup` is imported from `BiblioParsingInstitutions` module 
+        of `BiblioParsing` package.
         
     '''
+
     # Standard library imports
-    import functools
-    import unicodedata
-
-    nfc = functools.partial(unicodedata.normalize,'NFD')
-    text = nfc(text). \
-               encode('ascii', 'ignore'). \
-               decode('utf-8')
-    if strip:
-        text = text.strip()
+    import re
+    from collections import namedtuple
     
-    return text
-
-
-def special_symbol_remove(text, only_ascii = True, strip = True):                                                        # Deprecated, replaced by "remove_special_symbol"
-    '''The function `special_symbol_remove` remove accentuated characters in the string 'text'
-    and ignore non-ascii characters if 'only_ascii' is true. Finally, spaces at the ends of 'text'
-    are removed if strip is true.
+    # 3rd party library imports
+    import pandas as pd
     
-    Args:
-        text (str): the text where to remove special symbols.
-        only_ascii (boolean): True to remove non-ascii characters from 'text' (default: True).
-        strip (boolean): True to remove spaces at the ends of 'text' (default: True).
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
+    from BiblioParsing.BiblioParsingInstitutions import build_address_affiliations_lists
+    from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
+    from BiblioParsing.BiblioParsingInstitutions import read_inst_types
+    
+    # Globals imports    
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    
+    # Setting useful aliases
+    pub_id_alias             = COL_NAMES['pub_id']
+    address_col_List_alias   = COL_NAMES['address']
+    country_col_list_alias   = COL_NAMES['country']
+    inst_col_list_alias      = COL_NAMES['institution']
+    address_alias            = address_col_List_alias[2]
+    country_alias            = country_col_list_alias[2]
+    institution_alias        = inst_col_list_alias[2]
+    
+    # Setting named tuples
+    country     = namedtuple('country', country_col_list_alias )
+    institution = namedtuple('institution', inst_col_list_alias )
+    
+    # Getting useful dicts for affiliation normalization
+    aff_type_dict = read_inst_types() 
+    norm_raw_aff_dict = build_norm_raw_affiliations_dict()
+    
+    list_countries    = []
+    list_norm_institutions = []
+    list_raw_institutions  = []
+    
+    for pub_id, address_dg in df_address.groupby(pub_id_alias):
+        if verbose:
+            print("\n\nPub_id:", pub_id)
+            print("\naddress_dg:\n", address_dg)     
+        for idx, address_raw in enumerate(address_dg[address_alias].tolist()):
+            try:
+                aff_list_tup = build_address_affiliations_lists(address_raw, norm_raw_aff_dict, 
+                                                                aff_type_dict, verbose = False)
+                address_country, address_norm_affiliation_list, address_raw_affiliation_list = aff_list_tup
+            except KeyError:
+                print("\n\nError Pub_id / idx:", pub_id," / ", idx)
+                print("\naddress_dg:\n", address_dg[address_alias].tolist()[idx])
+                pass
+            address_norm_affiliations = "Not available"
+            address_raw_affiliations  = "Empty"
+            if address_norm_affiliation_list: address_norm_affiliations = "; ".join(address_norm_affiliation_list)
+            if address_raw_affiliation_list: address_raw_affiliations = "; ".join(address_raw_affiliation_list)
+            list_countries.append(country(pub_id, idx, address_country))
+            list_norm_institutions.append(institution(pub_id, idx, address_norm_affiliations))
+            list_raw_institutions.append(institution(pub_id, idx, address_raw_affiliations))            
+            
+            if verbose:
+                print('\nIdx address:                       ',idx)
+                print('Country:                           ',address_country)
+                print('address_norm_affiliation_list:     ',address_norm_affiliations)
+                print('address_unknown_affiliations_list: ',address_raw_affiliations)            
+
+    # Building a clean countries dataframe and accordingly updating the parsing success rate dict
+    df_country, _ = build_item_df_from_tup(list_countries, country_col_list_alias, 
+                                           country_alias, pub_id_alias)
+    
+    # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
+    df_norm_institution, _ = build_item_df_from_tup(list_norm_institutions, inst_col_list_alias, 
+                                                    institution_alias, pub_id_alias) 
+    
+    # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
+    df_raw_institution, _ = build_item_df_from_tup(list_raw_institutions, inst_col_list_alias, 
+                                                   institution_alias, pub_id_alias)    
+    if not(len(df_country)==len(df_norm_institution)==len(df_raw_institution)):
+        warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal '
+                   f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
+        print(warning)
         
-    Returns:
-        (str): the modified string 'text'.
-    
-    '''
-    # Standard library imports
-    import functools
-    import unicodedata
+    return (df_country, df_norm_institution, df_raw_institution)
 
-    if only_ascii:
-        nfc = functools.partial(unicodedata.normalize,'NFD')
-        text = nfc(text). \
-                   encode('ascii', 'ignore'). \
-                   decode('utf-8')
-    else:
-        nfkd_form = unicodedata.normalize('NFKD',text)
-        text = ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+################################# Deprecated functions ##########################################
+# country_normalization deprecated, replaced by "normalize_country"
+# town_names_uniformization deprecated, replaced by "rationalize_town_names"
+# accent_remove deprecated, replaced by "remove_special_symbol"
+# special_symbol_remove deprecated, replaced by "remove_special_symbol"
 
-    if strip:
-        text = text.strip()
-    
-    return text

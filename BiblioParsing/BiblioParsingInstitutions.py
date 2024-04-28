@@ -5,9 +5,13 @@ __all__ = ['address_inst_full_list',          #
            'build_institutions_dic',          #
            'build_norm_raw_affiliations_dict', 
            'extend_author_institutions',      #
+           'get_affiliations_list',
+           'get_norm_affiliations_list',
            'getting_secondary_inst_list',     #
            'read_inst_types',
            'build_raw_institutions',         #
+           'search_items',
+           'standardize_address',
            ]
 
 
@@ -113,7 +117,7 @@ def address_inst_full_list(full_address, inst_dic):
         norm_inst_full_list_str = EMPTY 
     
     # Setting the namedtuple to return
-    inst_full_list_tup =  inst_full_list_ntup(norm_inst_full_list_str,raw_inst_full_list_str) 
+    inst_full_list_tup =  inst_full_list_ntup(norm_inst_full_list_str, raw_inst_full_list_str) 
     
     return inst_full_list_tup
 
@@ -156,7 +160,6 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST    
     from BiblioParsing.BiblioSpecificGlobals import DIC_AMB_WORDS
-
     
     def _normalize_amb_words(text): 
         for amb_word in DIC_AMB_WORDS.keys():
@@ -167,9 +170,9 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     affiliation_raw = _normalize_amb_words(affiliation_raw)
     affiliation_raw = affiliation_raw.translate(DASHES_CHANGE)
     affiliation_raw = affiliation_raw.translate(SYMB_CHANGE)
-    affiliation_raw = re.sub(RE_SUB_FIRST,'University' + ', ',affiliation_raw)
-    affiliation_raw = re.sub(RE_SUB,'University' + ' ',affiliation_raw)
-    affiliation = remove_special_symbol(affiliation_raw, only_ascii=True, skip=True)
+    affiliation_raw = re.sub(RE_SUB_FIRST, 'University' + ', ', affiliation_raw)
+    affiliation_raw = re.sub(RE_SUB, 'University' + ' ', affiliation_raw)
+    affiliation = remove_special_symbol(affiliation_raw, only_ascii = True, skip = True)
     
     return affiliation
 
@@ -202,7 +205,7 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     import pandas as pd
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals  import DIC_INST_FILENAME
+    from BiblioParsing.BiblioSpecificGlobals import DIC_INST_FILENAME
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS    
     
     if dic_inst_filename == None: dic_inst_filename = DIC_INST_FILENAME
@@ -212,12 +215,11 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     path_dic_inst = Path(__file__).parent / rep_utils / Path(dic_inst_filename)
     
     # Reading and cleaning the dic_inst_filename file
-    inst_dic = pd.read_csv(path_dic_inst,sep=':',header=None,encoding='latin1')
-    inst_dic.sort_values([0],inplace=True)
+    inst_dic = pd.read_csv(path_dic_inst, sep = ':', header = None, encoding = 'latin1')
+    inst_dic.sort_values([0], inplace = True)
     inst_dic[0] = inst_dic[0].str.strip()
     inst_dic[1] = inst_dic[1].str.strip()
-    inst_dic = dict(zip(inst_dic[0],inst_dic[1]))
-    
+    inst_dic = dict(zip(inst_dic[0], inst_dic[1]))    
     return inst_dic
 
 
@@ -421,8 +423,6 @@ def getting_secondary_inst_list(parsing_dict):
     
     # Setting the df of 'authors_institutions' item
     auth_inst_df = parsing_dict['authors_institutions']
-    #auth_inst_df = pd.read_csv(Path(out_dir_parsing) / Path(DIC_OUTDIR_PARSING['I2']),
-    #                            sep = '\t')
     
     raw_institutions_list = []
     for auth_inst in auth_inst_df[institutions_alias]:
@@ -439,7 +439,7 @@ def getting_secondary_inst_list(parsing_dict):
 
 def build_raw_institutions(auth_inst_df):
     '''The `build_raw_institutions`function allows to built the list of raw institutions of a corpus.
-    The raw institutions are the ones that have not been complitly replaced by the normalized names 
+    The raw institutions are the ones that have not been completly replaced by the normalized names 
     of institutions given in a specific file.
     
     Args:
@@ -480,7 +480,7 @@ def build_raw_institutions(auth_inst_df):
 
 
 ################################### New functions for address parsing and affiliations normalization ###################################
-#To Do: test in BiblioAnalysisNormAff notebook
+
 
 def standardize_address(raw_address):
     
@@ -529,9 +529,9 @@ def standardize_address(raw_address):
     # Uniformizing words
     standard_address = raw_address
     for word_to_subsitute, re_pattern in DIC_WORD_RE_PATTERN.items():
-        standard_address = re.sub(re_pattern,word_to_subsitute + ' ',standard_address)
-    standard_address = re.sub(r'\s+',' ',standard_address)
-    standard_address = re.sub(r'\s,',',',standard_address)
+        standard_address = re.sub(re_pattern,word_to_subsitute + ' ', standard_address)
+    standard_address = re.sub(r'\s+', ' ', standard_address)
+    standard_address = re.sub(r'\s,', ',', standard_address)
     
     # Uniformizing dashes
     standard_address = standard_address.translate(DASHES_CHANGE)
@@ -543,7 +543,7 @@ def standardize_address(raw_address):
     country_pos = -1
     first_raw_affiliations_list = standard_address.split(',')
     # This split below is just for country finding even if affiliation may be separated by dashes
-    raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list],[])        
+    raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])        
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     space = " "
     if country != UNKNOWN:
@@ -599,6 +599,7 @@ def search_items(affiliation, country, verbose = False):
     
     # Standard library imports
     import re
+    from collections import namedtuple
     from string import Template
     
     # Local library imports 
@@ -615,8 +616,7 @@ def search_items(affiliation, country, verbose = False):
     from BiblioParsing.BiblioSpecificGlobals import GEN_KEEPING_WORDS
     from BiblioParsing.BiblioSpecificGlobals import KEEPING_PREFIX
     from BiblioParsing.BiblioSpecificGlobals import KEEPING_WORDS
-    from BiblioParsing.BiblioSpecificGlobals import USER_KEEPING_WORDS
-    
+    from BiblioParsing.BiblioSpecificGlobals import USER_KEEPING_WORDS    
     
     ################################### Internal functions start ###################################
     def  _search_droping_bp(text):
@@ -630,14 +630,13 @@ def search_items(affiliation, country, verbose = False):
             (boolean): True if a word is found.
             
         '''
-
         re_bp = re.compile(r'\bbp\s?\d+[a-z]?\b'     # For instence capturing "bp12" in "azert BP12 yui_OP"
                                                      # capturing " bp 156X" in " bp 156X azert"
                            + '|'
                            + r'\b\d+bp\b')  # For instence capturing "08bp" in "azert 08BP yui_OP".
 
         flag = False
-        result = re.search(re_bp,text.lower())
+        result = re.search(re_bp, text.lower())
         if result is not None:
             if verbose:
                 print('Droping word is postal-box abbreviation')
@@ -663,7 +662,6 @@ def search_items(affiliation, country, verbose = False):
             and the variable 'country'.
 
         '''
-
         # Setting regex for zip-codes search
         pattern = ''
         if country == 'United Kingdom':
@@ -773,7 +771,7 @@ def search_items(affiliation, country, verbose = False):
         flag = False
         for word_to_drop in DROPING_SUFFIX:
             re_drop_words = re.compile(droping_suffix_template.substitute({"word":word_to_drop}))
-            result = re.search(re_drop_words,text.lower())
+            result = re.search(re_drop_words, text.lower())
             if result is not None:
                 flag = True
                 if verbose:
@@ -819,8 +817,7 @@ def search_items(affiliation, country, verbose = False):
         Notes:
             This function uses the globals 'FR_DROPING_WORDS' and 'DROPING_WORDS' imported in the calling function.               
 
-        '''
-        
+        '''        
         droping_words_template = Template(  r'[\s(]$word[\s)]'     # For instence capturing "avenue" in "12 Avenue Azerty" or " cedex" in "azert cedex".
                                                                    # in "12 Avenue Azerty" or " cedex" in "azert cedex".
                                           + '|'
@@ -828,7 +825,6 @@ def search_items(affiliation, country, verbose = False):
                                           + '|'
                                           + r'^$word\b')
                                                                
-
         flag = False
         if country.lower()=='france':
             droping_words_to_search = FR_DROPING_WORDS
@@ -837,7 +833,7 @@ def search_items(affiliation, country, verbose = False):
             
         for word_to_drop in droping_words_to_search:
             re_drop_words = re.compile(droping_words_template.substitute({"word":word_to_drop}))
-            result = re.search(re_drop_words,text.lower())
+            result = re.search(re_drop_words, text.lower())
             if result is not None:
                 flag = True
                 if verbose:
@@ -858,20 +854,18 @@ def search_items(affiliation, country, verbose = False):
             This function uses the global 'KEEPING_PREFIX' imported in the calling function.               
 
         '''              
-
         keeping_prefix_template = Template(r'\b$prefix\d{3,4}\b') 
 
         flag = False
         if country.lower() == 'france':
             for prefix_to_keep in KEEPING_PREFIX:
                 re_keep_prefix = re.compile(keeping_prefix_template.substitute({"prefix":prefix_to_keep}))
-                result = re.search(re_keep_prefix,text.lower())
+                result = re.search(re_keep_prefix, text.lower())
                 if result is not None:
                     if verbose:
-                        print('Keeping word is the prefix:',prefix_to_keep)
+                        print('Keeping word is the prefix:', prefix_to_keep)
                     flag = True
         return [flag]
-
 
     def _search_keeping_words(text):
         ''''The internal function `_search_keaping_words` searches in 'text' for isolated words 
@@ -886,25 +880,22 @@ def search_items(affiliation, country, verbose = False):
         Notes:
             This function uses the global 'KEEPING_WORDS' imported in the calling function.               
               
-
         '''
         keeping_words_template = Template(r'\b$word\b')
 
         gen_flag, basic_flag, user_flag  = False, False, False
         for word_to_keep in KEEPING_WORDS:
             re_keep_words = re.compile(keeping_words_template.substitute({"word":word_to_keep}))
-            result = re.search(re_keep_words,text.lower())
+            result = re.search(re_keep_words, text.lower())
             if result is not None:
                 if verbose:
-                    print('Keeping word is the full word:',word_to_keep)
+                    print('Keeping word is the full word:', word_to_keep)
                 if word_to_keep in GEN_KEEPING_WORDS : gen_flag = True
                 if word_to_keep in BASIC_KEEPING_WORDS : basic_flag = True 
                 if word_to_keep in USER_KEEPING_WORDS : user_flag = True 
 
         return [gen_flag, basic_flag, user_flag]    
     #################################### Internal functions end ####################################
-
-    from collections import namedtuple
     
     funct_list = [
                   _search_droping_bp,
@@ -931,7 +922,7 @@ def search_items(affiliation, country, verbose = False):
     flag_list = [funct(affiliation_mod) for funct in funct_list]
     
     # Flattening flag_list
-    flag_list = sum(flag_list,[])
+    flag_list = sum(flag_list, [])
     found_item_flags = found_item_tup(*flag_list)
 
     return found_item_flags
@@ -982,17 +973,19 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
     # and putting them in a deduplicated-affiliations list
     drop_aff_idx_list = []
     for idx1, aff1 in enumerate(init_raw_affiliations_list): 
-        drop_aff_idx_list.extend([min(idx1,idx2) for idx2,aff2 in enumerate(init_raw_affiliations_list) if idx1!=idx2 and aff1==aff2])
+        drop_aff_idx_list.extend([min(idx1, idx2) for idx2, aff2 in enumerate(init_raw_affiliations_list) 
+                                  if idx1!=idx2 and aff1==aff2])
     dedup_raw_affiliations_list = []    
-    dedup_raw_affiliations_list.extend([aff for idx, aff in enumerate(init_raw_affiliations_list) if idx not in set(drop_aff_idx_list)])             
+    dedup_raw_affiliations_list.extend([aff for idx, aff in enumerate(init_raw_affiliations_list) 
+                                        if idx not in set(drop_aff_idx_list)])             
 
     # Setting country index in raw-affiliations list
     country_pos = -1
     country = dedup_raw_affiliations_list[country_pos].strip()
 
     # Splitting by special characters the deduplicated chunks and putting them in a raw-affiliations list
-    raw_affiliations_list = sum([x.split(' - ') for x in dedup_raw_affiliations_list],[])
-    raw_affiliations_list = sum([x.split(' | ') for x in raw_affiliations_list],[])
+    raw_affiliations_list = sum([x.split(' - ') for x in dedup_raw_affiliations_list], [])
+    raw_affiliations_list = sum([x.split(' | ') for x in raw_affiliations_list], [])
 
     # Initializing the affiliations list by keeping systematically the first chunck of the full address
     affiliations_list = [raw_affiliations_list[0]]
@@ -1037,29 +1030,29 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
             if not any(droping_word_flags):
                 affiliations_list.append(affiliation)
                 add_affiliation_flag = True
-                if verbose: print('No droping item found in:',affiliation,'\n')
+                if verbose: print('No droping item found in:', affiliation, '\n')
 
             else:                
                 if found_item_flags.droping_bp:
-                    affiliations_drop.append(('droping_bp',check_affiliations_list[index:country_pos]))
+                    affiliations_drop.append(('droping_bp', check_affiliations_list[index:country_pos]))
                     break_id = 'droping_bp'
-                    if verbose: print('Break identification:',break_id,'\n')
+                    if verbose: print('Break identification:', break_id, '\n')
                     break 
 
                 if found_item_flags.droping_digits:
 
                     if country.lower() in ['france','algeria']:
                         if not found_item_flags.keeping_prefix and not any(keeping_words_flags):
-                            affiliations_drop.append(('droping_digits',check_affiliations_list[index:country_pos]))
+                            affiliations_drop.append(('droping_digits', check_affiliations_list[index:country_pos]))
                             break_id = 'droping_digits'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                             break
                         elif found_item_flags.gen_keeping_words:
                             if not add_affiliation_flag: 
                                 affiliations_list.append(affiliation)
                                 add_affiliation_flag = True
                             break_id = 'droping_digits aborted by gen_keeping_words'     
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                         else: 
                             if not add_affiliation_flag: 
                                 affiliations_list.append(affiliation)
@@ -1067,35 +1060,35 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
                             if found_item_flags.basic_keeping_words: break_id = 'droping_digits aborted by basic_keeping_words'
                             if found_item_flags.user_keeping_words : break_id = 'droping_digits aborted by user_keeping_words'
                             if found_item_flags.keeping_prefix: break_id = 'droping_digits aborted by keeping_prefix'
-                            if verbose: print('Break identification:',break_id,'\n')                    
+                            if verbose: print('Break identification:', break_id, '\n')                    
                     else:
                         if not found_item_flags.gen_keeping_words and not found_item_flags.user_keeping_words:
                             affiliations_drop.append(('droping_digits',check_affiliations_list[index:country_pos]))
                             break_id = 'droping_digits'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                             break
                         elif found_item_flags.droping_words:
                             affiliations_drop.append(('droping_digits',check_affiliations_list[index:country_pos]))
                             break_id = 'droping_digits'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                             break
                         else:
                             if not add_affiliation_flag: 
                                 affiliations_list.append(affiliation)
                                 add_affiliation_flag = True
                                 break_id = 'droping_digits aborted by user_keeping_words'
-                                if verbose: print('Break identification:',break_id,'\n')
+                                if verbose: print('Break identification:', break_id, '\n')
 
                 if found_item_flags.droping_town:
                     if len(check_affiliations_list[index:country_pos])<=2:   
-                        affiliations_drop.append(('droping_town',check_affiliations_list[index:country_pos]))
+                        affiliations_drop.append(('droping_town', check_affiliations_list[index:country_pos]))
                         break_id = 'droping_town'
-                        if verbose: print('Break identification:',break_id,'\n')    
+                        if verbose: print('Break identification:', break_id, '\n')    
                         break
                     else:
-                        affiliations_drop.append(('droping_town',affiliation))
+                        affiliations_drop.append(('droping_town', affiliation))
                         break_id = 'droping_town aborted by index of town in affiliations list'
-                        if verbose: print('Break identification:',break_id,'\n')
+                        if verbose: print('Break identification:', break_id, '\n')
 
                 else:
                     if found_item_flags.droping_suffix:
@@ -1105,11 +1098,11 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
                                 add_affiliation_flag = True
                             if found_item_flags.gen_keeping_words: break_id = 'droping_suffix aborted by gen_keeping_words'
                             if found_item_flags.user_keeping_words: break_id = 'droping_suffix aborted by user_keeping_words'
-                            if verbose: print('Break identification:',break_id,'\n')    
+                            if verbose: print('Break identification:', break_id, '\n')    
                         else:
                             affiliations_drop.append(('droping_suffix',check_affiliations_list[index:country_pos]))
                             break_id = 'droping_suffix'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                             break   
 
                     if found_item_flags.droping_words:
@@ -1123,15 +1116,15 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
                             if found_item_flags.user_keeping_words: break_id = 'droping_word aborted by user_keeping_words'
                             if found_item_flags.basic_keeping_words: break_id = 'droping_word aborted by basic_keeping_words'
                             if found_item_flags.gen_keeping_words: break_id = 'droping_word aborted by gen_keeping_words'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                         else:
                             # Droping affiliation from affiliations_list if already added because of a former drop abort
                             if add_affiliation_flag:
                                 affiliations_list = affiliations_list[:-1]
                                 add_affiliation_flag = False
-                            affiliations_drop.append(('droping_words',check_affiliations_list[index:country_pos]))
+                            affiliations_drop.append(('droping_words', check_affiliations_list[index:country_pos]))
                             break_id = 'droping_words'
-                            if verbose: print('Break identification:',break_id,'\n')
+                            if verbose: print('Break identification:', break_id, '\n')
                             break             
 
     # Removing spaces from the affiliations kept 
@@ -1188,7 +1181,6 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     from BiblioParsing.BiblioSpecificGlobals import SMALL_WORDS_DROP    
     from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
 
-
     ################################################ Local functions start ################################################
 
     def _build_words_set(raw_aff):
@@ -1241,9 +1233,9 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
         std_raw_aff = raw_aff_mod
         std_raw_aff_add = ""
         for word_to_substitute, re_pattern in DIC_WORD_RE_PATTERN.items():
-            std_raw_aff = re.sub(re_pattern,word_to_substitute + ' ',std_raw_aff)
-        std_raw_aff = re.sub(r'\s+',' ',std_raw_aff)
-        std_raw_aff = re.sub(r'\s,',',',std_raw_aff)
+            std_raw_aff = re.sub(re_pattern, word_to_substitute + ' ', std_raw_aff)
+        std_raw_aff = re.sub(r'\s+', ' ', std_raw_aff)
+        std_raw_aff = re.sub(r'\s,', ',', std_raw_aff)
         std_raw_aff = std_raw_aff.lower()
         
         # Uniformizing dashes
@@ -1262,14 +1254,14 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
         # Building the corresponding set of words to std_raw_aff
         raw_aff_words_set = set(std_raw_aff.strip().split(' '))
 
-        # Managing missing space in raw affiliations related to particuliar institutions cases such as UMR or U followed by digits
+        # Managing missing space in raw affiliations related 
+        # to particuliar institutions cases such as UMR or U followed by digits
         for accron in MISSING_SPACE_ACRONYMS:
             re_accron = re.compile(accronymes_template.substitute({"word":accron}))
             if re.search(re_accron,std_raw_aff.lower()) and len(raw_aff_words_set)==2:
                 std_raw_aff_add = "".join(std_raw_aff.split(" "))
 
         # Droping small words
-        # print('       raw_aff_words_set_init:', raw_aff_words_set)
         for word_to_drop in SMALL_WORDS_DROP:
             re_drop_words = re.compile(small_words_template.substitute({"word":word_to_drop}))
             if re.search(re_drop_words,std_raw_aff.lower()):
@@ -1279,9 +1271,6 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
         raw_aff_words_set_add = {}
         if std_raw_aff_add:
             raw_aff_words_set_add = set(std_raw_aff_add.split(' '))
-
-        #print('       raw_aff_words_set_final:', raw_aff_words_set)
-        #print('       raw_aff_words_set_add:', raw_aff_words_set_add)
 
         return (raw_aff_words_set, raw_aff_words_set_add)
 
@@ -1297,12 +1286,9 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
             (list): List of words sets.
 
         '''
-
         raw_aff_words_sets_list = []
         for idx, raw_aff in enumerate(raw_aff_list):
-            if raw_aff and raw_aff!=' ':
-                #print('     ' + str(idx) + '- Raw affiliation:', raw_aff)
-                
+            if raw_aff and raw_aff!=' ':                
                 # Building the set of words for raw affiliation
                 raw_aff_words_set, raw_aff_words_set_add = _build_words_set(raw_aff)
 
@@ -1311,9 +1297,6 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
 
                 # Upadating the list of words sets using the set raw_aff_words_set_add
                 if raw_aff_words_set_add: raw_aff_words_sets_list.append(raw_aff_words_set_add)
-
-            #print('    raw_aff_words_sets_list:', raw_aff_words_sets_list)
-            #print()
 
         return raw_aff_words_sets_list
 
@@ -1326,7 +1309,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     # Reading the 'Country_affilialions.xlsx' file in the dataframe dic    
     wb = openpyxl.load_workbook(country_affiliations_file_path)
     country_aff_df = pd.read_excel(country_affiliations_file_path, 
-                                   sheet_name=wb.sheetnames)
+                                   sheet_name = wb.sheetnames)
 
     norm_raw_aff_dict = {}
     for country_aff_df_item in country_aff_df.items():
@@ -1343,6 +1326,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
             print()
 
         for num, norm_aff in enumerate(norm_raw_aff_df["Norm affiliations"]):
+            norm_aff = norm_aff.strip()
             raw_aff_list = [item for item in list(norm_raw_aff_df.loc[num])[1:] if not(pd.isnull(item)) == True]
 
             if verbose: 
@@ -1402,17 +1386,17 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
         inst_types_usecols = INST_TYPES_USECOLS
 
     # Reading the 'Country_affilialions.xlsx' file in the dataframe dic
-
     inst_types_df = pd.read_excel(inst_types_file_path, usecols = INST_TYPES_USECOLS)
 
-    levels = [x for x in inst_types_df['Level'] ]
-    abbreviations = [x for x in inst_types_df['Abbreviation'] ]
+    levels = [x for x in inst_types_df['Level']]
+    abbreviations = [x for x in inst_types_df['Abbreviation']]
     aff_type_dict = dict(zip(abbreviations, levels))
 
     return aff_type_dict
 
 
-def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, aff_type_dict, verbose=False):
+def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, 
+                               aff_type_dict, verbose = False):
     '''
     
     '''
@@ -1466,10 +1450,10 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, af
                     re_search_words = re.compile(set_words_template.substitute({"word":word}))
                     if re.search(re_search_words,aff_mod) :
                         words_set_tags.append('true')
-                        if verbose: print('     words_set_tags:',words_set_tags)
+                        if verbose: print('     words_set_tags:', words_set_tags)
                     else:
                         words_set_tags.append('false')
-                        if verbose: print('     words_set_tags:',words_set_tags)
+                        if verbose: print('     words_set_tags:', words_set_tags)
 
                 if 'false' not in words_set_tags:               
                     norm_affiliation_list.append(norm_aff)
@@ -1488,8 +1472,8 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict, af
 
     address_norm_affiliations_set = set(address_norm_affiliations_list)
     if verbose: 
-        print('address_norm_affiliations_list:',address_norm_affiliations_list)
-        print('address_norm_affiliations_set:     ',address_norm_affiliations_set)
+        print('address_norm_affiliations_list:', address_norm_affiliations_list)
+        print('address_norm_affiliations_set:     ', address_norm_affiliations_set)
     
     paris_nb = 0
     for norm_aff in address_norm_affiliations_set:
@@ -1555,8 +1539,8 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
                  third item is the list of unknown affiliations.
     
     Note:
-        The functions 'standardize_address' and 'get_affiliations_list' are imported from    .
-        The function 'get_norm_affiliations_list' is imported from    .
+        The functions 'standardize_address'n 'get_affiliations_list' and 'get_norm_affiliations_list'
+        are imported from  BiblioParsingInstitutions module BiblioParsing package.
     '''
     
     # Globals imports
@@ -1567,7 +1551,8 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
         print()
         print('Standardized address:              ', std_address)
 
-    country, affiliations_list, affiliations_drop = get_affiliations_list(std_address, drop_to_end = None, verbose = False)
+    return_tup = get_affiliations_list(std_address, drop_to_end = None, verbose = False)
+    country, affiliations_list, affiliations_drop = return_tup
     affiliations_list_mod = [affiliation.translate(SYMB_CHANGE) for affiliation in affiliations_list]
     
     if verbose:
@@ -1579,7 +1564,9 @@ def build_address_affiliations_lists(raw_address, norm_raw_aff_dict, aff_type_di
         print('Affiliations dropped:              ', affiliations_drop) 
 
     if country in norm_raw_aff_dict.keys():
-        address_norm_affiliation_list, address_unknown_affiliations_list = get_norm_affiliations_list(country, affiliations_list_mod, norm_raw_aff_dict, aff_type_dict, verbose=False)
+        return_tup = get_norm_affiliations_list(country, affiliations_list_mod, norm_raw_aff_dict, 
+                                                aff_type_dict, verbose = False)
+        address_norm_affiliation_list, address_unknown_affiliations_list = return_tup
     else:
         address_norm_affiliation_list = []
         address_unknown_affiliations_list = affiliations_list
@@ -1609,8 +1596,7 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
         The globals 'COL_NAMES' and 'DIC_OUTDIR_PARSING' from `BiblioSpecificGlobals` module 
         of `BiblioParsing` package are used.
     
-    '''
-    
+    '''    
     # Standard libraries import
     from pathlib import Path
 
@@ -1645,10 +1631,7 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
     temp_institutions_alias = "Full institutions"
 
     # Reading the '.dat' file                   
-    AD_usecols = [pub_id_alias, idx_address_alias, address_alias]     
-    #df_AD= pd.read_csv(Path(path_parsing) / Path(addresses_dat_alias),
-    #                   sep='\t',
-    #                   usecols=AD_usecols)
+    AD_usecols = [pub_id_alias, idx_address_alias, address_alias]
     AD_df = parsing_dict['addresses'][AD_usecols].copy()
 
 
@@ -1660,7 +1643,7 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
 
     # Splitting in 3 columns the tupple of each item of the column named temp_institutions_alias of dg
     df_inst_split = pd.DataFrame(AD_df[temp_institutions_alias].sort_index().to_list(),
-                                 columns=[country_alias,norm_institutions_alias,raw_institutions_alias])
+                                 columns=[country_alias, norm_institutions_alias, raw_institutions_alias])
 
     # Converting the list of strings of each item of a given column of df_inst_split, in a string of items joined by ';'
     norm_inst_list = ['; '.join(item) for item in df_inst_split[norm_institutions_alias]]
@@ -1675,12 +1658,9 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
     AD_df = pd.concat([AD_df, df_countries, df_norm_institutions, df_raw_institutions], axis = 1)
 
     # Droping in AD_df the column named temp_institutions_alias which is no more useful
-    AD_df.drop([temp_institutions_alias], axis=1, inplace=True)
+    AD_df.drop([temp_institutions_alias], axis = 1, inplace = True)
 
     # Saving the extended 'AD_df' dataframe in a new '.dat' file 
-    #AD_df.to_csv(Path(path_parsing) / Path(add_inst_dat_alias), 
-    #             index=False,
-    #             sep='\t')
     parsing_dict['addresses_institutions'] = AD_df
     
     message = "Dataframe of parsing dict['addresses_institutions'] created"
