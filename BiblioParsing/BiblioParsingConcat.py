@@ -458,7 +458,7 @@ def deduplicate_parsing(concat_parsing_dict, norm_inst_status = False):
                                   
     '''
     # Local library imports
-    from BiblioParsing.BiblioParsingUtils import build_norm_raw_institutions
+    from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_institutions
     
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
