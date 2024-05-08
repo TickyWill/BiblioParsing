@@ -37,7 +37,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'NOUN_MINIMUM_OCCURRENCES',
            'PARSING_ITEMS_LIST',
            'PARTIAL',
-           'REP_UTILS',
            'SCOPUS',
            'SCOPUS_CAT_CODES',
            'SCOPUS_JOURNALS_ISSN_CAT',
@@ -54,6 +53,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
           ]
 
 # Local imports 
+from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 from BiblioParsing.BiblioParsingUtils import read_towns_per_country
 
@@ -213,9 +213,6 @@ PARSING_ITEMS_LIST = ["articles", "authors", "addresses", "countries",
                       "subjects", "sub_subjects", "references",
                       "norm_institutions","raw_institutions",]
 
-# Folder of useful additionnal files    
-REP_UTILS = 'BiblioParsing_RefFiles'
-
 # For uniformization of document types
 DIC_DOCTYPE = {'Article'              : ['Article'],
                'Article; early access': ['Article; Early Access'],
@@ -316,6 +313,7 @@ from BiblioParsing.BiblioParsingUtils import read_towns_per_country
 
 # For replacing symbols in town names
 DIC_TOWN_SYMBOLS = {"-": " ",
+                    "'": " ",
                    }
 
 # For replacing names in town names
@@ -327,7 +325,6 @@ DIC_TOWN_WORDS = {" lez " : " les ",
 COUNTRY_TOWNS_FILE = 'Country_towns.xlsx'
 
 COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS, DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS)
-#COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS) #???
 
 
 #############################################
@@ -443,7 +440,7 @@ _FR_DROPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue",
                      "campus", "cedex", "ch.", "chemin", "complexe", "cours", "cs",
                      "domaine", "esplanade", "foret", "immeuble", 
                      "montee", "no.", "p", "p°", "parcelle", "parvis", "pl", "pl.", "place", "parc",
-                     "plan", "pole", "quai", "r", "r.", "region", "route", "rue",
+                     "plan", "pole", "quai", "r", "r.", "rambla", "region", "route", "rue",
                      "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
 
         # Removing accents keeping non adcii characters and converting to lower case the droping words, by default

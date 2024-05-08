@@ -4,6 +4,7 @@ __all__ = ['ACCENT_CHANGE',
            'CHANGE',
            'COUNTRIES',
            'COUNTRIES_CODES',
+           'COUNTRIES_CONTINENT',
            'COUNTRIES_GPS',
            'DASHES_CHANGE',
            'IN_TO_MM',
@@ -17,8 +18,16 @@ __all__ = ['ACCENT_CHANGE',
 
 # Countries normalized names and GPS coordinates
 COUNTRIES_INFO = 'Countries.xlsx'
+
+COUNTRIES_COL_NAMES = {"country"    : "Country",
+                       "short_name" : "Short name",
+                       "gps"        : "GPS Coordinates",
+                       "zip_letters": "Zip code letters",
+                       "zip_digits" : "Zip code digits",
+                       "continent"  : "Continent",                       
+                      }
         
-REP_UTILS = 'BiblioParsing_RefFiles'                         # !!!! Defined also in BiblioSpecificGlobals  !!!!!
+REP_UTILS = 'BiblioParsing_RefFiles' 
 
 def build_countries_globals():
         
@@ -51,24 +60,29 @@ def build_countries_globals():
     # 3rd party imports
     import pandas as pd
     
-    # Local imports
-    #from BiblioParsing.BiblioGeneralGlobals import COUNTRIES_INFO
-    #from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
+    # Setting columns name aliases
+    countries_alias   = COUNTRIES_COL_NAMES['country']
+    gps_alias         = COUNTRIES_COL_NAMES['gps']
+    short_alias       = COUNTRIES_COL_NAMES['short_name']
+    zip_letters_alias = COUNTRIES_COL_NAMES['zip_letters']
+    zip_digits_alias  = COUNTRIES_COL_NAMES['zip_digits']
+    continent_alias   = COUNTRIES_COL_NAMES['continent']
 
     # Setting the specific file paths for countries information    
     path_countries_info = Path(__file__).parent / Path(REP_UTILS) / Path(COUNTRIES_INFO)
     df = pd.read_excel(path_countries_info)
     
-    countries = df['Country'].to_list() 
+    countries = df[countries_alias].to_list() 
     countries_gps = {x[0]:ast.literal_eval(x[1])
-               for x in zip(df['Country'],df['GPS Coordinates'])}
-    countries_codes = {x[0]:x[1] for x in zip(df['Country'],df['Short_name'])}
-    zip_codes = {x[0]:{'letters':ast.literal_eval(x[1]),'digits':ast.literal_eval(x[2])}
-               for x in zip(df['Country'],df['zip_code_letters'],df['zip_code_Digits'])}
+                     for x in zip(df[countries_alias], df[gps_alias])}
+    countries_codes = {x[0]:x[1] for x in zip(df[countries_alias], df[short_alias])}
+    zip_codes = {x[0]:{'letters':ast.literal_eval(x[1]), 'digits':ast.literal_eval(x[2])}
+                 for x in zip(df[countries_alias], df[zip_letters_alias], df[zip_digits_alias])}
+    countries_continent = {x[0]:x[1] for x in zip(df[countries_alias], df[continent_alias])}
     
-    return (countries, countries_gps, countries_codes, zip_codes)
+    return (countries, countries_gps, countries_codes, zip_codes, countries_continent)
 
-COUNTRIES, COUNTRIES_GPS, COUNTRIES_CODES, ZIP_CODES =  build_countries_globals()
+COUNTRIES, COUNTRIES_GPS, COUNTRIES_CODES, ZIP_CODES, COUNTRIES_CONTINENT =  build_countries_globals()
 # Escape dot for the regex
 for country in ZIP_CODES.keys(): ZIP_CODES[country]['letters'] = [x.replace(".", r"\.").lower() 
                                                                   for x in ZIP_CODES[country]['letters']]

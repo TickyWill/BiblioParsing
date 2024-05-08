@@ -1063,9 +1063,9 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
     from pathlib import Path
     
     # Globals imports
+    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_CAT_CODES
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_JOURNALS_ISSN_CAT

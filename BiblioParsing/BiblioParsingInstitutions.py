@@ -205,8 +205,8 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     import pandas as pd
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import DIC_INST_FILENAME
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS    
+    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS 
+    from BiblioParsing.BiblioSpecificGlobals import DIC_INST_FILENAME   
     
     if dic_inst_filename == None: dic_inst_filename = DIC_INST_FILENAME
     if rep_utils == None: rep_utils = REP_UTILS 
@@ -964,7 +964,8 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
     from string import Template
     
     # Local library imports
-    #from BiblioParsing.BiblioParsingInstitutions import search_items  (check used outside ?)
+    import BiblioParsing as bp
+    from BiblioParsing.BiblioParsingInstitutions import search_items
     
     # Splitting by coma the standard address in chuncks listed in an initial-affiliations list
     init_raw_affiliations_list = std_address.split(',')
@@ -1127,13 +1128,19 @@ def get_affiliations_list(std_address, drop_to_end = None, verbose = False):
                             if verbose: print('Break identification:', break_id, '\n')
                             break             
 
-    # Removing spaces from the affiliations kept 
+    # Removing spaces from the kept affiliations 
     affiliations_list = [x.strip() for x in affiliations_list]
     if verbose:
-        print('affiliations_list stripped:',affiliations_list)
+        print('affiliations_list stripped:', affiliations_list)
+        print()
+        
+    # Removing country and country alias from the kept affiliations 
+    affiliations_list = [x for x in affiliations_list if x != country and x not in bp.ALIAS_UK]        
+    if verbose:
+        print('affiliations_list without country aliases:', affiliations_list)
         print()
     
-    return (country,affiliations_list,affiliations_drop) 
+    return (country, affiliations_list, affiliations_drop)
 
 
 def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verbose = False):
@@ -1173,13 +1180,13 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
     from BiblioParsing.BiblioGeneralGlobals import SYMB_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP   
     from BiblioParsing.BiblioSpecificGlobals import COUNTRY_AFFILIATIONS_FILE 
     from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN    
     from BiblioParsing.BiblioSpecificGlobals import MISSING_SPACE_ACRONYMS
-    from BiblioParsing.BiblioSpecificGlobals import SMALL_WORDS_DROP    
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
+    from BiblioParsing.BiblioSpecificGlobals import SMALL_WORDS_DROP 
 
     ################################################ Local functions start ################################################
 
@@ -1373,9 +1380,9 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
     import BiblioParsing as bau
     
     # Globals imports
+    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_FILE 
-    from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_USECOLS 
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
+    from BiblioParsing.BiblioSpecificGlobals import INST_TYPES_USECOLS
     
     # Setting the full path for the 'Inst_types.xlsx' file
     if not inst_types_file_path:
@@ -1409,7 +1416,7 @@ def get_norm_affiliations_list(country, affiliations_list, norm_raw_aff_dict,
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
     # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import REP_UTILS
+    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
         
             
     set_words_template = Template(r'[\s]$word[\s)]'     # For instence capturing "word" in "word of set" 
