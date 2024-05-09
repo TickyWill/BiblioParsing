@@ -1017,15 +1017,16 @@ def read_database_scopus(rawdata_path):
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_RAWDATA_EXTENT
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
     
-    # Check if rawdata file is available and get its full path if is 
+    # Check if rawdata file is available and get its full path if it is 
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, SCOPUS_RAWDATA_EXTENT)
     
     if rawdata_file_path:    
-        df = pd.read_csv(rawdata_file_path, dtype = COLUMN_TYPE_SCOPUS)    
-        df = check_and_drop_columns(SCOPUS, df)    
-        df = _check_affiliation_column_scopus(df)
-        df = df.replace(np.nan, UNKNOWN, regex = True)
-        df = normalize_journal_names(SCOPUS, df)
+        df = pd.read_csv(rawdata_file_path, dtype = COLUMN_TYPE_SCOPUS)
+        if len(df):
+            df = check_and_drop_columns(SCOPUS, df)
+            df = _check_affiliation_column_scopus(df)
+            df = df.replace(np.nan, UNKNOWN, regex = True)
+            df = normalize_journal_names(SCOPUS, df)
     else:
         df = None        
     return df
@@ -1062,35 +1063,36 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
     import json
     from pathlib import Path
     
-    # Globals imports
+    # 3rd party imports
+    import pandas as pd
+    
+    # Local imports
     from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import PARSING_ITEMS_LIST
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_CAT_CODES
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS_JOURNALS_ISSN_CAT
-    
-    # Internal functions    
-    def _keeping_item_parsing_results(item, item_df):
-        scopus_parsing_dict[item] = item_df
+    from BiblioParsing.BiblioParsingScopus import read_database_scopus
     
     # Setting useful aliases
-    articles_item_alias     = PARSING_ITEMS_LIST[0]
-    authors_item_alias      = PARSING_ITEMS_LIST[1]
-    addresses_item_alias    = PARSING_ITEMS_LIST[2]
-    countries_item_alias    = PARSING_ITEMS_LIST[3]
-    institutions_item_alias = PARSING_ITEMS_LIST[4]
-    auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
-    authors_kw_item_alias   = PARSING_ITEMS_LIST[6]
-    index_kw_item_alias     = PARSING_ITEMS_LIST[7]
-    title_kw_item_alias     = PARSING_ITEMS_LIST[8]    
-    subjects_item_alias     = PARSING_ITEMS_LIST[9]
-    sub_subjects_item_alias = PARSING_ITEMS_LIST[10]
-    references_item_alias   = PARSING_ITEMS_LIST[11]
+    articles_alias     = PARSING_ITEMS_LIST[0]
+    authors_alias      = PARSING_ITEMS_LIST[1]
+    addresses_alias    = PARSING_ITEMS_LIST[2]
+    countries_alias    = PARSING_ITEMS_LIST[3]
+    institutions_alias = PARSING_ITEMS_LIST[4]
+    auth_inst_alias    = PARSING_ITEMS_LIST[5]
+    authors_kw_alias   = PARSING_ITEMS_LIST[6]
+    index_kw_alias     = PARSING_ITEMS_LIST[7]
+    title_kw_alias     = PARSING_ITEMS_LIST[8]    
+    subjects_alias     = PARSING_ITEMS_LIST[9]
+    sub_subjects_alias = PARSING_ITEMS_LIST[10]
+    references_alias   = PARSING_ITEMS_LIST[11]
+    items_aliases_list = [PARSING_ITEMS_LIST[x] for x in range(12)]
     
     # Setting the specific file paths for subjects ans sub-subjects assignement for scopus corpuses    
     path_scopus_cat_codes = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_CAT_CODES)
-    path_scopus_journals_issn_cat = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_JOURNALS_ISSN_CAT)
+    path_scopus_journals_issn_cat = Path(__file__).parent / Path(REP_UTILS) / Path(SCOPUS_JOURNALS_ISSN_CAT)   
 
     # Reading and checking the corpus file
     df_corpus = read_database_scopus(rawdata_path)
@@ -1101,60 +1103,59 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
     # Initializing the dict of dataframes resulting from the parsing
     scopus_parsing_dict = {}
     
-    if df_corpus is not None:
-        
+    if df_corpus is not None:                      
         # Keeping the number of articles in scopus_dic_failed dict
         scopus_dic_failed['number of article'] = len(df_corpus)
-
-        # Building the dataframe of articles
-        articles_df = _build_articles_scopus(df_corpus)
-        _keeping_item_parsing_results(articles_item_alias, articles_df)
-
-        # Building the dataframe of authors
-        authors_df = _build_authors_scopus(df_corpus, scopus_dic_failed)
-        _keeping_item_parsing_results(authors_item_alias, authors_df)
-
-        # Building the dataframe of addresses, countries and institutions
-        addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_scopus(df_corpus,
-                                                                                                     scopus_dic_failed)
-          # Keeping addresses df
-        _keeping_item_parsing_results(addresses_item_alias, addresses_df)
-          # Keeping countries df 
-        _keeping_item_parsing_results(countries_item_alias, countries_df)
-          # Keeping institutions df
-        _keeping_item_parsing_results(institutions_item_alias, institutions_df)
-
-        # Building the dataframe of authors and their institutions
-        authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, inst_filter_list)
-        _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
-
-        # Building the dataframes of keywords
-        AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_scopus(df_corpus, scopus_dic_failed)   
-          # Keeping author keywords df 
-        _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
-          # Keeping journal (indexed) keywords df
-        _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
-          # Keeping title keywords df 
-        _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
-
-        # Building the dataframe of subjects
-        subjects_df = _build_subjects_scopus(df_corpus,
-                                             path_scopus_cat_codes,
-                                             path_scopus_journals_issn_cat,
-                                             scopus_dic_failed)
-        _keeping_item_parsing_results(subjects_item_alias, subjects_df)
-
-        # Building the dataframe of sub-subjects
-        sub_subjects_df = _build_sub_subjects_scopus(df_corpus,
-                                                     path_scopus_cat_codes,
-                                                     path_scopus_journals_issn_cat,
-                                                     scopus_dic_failed)
-        _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
-
-        # Building the dataframe of references
-        references_df = _build_references_scopus(df_corpus)
-        _keeping_item_parsing_results(references_item_alias, references_df)        
+        if len(df_corpus):
+            # Building the dataframe of articles
+            articles_df = _build_articles_scopus(df_corpus)
+            scopus_parsing_dict[articles_alias] = articles_df
+            
+            # Building the dataframe of authors
+            authors_df = _build_authors_scopus(df_corpus, scopus_dic_failed)
+            scopus_parsing_dict[authors_alias] = authors_df
+            
+            # Building the dataframe of addresses, countries and institutions
+            addresses_tup = _build_addresses_countries_institutions_scopus(df_corpus, scopus_dic_failed)
+            addresses_df, countries_df, institutions_df = addresses_tup
+            scopus_parsing_dict[addresses_alias]    = addresses_df 
+            scopus_parsing_dict[countries_alias]    = countries_df 
+            scopus_parsing_dict[institutions_alias] = institutions_df                         
+            
+            # Building the dataframe of authors and their institutions
+            authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, 
+                                                                                   inst_filter_list)
+            scopus_parsing_dict[auth_inst_alias] = authors_institutions_df
+            
+            # Building the dataframes of keywords
+            keywords_tup = _build_keywords_scopus(df_corpus, scopus_dic_failed) 
+            AK_keywords_df, IK_keywords_df, TK_keywords_df = keywords_tup
+            scopus_parsing_dict[authors_kw_alias] = AK_keywords_df 
+            scopus_parsing_dict[index_kw_alias]   = IK_keywords_df 
+            scopus_parsing_dict[title_kw_alias]   = TK_keywords_df
+            
+            # Building the dataframe of subjects
+            subjects_df = _build_subjects_scopus(df_corpus,
+                                                 path_scopus_cat_codes,
+                                                 path_scopus_journals_issn_cat,
+                                                 scopus_dic_failed)
+            scopus_parsing_dict[subjects_alias] = subjects_df
+           
+            # Building the dataframe of sub-subjects
+            sub_subjects_df = _build_sub_subjects_scopus(df_corpus,
+                                                         path_scopus_cat_codes,
+                                                         path_scopus_journals_issn_cat,
+                                                         scopus_dic_failed)
+            scopus_parsing_dict[sub_subjects_alias] = sub_subjects_df
+            
+            # Building the dataframe of references
+            references_df = _build_references_scopus(df_corpus)
+            scopus_parsing_dict[references_alias] = references_df               
     
+        else:
+            empty_df = pd.DataFrame()
+            for item in items_aliases_list: scopus_parsing_dict[item] = empty_df 
+            
     return scopus_parsing_dict, scopus_dic_failed
         
         

@@ -433,11 +433,18 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
        
     # Concatenating the dicts of wos and scopus corpuses,item by item of the common_items_list
     concat_parsing_dict = {}
-    for item in common_items_list: 
-        concat_parsing_dict[item] = _concatenate_item_dfs(item, first_parsing_dict[item], second_parsing_dict[item])
+    for item in common_items_list:
+        if len(first_parsing_dict[item]) and len(second_parsing_dict[item]):
+            concat_parsing_dict[item] = _concatenate_item_dfs(item, first_parsing_dict[item], second_parsing_dict[item])
+        elif len(second_parsing_dict[item]):
+            concat_parsing_dict[item] = second_parsing_dict[item]
+        elif len(first_parsing_dict[item]):
+            concat_parsing_dict[item] = first_parsing_dict[item]
+        else:
+            concat_parsing_dict[item] = None
 
     # Extending the author with institutions parsing df
-    if inst_filter_list: 
+    if inst_filter_list and concat_parsing_dict[auth_inst_item_alias] is not None: 
         concat_parsing_dict[auth_inst_item_alias] = extend_author_institutions(concat_parsing_dict[auth_inst_item_alias],
                                                                                inst_filter_list)    
     return concat_parsing_dict

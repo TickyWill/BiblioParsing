@@ -1175,7 +1175,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     import pandas as pd
 
     # Local library imports 
-    import BiblioParsing as bau
+    import BiblioParsing as bp
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
     
     # Globals imports
@@ -1312,7 +1312,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     
     # Setting the path for the 'Country_affilialions.xlsx' file
     if not country_affiliations_file_path:
-        country_affiliations_file_path = Path(bau.__file__).parent / Path(REP_UTILS) / Path(COUNTRY_AFFILIATIONS_FILE)
+        country_affiliations_file_path = Path(bp.__file__).parent / Path(REP_UTILS) / Path(COUNTRY_AFFILIATIONS_FILE)
    
     # Reading the 'Country_affilialions.xlsx' file in the dataframe dic    
     wb = openpyxl.load_workbook(country_affiliations_file_path)
@@ -1378,7 +1378,7 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
     import pandas as pd
 
     # Local imports
-    import BiblioParsing as bau
+    import BiblioParsing as bp
     
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
@@ -1388,7 +1388,7 @@ def read_inst_types(inst_types_file_path = None, inst_types_usecols = None):
     # Setting the full path for the 'Inst_types.xlsx' file
     if not inst_types_file_path:
         inst_types_file = INST_TYPES_FILE
-        inst_types_file_path = Path(bau.__file__).parent / Path(REP_UTILS) / Path(inst_types_file)
+        inst_types_file_path = Path(bp.__file__).parent / Path(REP_UTILS) / Path(inst_types_file)
         
     if not inst_types_usecols:
         inst_types_usecols = INST_TYPES_USECOLS
