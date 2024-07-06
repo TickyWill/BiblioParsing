@@ -292,7 +292,7 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
     return df_address, df_country, df_institution
 
 
-def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list):
+def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list, inst_dic_path = None):
     
     '''The `_build_authors_countries_institutions_scopus' function parses the fields 'Affiliations' 
        and 'Authors with affiliations' of a scopus database to retrieve the article authors 
@@ -398,10 +398,10 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     scopus_auth_with_aff_alias = COLUMN_LABEL_SCOPUS['authors_with_affiliations']
     
     # Setting named tuples
-    addr_country_inst  = namedtuple('address', auth_inst_col_list_alias[:-1])    
+    addr_country_inst  = namedtuple('address', auth_inst_col_list_alias[:-1])
     
     # Building the inst_dic dict
-    inst_dic = build_institutions_dic(rep_utils = None, dic_inst_filename = None)
+    inst_dic = build_institutions_dic(inst_dic_path = inst_dic_path)
     
     list_addr_country_inst = []    
     for pub_id, affiliations, authors_affiliations in zip(df_corpus[pub_id_alias],
@@ -1032,7 +1032,7 @@ def read_database_scopus(rawdata_path):
     return df
 
 
-def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
+def biblio_parser_scopus(rawdata_path, inst_filter_list = None, inst_dic_path = None):
     
     '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns of the csv file are read and parsed using the functions:
@@ -1124,7 +1124,7 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None):
             
             # Building the dataframe of authors and their institutions
             authors_institutions_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, 
-                                                                                   inst_filter_list)
+                                                                                   inst_filter_list, inst_dic_path)
             scopus_parsing_dict[auth_inst_alias] = authors_institutions_df
             
             # Building the dataframes of keywords

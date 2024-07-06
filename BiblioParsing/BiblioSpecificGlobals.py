@@ -16,7 +16,6 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'DIC_DOCTYPE',
            'DIC_AMB_WORDS',
            'DIC_LOW_WORDS',
-           'DIC_INST_FILENAME',
            'DIC_TOWN_SYMBOLS',
            'DIC_TOWN_WORDS',
            'DIC_WORD_RE_PATTERN',
@@ -26,8 +25,11 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'ENCODING',
            'FR_DROPING_WORDS',
            'INST_BASE_LIST',
+           'INST_DIC_FILENAME',
+           'INST_NORM_NAMES_COL',
            'INST_TYPES_FILE',
            'INST_TYPES_USECOLS',
+           'INST_RAW_NAMES_COL',
            'KEEPING_WORDS',
            'KEEPING_PREFIX',
            'LENGTH_THRESHOLD',
@@ -344,8 +346,10 @@ COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'
 INST_TYPES_FILE    = "Inst_types.xlsx"                                                                                         
 INST_TYPES_USECOLS = ['Level', 'Abbreviation']                                                                                 
 
-# To Do: convert to json ???
-DIC_INST_FILENAME = 'Inst_dic.csv'                                                  
+# Setting the file name and column names for institute names
+INST_DIC_FILENAME   = 'Inst_dic.xlsx' 
+INST_NORM_NAMES_COL = "Inst_norm_name"
+INST_RAW_NAMES_COL  = "Inst_raw_name"
 
 # To Do: Check if still used
 INST_BASE_LIST = ['UMR', 'CNRS', 'University']

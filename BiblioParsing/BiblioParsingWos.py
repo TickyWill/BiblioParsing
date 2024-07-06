@@ -311,7 +311,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     return df_address, df_country, df_institution
 
 
-def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list):
+def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list, inst_dic_path = None):
     
     '''The `_build_authors_countries_institutions_wos' function parses the fields 'C1' 
        of wos database to retrieve the article authors with their addresses, affiliations and country. 
@@ -416,7 +416,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     author_address_tup = namedtuple('author_address','author address')
     
     # Building the inst_dic dict
-    inst_dic = build_institutions_dic(rep_utils = None, dic_inst_filename = None)    
+    inst_dic = build_institutions_dic(inst_dic_path = inst_dic_path)    
     
     list_addr_country_inst = []
     for pub_id, affiliation in zip(df_corpus[pub_id_alias],
@@ -847,7 +847,7 @@ def read_database_wos(rawdata_path):
     return df
 
 
-def biblio_parser_wos(rawdata_path, inst_filter_list = None):
+def biblio_parser_wos(rawdata_path, inst_filter_list = None, inst_dic_path = None):
     
     '''The function `biblio_parser_wos` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns USECOLS_WOS of the tsv file xxxx.txt are read and parsed using the functions:
@@ -938,7 +938,8 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None):
         _keeping_item_parsing_results(institutions_item_alias, institutions_df)
 
         # Building the dataframe of authors and their institutions
-        authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, inst_filter_list)
+        authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, 
+                                                                            inst_filter_list, inst_dic_path)
         _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
 
         # Building the dataframes of keywords

@@ -178,28 +178,29 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     return affiliation
 
 
-def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
-    
+def build_institutions_dic(inst_dic_path = None):    
     '''The `builds_institutions_dic` function builds the dict 'inst_dic' 
-    giving the mormalized names of institutions from a csv file `dic_inst_filename`.
-    The name of the csv file is set in the `DIC_INST_FILENAME` global.
+    giving the mormalized names of the institute from a json file 
+    which path is set by 'inst_dic_path'.
+    If 'inst_dic_path' is None, it is built using the `REP_UTILS` 
+    and `INST_DIC_FILENAME` globals.
     
     Args: 
-        rep_utils (str): name of the folder where the csv file is stored
-        dic_inst_filename (str): name of the csv file.        
+        inst_dic_path (path): The full path to the folder where the json file is stored.     
     
     Returns:       
-        `dict`: `inst_dic` as {raw_inst:norm_inst} where 
-                - raw_inst a raw institution name 
-                - norm_inst is the normalized institution name.
+        `dict`: `inst_dic` as {norm_inst: raw_inst} where  
+                - norm_inst is the normalized institution name
+                - raw_inst a raw institution name.
         
     Note:
-        The globals `DIC_INST_FILENAME` and `REP_UTILS` from `BiblioSpecificGlobals` module
-        of `BiblioAnalysis_utils` package are used.
+        The globals `INST_DIC_FILENAME` and `REP_UTILS` from `BiblioSpecificGlobals` module
+        of `BiblioParsing` package are used.
     
     '''
     
     # Standard library imports
+    #import json
     from pathlib import Path
     
     # 3rd party imports
@@ -207,20 +208,20 @@ def build_institutions_dic(rep_utils = None, dic_inst_filename = None):
     
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import REP_UTILS 
-    from BiblioParsing.BiblioSpecificGlobals import DIC_INST_FILENAME   
+    from BiblioParsing.BiblioSpecificGlobals import INST_DIC_FILENAME
+    from BiblioParsing.BiblioSpecificGlobals import INST_NORM_NAMES_COL
+    from BiblioParsing.BiblioSpecificGlobals import INST_RAW_NAMES_COL
     
-    if dic_inst_filename == None: dic_inst_filename = DIC_INST_FILENAME
-    if rep_utils == None: rep_utils = REP_UTILS 
+    # Setting the path for the 'inst_dic.xlsx' file
+    if not inst_dic_path:
+        inst_dic_path = Path(__file__).parent / REP_UTILS / Path(INST_DIC_FILENAME)
     
-    # Setting the file path for dic_inst_filename file reading    
-    path_dic_inst = Path(__file__).parent / rep_utils / Path(dic_inst_filename)
-    
-    # Reading and cleaning the dic_inst_filename file
-    inst_dic = pd.read_csv(path_dic_inst, sep = ':', header = None, encoding = 'latin1')
-    inst_dic.sort_values([0], inplace = True)
-    inst_dic[0] = inst_dic[0].str.strip()
-    inst_dic[1] = inst_dic[1].str.strip()
-    inst_dic = dict(zip(inst_dic[0], inst_dic[1]))    
+    # Reading, cleaning and setting the inst_dic_path file as dict
+    inst_df = pd.read_excel(inst_dic_path)        
+    keys_list   = [k.strip() for k in inst_df[INST_NORM_NAMES_COL]]
+    values_list = [v.strip().lower() for v in inst_df[INST_RAW_NAMES_COL]]
+    inst_dic = dict(zip(values_list, keys_list))   
+   
     return inst_dic
 
 
@@ -1651,7 +1652,7 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
 
     # Splitting in 3 columns the tupple of each item of the column named temp_institutions_alias of dg
     df_inst_split = pd.DataFrame(AD_df[temp_institutions_alias].sort_index().to_list(),
-                                 columns=[country_alias, norm_institutions_alias, raw_institutions_alias])
+                                 columns = [country_alias, norm_institutions_alias, raw_institutions_alias])
 
     # Converting the list of strings of each item of a given column of df_inst_split, in a string of items joined by ';'
     norm_inst_list = ['; '.join(item) for item in df_inst_split[norm_institutions_alias]]
@@ -1715,13 +1716,13 @@ def build_norm_raw_institutions(df_address, inst_types_file_path = None,
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     
     # Setting useful aliases
-    pub_id_alias             = COL_NAMES['pub_id']
-    address_col_List_alias   = COL_NAMES['address']
-    country_col_list_alias   = COL_NAMES['country']
-    inst_col_list_alias      = COL_NAMES['institution']
-    address_alias            = address_col_List_alias[2]
-    country_alias            = country_col_list_alias[2]
-    institution_alias        = inst_col_list_alias[2]
+    pub_id_alias           = COL_NAMES['pub_id']
+    address_col_List_alias = COL_NAMES['address']
+    country_col_list_alias = COL_NAMES['country']
+    inst_col_list_alias    = COL_NAMES['institution']
+    address_alias          = address_col_List_alias[2]
+    country_alias          = country_col_list_alias[2]
+    institution_alias      = inst_col_list_alias[2]
     
     # Setting named tuples
     country     = namedtuple('country', country_col_list_alias )
@@ -1731,7 +1732,7 @@ def build_norm_raw_institutions(df_address, inst_types_file_path = None,
     aff_type_dict = read_inst_types(inst_types_file_path,)
     norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path)
     
-    list_countries    = []
+    list_countries = []
     list_norm_institutions = []
     list_raw_institutions  = []
     
