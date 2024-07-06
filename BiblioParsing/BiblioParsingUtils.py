@@ -366,7 +366,7 @@ def normalize_journal_names(database,corpus_df):
     return corpus_df
 
 
-def biblio_parser(rawdata_path, database, inst_filter_list = None, , inst_dic_path = None):
+def biblio_parser(rawdata_path, database, inst_filter_list = None, inst_dic_path = None):
     
     '''The `biblio_parser` function parse wos or scopus databases using the appropriate parser.
     
