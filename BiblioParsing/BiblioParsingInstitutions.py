@@ -16,15 +16,16 @@ __all__ = ['address_inst_full_list',          #
            ]
 
 
-def address_inst_full_list(full_address, inst_dic):
-
-    '''The `address_inst_full_list` function allows building the affiliations list of a full address
-    using the internal function `_check_institute`of `BiblioParsingUtils` module
+def address_inst_full_list(full_address, norm_raw_aff_dict, aff_type_dict):
+    """The `address_inst_full_list` function allows building the affiliations list of a full address
+    using the internal function `_check_institute`of `BiblioParsingUtils` module.
     
     Args:
-       full_address (str): the full address to be parsed in institutions and country.
-       inst_dic (dict): a dict used for the normalization of the institutions names, 
-                        with the raw names as keys and the normalized names as values.
+        full_address (str): the full address to be parsed in institutions and country.
+        norm_raw_aff_dict (dict): a dict used for the normalization of the institutions names, 
+                                 with the normalized names as keys and the raw names as values.
+        aff_type_dict (dict): a dict used to set the order of the normalized names of institutions 
+                              by institution type.
         
     Returns:
         (namedtuple): tuple of two strings. 
@@ -34,92 +35,36 @@ def address_inst_full_list(full_address, inst_dic):
                       with no fully corresponding normalized names.
         
     Notes:
-        The globals 'RE_ZIP_CODE' and 'EMPTY' are imported from `BiblioSpecificGlobals` module 
+        The global 'EMPTY' is imported from `BiblioSpecificGlobals` module 
         of `BiblioParsing` package.
-        The function `normalize_country` is imported from `BiblioParsingUtils` module
-        of `BiblioAnalysis_utils` package.
-        
-    '''
-    
-    # Standard library imports
-    import re
-    from collections import namedtuple
-    from string import Template
+    """
 
-    # 3rd party library imports
-    import pandas as pd
-    
-    # Local library imports
-    from BiblioParsing.BiblioParsingUtils import normalize_country
-    
+    # Standard library imports
+    from collections import namedtuple
+
     # Globals imports
-    from BiblioParsing.BiblioRegexpGlobals import RE_ZIP_CODE
-    from BiblioParsing.BiblioSpecificGlobals import INST_BASE_LIST
     from BiblioParsing.BiblioSpecificGlobals import EMPTY
 
     inst_full_list_ntup = namedtuple('inst_full_list_ntup',['norm_inst_list','raw_inst_list'])
-    
-    country_raw = full_address.split(",")[-1].strip()
-    country = normalize_country(country_raw)
-    add_country = "_" + country
-    
-    if RE_ZIP_CODE.findall(full_address):
-        address_to_keep = re.sub(RE_ZIP_CODE,"",full_address) + ","
-    else:
-        address_to_keep = ", ".join(full_address.split(",")[:-1])    
-    address_to_keep = address_to_keep.lower()
-    
-    # Building the list of normalized institutions which raw institutions are found in 'address_to_keep' 
-    # and building the corresponding list of raw institutions found in 'address_to_keep'
-    norm_inst_full_list = [] 
-    raw_inst_found_list = []
-    for raw_inst, norm_inst in inst_dic.items():        
-        raw_inst_lower = raw_inst.lower()
-        raw_inst_split = raw_inst_lower.split()                     
-        if _check_institute(address_to_keep,raw_inst_split):            
-            norm_inst_full_list.append(norm_inst + add_country)            
-            raw_inst_found_list.append(raw_inst_lower)
 
-    # Cleaning 'raw_inst_found_list' from partial institution names
-    for inst_base in INST_BASE_LIST:
-        if (inst_base.lower() in raw_inst_found_list) and (inst_base.lower()+"," not in address_to_keep) : 
-            raw_inst_found_list.remove(inst_base.lower())
-    for raw_inst_found in raw_inst_found_list:
-        other_raw_inst_found_list = raw_inst_found_list.copy()
-        other_raw_inst_found_list.remove(raw_inst_found)        
-        for other_raw_inst_found in other_raw_inst_found_list:
-            if raw_inst_found in other_raw_inst_found:
-                raw_inst_found_list = other_raw_inst_found_list
+    aff_list_tup = build_address_affiliations_lists(full_address, norm_raw_aff_dict, aff_type_dict, verbose = False)
+    country, norm_inst_full_list, raw_inst_full_list = aff_list_tup
 
-    # Removing 'raw_inst_found_list' items from 'address_to_keep'             
-    for raw_inst_found in raw_inst_found_list:            
-        if raw_inst_found in address_to_keep: 
-            address_to_keep = address_to_keep.replace(raw_inst_found,"")  
-            address_to_keep = ", ".join(x.strip() for x in address_to_keep.split(","))
-
-    while (address_to_keep and address_to_keep[0] == "-"): address_to_keep = address_to_keep[1:]
-    address_to_keep = address_to_keep.replace("-", " ")
-    address_to_keep = " ".join(x.strip() for x in address_to_keep.split(" ") if x!="")       
-            
-    # # Building the list of raw institutions remaning in 'address_to_keep'
-    raw_inst_full_list = [x.strip() + add_country for x in address_to_keep.split(",") if (x!="" and x!=" ")]
-
-    # Building a string from the final list of raw institutions  
     if raw_inst_full_list:
         raw_inst_full_list_str = ";".join(raw_inst_full_list)       
     else:
         raw_inst_full_list_str = EMPTY 
-    
+
     # Building a string from the final list of normalized institutions without duplicates
     norm_inst_full_list = list(set(norm_inst_full_list))
     if norm_inst_full_list:
         norm_inst_full_list_str = ";".join(norm_inst_full_list)
     else:
         norm_inst_full_list_str = EMPTY 
-    
+
     # Setting the namedtuple to return
-    inst_full_list_tup =  inst_full_list_ntup(norm_inst_full_list_str, raw_inst_full_list_str) 
-    
+    inst_full_list_tup =  inst_full_list_ntup(norm_inst_full_list_str, raw_inst_full_list_str)
+
     return inst_full_list_tup
 
 
@@ -331,13 +276,13 @@ def _check_institute(address,raw_inst_split):
 
 
 def extend_author_institutions(item_df, inst_filter_list):
-    ''' The `extend_author_institutions` function extends the df of authors with institutions 
+    """ The `extend_author_institutions` function extends the df of authors with institutions 
     initialy obtained by the parsing of the corpus, with complementary information about institutions
     selected by the user.
     
     Args:
         item_df (df): Dataframe of authors with institutions.
-        inst_filter_list (list): the affiliations filter list of tuples (institution, country). 
+        inst_filter_list (list): the affiliations filter list of tuples (institution, collumn name). 
 
     Retruns:
         (df): The extended dataframe.
@@ -346,51 +291,52 @@ def extend_author_institutions(item_df, inst_filter_list):
         The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module 
         of `BiblioParsing` package.
     
-    '''
-    
+    """
+
     # 3rd party imports
     import pandas as pd
-    
+
     # Globals imports
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    
-    def _address_inst_list(inst_names_list,institutions):
+
+    def _address_inst_list(inst_names_list, institutions):
         secondary_institutions = []
         for inst in inst_names_list:
             if inst in institutions:
                 secondary_institutions.append(1)
             else:
-                secondary_institutions.append(0)               
+                secondary_institutions.append(0)
         return secondary_institutions
 
     # Setting useful column names aliases
     institutions_alias = COL_NAMES['auth_inst'][4]
     temp_col_alias     = "temp_col"
-    
+
     # Getting the useful columns of the item df                   
-    read_usecols = [COL_NAMES['auth_inst'][x] for x in [0,1,2,3,4]] 
+    read_usecols = [COL_NAMES['auth_inst'][x] for x in [0,1,2,3,4]]
     item_df      = item_df[read_usecols]
-    
+
     # Setting an institution name for each of the institutions indicated in the institutions filter
-    inst_names_list = [f'{x[0]}_{x[1]}' for x in inst_filter_list]   
-    
+    inst_names_list = [f'{x[0]}' for x in inst_filter_list]
+    inst_col_list   = [f'{x[1]}' for x in inst_filter_list]
+
     # Building the "sec_institution_alias" column in the 'item_df' dataframe using "inst_filter_list"
     item_dg = item_df.copy()
     item_dg[temp_col_alias] = item_dg.apply(lambda row: _address_inst_list(inst_names_list,
                                                                            row[institutions_alias]), axis = 1)
     item_dg.reset_index(inplace = True, drop = True)
 
-    # Distributing in a 'inst_split_df' df the value lists of 'item_dg[temp_col_alias]' column  
-    # into columns which names are in 'inst_names_list' list     
+    # Distributing in a 'inst_split_df' df the value lists of 'item_dg[temp_col_alias]' column
+    # into columns which names are in 'inst_col_list' list
     inst_split_df = pd.DataFrame(item_dg[temp_col_alias].sort_index().to_list(),
-                                 columns = inst_names_list)
-    
+                                 columns = inst_col_list)
+
     # Extending the 'df' dataframe with 'inst_split_df' dataframe
     new_item_df = pd.concat([item_dg, inst_split_df], axis = 1)
 
     # Droping the 'df[temp_col_alias]' column which is no more useful
     new_item_df.drop([temp_col_alias], axis = 1, inplace = True)
-    
+
     return new_item_df
 
 

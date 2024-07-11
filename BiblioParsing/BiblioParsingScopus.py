@@ -292,9 +292,10 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
     return df_address, df_country, df_institution
 
 
-def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list, inst_dic_path = None):
-    
-    '''The `_build_authors_countries_institutions_scopus' function parses the fields 'Affiliations' 
+def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list,
+                                                 country_affiliations_file_path = None,
+                                                 inst_types_file_path = None):
+    """The `_build_authors_countries_institutions_scopus' function parses the fields 'Affiliations' 
        and 'Authors with affiliations' of a scopus database to retrieve the article authors 
        with their addresses, affiliations and country. 
        In addition, a secondary affiliations list may be added according to a filtering of affiliations.
@@ -363,26 +364,24 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
         from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol`, and `normalize_country` are imported 
         from `BiblioParsingUtils` module of `BiblioAnalysis_utils` package.
-        The functions  `address_inst_full_list` and `build_institutions_dic` are imported 
-        from `BiblioParsingInstitutions` module of `BiblioAnalysis_utils` package.
-             
-    '''
-    
+        The functions  `address_inst_full_list`, `build_norm_raw_affiliations_dict`, 
+        `read_inst_types` and `extend_author_institutions` are imported 
+        from `BiblioParsingInstitutions` module of `BiblioParsing` package.
+    """
+
     # Standard library imports
     import re
     from collections import namedtuple
-    
-    # 3rd party library imports
-    import pandas as pd
-    
+
     # Local library imports
     from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list
-    from BiblioParsing.BiblioParsingInstitutions import build_institutions_dic
+    from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
+    from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup 
     from BiblioParsing.BiblioParsingUtils import normalize_country
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol    
-    
+
     # Globals imports
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST
@@ -396,26 +395,28 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     norm_institution_alias     = auth_inst_col_list_alias[4] 
     scopus_aff_alias           = COLUMN_LABEL_SCOPUS['affiliations']
     scopus_auth_with_aff_alias = COLUMN_LABEL_SCOPUS['authors_with_affiliations']
-    
+
     # Setting named tuples
     addr_country_inst  = namedtuple('address', auth_inst_col_list_alias[:-1])
-    
+
     # Building the inst_dic dict
-    inst_dic = build_institutions_dic(inst_dic_path = inst_dic_path)
-    
+    norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path = country_affiliations_file_path,
+                                                         verbose = False)
+    aff_type_dict = read_inst_types(inst_types_file_path = inst_types_file_path, inst_types_usecols = None)
+
     list_addr_country_inst = []    
     for pub_id, affiliations, authors_affiliations in zip(df_corpus[pub_id_alias],
                                                           df_corpus[scopus_aff_alias],
                                                           df_corpus[scopus_auth_with_aff_alias]):
-        
+
         idx_author, last_author = -1, '' # Initialization for the author and address counter
-        
+
         list_affiliations = affiliations.split(';')
         list_authors_affiliations = authors_affiliations.split(';')
-        
+
         for x in list_authors_affiliations:
             auth_item_nbr = 2
-            if "." in x.split(',')[0]: auth_item_nbr = 1              # Change in scopus on 07/2023
+            if "." in x.split(',')[0]: auth_item_nbr = 1 # Change in scopus on 07/2023
             author = (','.join(x.split(',')[0:auth_item_nbr])).strip()
 
             if last_author != author:
@@ -435,7 +436,9 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
                     for address in author_address_list_raw:
                         author_country_raw      = address.split(',')[-1].strip()
                         author_country          = normalize_country(author_country_raw)
-                        author_institutions_tup = address_inst_full_list(address, inst_dic)
+                        author_institutions_tup = address_inst_full_list(address,
+                                                                         norm_raw_aff_dict,
+                                                                         aff_type_dict)
 
                     list_addr_country_inst.append(addr_country_inst(pub_id,
                                                                     idx_author,
@@ -443,17 +446,17 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
                                                                     author_country,
                                                                     author_institutions_tup.norm_inst_list,
                                                                     author_institutions_tup.raw_inst_list,))
-                
+
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
     df_addr_country_inst, dic_failed = build_item_df_from_tup(list_addr_country_inst, auth_inst_col_list_alias[:-1], 
                                                               norm_institution_alias, pub_id_alias, dic_failed)
-    
+
     if inst_filter_list is not None:
         df_addr_country_inst = extend_author_institutions(df_addr_country_inst, inst_filter_list)
-        
+
     # Sorting the values in the dataframe returned by two columns
     df_addr_country_inst.sort_values(by = [pub_id_alias, pub_idx_author_alias], inplace = True)
-    
+
     return df_addr_country_inst
 
 

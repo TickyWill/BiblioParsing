@@ -311,9 +311,10 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     return df_address, df_country, df_institution
 
 
-def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list, inst_dic_path = None):
-    
-    '''The `_build_authors_countries_institutions_wos' function parses the fields 'C1' 
+def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list,
+                                              country_affiliations_file_path = None,
+                                              inst_types_file_path = None):
+    """The `_build_authors_countries_institutions_wos' function parses the fields 'C1' 
        of wos database to retrieve the article authors with their addresses, affiliations and country. 
        In addition, a secondary affiliations list may be added according to a filtering of affiliations.
        
@@ -377,19 +378,17 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
         The functions `address_inst_full_list` and `build_institutions_dic` are imported 
         from `BiblioParsingInstitutions` module of `BiblioAnalysis_utils` package.
         
-    '''
+    """
     
     # Standard library imports
     import re
     from collections import namedtuple
     
-    # 3rd party library imports
-    import pandas as pd
-    
     # Local library imports 
     from BiblioParsing.BiblioParsingInstitutions import address_inst_full_list
-    from BiblioParsing.BiblioParsingInstitutions import build_institutions_dic
+    from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
+    from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
     from BiblioParsing.BiblioParsingUtils import normalize_country
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
@@ -416,7 +415,9 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     author_address_tup = namedtuple('author_address','author address')
     
     # Building the inst_dic dict
-    inst_dic = build_institutions_dic(inst_dic_path = inst_dic_path)    
+    norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path = country_affiliations_file_path,
+                                                         verbose = False)
+    aff_type_dict = read_inst_types(inst_types_file_path = inst_types_file_path, inst_types_usecols = None)
     
     list_addr_country_inst = []
     for pub_id, affiliation in zip(df_corpus[pub_id_alias],
@@ -454,7 +455,9 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
                     author_address_raw = remove_special_symbol(author_address_raw, only_ascii=True, strip=True)
                     author_address = re.sub(RE_SUB_FIRST,'University' + ', ', author_address_raw) 
                     author_address = re.sub(RE_SUB,'University' + ' ', author_address_raw)
-                    author_institutions_tup = address_inst_full_list(author_address, inst_dic)
+                    author_institutions_tup = address_inst_full_list(author_address,
+                                                                     norm_raw_aff_dict,
+                                                                     aff_type_dict)
 
                     list_addr_country_inst.append(addr_country_inst(pub_id,
                                                                     idx_author,
