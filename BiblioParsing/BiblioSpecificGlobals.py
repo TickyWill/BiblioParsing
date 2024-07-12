@@ -24,12 +24,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'EMPTY',
            'ENCODING',
            'FR_DROPING_WORDS',
-           'INST_BASE_LIST',
-           'INST_DIC_FILENAME',
-           'INST_NORM_NAMES_COL',
-           'INST_TYPES_FILE',
            'INST_TYPES_USECOLS',
-           'INST_RAW_NAMES_COL',
+           'INSTITUTE_AFFILIATIONS_FILE',
            'KEEPING_WORDS',
            'KEEPING_PREFIX',
            'LENGTH_THRESHOLD',
@@ -340,19 +336,14 @@ import re
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 
 # Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
-COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'                                                                         
+COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'
+
+# Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
+INSTITUTE_AFFILIATIONS_FILE = "Institute_affiliations.xlsx"
 
 # Setting the file name for the file of institutions types description and order level with the useful columns
-INST_TYPES_FILE    = "Inst_types.xlsx"                                                                                         
-INST_TYPES_USECOLS = ['Level', 'Abbreviation']                                                                                 
-
-# Setting the file name and column names for institute names
-INST_DIC_FILENAME   = 'Inst_dic.xlsx' 
-INST_NORM_NAMES_COL = "Inst_norm_name"
-INST_RAW_NAMES_COL  = "Inst_raw_name"
-
-# To Do: Check if still used
-INST_BASE_LIST = ['UMR', 'CNRS', 'University']
+INST_TYPES_FILE    = "Institutions_types.xlsx"                                                                                         
+INST_TYPES_USECOLS = ['Level', 'Abbreviation']
 
 # Potentialy ambiguous words in institutions names
 DIC_AMB_WORDS = {' des ': ' ', # Conflict with DES institution

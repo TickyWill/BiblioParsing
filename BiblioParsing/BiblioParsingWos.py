@@ -208,7 +208,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     Notes:
         The globals 'COL_NAMES', 'COLUMN_LABEL_WOS', 'RE_ADDRESS', 'RE_AUTHOR', 'RE_SUB', 'RE_SUB_FIRST'
         and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
-        The functions `remove_special_symbol`, `address_inst_full_list`, `build_institutions_dic` and `normalize_country` 
+        The functions `remove_special_symbol`, `address_inst_full_list` and `normalize_country` 
         are imported from `BiblioParsingUtils` of `BiblioAnalysis_utils` package.
         
     '''
@@ -311,7 +311,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     return df_address, df_country, df_institution
 
 
-def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list,
+def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter_list = None,
                                               country_affiliations_file_path = None,
                                               inst_types_file_path = None):
     """The `_build_authors_countries_institutions_wos' function parses the fields 'C1' 
@@ -375,7 +375,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
         'SYMBOL' and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol` and `normalize_country` are imported from `BiblioParsingUtils` 
         of `BiblioAnalysis_utils` package.
-        The functions `address_inst_full_list` and `build_institutions_dic` are imported 
+        The functions `address_inst_full_list` is imported 
         from `BiblioParsingInstitutions` module of `BiblioAnalysis_utils` package.
         
     """
@@ -850,7 +850,9 @@ def read_database_wos(rawdata_path):
     return df
 
 
-def biblio_parser_wos(rawdata_path, inst_filter_list = None, inst_dic_path = None):
+def biblio_parser_wos(rawdata_path, inst_filter_list = None,
+                      country_affiliations_file_path = None,
+                      inst_types_file_path = None):
     
     '''The function `biblio_parser_wos` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns USECOLS_WOS of the tsv file xxxx.txt are read and parsed using the functions:
@@ -895,18 +897,18 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None, inst_dic_path = Non
         wos_parsing_dict[item] = item_df
     
     # Setting useful aliases
-    articles_item_alias     = PARSING_ITEMS_LIST[0]
-    authors_item_alias      = PARSING_ITEMS_LIST[1]
-    addresses_item_alias    = PARSING_ITEMS_LIST[2]
-    countries_item_alias    = PARSING_ITEMS_LIST[3]
-    institutions_item_alias = PARSING_ITEMS_LIST[4]
-    auth_inst_item_alias    = PARSING_ITEMS_LIST[5]
-    authors_kw_item_alias   = PARSING_ITEMS_LIST[6]
-    index_kw_item_alias     = PARSING_ITEMS_LIST[7]
-    title_kw_item_alias     = PARSING_ITEMS_LIST[8]    
-    subjects_item_alias     = PARSING_ITEMS_LIST[9]
-    sub_subjects_item_alias = PARSING_ITEMS_LIST[10]
-    references_item_alias   = PARSING_ITEMS_LIST[11]
+    articles_alias     = PARSING_ITEMS_LIST[0]
+    authors_alias      = PARSING_ITEMS_LIST[1]
+    addresses_alias    = PARSING_ITEMS_LIST[2]
+    countries_alias    = PARSING_ITEMS_LIST[3]
+    institutions_alias = PARSING_ITEMS_LIST[4]
+    auth_inst_alias    = PARSING_ITEMS_LIST[5]
+    authors_kw_alias   = PARSING_ITEMS_LIST[6]
+    index_kw_alias     = PARSING_ITEMS_LIST[7]
+    title_kw_alias     = PARSING_ITEMS_LIST[8]    
+    subjects_alias     = PARSING_ITEMS_LIST[9]
+    sub_subjects_alias = PARSING_ITEMS_LIST[10]
+    references_alias   = PARSING_ITEMS_LIST[11]
     
     # Reading and checking the raw corpus file
     df_corpus = read_database_wos(rawdata_path)
@@ -924,46 +926,48 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None, inst_dic_path = Non
     
         # Building the dataframe of articles
         articles_df = _build_articles_wos(df_corpus)
-        _keeping_item_parsing_results(articles_item_alias, articles_df)    
+        _keeping_item_parsing_results(articles_alias, articles_df)    
 
         # Building the dataframe of authors
         authors_df = _build_authors_wos(df_corpus, wos_dic_failed)
-        _keeping_item_parsing_results(authors_item_alias, authors_df)
+        _keeping_item_parsing_results(authors_alias, authors_df)
 
         # Building the dataframe of addresses, countries and institutions
         addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_wos(df_corpus,
                                                                                                   wos_dic_failed)
           # Keeping addresses df
-        _keeping_item_parsing_results(addresses_item_alias, addresses_df)
+        _keeping_item_parsing_results(addresses_alias, addresses_df)
           # Keeping countries df
-        _keeping_item_parsing_results(countries_item_alias, countries_df)
+        _keeping_item_parsing_results(countries_alias, countries_df)
           # Keeping institutions df
-        _keeping_item_parsing_results(institutions_item_alias, institutions_df)
+        _keeping_item_parsing_results(institutions_alias, institutions_df)
 
         # Building the dataframe of authors and their institutions
-        authors_institutions_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, 
-                                                                            inst_filter_list, inst_dic_path)
-        _keeping_item_parsing_results(auth_inst_item_alias, authors_institutions_df)
+        auth_inst_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, 
+                                                                 inst_filter_list = inst_filter_list ,
+                                                                 country_affiliations_file_path = country_affiliations_file_path,
+                                                                 inst_types_file_path = inst_types_file_path)
+        _keeping_item_parsing_results(auth_inst_alias, auth_inst_df)
 
         # Building the dataframes of keywords
         AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus, wos_dic_failed)   
           # Keeping author keywords df
-        _keeping_item_parsing_results(authors_kw_item_alias, AK_keywords_df)
+        _keeping_item_parsing_results(authors_kw_alias, AK_keywords_df)
           # Keeping journal (indexed) keywords df
-        _keeping_item_parsing_results(index_kw_item_alias, IK_keywords_df)
+        _keeping_item_parsing_results(index_kw_alias, IK_keywords_df)
           # Keeping title keywords df
-        _keeping_item_parsing_results(title_kw_item_alias, TK_keywords_df)
+        _keeping_item_parsing_results(title_kw_alias, TK_keywords_df)
 
         # Building the dataframe of subjects
         subjects_df = _build_subjects_wos(df_corpus, wos_dic_failed)
-        _keeping_item_parsing_results(subjects_item_alias, subjects_df)
+        _keeping_item_parsing_results(subjects_alias, subjects_df)
 
         # Building the dataframe of sub-subjects
         sub_subjects_df = _build_sub_subjects_wos(df_corpus, wos_dic_failed)
-        _keeping_item_parsing_results(sub_subjects_item_alias, sub_subjects_df)
+        _keeping_item_parsing_results(sub_subjects_alias, sub_subjects_df)
 
         # Building the dataframe of references 
         references_df = _build_references_wos(df_corpus)
-        _keeping_item_parsing_results(references_item_alias, references_df)
+        _keeping_item_parsing_results(references_alias, references_df)
         
     return wos_parsing_dict, wos_dic_failed

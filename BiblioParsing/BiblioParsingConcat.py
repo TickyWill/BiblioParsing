@@ -450,7 +450,11 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     return concat_parsing_dict
 
 
-def deduplicate_parsing(concat_parsing_dict, norm_inst_status = False):
+def deduplicate_parsing(concat_parsing_dict,
+                        norm_inst_status = False,
+                        inst_types_file_path = None,
+                        country_affiliations_file_path = None,
+                        verbose = False):
     ''' The `deduplicate_parsing` function deduplicate parsing dfs of two corpuses. 
     It proceeds with deduplication of article lines using the `_deduplicate_articles` internal function.
     Then, it rationalizes the content of the other parsing dfs using the IDs of the droped articles lines
@@ -490,9 +494,12 @@ def deduplicate_parsing(concat_parsing_dict, norm_inst_status = False):
         dedup_parsing_dict[item] = _deduplicate_item_df(pub_id_to_drop, item, concat_parsing_dict[item])
     
     if norm_inst_status:
-        # Creating dataframes of normalized institutions and of not-yet normalized institions
+        # Creating dataframes of normalized institutions and of not-yet normalized institutions
         df_address = dedup_parsing_dict[addresses_item_alias]
-        _, df_norm_institution, df_raw_institution = build_norm_raw_institutions(df_address, verbose = False)
+        _, df_norm_institution, df_raw_institution = build_norm_raw_institutions(df_address,
+                                                                                 inst_types_file_path = None,
+                                                                                 country_affiliations_file_path = None,
+                                                                                 verbose = False)
         dedup_parsing_dict[norm_inst_alias] = df_norm_institution
         dedup_parsing_dict[raw_inst_alias]  = df_raw_institution
     

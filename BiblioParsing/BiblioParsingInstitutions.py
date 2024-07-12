@@ -2,7 +2,6 @@ __all__ = ['address_inst_full_list',          #
            'affiliation_uniformization',      #
            'build_address_affiliations_lists',
            'build_addresses_institutions',
-           'build_institutions_dic',          #
            'build_norm_raw_affiliations_dict',
            'build_norm_raw_institutions',
            'extend_author_institutions',      #
@@ -121,53 +120,6 @@ def affiliation_uniformization(affiliation_raw):    # A refondre profondément
     affiliation = remove_special_symbol(affiliation_raw, only_ascii = True, skip = True)
     
     return affiliation
-
-
-def build_institutions_dic(inst_dic_path = None):    
-    '''The `builds_institutions_dic` function builds the dict 'inst_dic' 
-    giving the mormalized names of the institute from a json file 
-    which path is set by 'inst_dic_path'.
-    If 'inst_dic_path' is None, it is built using the `REP_UTILS` 
-    and `INST_DIC_FILENAME` globals.
-    
-    Args: 
-        inst_dic_path (path): The full path to the folder where the json file is stored.     
-    
-    Returns:       
-        `dict`: `inst_dic` as {norm_inst: raw_inst} where  
-                - norm_inst is the normalized institution name
-                - raw_inst a raw institution name.
-        
-    Note:
-        The globals `INST_DIC_FILENAME` and `REP_UTILS` from `BiblioSpecificGlobals` module
-        of `BiblioParsing` package are used.
-    
-    '''
-    
-    # Standard library imports
-    #import json
-    from pathlib import Path
-    
-    # 3rd party imports
-    import pandas as pd
-    
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import REP_UTILS 
-    from BiblioParsing.BiblioSpecificGlobals import INST_DIC_FILENAME
-    from BiblioParsing.BiblioSpecificGlobals import INST_NORM_NAMES_COL
-    from BiblioParsing.BiblioSpecificGlobals import INST_RAW_NAMES_COL
-    
-    # Setting the path for the 'inst_dic.xlsx' file
-    if not inst_dic_path:
-        inst_dic_path = Path(__file__).parent / REP_UTILS / Path(INST_DIC_FILENAME)
-    
-    # Reading, cleaning and setting the inst_dic_path file as dict
-    inst_df = pd.read_excel(inst_dic_path)        
-    keys_list   = [k.strip() for k in inst_df[INST_NORM_NAMES_COL]]
-    values_list = [v.strip().lower() for v in inst_df[INST_RAW_NAMES_COL]]
-    inst_dic = dict(zip(values_list, keys_list))   
-   
-    return inst_dic
 
 
 def _check_institute(address,raw_inst_split):
@@ -1621,8 +1573,10 @@ def build_addresses_institutions(parsing_dict, norm_raw_aff_dict, aff_type_dict)
     message = "Dataframe of parsing dict['addresses_institutions'] created"
     return message
 
-def build_norm_raw_institutions(df_address, inst_types_file_path = None,
-                                country_affiliations_file_path = None, verbose = False):
+def build_norm_raw_institutions(df_address,
+                                inst_types_file_path = None,
+                                country_affiliations_file_path = None,
+                                verbose = False):
     
     '''The function `build_norm_raw_institutions_wos` parses the addresses 
     of each publication of the Wos corpus to retrieve the country, 
@@ -1675,7 +1629,7 @@ def build_norm_raw_institutions(df_address, inst_types_file_path = None,
     institution = namedtuple('institution', inst_col_list_alias )
     
     # Getting useful dicts for affiliation normalization
-    aff_type_dict = read_inst_types(inst_types_file_path,)
+    aff_type_dict = read_inst_types(inst_types_file_path, inst_types_usecols = None)
     norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path)
     
     list_countries = []

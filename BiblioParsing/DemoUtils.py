@@ -144,7 +144,10 @@ def set_user_config(year = None, db_list = None):
 
 def parse_to_dedup(year, db_raw_dict, 
                    user_inst_filter_list, 
-                   user_norm_inst_status, 
+                   user_norm_inst_status,
+                   user_istitute_affiliations_file_path,
+                   user_inst_types_file_path,
+                   user_country_affiliations_file_path,
                    verbose = False):
     """
     """
@@ -164,11 +167,15 @@ def parse_to_dedup(year, db_raw_dict,
     
     # Parsing Scopus rawdata
     scopus_raw_path = db_raw_dict[SCOPUS]
-    scopus_parsing_dict, scopus_fails_dict = biblio_parser(scopus_raw_path, SCOPUS, inst_filter_list = None)        
+    scopus_parsing_dict, scopus_fails_dict = biblio_parser(scopus_raw_path, SCOPUS, inst_filter_list = user_inst_filter_list,
+                                                           country_affiliations_file_path = user_istitute_affiliations_file_path,
+                                                           inst_types_file_path = user_inst_types_file_path)
         
     # Parsing WoS rawdata 
     wos_raw_path = db_raw_dict[WOS]
-    wos_parsing_dict, wos_fails_dict = biblio_parser(wos_raw_path, WOS, inst_filter_list = None)
+    wos_parsing_dict, wos_fails_dict = biblio_parser(wos_raw_path, WOS, inst_filter_list = user_inst_filter_list,
+                                                     country_affiliations_file_path = user_istitute_affiliations_file_path,
+                                                     inst_types_file_path = user_inst_types_file_path)
     
     # Initializing results dicts
     parsing_dicts_dict = {} 
@@ -182,7 +189,9 @@ def parse_to_dedup(year, db_raw_dict,
 
         # Deduplicating the concatenation of the two parsings
         dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict, 
-                                                 norm_inst_status = user_norm_inst_status)
+                                            norm_inst_status = user_norm_inst_status,
+                                            inst_types_file_path = user_inst_types_file_path,
+                                            country_affiliations_file_path = user_country_affiliations_file_path)
 
         # Building parsing performances dict
         fails_dicts[SCOPUS] = scopus_fails_dict
