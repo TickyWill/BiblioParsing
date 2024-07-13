@@ -496,10 +496,11 @@ def deduplicate_parsing(concat_parsing_dict,
     if norm_inst_status:
         # Creating dataframes of normalized institutions and of not-yet normalized institutions
         df_address = dedup_parsing_dict[addresses_item_alias]
-        _, df_norm_institution, df_raw_institution = build_norm_raw_institutions(df_address,
-                                                                                 inst_types_file_path = None,
-                                                                                 country_affiliations_file_path = None,
-                                                                                 verbose = False)
+        return_tup = build_norm_raw_institutions(df_address,
+                                                 inst_types_file_path = inst_types_file_path,
+                                                 country_affiliations_file_path = country_affiliations_file_path,
+                                                 verbose = False)
+        _, df_norm_institution, df_raw_institution = return_tup
         dedup_parsing_dict[norm_inst_alias] = df_norm_institution
         dedup_parsing_dict[raw_inst_alias]  = df_raw_institution
     

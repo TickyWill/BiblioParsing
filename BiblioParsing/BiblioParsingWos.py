@@ -457,7 +457,8 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
                     author_address = re.sub(RE_SUB,'University' + ' ', author_address_raw)
                     author_institutions_tup = address_inst_full_list(author_address,
                                                                      norm_raw_aff_dict,
-                                                                     aff_type_dict)
+                                                                     aff_type_dict,
+                                                                     drop_status = False)
 
                     list_addr_country_inst.append(addr_country_inst(pub_id,
                                                                     idx_author,
