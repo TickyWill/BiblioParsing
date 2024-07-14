@@ -242,18 +242,25 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
         
         if list_affiliation:
             for idx_address, address_pub in enumerate(list_affiliation):
-                
                 address_pub = remove_special_symbol(address_pub, only_ascii=True, strip=True)
                 list_addresses.append(address(pub_id,
                                               idx_address,
                                               address_pub))
 
-                institution = address_pub.split(',')[0]
+                addresses_split = address_pub.split(',')
+                inst_nb = len(addresses_split)
+                inst_num = 0
+                institution = addresses_split[inst_num]                    
+                if not institution and inst_nb:
+                    while not institution and inst_num < inst_nb:
+                        inst_num += 1
+                        institution = address_pub.split(',')[inst_num]
                 institution = re.sub(RE_SUB_FIRST,'University' + ', ',institution)
                 institution = re.sub(RE_SUB,'University'+' ', institution)
                 list_institutions.append(ref_institution(pub_id,
                                                          idx_address,
                                                          institution))
+                
                 country_raw = address_pub.split(',')[-1].replace(';','').strip()  
                 country     = normalize_country(country_raw)
                 if country == '':
@@ -285,7 +292,7 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
                                                         institution_alias, pub_id_alias, dic_failed)
     
     if not(len(df_address) == len(df_country) == len(df_institution)):
-        warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal'
+        warning = (f'\nWARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal '
                    f'in "_build_addresses_countries_institutions_scopus" function of "BiblioParsingScopus.py" module')
         print(warning)
     
