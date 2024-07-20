@@ -21,11 +21,12 @@ item_filename_dict = config_tup[3]
 save_extent = "xlsx"
 
 # Setting the user's authors affiliations filter as a list of tuples (institution normalized name, institution column name)
-user_inst_filter_list = [(<normlized name 1>, <column name 1>),
-                         (<normlized name 2>, <column name 2>),
+user_inst_filter_list = [(<normalized name 1>, <column name 1>),
+                         (<normalized name 2>, <column name 2>),
                          ...]
 
-# Setting the user's xlsx files for mormalizing institutions (see structure exemples in BiblioParsing_RefFiles folder)
+# Setting the user's xlsx files for mormalizing institutions 
+# if set to None, use of default files of BiblioParsing_RefFiles folder
 user_institute_affiliations_file_path = Path(<your_fullpath_to_institute_affiliations_file>)
 user_country_affiliations_file_path = Path(<your_fullpath_to_country_affiliations_file>)
 user_inst_types_file_path = Path(<your_fullpath_to_inst_types_file>)
