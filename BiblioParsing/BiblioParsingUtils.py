@@ -8,7 +8,6 @@ __all__ = ['biblio_parser',
            'normalize_journal_names',
            'normalize_name',
            'rationalize_town_names',
-           'read_towns_per_country',
            'remove_special_symbol',
            'set_rawdata_error',
            'upgrade_col_names',
@@ -368,7 +367,9 @@ def normalize_journal_names(database,corpus_df):
 
 def biblio_parser(rawdata_path, database, inst_filter_list = None,
                   country_affiliations_file_path = None,
-                  inst_types_file_path = None):
+                  inst_types_file_path = None,
+                  country_towns_file = None,
+                  country_towns_folder_path = None):
     
     '''The `biblio_parser` function parse wos or scopus databases using the appropriate parser.
     
@@ -390,12 +391,16 @@ def biblio_parser(rawdata_path, database, inst_filter_list = None,
     if database == WOS:
         wos_tup = biblio_parser_wos(rawdata_path, inst_filter_list = inst_filter_list,
                                    country_affiliations_file_path = country_affiliations_file_path,
-                                   inst_types_file_path = inst_types_file_path)
+                                   inst_types_file_path = inst_types_file_path,
+                                   country_towns_file = country_towns_file,
+                                   country_towns_folder_path = country_towns_folder_path)
         parsing_dict, dic_failed = wos_tup[0], wos_tup[1]
     elif database == SCOPUS:
         scopus_tup = biblio_parser_scopus(rawdata_path, inst_filter_list = inst_filter_list,
                                           country_affiliations_file_path = country_affiliations_file_path,
-                                          inst_types_file_path = inst_types_file_path)
+                                          inst_types_file_path = inst_types_file_path,
+                                          country_towns_file = country_towns_file,
+                                          country_towns_folder_path = country_towns_folder_path)
         parsing_dict, dic_failed = scopus_tup[0], scopus_tup[1]
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be wos or scopus ")
@@ -479,17 +484,17 @@ def upgrade_col_names(corpus_folder):
     
     # Beware: the new file authorsinst.dat is not present in the old parsing folders
     dict_filename_conversion  = {'addresses.dat':'address',
-                                'articles.dat': 'articles',
-                                'authors.dat':'authors',
-                                'authorsinst.dat':'auth_inst',
-                                'authorskeywords.dat':'keywords',
-                                'countries.dat':'country',
-                                'institutions.dat':'institution',
-                                'journalkeywords.dat':'keywords',
-                                'references.dat':'references',
-                                'subjects.dat': 'subject',
-                                'subjects2.dat':'sub_subject',
-                                'titlekeywords.dat':'keywords'}
+                                 'articles.dat': 'articles',
+                                 'authors.dat':'authors',
+                                 'authorsinst.dat':'auth_inst',
+                                 'authorskeywords.dat':'keywords',
+                                 'countries.dat':'country',
+                                 'institutions.dat':'institution',
+                                 'journalkeywords.dat':'keywords',
+                                 'references.dat':'references',
+                                 'subjects.dat': 'subject',
+                                 'subjects2.dat':'sub_subject',
+                                 'titlekeywords.dat':'keywords'}
 
     for dirpath, dirs, files in os.walk(corpus_folder):  
         if ('parsing' in   dirpath) |  ('filter_' in  dirpath):
@@ -514,55 +519,38 @@ def upgrade_col_names(corpus_folder):
                     print(f'Warning: File {os.path.join(dirpath,file)} not recognized as a parsing file')
 
 
-def read_towns_per_country(country_towns_file, rep_utils, dic_town_symbols, dic_town_words):
-    
-    '''The function `read_towns_per_country` builds a list of towns per country.
-    It calls the functions `rationalize_town_names`and `remove_special_symbol`
-    defined in the same module 'BiblioParsingUtils' of the package 'BiblioParsing'.
+def rationalize_town_names(text, dic_town_symbols = None, dic_town_words = None):
+    """The function `rationalize_town_names` replaces in the string 'text'
+    symbols and words defined by the keys of the dictionaries 'DIC_TOWN_SYMBOLS'
+    and 'DIC_TOWN_WORDS' by their corresponding values in these dictionaries.
     
     Args:
-        country_towns_file (str): File name of the list of towns per country.
-        rep_utils (str): Folder of the file named 'country_towns_file'
+        text (str): The string where changes will be done.
         
     Returns:
-        (list): list of towns.
+        (str): The modified string.
         
     Notes:
-        The data are extracted from the excel file 'country_towns' which is located in the folder
-        `rep_utils` of the package `BiblioParsing`.
-        
-    '''
-    # Standard library imports
-    from pathlib import Path
-
-    # 3rd party library imports
-    import openpyxl
-    import pandas as pd
-
-    # Local imports
-    import BiblioParsing as bau
-
-    file = Path(bau.__file__).parent / Path(rep_utils) / Path(country_towns_file)
-    wb = openpyxl.load_workbook(file)
-
-    dict_df = pd.read_excel(file, 
-                            sheet_name=wb.sheetnames)
-    towns_dic = {x[0]:x[1]['Town name'].tolist() for x in dict_df.items()}
-
-    for country in towns_dic.keys():
-        
-        list_towns = []
-        for town in towns_dic[country]:
-            town = town.lower()
-            town = rationalize_town_names(town, dic_town_symbols=dic_town_symbols, dic_town_words= dic_town_words)
-            town = remove_special_symbol(town, only_ascii = False, strip = False)
-            town = town.strip()
-            list_towns.append(town)
-
-        towns_dic[country]= list_towns
+        The globals 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' are imported from
+        `BiblioSpecificGlobals` module of `BiblioParsing' package.
+    """    
+    if dic_town_symbols == None: 
+        # Globals imports
+        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS    
+        dic_town_symbols = DIC_TOWN_SYMBOLS
+    if dic_town_words == None: 
+        # Globals imports
+        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
+        dic_town_words = DIC_TOWN_WORDS
     
-    return towns_dic
+    # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
+    for town_symb in dic_town_symbols.keys():
+        text = text.replace(town_symb, dic_town_symbols[town_symb])
 
+    # Uniformizing words in town names using the dict 'DIC_TOWN_WORDS'
+    for town_word in dic_town_words.keys():
+        text = text.replace(town_word, dic_town_words[town_word])    
+    return text
 
 def remove_special_symbol(text, only_ascii = True, strip = True):
     '''The function `remove_special_symbol` removes accentuated characters in the string 'text'
@@ -593,43 +581,6 @@ def remove_special_symbol(text, only_ascii = True, strip = True):
 
     if strip:
         text = text.strip()
-    
-    return text
-
-
-def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
-    '''The function `rationalize_town_names` replaces in the string 'text'
-    symbols and words defined by the keys of the dictionaries 'DIC_TOWN_SYMBOLS'
-    and 'DIC_TOWN_WORDS' by their corresponding values in these dictionaries.
-    
-    Args:
-        text (str): The string where changes will be done.
-        
-    Returns:
-        (str): The modified string.
-        
-    Notes:
-        The globals 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' are imported from
-        `BiblioSpecificGlobals` module of `BiblioParsing' package.
-    
-    '''
-    
-    if dic_town_symbols==None: 
-        # Globals imports
-        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS    
-        dic_town_symbols=DIC_TOWN_SYMBOLS
-    if dic_town_words==None: 
-        # Globals imports
-        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
-        dic_town_words=DIC_TOWN_WORDS
-    
-    # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
-    for town_symb in dic_town_symbols.keys():
-        text = text.replace(town_symb, dic_town_symbols[town_symb])
-
-    # Uniformizing words in town names using the dict 'DIC_TOWN_WORDS'
-    for town_word in dic_town_words.keys():
-        text = text.replace(town_word, dic_town_words[town_word])
     
     return text
 

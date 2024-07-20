@@ -29,6 +29,8 @@ user_inst_filter_list = [(<normlized name 1>, <column name 1>),
 user_institute_affiliations_file_path = Path(<your_fullpath_to_institute_affiliations_file>)
 user_country_affiliations_file_path = Path(<your_fullpath_to_country_affiliations_file>)
 user_inst_types_file_path = Path(<your_fullpath_to_inst_types_file>)
+user_country_towns_folder_path = Path(<your_fullpath_to_country_towns_folder>)
+user_country_towns_file = Path(<your_country_towns_file_name>)
 
 # Setting the user's status of building normalized institutions file and raw institutions file after deduplicating parsing
 user_norm_inst_status = True
@@ -39,7 +41,9 @@ scopus_parsing_path = Path(<your_fullpath_for_scopus_parsing_results>)
 scopus_parsing_dict, scopus_fails_dict = bp.biblio_parser_scopus(scopus_raw_path,
                                                                  inst_filter_list = None,
                                                                  country_affiliations_file_path = user_institute_affiliations_file_path,
-                                                                 inst_types_file_path = user_inst_types_file_path)
+                                                                 inst_types_file_path = user_inst_types_file_path,
+                                                                 country_towns_file = user_country_towns_file,
+                                                                 country_towns_folder_path = user_country_towns_folder_path)
 bp.save_parsing_dict(scopus_parsing_dict, scopus_parsing_path, item_filename_dict, save_extent)
 bp.save_fails_dict(scopus_fails_dict, scopus_parsing_path)
     
@@ -49,7 +53,9 @@ wos_parsing_path = Path(<your_fullpath_for_wos_parsing_results>)
 wos_parsing_dict, wos_fails_dict = bp.biblio_parser_wos(wos_raw_path,
                                                         inst_filter_list = None,
                                                         country_affiliations_file_path = user_institute_affiliations_file_path,
-                                                        inst_types_file_path = user_inst_types_file_path) 
+                                                        inst_types_file_path = user_inst_types_file_path,
+                                                        country_towns_file = user_country_towns_file,
+                                                        country_towns_folder_path = user_country_towns_folder_path) 
 bp.save_parsing_dict(wos_parsing_dict, wos_parsing_path, item_filename_dict, save_extent)
 bp.save_fails_dict(wos_fails_dict, wos_parsing_path)
     
@@ -64,7 +70,9 @@ dedup_parsing_path = Path(<your_fullpath_for_parsings_dedup_results>)
 dedup_parsing_dict = bp.deduplicate_parsing(concat_parsing_dict, 
                                             norm_inst_status = user_norm_inst_status,
                                             inst_types_file_path = user_inst_types_file_path,
-                                            country_affiliations_file_path = user_country_affiliations_file_path)
+                                            country_affiliations_file_path = user_country_affiliations_file_path,
+                                            country_towns_file = user_country_towns_file,
+                                            country_towns_folder_path = user_country_towns_folder_path)
 bp.save_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict, save_extent)
 ```
 **for more exemples refer to** [BiblioParsing-exemples](https://github.com/TickyWill/BiblioParsing/Demo_BiblioParsing.ipynb).

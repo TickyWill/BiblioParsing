@@ -454,6 +454,8 @@ def deduplicate_parsing(concat_parsing_dict,
                         norm_inst_status = False,
                         inst_types_file_path = None,
                         country_affiliations_file_path = None,
+                        country_towns_file = None,
+                        country_towns_folder_path = None,
                         verbose = False):
     ''' The `deduplicate_parsing` function deduplicate parsing dfs of two corpuses. 
     It proceeds with deduplication of article lines using the `_deduplicate_articles` internal function.
@@ -499,6 +501,8 @@ def deduplicate_parsing(concat_parsing_dict,
         return_tup = build_norm_raw_institutions(df_address,
                                                  inst_types_file_path = inst_types_file_path,
                                                  country_affiliations_file_path = country_affiliations_file_path,
+                                                 country_towns_file = country_towns_file,
+                                                 country_towns_folder_path = country_towns_folder_path,
                                                  verbose = False)
         _, df_norm_institution, df_raw_institution = return_tup
         dedup_parsing_dict[norm_inst_alias] = df_norm_institution

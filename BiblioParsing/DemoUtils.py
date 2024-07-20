@@ -148,6 +148,8 @@ def parse_to_dedup(year, db_raw_dict,
                    user_istitute_affiliations_file_path,
                    user_inst_types_file_path,
                    user_country_affiliations_file_path,
+                   user_country_towns_file,
+                   user_country_towns_folder_path,
                    verbose = False):
     """
     """
@@ -169,13 +171,17 @@ def parse_to_dedup(year, db_raw_dict,
     scopus_raw_path = db_raw_dict[SCOPUS]
     scopus_parsing_dict, scopus_fails_dict = biblio_parser(scopus_raw_path, SCOPUS, inst_filter_list = user_inst_filter_list,
                                                            country_affiliations_file_path = user_istitute_affiliations_file_path,
-                                                           inst_types_file_path = user_inst_types_file_path)
+                                                           inst_types_file_path = user_inst_types_file_path,
+                                                           country_towns_file = user_country_towns_file,
+                                                           country_towns_folder_path = user_country_towns_folder_path)
         
     # Parsing WoS rawdata 
     wos_raw_path = db_raw_dict[WOS]
     wos_parsing_dict, wos_fails_dict = biblio_parser(wos_raw_path, WOS, inst_filter_list = user_inst_filter_list,
                                                      country_affiliations_file_path = user_istitute_affiliations_file_path,
-                                                     inst_types_file_path = user_inst_types_file_path)
+                                                     inst_types_file_path = user_inst_types_file_path,
+                                                     country_towns_file = user_country_towns_file,
+                                                     country_towns_folder_path = user_country_towns_folder_path)
     
     # Initializing results dicts
     parsing_dicts_dict = {} 
@@ -189,9 +195,11 @@ def parse_to_dedup(year, db_raw_dict,
 
         # Deduplicating the concatenation of the two parsings
         dedup_parsing_dict = deduplicate_parsing(concat_parsing_dict, 
-                                            norm_inst_status = user_norm_inst_status,
-                                            inst_types_file_path = user_inst_types_file_path,
-                                            country_affiliations_file_path = user_country_affiliations_file_path)
+                                                 norm_inst_status = user_norm_inst_status,
+                                                 inst_types_file_path = user_inst_types_file_path,
+                                                 country_affiliations_file_path = user_country_affiliations_file_path,
+                                                 country_towns_file = user_country_towns_file,
+                                                 country_towns_folder_path = user_country_towns_folder_path)
 
         # Building parsing performances dict
         fails_dicts[SCOPUS] = scopus_fails_dict

@@ -301,7 +301,9 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
 
 def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_filter_list = None,
                                                  country_affiliations_file_path = None,
-                                                 inst_types_file_path = None):
+                                                 inst_types_file_path = None,
+                                                 country_towns_file = None,
+                                                 country_towns_folder_path = None):
     """The `_build_authors_countries_institutions_scopus' function parses the fields 'Affiliations' 
        and 'Authors with affiliations' of a scopus database to retrieve the article authors 
        with their addresses, affiliations and country. 
@@ -370,7 +372,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
         The globals 'COL_NAMES', 'COLUMN_LABEL_SCOPUS', 'RE_SUB', 'RE_SUB_FIRST' and 'SYMBOL' are used 
         from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol`, and `normalize_country` are imported 
-        from `BiblioParsingUtils` module of `BiblioAnalysis_utils` package.
+        from `BiblioParsingUtils` module of `BiblioParsing` package.
         The functions  `address_inst_full_list`, `build_norm_raw_affiliations_dict`, 
         `read_inst_types` and `extend_author_institutions` are imported 
         from `BiblioParsingInstitutions` module of `BiblioParsing` package.
@@ -385,6 +387,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
+    from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup 
     from BiblioParsing.BiblioParsingUtils import normalize_country
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol    
@@ -410,6 +413,8 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path = country_affiliations_file_path,
                                                          verbose = False)
     aff_type_dict = read_inst_types(inst_types_file_path = inst_types_file_path, inst_types_usecols = None)
+    towns_dict = read_towns_per_country(country_towns_file = country_towns_file,
+                                        country_towns_folder_path = country_towns_folder_path)
 
     list_addr_country_inst = []    
     for pub_id, affiliations, authors_affiliations in zip(df_corpus[pub_id_alias],
@@ -446,6 +451,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
                         author_institutions_tup = address_inst_full_list(address,
                                                                          norm_raw_aff_dict,
                                                                          aff_type_dict,
+                                                                         towns_dict,
                                                                          drop_status = False)
 
                     list_addr_country_inst.append(addr_country_inst(pub_id,
@@ -1045,7 +1051,9 @@ def read_database_scopus(rawdata_path):
 
 def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
                          country_affiliations_file_path = None,
-                         inst_types_file_path = None):
+                         inst_types_file_path = None,
+                         country_towns_file = None,
+                         country_towns_folder_path = None):
     
     '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns of the csv file are read and parsed using the functions:
@@ -1143,7 +1151,9 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
             auth_inst_df = _build_authors_countries_institutions_scopus(df_corpus, scopus_dic_failed, 
                                                                         inst_filter_list = inst_filter_list ,
                                                                         country_affiliations_file_path = country_affiliations_file_path,
-                                                                        inst_types_file_path = inst_types_file_path)
+                                                                        inst_types_file_path = inst_types_file_path,
+                                                                        country_towns_file = country_towns_file,
+                                                                        country_towns_folder_path = country_towns_folder_path)
             _keeping_item_parsing_results(auth_inst_alias, auth_inst_df)
             
             # Building the dataframes of keywords

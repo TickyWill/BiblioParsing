@@ -13,6 +13,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'COLUMN_TYPE_SCOPUS',
            'COUNTRY_AFFILIATIONS_FILE',
            'COUNTRY_TOWNS',
+           'COUNTRY_TOWNS_FILE',
            'DIC_DOCTYPE',
            'DIC_AMB_WORDS',
            'DIC_LOW_WORDS',
@@ -53,8 +54,8 @@ __all__ = ['BASIC_KEEPING_WORDS',
 
 # Local imports 
 from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
+from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
-from BiblioParsing.BiblioParsingUtils import read_towns_per_country
 
 
 #####################
@@ -307,9 +308,6 @@ USECOLS_WOS  = [x.strip() for x in _USECOLS_WOS.split(',')]
 # Built globals #
 #################
 
-# Local library imports
-from BiblioParsing.BiblioParsingUtils import read_towns_per_country
-
 # For replacing symbols in town names
 DIC_TOWN_SYMBOLS = {"-": " ",
                     "'": " ",
@@ -323,7 +321,7 @@ DIC_TOWN_WORDS = {" lez " : " les ",
 # Setting the file name of the file for droping towns in addresses
 COUNTRY_TOWNS_FILE = 'Country_towns.xlsx'
 
-COUNTRY_TOWNS = read_towns_per_country(COUNTRY_TOWNS_FILE, REP_UTILS, DIC_TOWN_SYMBOLS, DIC_TOWN_WORDS)
+COUNTRY_TOWNS = read_towns_per_country(country_towns_file = None, country_towns_folder_path = None)
 
 
 #############################################
