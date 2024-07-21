@@ -1329,9 +1329,9 @@ def build_norm_raw_institutions(df_address,
     
     # Local library imports
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
-    from BiblioParsing.BiblioParsingUtils import read_towns_per_country
     from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
+    from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
     
     # Globals imports    
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
