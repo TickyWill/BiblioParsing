@@ -388,7 +388,8 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
-    from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup 
+    from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
+    from BiblioParsing.BiblioParsingUtils import clean_authors_countries_institutions 
     from BiblioParsing.BiblioParsingUtils import normalize_country
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol    
 
@@ -463,7 +464,8 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
 
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
     df_addr_country_inst, dic_failed = build_item_df_from_tup(list_addr_country_inst, auth_inst_col_list_alias[:-1], 
-                                                              norm_institution_alias, pub_id_alias, dic_failed)
+                                                              norm_institution_alias, pub_id_alias, dic_failed)    
+    df_addr_country_inst = clean_authors_countries_institutions(df_addr_country_inst)
 
     if inst_filter_list is not None:
         df_addr_country_inst = extend_author_institutions(df_addr_country_inst, inst_filter_list)

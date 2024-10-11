@@ -3,6 +3,7 @@ __all__ = ['biblio_parser',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
+           'clean_authors_countries_institutions',
            'merge_database',
            'normalize_country',
            'normalize_journal_names',
@@ -61,6 +62,51 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, di
                                 pub_id_alias:[int(x) for x in list(list_id)]}    
     item_df = item_df[item_df[item_col] != '']
     return item_df, dic_failed
+
+
+def clean_authors_countries_institutions(auth_addr_country_inst_df, verbose=False):
+    """
+    """
+    # 3rd party imports
+    import pandas as pd
+    
+    #Local imports
+    from BiblioParsing.BiblioSpecificGlobals import EMPTY
+    
+    # Setting useful aliases
+    empty_alias = EMPTY
+    columns_list = auth_addr_country_inst_df.columns
+    pub_id_alias = columns_list[0]
+    author_alias = columns_list[1]
+    address_alias = columns_list[2]
+    country_alias = columns_list[3]
+    norm_aff_alias = columns_list[4]
+    raw_aff_alias = columns_list[5]
+    
+    new_auth_addr_country_inst_df = pd.DataFrame(columns=columns_list)
+    for pub_id, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_alias):
+        new_pub_id_dg = pd.DataFrame(columns=columns_list)
+        for author_id, author_dg in pub_id_dg.groupby(author_alias):
+            new_author_dg = author_dg.copy()
+            if len(author_dg)>1:
+                country_list = list(set(author_dg[country_alias].to_list()))
+                new_author_dg[country_alias] = "; ".join(country_list)
+                
+                address_list = author_dg[address_alias].to_list()
+                new_author_dg[address_alias] = "; ".join(address_list)
+                
+                norm_aff_list = list(set(author_dg[norm_aff_alias].to_list()) - {empty_alias})
+                new_author_dg[norm_aff_alias] = "; ".join(norm_aff_list)
+                
+                raw_aff_list = list(set(author_dg[raw_aff_alias].to_list()) - {empty_alias})
+                new_author_dg[raw_aff_alias] = "; ".join(raw_aff_list)
+                
+                new_author_dg.drop_duplicates(subset=[pub_id_alias, author_alias], inplace=True)
+                new_pub_id_dg = pd.concat([new_pub_id_dg, new_author_dg])
+            else:
+                new_pub_id_dg = pd.concat([new_pub_id_dg, author_dg])
+        new_auth_addr_country_inst_df = pd.concat([new_auth_addr_country_inst_df, new_pub_id_dg])
+    return new_auth_addr_country_inst_df
 
 
 def build_title_keywords(df):
