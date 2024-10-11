@@ -81,6 +81,7 @@ bp.save_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict,
 
 # Release History
 1.0.0 first release
+1.1.0 Enhancement of author with affiliations parsing
 
 
 # Meta
