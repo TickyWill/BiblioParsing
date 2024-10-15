@@ -106,6 +106,8 @@ def clean_authors_countries_institutions(auth_addr_country_inst_df, verbose=Fals
             else:
                 new_pub_id_dg = pd.concat([new_pub_id_dg, author_dg])
         new_auth_addr_country_inst_df = pd.concat([new_auth_addr_country_inst_df, new_pub_id_dg])
+    new_auth_addr_country_inst_df.fillna(empty_alias, inplace=True)
+    new_auth_addr_country_inst_df.replace("", empty_alias, inplace=True)
     return new_auth_addr_country_inst_df
 
 
