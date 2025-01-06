@@ -1335,6 +1335,7 @@ def build_norm_raw_institutions(df_address,
     
     # Globals imports    
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import EMPTY
     
     # Setting useful aliases
     pub_id_alias           = COL_NAMES['pub_id']
@@ -1377,8 +1378,8 @@ def build_norm_raw_institutions(df_address,
                 print("\n\nError Pub_id / idx:", pub_id," / ", idx)
                 print("\naddress_dg:\n", address_dg[address_alias].tolist()[idx])
                 pass
-            address_norm_affiliations = "Not available"
-            address_raw_affiliations  = "Empty"
+            address_norm_affiliations = EMPTY
+            address_raw_affiliations  = EMPTY
             if address_norm_affiliation_list: address_norm_affiliations = "; ".join(address_norm_affiliation_list)
             if address_raw_affiliation_list: address_raw_affiliations = "; ".join(address_raw_affiliation_list)
             list_countries.append(country(pub_id, idx, address_country))
