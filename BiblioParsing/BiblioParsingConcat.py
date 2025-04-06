@@ -1,6 +1,8 @@
 __all__ = ['concatenate_parsing', 
-           'deduplicate_parsing',]
-    
+           'deduplicate_parsing']
+
+# Local imports
+from BiblioParsing.BiblioParsingUtils import dict_print
 
 def _concatenate_item_dfs(item, first_corpus_df, second_corpus_df):
     
@@ -504,9 +506,15 @@ def deduplicate_parsing(concat_parsing_dict,
                                                  country_towns_file = country_towns_file,
                                                  country_towns_folder_path = country_towns_folder_path,
                                                  verbose = False)
-        _, df_norm_institution, df_raw_institution = return_tup
+        _, df_norm_institution, df_raw_institutionm, wrong_affil_types_dict = return_tup
         dedup_parsing_dict[norm_inst_alias] = df_norm_institution
         dedup_parsing_dict[raw_inst_alias]  = df_raw_institution
+        
+        if wrong_affil_types_dict:
+            print("\nWARNING: Uncorrect normalized-affiliation types found in the file: "
+                  f"\n         {user_country_affiliations_file_path}"
+                  "\n\n         Please, correct the following affiliation types:")
+            dict_print(country_affiliations_file_path)
     
     return dedup_parsing_dict
 

@@ -74,9 +74,14 @@ NORM_JOURNAL_COLUMN_LABEL = 'Norm_journal'
 
 # Column names common to column names dicts 
 pub_id      = 'Pub_id'
+idx_author  = 'Idx_author'
 idx_address = 'Idx_address'
 address     = 'Address'
 country     = 'Country'
+journal     = 'Journal'
+year        = 'Year'
+volume      = 'Volume'
+page        = 'Page'
 
 # Column names dicts
 COL_NAMES = {'pub_id'      : pub_id,
@@ -91,20 +96,20 @@ COL_NAMES = {'pub_id'      : pub_id,
                               'Unknown_institutions',],
              'articles'    : [pub_id,
                               'Authors',
-                              'Year',
-                              'Journal',
-                              'Volume',
-                              'Page',
+                              year,
+                              journal,
+                              volume,
+                              page,
                               'DOI',
                               'Document_type',
                               'Language',
                               'Title',
                               'ISSN',],
              'authors'     : [pub_id,
-                              'Idx_author',
+                              idx_author,
                               'Co_author',],  
              'auth_inst'   : [pub_id,
-                              'Idx_author',
+                              idx_author,
                               address,
                               country,
                               'Norm_institutions',
@@ -120,10 +125,10 @@ COL_NAMES = {'pub_id'      : pub_id,
                               'Keyword',],                             
              'references'  : [pub_id,
                               'Author',
-                              'Year',                             
-                              'Journal',
-                              'Volume',
-                              'Page',],
+                              year,                             
+                              journal,
+                              volume,
+                              page,],
              'subject'     : [pub_id,
                               'Subject',],
              'sub_subject' : [pub_id,
@@ -352,7 +357,7 @@ DIC_AMB_WORDS = {' des ': ' ', # Conflict with DES institution
 
 # For replacing aliases of a word by a word (case sensitive)
 DIC_WORD_RE_PATTERN = {}
-DIC_WORD_RE_PATTERN['University'] = re.compile(r'\bUniv[aàädeéirstyz]{0,8}\b\.?')
+DIC_WORD_RE_PATTERN['University'] = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
 DIC_WORD_RE_PATTERN['Laboratory'] = re.compile(  r"'?\bLab\b\.?" \
                                                +  "|" \
                                                + r"'?\bLabor[aeimorstuy]{0,7}\b\.?")

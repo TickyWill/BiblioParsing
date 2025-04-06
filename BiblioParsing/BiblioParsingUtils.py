@@ -4,6 +4,7 @@ __all__ = ['biblio_parser',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
            'clean_authors_countries_institutions',
+           'dict_print',
            'merge_database',
            'normalize_country',
            'normalize_journal_names',
@@ -13,6 +14,11 @@ __all__ = ['biblio_parser',
            'set_rawdata_error',
            'upgrade_col_names',
            ]
+
+
+def dict_print(dic):
+    for k,v in dic.items():
+        print("            ", k, ":", v)
 
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):

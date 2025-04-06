@@ -435,7 +435,6 @@ def _search_items(affiliation, country, towns_dict, verbose = False):
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import ZIP_CODES        
     from BiblioParsing.BiblioSpecificGlobals import BASIC_KEEPING_WORDS
-    #from BiblioParsing.BiblioSpecificGlobals import COUNTRY_TOWNS
     from BiblioParsing.BiblioSpecificGlobals import DROPING_SUFFIX
     from BiblioParsing.BiblioSpecificGlobals import DROPING_WORDS    
     from BiblioParsing.BiblioSpecificGlobals import FR_DROPING_WORDS
@@ -1292,6 +1291,18 @@ def read_towns_per_country(country_towns_file = None, country_towns_folder_path 
     return towns_dict
 
 
+def _check_norm_raw_aff_dict(norm_raw_aff_dict, aff_type_dict, user_country_affiliations_file_path):
+    wrong_affil_types_dict = {}
+    aff_types_set = set(aff_type_dict.keys())
+    for country, country_dict in norm_raw_aff_dict.items():
+        norm_affil_types_set = set([norm_affil.split(' ')[-1] for norm_affil in country_dict.keys()])
+        norm_affil_types_in = aff_types_set.intersection(norm_affil_types_set)
+        norm_affil_types_out = norm_affil_types_set - norm_affil_types_in
+        if norm_affil_types_out:
+            wrong_affil_types_dict[country] = list(norm_affil_types_out)
+    return wrong_affil_types_dict
+
+
 def build_norm_raw_institutions(df_address,
                                 inst_types_file_path = None,
                                 country_affiliations_file_path = None,
@@ -1309,7 +1320,7 @@ def build_norm_raw_institutions(df_address,
         verbose (bool): If set to 'True' allows prints for code control (default: False).
 
     Returns:
-        (tuple): The tuple of the dataframes df_country, df_norm_institutions, df_raw_institutions.
+        (tuple): (df_country, df_norm_institutions, df_raw_institutions, wrong_affil_types_dict).
         
     Notes:
         The global 'COL_NAMES' is imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
@@ -1351,61 +1362,73 @@ def build_norm_raw_institutions(df_address,
     institution = namedtuple('institution', inst_col_list_alias )
     
     # Getting useful dicts for affiliation normalization
-    aff_type_dict = read_inst_types(inst_types_file_path = inst_types_file_path,
-                                    inst_types_usecols = None)
-    norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path = country_affiliations_file_path)
+    aff_type_dict = read_inst_types(inst_types_file_path=inst_types_file_path,
+                                    inst_types_usecols=None)
+    norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path=country_affiliations_file_path)
     towns_dict = read_towns_per_country(country_towns_file = country_towns_file,
                                         country_towns_folder_path = country_towns_folder_path)
+    wrong_affil_types_dict = _check_norm_raw_aff_dict(norm_raw_aff_dict, aff_type_dict,
+                                                      country_affiliations_file_path)
     
-    list_countries = []
-    list_norm_institutions = []
-    list_raw_institutions  = []
-    
-    for pub_id, address_dg in df_address.groupby(pub_id_alias):
-        if verbose:
-            print("\n\nPub_id:", pub_id)
-            print("\naddress_dg:\n", address_dg)     
-        for idx, address_raw in enumerate(address_dg[address_alias].tolist()):
-            try:
-                aff_list_tup = _build_address_affiliations_lists(address_raw,
-                                                                 norm_raw_aff_dict,
-                                                                 aff_type_dict,
-                                                                 towns_dict,
-                                                                 drop_status = True,
-                                                                 verbose = False)
-                address_country, address_norm_affiliation_list, address_raw_affiliation_list = aff_list_tup
-            except KeyError:
-                print("\n\nError Pub_id / idx:", pub_id," / ", idx)
-                print("\naddress_dg:\n", address_dg[address_alias].tolist()[idx])
-                pass
-            address_norm_affiliations = EMPTY
-            address_raw_affiliations  = EMPTY
-            if address_norm_affiliation_list: address_norm_affiliations = "; ".join(address_norm_affiliation_list)
-            if address_raw_affiliation_list: address_raw_affiliations = "; ".join(address_raw_affiliation_list)
-            list_countries.append(country(pub_id, idx, address_country))
-            list_norm_institutions.append(institution(pub_id, idx, address_norm_affiliations))
-            list_raw_institutions.append(institution(pub_id, idx, address_raw_affiliations))            
-            
-            if verbose:
-                print('\nIdx address:                       ', idx)
-                print('Country:                           ', address_country)
-                print('address_norm_affiliation_list:     ', address_norm_affiliations)
-                print('address_unknown_affiliations_list: ', address_raw_affiliations)            
+    if not wrong_affil_types_dict:
+        list_countries = []
+        list_norm_institutions = []
+        list_raw_institutions = []
 
-    # Building a clean countries dataframe and accordingly updating the parsing success rate dict
-    df_country, _ = build_item_df_from_tup(list_countries, country_col_list_alias, 
-                                           country_alias, pub_id_alias)
-    
-    # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-    df_norm_institution, _ = build_item_df_from_tup(list_norm_institutions, inst_col_list_alias, 
-                                                    institution_alias, pub_id_alias) 
-    
-    # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-    df_raw_institution, _ = build_item_df_from_tup(list_raw_institutions, inst_col_list_alias, 
-                                                   institution_alias, pub_id_alias)    
-    if not(len(df_country)==len(df_norm_institution)==len(df_raw_institution)):
-        warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal '
-                   f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
-        print(warning)
-        
-    return (df_country, df_norm_institution, df_raw_institution)
+        for pub_id, address_dg in df_address.groupby(pub_id_alias):
+            if verbose:
+                print("\n\nPub_id:", pub_id)
+                print("\naddress_dg:\n", address_dg)     
+            for idx, address_raw in enumerate(address_dg[address_alias].tolist()):
+                address_country = ""
+                address_norm_affiliation_list = []
+                address_raw_affiliation_list = []            
+                try:
+                    aff_list_tup = _build_address_affiliations_lists(address_raw,
+                                                                     norm_raw_aff_dict,
+                                                                     aff_type_dict,
+                                                                     towns_dict,
+                                                                     drop_status=True,
+                                                                     verbose=False)
+                    address_country, address_norm_affiliation_list, address_raw_affiliation_list = aff_list_tup
+                except KeyError:
+                    print("\n\nError Pub_id / idx:", pub_id," / ", idx)
+                    print("\naddress_dg:\n", address_dg[address_alias].tolist()[idx])
+                    pass
+                address_norm_affiliations = EMPTY
+                address_raw_affiliations = EMPTY
+                if address_norm_affiliation_list: 
+                    address_norm_affiliations = "; ".join(address_norm_affiliation_list)
+                if address_raw_affiliation_list: 
+                    address_raw_affiliations = "; ".join(address_raw_affiliation_list)
+                if address_country: list_countries.append(country(pub_id, idx, address_country))
+                list_norm_institutions.append(institution(pub_id, idx, address_norm_affiliations))
+                list_raw_institutions.append(institution(pub_id, idx, address_raw_affiliations))            
+
+                if verbose:
+                    print('\nIdx address:                       ', idx)
+                    print('Country:                           ', address_country)
+                    print('address_norm_affiliation_list:     ', address_norm_affiliations)
+                    print('address_unknown_affiliations_list: ', address_raw_affiliations)            
+
+        # Building a clean countries dataframe and accordingly updating the parsing success rate dict
+        df_country, _ = build_item_df_from_tup(list_countries, country_col_list_alias, 
+                                               country_alias, pub_id_alias)
+
+        # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
+        df_norm_institution, _ = build_item_df_from_tup(list_norm_institutions, inst_col_list_alias, 
+                                                        institution_alias, pub_id_alias) 
+
+        # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
+        df_raw_institution, _ = build_item_df_from_tup(list_raw_institutions, inst_col_list_alias, 
+                                                       institution_alias, pub_id_alias)    
+        if not(len(df_country)==len(df_norm_institution)==len(df_raw_institution)):
+            warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal '
+                       f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
+            print(warning)
+    else:
+        # Returning empty dataframes
+        df_country = pd.DataFrame()
+        df_norm_institution= pd.DataFrame()
+        df_raw_institution = pd.DataFrame()
+    return df_country, df_norm_institution, df_raw_institution, wrong_affil_types_dict
