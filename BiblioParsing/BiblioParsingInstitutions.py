@@ -1308,18 +1308,18 @@ def build_norm_raw_institutions(df_address,
                                 country_towns_file=None,
                                 country_towns_folder_path=None,
                                 verbose=False,
-                                progress_callback=None):
-    
-    '''The function `build_norm_raw_institutions_wos` parses the addresses 
+                                progress_param=None):    
+    """The function `build_norm_raw_institutions_wos` parses the addresses 
     of each publication of the Wos corpus to retrieve the country, 
     the normalized institutions and the institutions not yet normalized for each address.
 
     Args:
-        df_address (dataframe): the dataframe of the addresses resulting
+        df_address (dataframe): the dataframe of the addresses resulting \
         from the concatenation/deduplication of databases.
         verbose (bool): If set to 'True' allows prints for code control (default: False).
-        progress_callback (function): Function for updating ProgressBar if used \
-        tkinter widget status (default = None).
+        progress_param (tup): (Function for updating ProgressBar tkinter widget status, \
+        The initial progress status (int), The final progress status (int)) \
+        (optional, default = None)
     Returns:
         (tuple): (df_country, df_norm_institutions, df_raw_institutions, wrong_affil_types_dict).        
     Notes:
@@ -1328,8 +1328,7 @@ def build_norm_raw_institutions(df_address,
         are imported from `BiblioParsingInstitutions` module of `BiblioParsing` package.
         The function `build_item_df_from_tup` is imported from `BiblioParsingInstitutions` module 
         of `BiblioParsing` package.
-        
-    '''
+    """
 
     # Standard library imports
     import re
@@ -1376,11 +1375,11 @@ def build_norm_raw_institutions(df_address,
                                                       country_affiliations_file_path)
 
     if not wrong_affil_types_dict:
-        if progress_callback:
-            init_progress = 20
-            final_progress = 70
-            step_nb = len(df_address)
-            progress_step = int((final_progress-init_progress) / step_nb)
+        step_nb = len(df_address)
+        step = 0
+        if progress_param:
+            progress_callback, init_progress, final_progress = progress_param
+            progress_step = (final_progress-init_progress) / step_nb
             progress_status = init_progress
             progress_callback(progress_status)
 
@@ -1417,28 +1416,33 @@ def build_norm_raw_institutions(df_address,
                 if address_country:
                     list_countries.append(country(pub_id, idx, address_country))
                 list_norm_institutions.append(norm_institution(pub_id, idx, address_norm_affiliations))
-                list_raw_institutions.append(raw_institution(pub_id, idx, address_raw_affiliations, std_address))            
+                list_raw_institutions.append(raw_institution(pub_id, idx, address_raw_affiliations, std_address))
+                step += 1
 
                 if verbose:
                     print('\nIdx address:                       ', idx)
                     print('Country:                           ', address_country)
                     print('address_norm_affiliation_list:     ', address_norm_affiliations)
                     print('address_unknown_affiliations_list: ', address_raw_affiliations)
-                if progress_callback:
+                    print(f"        Number of addresses analyzed: {step} / {step_nb}")
+                else:
+                    print(f"        Number of addresses analyzed: {step} / {step_nb}", end="\r")
+
+                if progress_param:
                     progress_status += progress_step
                     progress_callback(progress_status)
 
         # Building a clean countries dataframe and accordingly updating the parsing success rate dict
-        df_country, _ = build_item_df_from_tup(list_countries, country_col_list_alias, 
+        df_country, _ = build_item_df_from_tup(list_countries, country_col_list_alias,
                                                country_alias, pub_id_alias)
 
         # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-        df_norm_institution, _ = build_item_df_from_tup(list_norm_institutions, norm_institution_list, 
-                                                        institution_alias, pub_id_alias) 
+        df_norm_institution, _ = build_item_df_from_tup(list_norm_institutions, norm_institution_list,
+                                                        institution_alias, pub_id_alias)
 
         # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-        df_raw_institution, _ = build_item_df_from_tup(list_raw_institutions, raw_institution_list, 
-                                                       institution_alias, pub_id_alias)    
+        df_raw_institution, _ = build_item_df_from_tup(list_raw_institutions, raw_institution_list,
+                                                       institution_alias, pub_id_alias)
         if not(len(df_country)==len(df_norm_institution)==len(df_raw_institution)):
             warning = (f'WARNING: Lengths of "df_address", "df_country" and "df_institution" dataframes are not equal '
                        f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
@@ -1449,7 +1453,7 @@ def build_norm_raw_institutions(df_address,
         df_norm_institution= pd.DataFrame()
         df_raw_institution = pd.DataFrame()
 
-    if progress_callback:
-        progress_callback(final_progress)    
+    if progress_param:
+        progress_callback(final_progress)
 
     return df_country, df_norm_institution, df_raw_institution, wrong_affil_types_dict
