@@ -51,7 +51,7 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     return error_text
 
 
-def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed = None):
+def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed=None):
     '''Building a clean item dataframe from a tuple 
     and accordingly updating the parsing success rate dict.'''
     
