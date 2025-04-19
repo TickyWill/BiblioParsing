@@ -1454,6 +1454,7 @@ def build_norm_raw_institutions(df_address,
         df_raw_institution = pd.DataFrame()
 
     if progress_param:
+        progress_callback, _, final_progress = progress_param
         progress_callback(final_progress)
 
     return df_country, df_norm_institution, df_raw_institution, wrong_affil_types_dict
