@@ -4,6 +4,7 @@ __all__ = ['address_inst_full_list',
            'extend_author_institutions',
            'read_inst_types',
            'read_towns_per_country',
+           'standardize_address',
            ]
 
 
@@ -153,7 +154,7 @@ def _build_address_affiliations_lists(std_address, norm_raw_aff_dict, aff_type_d
                  third item is the list of unknown affiliations.
     
     Note:
-        The functions '_standardize_address', '_get_affiliations_list' and '_get_norm_affiliations_list'
+        The functions '_get_affiliations_list' and '_get_norm_affiliations_list'
         are imported from  BiblioParsingInstitutions module BiblioParsing package.
     '''
     
@@ -307,7 +308,7 @@ def extend_author_institutions(item_df, inst_filter_list):
     return new_item_df
 
 
-def _standardize_address(raw_address):
+def _standardize_address_old(raw_address):
     
     '''The function `_standardize_address` standardizes the string 'raw_address' by replacing
     all aliases of a word, such as 'University', 'Institute', 'Center' and' Department', 
@@ -376,6 +377,75 @@ def _standardize_address(raw_address):
     else:
         standard_address = ','.join(first_raw_affiliations_list + [space + country])
 
+    return standard_address
+
+
+def standardize_address(raw_address):
+    """Standardizes the string 'raw_address' by replacing all aliases of a word, 
+    such as 'University', 'Institute', 'Center' and' Department', by a standardized 
+    version.
+
+    The aliases of a given word are captured using a specific regex which is case sensitive defined 
+    by the global 'DIC_WORD_RE_PATTERN' imported from the `BiblioParsing` package imported as "bp". 
+    The aliases may contain symbols from a given list of any language including accentuated ones. 
+    The length of the aliases is limited to a maximum according to the longest alias known.
+        ex: The longest alias known for the word 'University' is 'Universidade'. 
+            Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
+            with possibly before one symbol among a to z and after up to 8 symbols from the list 
+            '[aàäcdeéirstyz]' and possibly finishing with a dot. 
+    Then, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global and apostrophes are replaced 
+    by the standard cote using 'APOSTROPHE_CHANGE' global. 
+    The globals are imported from the `BiblioParsing` package imported as "bp". 
+    Finally, the country is normalized through the `normalize_country` function imported from 
+    the `BiblioParsing` package imported as "bp".
+
+    Args:
+        raw_address (str): The full address to be standardized.
+    Returns:
+        (str): The full standardized address.
+    """
+    # Standard library imports
+    import re
+    
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import normalize_country
+    
+    # Globals imports
+    from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
+    from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+
+    # Uniformizing words
+    standard_address = raw_address
+    for word_to_substitute, re_pattern in DIC_WORD_RE_PATTERN.items():
+        if word_to_substitute=='University':
+            re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
+        standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
+    standard_address = re.sub(r'\s+', ' ', standard_address)
+    standard_address = re.sub(r'\s,', ',', standard_address)
+
+    # Uniformizing dashes
+    standard_address = standard_address.translate(DASHES_CHANGE)
+
+    # Uniformizing apostrophes
+    standard_address = standard_address.translate(APOSTROPHE_CHANGE)
+
+    # Dropping symbols
+    standard_address = standard_address.translate(SYMB_DROP)
+
+    # Uniformizing countries
+    country_pos = -1
+    first_raw_affiliations_list = standard_address.split(',')
+    # This split below is just for country finding even if affiliation may be separated by dashes
+    raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
+    country = normalize_country(raw_affiliations_list[country_pos].strip())
+    space = " "
+    if country!=UNKNOWN:
+        standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
+    else:
+        standard_address = ','.join(first_raw_affiliations_list + [space + country])
     return standard_address
 
 
@@ -1342,6 +1412,7 @@ def build_norm_raw_institutions(df_address,
     from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_affiliations_dict
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
+    from BiblioParsing.BiblioParsingInstitutions import standardize_address
     
     # Globals imports    
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
@@ -1391,7 +1462,7 @@ def build_norm_raw_institutions(df_address,
                 print("\n\nPub_id:", pub_id)
                 print("\naddress_dg:\n", address_dg)     
             for idx, raw_address in enumerate(address_dg[address_alias].tolist()):
-                std_address = _standardize_address(raw_address)
+                std_address = standardize_address(raw_address)
                 address_country = ""
                 address_norm_affiliation_list = []
                 address_raw_affiliation_list = []            

@@ -185,6 +185,7 @@ SYMB_CHANGE = str.maketrans(DIC_CHANGE_SYMB)
 DIC_DROP_SYMB = {"'": " ",
                  "*": " ",
                  "#": " ",
+                 "|": " ",
                 } 
 
 SYMB_DROP = str.maketrans(DIC_DROP_SYMB)
