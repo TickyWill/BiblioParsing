@@ -79,6 +79,7 @@ target/
 .ipynb_checkpoints
 Demo_BiblioParsing_amal.ipynb
 CheckInstitutionsParsing.ipynb
+Demo_BiblioParsing-test.ipynb
 
 # IPython
 profile_default/
