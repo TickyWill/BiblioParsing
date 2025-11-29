@@ -237,8 +237,10 @@ def normalize_country(country):
             country_clean = 'United Arab Emirates'
         elif country == 'Vietnam':   
             country_clean = 'Viet Nam'
+        elif country=='Palestine':
+            country_clean = 'Palestinian Territory'
         else:
-            country_clean = UNKNOWN
+            country_clean = UNKNOWN.capitalize()
 
     return country_clean
 

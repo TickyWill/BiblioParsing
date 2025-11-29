@@ -441,11 +441,8 @@ def standardize_address(raw_address):
     # This split below is just for country finding even if affiliation may be separated by dashes
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
-    space = " "
-    if country!=UNKNOWN:
-        standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
-    else:
-        standard_address = ','.join(first_raw_affiliations_list + [space + country])
+    space = " "    
+    standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
     return standard_address
 
 
