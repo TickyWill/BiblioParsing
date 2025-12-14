@@ -221,6 +221,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     import pandas as pd
     
     # Local library imports
+    from BiblioParsing.BiblioParsingInstitutions import standardize_address
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
     from BiblioParsing.BiblioParsingUtils import normalize_country
     from BiblioParsing.BiblioParsingUtils import remove_special_symbol
@@ -270,11 +271,9 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
                 list_addresses.append(address(pub_id,
                                               idx,
                                               author_address))
-
-                author_institution_raw = author_address.split(',')[0]
-                author_institution_raw = re.sub(RE_SUB_FIRST,'University' + ', ', author_institution_raw)                 
-                author_institution     = re.sub(RE_SUB,'University' + ' ', author_institution_raw)
-                list_institutions.append(institution(pub_id, idx, author_institution))
+                author_address = standardize_address(author_address)
+                raw_author_institution = author_address.split(',')[0]
+                list_institutions.append(institution(pub_id, idx, raw_author_institution))
 
                 author_country_raw = author_address.split(',')[-1].replace(';','').strip()
                 author_country     = normalize_country(author_country_raw)
@@ -392,6 +391,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
+    from BiblioParsing.BiblioParsingInstitutions import standardize_address
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
     from BiblioParsing.BiblioParsingUtils import clean_authors_countries_institutions
     from BiblioParsing.BiblioParsingUtils import normalize_country
@@ -443,7 +443,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
             authors_list_ordered = df_corpus.loc[pub_id, wos_auth_fullnames_alias].split(';')
             authors_list_ordered = [author_ordered.strip() for author_ordered in authors_list_ordered]
                 
-            for tup in list_author_address_tup:
+            for tup_num, tup in enumerate(list_author_address_tup):
                 # check the case of an author in list_author_address_tup not an effective author name (ex: a team name or anonymous)
                 if tup.author in authors_list_ordered: 
                     idx_author = authors_list_ordered.index(tup.author)
@@ -457,16 +457,14 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
                                    f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
                         print(warning)
 
-                    author_address_raw = tup.address
-                    author_address_raw = remove_special_symbol(author_address_raw, only_ascii=True, strip=True)
-                    author_address = re.sub(RE_SUB_FIRST,'University' + ', ', author_address_raw) 
-                    author_address = re.sub(RE_SUB,'University' + ' ', author_address_raw)
-                    author_institutions_tup = address_inst_full_list(author_address,
+                    raw_author_address = tup.address
+                    raw_author_address = remove_special_symbol(raw_author_address, only_ascii=True, strip=True)
+                    std_author_address = standardize_address(raw_author_address)
+                    author_institutions_tup = address_inst_full_list(std_author_address,
                                                                      norm_raw_aff_dict,
                                                                      aff_type_dict,
                                                                      towns_dict,
                                                                      drop_status = False)
-
                     list_addr_country_inst.append(addr_country_inst(pub_id,
                                                                     idx_author,
                                                                     tup.address,

@@ -220,9 +220,11 @@ def normalize_country(country):
     
     # Globals imports
     from BiblioParsing.BiblioGeneralGlobals import ALIAS_UK
+    from BiblioParsing.BiblioGeneralGlobals import ALIAS_FR
+    from BiblioParsing.BiblioGeneralGlobals import ALIAS_BLR
     from BiblioParsing.BiblioGeneralGlobals import COUNTRIES
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
-    
+
     country_clean = country
     if country not in COUNTRIES:
         if country in  ALIAS_UK:
@@ -239,9 +241,12 @@ def normalize_country(country):
             country_clean = 'Viet Nam'
         elif country=='Palestine':
             country_clean = 'Palestinian Territory'
+        elif country in ALIAS_FR:
+            country_clean = 'France'
+        elif country in ALIAS_BLR:
+            country_clean = 'Belarus'
         else:
             country_clean = UNKNOWN.capitalize()
-
     return country_clean
 
 

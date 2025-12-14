@@ -1,6 +1,8 @@
 __all__ = ['ACCENT_CHANGE',
+           'ALIAS_FR',
            'ALIAS_UK',
            'APOSTROPHE_CHANGE',
+           'ALIAS_BLR',
            'CHANGE',
            'COUNTRIES',
            'COUNTRIES_CODES',
@@ -93,8 +95,13 @@ NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY'''
 USA_STATES = [x.strip() for x in USA_STATES.split(',')]
 
 ALIAS_UK = '''England,Wales,North Ireland,Scotland'''
-ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')] 
+ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]
 
+ALIAS_FR = '''FRANCE,FR,Fr'''
+ALIAS_FR = [x.strip() for x in ALIAS_FR.split(',')]
+
+ALIAS_BLR = '''BELARUS,BLR'''
+ALIAS_BLR = [x.strip() for x in ALIAS_BLR.split(',')]
 
 #To Do : Check if this global is still used
 # Character replacements

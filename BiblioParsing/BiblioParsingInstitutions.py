@@ -441,8 +441,11 @@ def standardize_address(raw_address):
     # This split below is just for country finding even if affiliation may be separated by dashes
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
-    space = " "    
-    standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
+    space = " "
+    if country!=UNKNOWN:
+        standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
+    else:
+        standard_address = ','.join(first_raw_affiliations_list + [space + country])
     return standard_address
 
 
@@ -1206,25 +1209,16 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
     if not country_affiliations_file_path:
         country_affiliations_file_path = Path(bp.__file__).parent / Path(REP_UTILS) / Path(COUNTRY_AFFILIATIONS_FILE)
    
-    # Reading the 'Country_affilialions.xlsx' file in a data dict    
+    # Reading the 'Country_affilialions.xlsx' file in the dataframe dic    
     wb = openpyxl.load_workbook(country_affiliations_file_path)
-    sheetlist = wb.sheetnames
-    sheetlist.remove('New')
-    country_aff_dict = pd.read_excel(country_affiliations_file_path, 
-                                     sheet_name=sheetlist)
+    country_aff_df = pd.read_excel(country_affiliations_file_path, 
+                                   sheet_name = wb.sheetnames)
 
     norm_raw_aff_dict = {}
-    for country_aff_df_items in country_aff_dict.items():
-        country = country_aff_df_items[0]
+    for country_aff_df_item in country_aff_df.items():
+        country = country_aff_df_item[0]
         norm_raw_aff_dict[country] = {}
-        init_norm_raw_aff_df = country_aff_df_items[1]
-        init_norm_raw_aff_nb = len(init_norm_raw_aff_df["Norm affiliations"])
-
-        # Dropping columns that are fully empty
-        inter_norm_raw_aff_df = init_norm_raw_aff_df.dropna(axis=1, how='all')
-
-        # Dropping rows where "Norm_affiliations" cell is empty
-        norm_raw_aff_df = inter_norm_raw_aff_df.dropna(axis=0, subset=["Norm affiliations"])
+        norm_raw_aff_df = country_aff_df_item[1]    
         norm_raw_aff_nb = len(norm_raw_aff_df["Norm affiliations"])
 
         if verbose:
@@ -1236,7 +1230,7 @@ def build_norm_raw_affiliations_dict(country_affiliations_file_path = None, verb
 
         for num, norm_aff in enumerate(norm_raw_aff_df["Norm affiliations"]):
             norm_aff = norm_aff.strip()
-            raw_aff_list = [item for item in list(norm_raw_aff_df.loc[num])[1:] if not(pd.isnull(item))==True]
+            raw_aff_list = [item for item in list(norm_raw_aff_df.loc[num])[1:] if not(pd.isnull(item)) == True]
 
             if verbose: 
                 print()

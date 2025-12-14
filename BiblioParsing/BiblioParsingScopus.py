@@ -388,6 +388,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
     from BiblioParsing.BiblioParsingInstitutions import read_inst_types
     from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
+    from BiblioParsing.BiblioParsingInstitutions import standardize_address
     from BiblioParsing.BiblioParsingUtils import build_item_df_from_tup
     from BiblioParsing.BiblioParsingUtils import clean_authors_countries_institutions 
     from BiblioParsing.BiblioParsingUtils import normalize_country
@@ -417,45 +418,44 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
     towns_dict = read_towns_per_country(country_towns_file = country_towns_file,
                                         country_towns_folder_path = country_towns_folder_path)
 
-    list_addr_country_inst = []    
+    addr_country_inst_list = []    
     for pub_id, affiliations, authors_affiliations in zip(df_corpus[pub_id_alias],
                                                           df_corpus[scopus_aff_alias],
                                                           df_corpus[scopus_auth_with_aff_alias]):
+        # Initializing the authors and addresses counters
+        idx_author, last_author = -1, '' 
 
-        idx_author, last_author = -1, '' # Initialization for the author and address counter
+        affiliations_list = affiliations.split(';')
+        authors_affiliations_list = authors_affiliations.split(';')
 
-        list_affiliations = affiliations.split(';')
-        list_authors_affiliations = authors_affiliations.split(';')
-
-        for x in list_authors_affiliations:
+        for author_affiliations in authors_affiliations_list:
             auth_item_nbr = 2
-            if "." in x.split(',')[0]: auth_item_nbr = 1 # Change in scopus on 07/2023
-            author = (','.join(x.split(',')[0:auth_item_nbr])).strip()
+            author_affiliations_list = author_affiliations.split(',')
+            if "." in author_affiliations_list[0]: # Change in scopus on 07/2023
+                auth_item_nbr = 1
+            author = (','.join(author_affiliations_list[0:auth_item_nbr])).strip()
 
             if last_author != author:
                 idx_author += 1
             last_author = author
 
-            author_list_addresses = ','.join(x.split(',')[auth_item_nbr:])
-
-            author_address_list_raw = []
-            for affiliation_raw in list_affiliations:
-                if affiliation_raw in author_list_addresses:
-                    affiliation_raw = remove_special_symbol(affiliation_raw, only_ascii=True, strip=True)
-                    affiliation_raw = re.sub(RE_SUB_FIRST,'University' + ', ',affiliation_raw)
-                    affiliation     = re.sub(RE_SUB,'University' + ' ',affiliation_raw)
-                    author_address_list_raw.append(affiliation) 
-
-                    for address in author_address_list_raw:
-                        author_country_raw      = address.split(',')[-1].strip()
-                        author_country          = normalize_country(author_country_raw)
+            author_addresses_str = ','.join(author_affiliations_list[auth_item_nbr:])
+            author_addresses_list = []
+            for raw_affiliation in affiliations_list:
+                if raw_affiliation in author_addresses_str:
+                    raw_affiliation = remove_special_symbol(raw_affiliation, only_ascii=True, strip=True)
+                    std_affiliation = standardize_address(raw_affiliation)
+                    author_addresses_list.append(std_affiliation) 
+                    for address in author_addresses_list:
+                        author_country_raw = address.split(',')[-1].strip()
+                        author_country = normalize_country(author_country_raw)
                         author_institutions_tup = address_inst_full_list(address,
                                                                          norm_raw_aff_dict,
                                                                          aff_type_dict,
                                                                          towns_dict,
                                                                          drop_status = False)
 
-                    list_addr_country_inst.append(addr_country_inst(pub_id,
+                    addr_country_inst_list.append(addr_country_inst(pub_id,
                                                                     idx_author,
                                                                     address,
                                                                     author_country,
@@ -463,7 +463,7 @@ def _build_authors_countries_institutions_scopus(df_corpus, dic_failed, inst_fil
                                                                     author_institutions_tup.raw_inst_list,))
 
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
-    df_addr_country_inst, dic_failed = build_item_df_from_tup(list_addr_country_inst, auth_inst_col_list_alias[:-1], 
+    df_addr_country_inst, dic_failed = build_item_df_from_tup(addr_country_inst_list, auth_inst_col_list_alias[:-1], 
                                                               norm_institution_alias, pub_id_alias, dic_failed)    
     df_addr_country_inst = clean_authors_countries_institutions(df_addr_country_inst)
 
@@ -1188,6 +1188,5 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
             for item in items_aliases_list:
                 _keeping_item_parsing_results(item, empty_df)
             
-    return scopus_parsing_dict, scopus_dic_failed
-        
+    return scopus_parsing_dict, scopus_dic_failed    
         
