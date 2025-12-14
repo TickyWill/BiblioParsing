@@ -192,7 +192,7 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
         The dataframes df_address, df_country, df_institution.
         
     Notes:
-        The globals 'COL_NAMES', 'COLUMN_LABEL_SCOPUS', 'RE_SUB', 'RE_SUB_FIRST' and 'UNKNOWN' 
+        The globals 'COL_NAMES', 'COLUMN_LABEL_SCOPUS', 'RE_SUB', 'RE_SUB_FIRST' and 'UNKNOWN_COUNTRY' 
         are used from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol` and `normalize_country` are used 
         from `BiblioParsingUtils` of `BiblioAnalysis_utils` package.
@@ -216,7 +216,7 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
 
     # Setting useful aliases
     pub_id_alias           = COL_NAMES['pub_id']
@@ -264,9 +264,9 @@ def _build_addresses_countries_institutions_scopus(df_corpus, dic_failed):
                 country_raw = address_pub.split(',')[-1].replace(';','').strip()  
                 country     = normalize_country(country_raw)
                 if country == '':
-                    country = UNKNOWN
+                    country = UNKNOWN_COUNTRY
                     warning = (f'WARNING: the invalid country name "{country_raw}" '
-                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
+                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN_COUNTRY}" '
                                f'in "_build_addresses_countries_institutions_scopus" '
                                f'function of "BiblioParsingScopus.py" module.')
                     print(warning)

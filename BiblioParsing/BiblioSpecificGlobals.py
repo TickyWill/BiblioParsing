@@ -45,6 +45,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'SMALL_WORDS_DROP',
            'SYMBOL',
            'UNKNOWN',
+           'UNKNOWN_COUNTRY',
            'USECOLS_SCOPUS',
            'USECOLS_WOS',
            'USER_KEEPING_WORDS',
@@ -277,6 +278,7 @@ SYMBOL  = '\s,;:.\-\/'
 PARTIAL = 'partial'    # For unparsed partial references
 EMPTY   = 'empty'
 UNKNOWN = 'unknown'
+UNKNOWN_COUNTRY = 'Unknown'
 
 
 #######################################

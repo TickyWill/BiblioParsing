@@ -207,7 +207,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
         
     Notes:
         The globals 'COL_NAMES', 'COLUMN_LABEL_WOS', 'RE_ADDRESS', 'RE_AUTHOR', 'RE_SUB', 'RE_SUB_FIRST'
-        and 'UNKNOWN' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
+        and 'UNKNOWN_COUNTRY' are imported from `BiblioSpecificGlobals` module of `BiblioParsing` package.
         The functions `remove_special_symbol` and `normalize_country` 
         are imported from `BiblioParsingUtils` of `BiblioAnalysis_utils` package.
         
@@ -233,20 +233,20 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
     from BiblioParsing.BiblioRegexpGlobals import RE_SUB_FIRST    
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
     
     # Setting useful aliases
     pub_id_alias             = COL_NAMES['pub_id']
-    address_col_List_alias   = COL_NAMES['address']
+    address_col_list_alias   = COL_NAMES['address']
     country_col_list_alias   = COL_NAMES['country']
     inst_col_list_alias      = COL_NAMES['institution']
-    address_alias            = address_col_List_alias[2]
+    address_alias            = address_col_list_alias[2]
     country_alias            = country_col_list_alias[2]
     institution_alias        = inst_col_list_alias[2]     
     wos_auth_with_aff_alias  = COLUMN_LABEL_WOS['authors_with_affiliations']
     
     # Setting named tuples 
-    address     = namedtuple('address', address_col_List_alias )
+    address     = namedtuple('address', address_col_list_alias )
     country     = namedtuple('country', country_col_list_alias )
     institution = namedtuple('institution', inst_col_list_alias )    
     
@@ -278,9 +278,9 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
                 author_country_raw = author_address.split(',')[-1].replace(';','').strip()
                 author_country     = normalize_country(author_country_raw)
                 if author_country == '':
-                    author_country = UNKNOWN
+                    author_country = UNKNOWN_COUNTRY
                     warning = (f'WARNING: the invalid country name "{author_country_raw}" '
-                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
+                               f'in pub_id {pub_id} has been replaced by "{UNKNOWN_COUNTRY}" '
                                f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
                     print(warning)
 
@@ -291,7 +291,7 @@ def _build_addresses_countries_institutions_wos(df_corpus, dic_failed):
             list_countries.append(country(pub_id, 0, ''))
     
     # Building a clean addresses dataframe and accordingly updating the parsing success rate dict
-    df_address, dic_failed = build_item_df_from_tup(list_addresses, address_col_List_alias, 
+    df_address, dic_failed = build_item_df_from_tup(list_addresses, address_col_list_alias, 
                                                     address_alias, pub_id_alias, dic_failed)
 
     # Building a clean countries dataframe and accordingly updating the parsing success rate dict
@@ -405,6 +405,7 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
     from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
     from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
     from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
 
     # Setting useful aliases
     pub_id_alias             = COL_NAMES['pub_id']
@@ -451,9 +452,9 @@ def _build_authors_countries_institutions_wos(df_corpus, dic_failed, inst_filter
                     author_country_raw = tup.address.split(',')[-1].replace(';','').strip()
                     author_country = normalize_country(author_country_raw)
                     if author_country == '':
-                        author_country = UNKNOWN
+                        author_country = UNKNOWN_COUNTRY
                         warning = (f'WARNING: the invalid country name "{author_country_raw}" '
-                                   f'in pub_id {pub_id} has been replaced by "{UNKNOWN}" '
+                                   f'in pub_id {pub_id} has been replaced by "{UNKNOWN_COUNTRY}" '
                                    f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
                         print(warning)
 

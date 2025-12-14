@@ -415,7 +415,7 @@ def standardize_address(raw_address):
     from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
     from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
 
     # Uniformizing words
     standard_address = raw_address
@@ -442,7 +442,7 @@ def standardize_address(raw_address):
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     space = " "
-    if country!=UNKNOWN:
+    if country!=UNKNOWN_COUNTRY:
         standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
     else:
         standard_address = ','.join(first_raw_affiliations_list + [space + country])
@@ -847,7 +847,7 @@ def _get_affiliations_list(std_address, towns_dict, drop_status = True, verbose 
         of the package`BiblioParsing`.
         The function `normalize_country` is imported from the module `BiblioParsingInstitutions` 
         of the package`BiblioParsing`.
-        The globals 'KEEPING_WORDS', 'KEEPING_PREFIX' and 'UNKNOWN' are imported from the module `BiblioSpecificGlobals` 
+        The globals 'KEEPING_WORDS' and 'KEEPING_PREFIX' are imported from the module `BiblioSpecificGlobals` 
         of the package`BiblioParsing`.        
         
     '''
