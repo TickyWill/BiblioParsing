@@ -8,6 +8,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'BLACKLISTED_WORDS',
            'COL_NAMES',
            'COLUMN_LABEL_SCOPUS',
+           'COLUMN_LABEL_SCOPUS_PLUS',
            'COLUMN_LABEL_WOS',
            'COLUMN_LABEL_WOS_PLUS',
            'COLUMN_TYPE_SCOPUS',
@@ -24,6 +25,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'DROPING_SUFFIX',
            'EMPTY',
            'ENCODING',
+           'FIELD_SIZE_LIMIT',
            'FR_DROPING_WORDS',
            'INST_TYPES_FILE',
            'INST_TYPES_USECOLS',
@@ -86,6 +88,10 @@ page        = 'Page'
 
 # Column names dicts
 COL_NAMES = {'pub_id'      : pub_id,
+             'wos_id'      : ['WoS_id',
+                              pub_id],
+             'scopus_id'   : ['Scopus_id',
+                              pub_id,],
              'address'     : [pub_id,
                               idx_address,
                               address,],
@@ -164,6 +170,10 @@ COLUMN_LABEL_SCOPUS = {'affiliations'             : 'Affiliations',
                        }
 
 
+COLUMN_LABEL_SCOPUS_PLUS = {'scopus_id': 'EID',
+                           }
+
+
 COLUMN_TYPE_SCOPUS = {COLUMN_LABEL_SCOPUS['affiliations']             : str,
                       COLUMN_LABEL_SCOPUS['author_keywords']          : str,
                       COLUMN_LABEL_SCOPUS['authors']                  : str,
@@ -206,6 +216,7 @@ COLUMN_LABEL_WOS = {'affiliations'             : '',
 
 
 COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
+                         'wos_id'              : 'UT',
                         }
 
 

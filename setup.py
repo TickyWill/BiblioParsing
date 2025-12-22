@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'requirements.txt'), encoding='utf-8') as f:
 # This setup is suitable for "python setup.py develop".
 
 setup(name='BiblioParsing',
-      version='1.1.0',
+      version='1.2.0',
       description='A toolbox for parsing a bibliography',
       long_description=long_description,
       long_description_content_type='text/markdown',

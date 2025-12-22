@@ -1,5 +1,6 @@
 __all__ = ['biblio_parser',
            'build_item_df_from_tup',
+           'build_pub_db_ids',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
@@ -51,7 +52,7 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     return error_text
 
 
-def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, dic_failed=None):
+def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, fails_dict=None):
     '''Building a clean item dataframe from a tuple 
     and accordingly updating the parsing success rate dict.'''
     
@@ -62,12 +63,12 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, di
                                       for idx,label in enumerate(item_col_names)})
     list_id = item_df[item_df[item_col] == ''][pub_id_alias].values
     list_id = list(set(list_id))
-    if dic_failed:
-        df_corpus_len = dic_failed['number of article']
-        dic_failed[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
+    if fails_dict:
+        df_corpus_len = fails_dict['number of article']
+        fails_dict[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
                                 pub_id_alias:[int(x) for x in list(list_id)]}    
     item_df = item_df[item_df[item_col] != '']
-    return item_df, dic_failed
+    return item_df, fails_dict
 
 
 def clean_authors_countries_institutions(auth_addr_country_inst_df, verbose=False):
@@ -426,6 +427,25 @@ def normalize_journal_names(database,corpus_df):
     return corpus_df
 
 
+def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
+    # Local imports
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+
+    # Setting useful aliases
+    pub_id_col_alias = COL_NAMES['pub_id']
+    
+    # Setting the pub_id in rawdata_df index
+    rawdata_df.index = range(len(rawdata_df))
+
+    # Setting the pub-id as a column
+    rawdata_df = rawdata_df.rename_axis(pub_id_col_alias).reset_index()
+
+    # Building the final data
+    init_db_ids_df = rawdata_df[[init_db_id_col, pub_id_col_alias]]
+    db_ids_df = init_db_ids_df.rename(columns={init_db_id_col: db_id_col})
+    return db_ids_df
+
+
 def biblio_parser(rawdata_path, database, inst_filter_list = None,
                   country_affiliations_file_path = None,
                   inst_types_file_path = None,
@@ -455,21 +475,21 @@ def biblio_parser(rawdata_path, database, inst_filter_list = None,
                                    inst_types_file_path = inst_types_file_path,
                                    country_towns_file = country_towns_file,
                                    country_towns_folder_path = country_towns_folder_path)
-        parsing_dict, dic_failed = wos_tup[0], wos_tup[1]
+        parsing_dict, fails_dict, database_ids_df = wos_tup
     elif database == SCOPUS:
         scopus_tup = biblio_parser_scopus(rawdata_path, inst_filter_list = inst_filter_list,
                                           country_affiliations_file_path = country_affiliations_file_path,
                                           inst_types_file_path = inst_types_file_path,
                                           country_towns_file = country_towns_file,
                                           country_towns_folder_path = country_towns_folder_path)
-        parsing_dict, dic_failed = scopus_tup[0], scopus_tup[1]
+        parsing_dict, fails_dict, database_ids_df = scopus_tup
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be wos or scopus ")
         
-    return parsing_dict, dic_failed
+    return parsing_dict, fails_dict, database_ids_df
 
         
-def check_and_drop_columns(database, df):
+def check_and_drop_columns(database, init_df):
     # Standard libraries import
     import numpy as np
     
@@ -481,6 +501,7 @@ def check_and_drop_columns(database, df):
     from BiblioParsing.BiblioSpecificGlobals import SCOPUS
     from BiblioParsing.BiblioSpecificGlobals import WOS
     
+    df = init_df.copy()
     
     # Setting useful aliases
     wos_col_issn_alias  = COLUMN_LABEL_WOS["issn"]

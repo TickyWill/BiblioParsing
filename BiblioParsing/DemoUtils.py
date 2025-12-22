@@ -2,10 +2,12 @@
 '''
 __all__ = ['set_user_config',
            'parse_to_dedup',
+           'save_db_ids_data',
            'save_fails_dict',
            'save_parsing_dict',
            'save_parsing_dicts',
           ]
+
 
 def _get_demo_config():
     # Standard library imports
@@ -20,6 +22,7 @@ def _get_demo_config():
         config_dict = json.load(file)       
 
     return config_dict
+
 
 def _build_effective_config(parsing_folder_dict, db_list):
     parsing_folder_dict_init = parsing_folder_dict
@@ -169,23 +172,27 @@ def parse_to_dedup(year, db_raw_dict,
     
     # Parsing Scopus rawdata
     scopus_raw_path = db_raw_dict[SCOPUS]
-    scopus_parsing_dict, scopus_fails_dict = biblio_parser(scopus_raw_path, SCOPUS, inst_filter_list = user_inst_filter_list,
-                                                           country_affiliations_file_path = user_istitute_affiliations_file_path,
-                                                           inst_types_file_path = user_inst_types_file_path,
-                                                           country_towns_file = user_country_towns_file,
-                                                           country_towns_folder_path = user_country_towns_folder_path)
+    return_tup = biblio_parser(scopus_raw_path, SCOPUS, inst_filter_list = user_inst_filter_list,
+                               country_affiliations_file_path = user_istitute_affiliations_file_path,
+                               inst_types_file_path = user_inst_types_file_path,
+                               country_towns_file = user_country_towns_file,
+                               country_towns_folder_path = user_country_towns_folder_path)
+    scopus_parsing_dict, scopus_fails_dict, scopus_ids_df = return_tup
         
     # Parsing WoS rawdata 
     wos_raw_path = db_raw_dict[WOS]
-    wos_parsing_dict, wos_fails_dict = biblio_parser(wos_raw_path, WOS, inst_filter_list = user_inst_filter_list,
-                                                     country_affiliations_file_path = user_istitute_affiliations_file_path,
-                                                     inst_types_file_path = user_inst_types_file_path,
-                                                     country_towns_file = user_country_towns_file,
-                                                     country_towns_folder_path = user_country_towns_folder_path)
+    return_tup = biblio_parser(wos_raw_path, WOS, inst_filter_list = user_inst_filter_list,
+                               country_affiliations_file_path = user_istitute_affiliations_file_path,
+                               inst_types_file_path = user_inst_types_file_path,
+                               country_towns_file = user_country_towns_file,
+                               country_towns_folder_path = user_country_towns_folder_path)
+    wos_parsing_dict, wos_fails_dict, wos_ids_df = return_tup
     
     # Initializing results dicts
     parsing_dicts_dict = {} 
     fails_dicts = {}
+    ids_dfs_dict = {}
+    
     
     if scopus_parsing_dict and wos_parsing_dict:
         
@@ -203,18 +210,22 @@ def parse_to_dedup(year, db_raw_dict,
 
         # Building parsing performances dict
         fails_dicts[SCOPUS] = scopus_fails_dict
-        fails_dicts[WOS]    = wos_fails_dict  
+        fails_dicts[WOS] = wos_fails_dict
 
-        # Building results dict
-        
+        # Building databases-IDs dict
+        ids_dfs_dict[SCOPUS] = scopus_ids_df
+        ids_dfs_dict[WOS] = wos_ids_df
+
+        # Building results dict        
         parsing_dicts_dict[SCOPUS] = scopus_parsing_dict
-        if verbose: print(f'\nScopus corpus successfully parsed in parsing_dicts_dict[{SCOPUS}]')
-        parsing_dicts_dict[WOS]    = wos_parsing_dict
-        if verbose: print(f'\nWos corpus successfully parsed in parsing_dicts_dict[{WOS}]')
+        parsing_dicts_dict[WOS] = wos_parsing_dict
         parsing_dicts_dict["concat"] = concat_parsing_dict
-        if verbose: print(f'\nParsings successfully concatenated in parsing_dicts_dict["concat"]')
-        parsing_dicts_dict["dedup"]  = dedup_parsing_dict
-        if verbose: print(f'\nParsings successfully deduplicated in parsing_dicts_dict["dedup"]')
+        parsing_dicts_dict["dedup"] = dedup_parsing_dict
+        if verbose:
+            print(f'\nScopus corpus successfully parsed in parsing_dicts_dict[{SCOPUS}]')
+            print(f'\nWos corpus successfully parsed in parsing_dicts_dict[{WOS}]')
+            print('\nParsings successfully concatenated in parsing_dicts_dict["concat"]')
+            print('\nParsings successfully deduplicated in parsing_dicts_dict["dedup"]')
         
     else:
         if not scopus_parsing_dict:
@@ -222,7 +233,8 @@ def parse_to_dedup(year, db_raw_dict,
         if not wos_parsing_dict:
             print(set_rawdata_error(WOS, wos_raw_path, WOS_RAWDATA_EXTENT))
     
-    return parsing_dicts_dict, fails_dicts
+    return parsing_dicts_dict, fails_dicts, ids_dfs_dict
+
 
 def save_parsing_dict(parsing_dict, parsing_path, 
                       item_filename_dict, save_extent):
@@ -256,6 +268,7 @@ def save_parsing_dict(parsing_dict, parsing_path,
     message = f"All parsing results saved as {save_extent} files"
     return message  
 
+
 def save_fails_dict(fails_dict, parsing_path):
     '''The function `save_fails_dict` saves parsing fails in a json file
     named "failed.json".
@@ -277,15 +290,38 @@ def save_fails_dict(fails_dict, parsing_path):
         json.dump(fails_dict, write_json, indent=4)
         
     message = f"Parsing-fails results saved as json file"
-    return message  
+    return message 
 
-def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, 
-                       item_filename_dict, save_extent, fails_dicts): 
+
+def save_db_ids_data(db_ids_df, parsing_path, database):
+    """The function `save_db_ids_data` saves database-IDs data in an xlsx file.
+    
+    Args:
+        db_ids_df (dataframe): The database IDs data.
+        parsing_path (path): The full path of the parsing results folder \
+        for saving the xlsx file.
+    """
+    # Standard library imports
+    from pathlib import Path
+    
+    file_name = database.capitalize() + "_IDs.xlsx"
+    file_path = parsing_path / Path(file_name)
+    
+    db_ids_df.to_excel(file_path, index=False)
+        
+    message = f"Database-IDs data saved as xlsx file"
+    return message
+
+
+def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict,
+                       save_extent, fails_dicts, ids_dfs_dict): 
     """
     
     Note:
         Uses `save_parsing_dict` function.
     """
+    fails_save_status = False
+    db_ids_save_status = False
 
     for parsing_name, parsing_dict in parsing_dicts_dict.items():
         parsing_path = parsing_path_dict[parsing_name]
@@ -294,14 +330,17 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict,
         if parsing_name in fails_dicts.keys():
             parsing_fails_dict = fails_dicts[parsing_name]
             _ = save_fails_dict(parsing_fails_dict, parsing_path)
+            fails_save_status = True   
 
-    message  = f"All parsing-to-deduplication results saved as files with .{save_extent} extension."
-    message += f"\n Parsing-fails results of Scopus and WoS saved as json files."
+        if parsing_name in ids_dfs_dict.keys():
+            db_ids_df = ids_dfs_dict[parsing_name]
+            _ = save_db_ids_data(db_ids_df, parsing_path, parsing_name)
+            db_ids_save_status = True
+
+    message = f"All parsing-to-deduplication results saved as files with .{save_extent} extension."
+    if fails_save_status:
+        message += f"\n All parsing-fails results saved as json files."
+    if db_ids_save_status:
+        message += f"\n All database-IDs data saved as xlsx files."
+    
     return message
-
-
-
-
-
-
-
