@@ -874,11 +874,9 @@ def read_database_wos(rawdata_path, wos_ids=False):
     return return_tup
 
 
-def biblio_parser_wos(rawdata_path, inst_filter_list = None,
-                      country_affiliations_file_path = None,
-                      inst_types_file_path = None,
-                      country_towns_file = None,
-                      country_towns_folder_path = None):
+def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_file_path=None,
+                      inst_types_file_path=None, country_towns_file=None,
+                      country_towns_folder_path=None):
     
     '''The function `biblio_parser_wos` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns USECOLS_WOS of the tsv file xxxx.txt are read and parsed using the functions:
@@ -951,24 +949,28 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None,
         wos_dic_failed['number of article'] = len(df_corpus)
     
         # Building the dataframe of articles
+        print(f"  - {articles_alias} parsing...", end="\r")
         articles_df = _build_articles_wos(df_corpus)
-        _keeping_item_parsing_results(articles_alias, articles_df)    
+        _keeping_item_parsing_results(articles_alias, articles_df)
+        print(f"  - {articles_alias} parsed    ")    
 
         # Building the dataframe of authors
+        print(f"  - {authors_alias} parsing...", end="\r")
         authors_df = _build_authors_wos(df_corpus, wos_dic_failed)
         _keeping_item_parsing_results(authors_alias, authors_df)
+        print(f"  - {authors_alias} parsed    ")
 
         # Building the dataframe of addresses, countries and institutions
+        print(f"  - {addresses_alias}, {countries_alias} and {institutions_alias} parsing...", end="\r")
         addresses_df, countries_df, institutions_df = _build_addresses_countries_institutions_wos(df_corpus,
                                                                                                   wos_dic_failed)
-          # Keeping addresses df
         _keeping_item_parsing_results(addresses_alias, addresses_df)
-          # Keeping countries df
         _keeping_item_parsing_results(countries_alias, countries_df)
-          # Keeping institutions df
         _keeping_item_parsing_results(institutions_alias, institutions_df)
+        print(f"  - {addresses_alias}, {countries_alias} and {institutions_alias} parsed    ")
 
         # Building the dataframe of authors and their institutions
+        print(f"  - {auth_inst_alias} parsing...", end="\r")
         auth_inst_df = _build_authors_countries_institutions_wos(df_corpus, wos_dic_failed, 
                                                                  inst_filter_list = inst_filter_list ,
                                                                  country_affiliations_file_path = country_affiliations_file_path,
@@ -976,26 +978,32 @@ def biblio_parser_wos(rawdata_path, inst_filter_list = None,
                                                                  country_towns_file = country_towns_file,
                                                                  country_towns_folder_path = country_towns_folder_path)
         _keeping_item_parsing_results(auth_inst_alias, auth_inst_df)
+        print(f"  - {auth_inst_alias} parsed    ")
 
         # Building the dataframes of keywords
-        AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus, wos_dic_failed)   
-          # Keeping author keywords df
+        print(f"  - {authors_kw_alias}, {index_kw_alias} and {title_kw_alias} parsing...", end="\r")
+        AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(df_corpus, wos_dic_failed)
         _keeping_item_parsing_results(authors_kw_alias, AK_keywords_df)
-          # Keeping journal (indexed) keywords df
         _keeping_item_parsing_results(index_kw_alias, IK_keywords_df)
-          # Keeping title keywords df
         _keeping_item_parsing_results(title_kw_alias, TK_keywords_df)
+        print(f"  - {authors_kw_alias}, {index_kw_alias} and {title_kw_alias} parsed    ")
 
         # Building the dataframe of subjects
+        print(f"  - {subjects_alias} parsing...", end="\r")
         subjects_df = _build_subjects_wos(df_corpus, wos_dic_failed)
         _keeping_item_parsing_results(subjects_alias, subjects_df)
+        print(f"  - {subjects_alias} parsed    ")
 
         # Building the dataframe of sub-subjects
+        print(f"  - {sub_subjects_alias} parsing...", end="\r")
         sub_subjects_df = _build_sub_subjects_wos(df_corpus, wos_dic_failed)
         _keeping_item_parsing_results(sub_subjects_alias, sub_subjects_df)
+        print(f"  - {sub_subjects_alias} parsed    ")
 
-        # Building the dataframe of references 
+        # Building the dataframe of references
+        print(f"  - {references_alias} parsing...", end="\r")
         references_df = _build_references_wos(df_corpus)
         _keeping_item_parsing_results(references_alias, references_df)
+        print(f"  - {references_alias} parsed    ")
         
     return wos_parsing_dict, wos_dic_failed, wos_ids_df

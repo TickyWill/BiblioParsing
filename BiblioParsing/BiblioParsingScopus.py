@@ -1065,11 +1065,9 @@ def read_database_scopus(rawdata_path, scopus_ids=False):
     return return_tup 
 
 
-def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
-                         country_affiliations_file_path = None,
-                         inst_types_file_path = None,
-                         country_towns_file = None,
-                         country_towns_folder_path = None):
+def biblio_parser_scopus(rawdata_path, inst_filter_list=None, country_affiliations_file_path=None,
+                         inst_types_file_path=None, country_towns_file=None,
+                         country_towns_folder_path=None):
     
     '''The function `biblio_parser_scopus` generates parsing dataframes from the csv file stored in the rawdata folder.    
     The columns of the csv file are read and parsed using the functions:
@@ -1149,21 +1147,28 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
         scopus_dic_failed['number of article'] = len(corpus_df)
         if len(corpus_df):
             # Building the dataframe of articles
+            print(f"  - {articles_alias} parsing...", end="\r")
             articles_df = _build_articles_scopus(corpus_df)
             _keeping_item_parsing_results(articles_alias, articles_df)
+            print(f"  - {articles_alias} parsed    ")
             
             # Building the dataframe of authors
+            print(f"  - {authors_alias} parsing...", end="\r")
             authors_df = _build_authors_scopus(corpus_df, scopus_dic_failed)
-            scopus_parsing_dict[authors_alias] = authors_df
+            _keeping_item_parsing_results(authors_alias, authors_df)
+            print(f"  - {authors_alias} parsed    ")
             
             # Building the dataframe of addresses, countries and institutions
+            print(f"  - {addresses_alias}, {countries_alias} and {institutions_alias} parsing...", end="\r")
             addresses_tup = _build_addresses_countries_institutions_scopus(corpus_df, scopus_dic_failed)
             addresses_df, countries_df, institutions_df = addresses_tup
             _keeping_item_parsing_results(addresses_alias, addresses_df)
             _keeping_item_parsing_results(countries_alias, countries_df)
             _keeping_item_parsing_results(institutions_alias, institutions_df)
+            print(f"  - {addresses_alias}, {countries_alias} and {institutions_alias} parsed    ")
             
             # Building the dataframe of authors and their institutions
+            print(f"  - {auth_inst_alias} parsing...", end="\r")
             auth_inst_df = _build_authors_countries_institutions_scopus(corpus_df, scopus_dic_failed, 
                                                                         inst_filter_list = inst_filter_list ,
                                                                         country_affiliations_file_path = country_affiliations_file_path,
@@ -1171,36 +1176,45 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list = None,
                                                                         country_towns_file = country_towns_file,
                                                                         country_towns_folder_path = country_towns_folder_path)
             _keeping_item_parsing_results(auth_inst_alias, auth_inst_df)
+            print(f"  - {auth_inst_alias} parsed    ")
             
             # Building the dataframes of keywords
+            print(f"  - {authors_kw_alias}, {index_kw_alias} and {title_kw_alias} parsing...", end="\r")
             keywords_tup = _build_keywords_scopus(corpus_df, scopus_dic_failed) 
             AK_keywords_df, IK_keywords_df, TK_keywords_df = keywords_tup
             _keeping_item_parsing_results(authors_kw_alias, AK_keywords_df)
             _keeping_item_parsing_results(index_kw_alias, IK_keywords_df)
             _keeping_item_parsing_results(title_kw_alias, TK_keywords_df)
+            print(f"  - {authors_kw_alias}, {index_kw_alias} and {title_kw_alias} parsed    ")
             
             # Building the dataframe of subjects
+            print(f"  - {subjects_alias} parsing...", end="\r")
             subjects_df = _build_subjects_scopus(corpus_df,
                                                  path_scopus_cat_codes,
                                                  path_scopus_journals_issn_cat,
                                                  scopus_dic_failed)
             _keeping_item_parsing_results(subjects_alias, subjects_df)
+            print(f"  - {subjects_alias} parsed    ")
            
             # Building the dataframe of sub-subjects
+            print(f"  - {sub_subjects_alias} parsing...", end="\r")
             sub_subjects_df = _build_sub_subjects_scopus(corpus_df,
                                                          path_scopus_cat_codes,
                                                          path_scopus_journals_issn_cat,
                                                          scopus_dic_failed)
             _keeping_item_parsing_results(sub_subjects_alias, sub_subjects_df)
+            print(f"  - {sub_subjects_alias} parsed    ")
             
             # Building the dataframe of references
+            print(f"  - {references_alias} parsing...", end="\r")
             references_df = _build_references_scopus(corpus_df)
             _keeping_item_parsing_results(references_alias, references_df)
+            print(f"  - {references_alias} parsed    ")
     
         else:
             empty_df = pd.DataFrame()
             for item in items_aliases_list:
                 _keeping_item_parsing_results(item, empty_df)
             
-    return scopus_parsing_dict, scopus_dic_failed, scopus_ids_df    
+    return scopus_parsing_dict, scopus_dic_failed, scopus_ids_df      
         
