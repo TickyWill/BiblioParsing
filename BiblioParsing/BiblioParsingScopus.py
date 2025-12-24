@@ -1106,7 +1106,7 @@ def _correct_full_rawdata(corpus_df):
     new_corpus_df = _check_authors(new_corpus_df, auth_check_cols,
                                    verbose=True)
     # Droping pub_id_col column
-    new_corpus_df.drop(columns=[pub_id_col])
+    new_corpus_df.drop(columns=[pub_id_col], inplace=True)
     return new_corpus_df
 
 
