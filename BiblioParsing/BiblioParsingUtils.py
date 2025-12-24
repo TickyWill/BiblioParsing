@@ -471,10 +471,10 @@ def biblio_parser(rawdata_path, database, inst_filter_list = None,
     
     if database == WOS:
         wos_tup = biblio_parser_wos(rawdata_path, inst_filter_list = inst_filter_list,
-                                   country_affiliations_file_path = country_affiliations_file_path,
-                                   inst_types_file_path = inst_types_file_path,
-                                   country_towns_file = country_towns_file,
-                                   country_towns_folder_path = country_towns_folder_path)
+                                    country_affiliations_file_path = country_affiliations_file_path,
+                                    inst_types_file_path = inst_types_file_path,
+                                    country_towns_file = country_towns_file,
+                                    country_towns_folder_path = country_towns_folder_path)
         parsing_dict, fails_dict, database_ids_df = wos_tup
     elif database == SCOPUS:
         scopus_tup = biblio_parser_scopus(rawdata_path, inst_filter_list = inst_filter_list,
@@ -634,7 +634,7 @@ def rationalize_town_names(text, dic_town_symbols = None, dic_town_words = None)
         text = text.replace(town_word, dic_town_words[town_word])    
     return text
 
-def remove_special_symbol(text, only_ascii = True, strip = True):
+def remove_special_symbol(text, only_ascii=True, strip=True):
     '''The function `remove_special_symbol` removes accentuated characters in the string 'text'
     and ignore non-ascii characters if 'only_ascii' is true. Finally, spaces at the ends of 'text'
     are removed if strip is true.

@@ -950,6 +950,166 @@ def _build_references_scopus(corpus_df):
     return df_references
 
 
+def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
+    """Corrects the list of affiliations and the list of authors-with-affiliations 
+    when irregular sequence of separators induces a discrepancy between number 
+    of authors and number of authors-with-affiliations.
+
+    Args:
+        corpus_df (dataframe): The full rawdata of the corpus.
+        check_cols (list): The column names where the authors \
+        names or affiliations are present.
+        verbose (bool): Optional for printing if True the list \
+        of publications IDs corrected (default=False).
+    Returns:
+        (dataframe): The corrected full rawdata of the corpus.
+    """
+    pub_id_col, authors_col, affil_col, auth_affil_col = check_cols
+    corrected_pub_ids = []
+    new_corpus_df = corpus_df.copy()
+    for row_idx, row in corpus_df.iterrows():
+        pub_id = row[pub_id_col]
+        std_sep = "; "
+        authors_list = row[authors_col].split(std_sep)        
+        affil_list = row[affil_col].split(std_sep)
+        auth_affil_list = row[auth_affil_col].split(std_sep)
+
+        check_sep = ";"
+        check_auth_affil_list = row[auth_affil_col].split(check_sep)
+        authors_nb = len(authors_list)
+        auth_affil_nb = len(check_auth_affil_list)
+        if authors_nb!=auth_affil_nb:
+            false_sep = ";, "
+            correct_sep = ", "
+            if any(lambda s: false_sep in s for s in affil_list):
+                affil_list = [x.replace(false_sep, correct_sep) for x in affil_list]
+            if any(lambda s: false_sep in s for s in auth_affil_list):
+                auth_affil_list = [x.replace(false_sep, correct_sep) for x in auth_affil_list]
+            corrected_pub_ids.append(pub_id)
+        new_corpus_df.loc[row_idx, affil_col] = std_sep.join(affil_list)
+        new_corpus_df.loc[row_idx, auth_affil_col] = std_sep.join(auth_affil_list)
+    if verbose:
+        print("  - Corrected lists of affilations and author-with-affiliations "
+              f"for publication IDs: {corrected_pub_ids}")        
+    return new_corpus_df
+
+
+def _correct_firstname_initials(author, fullname):
+    if "(" in fullname:
+        fullname = fullname.split(" (")[0]
+    lastname, firstname = fullname.split(", ")
+    firstname = firstname.replace('-',' ').strip(' ')
+    firstname_list = firstname.split(' ')
+    firstname_list = sum([x.split('.') for x in firstname.split(' ')], [])
+    initials_list = [x[0]+"." for x in firstname_list if x]
+    initials = ''.join(initials_list)
+    new_author = ' '.join([lastname, initials])
+    return new_author
+
+
+def _correct_auth_data(author, auth_tup):
+    fullname, auth_affil = auth_tup
+    new_author = _correct_firstname_initials(author, fullname)
+    
+    auth_affil_split = auth_affil.split(", ")
+    affil = ", ".join(auth_affil_split[1:])
+    new_auth_affil = ", ".join([new_author, affil])
+    return new_author, new_auth_affil
+
+
+def _check_authors(corpus_df, check_cols, verbose=False):
+    """Corrects the firstname initials for the authors using 
+    the fullnames given in the full corpus data.
+
+    Args:
+        corpus_df (dataframe): The full rawdata of the corpus.
+        check_cols (list): The column names where the authors \
+        names are present.
+        verbose (bool): Optional for printing if True the list \
+        of publications IDs corrected (default=False).
+    Returns:
+        (dataframe): The corrected full rawdata of the corpus.
+    """
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+    pub_id_col, authors_col, fullname_col, auth_affil_col = check_cols
+    corrected_pub_ids = []
+    new_corpus_df = corpus_df.copy()
+    for row_idx, row in corpus_df.iterrows():
+        pub_id = row[pub_id_col]
+
+        # Removing accentuated characters
+        authors_str = remove_special_symbol(row[authors_col])
+        fullnames_str = remove_special_symbol(row[fullname_col])
+        auth_affil_str = remove_special_symbol(row[auth_affil_col])
+
+        # Building dict keyyed by author and valued by a tuple 
+        # composed of fullname and author-with-affiliations
+        authors_list = authors_str.split("; ")
+        fullnames_list = fullnames_str.split("; ")        
+        auth_affil_list = auth_affil_str.split("; ")
+        author_tup_list = list(zip(fullnames_list, auth_affil_list))
+        auth_data_dict = dict(zip(authors_list, author_tup_list))
+
+        # Correcting list of authors and list of authors-with-affiliations
+        new_authors_list = []
+        new_auth_affils_list = []
+        for author, auth_tup in auth_data_dict.items():
+            new_author, new_auth_affil = _correct_auth_data(author, auth_tup)
+            if author!=new_author:
+                corrected_pub_ids.append(pub_id)
+            new_authors_list.append(new_author)
+            new_auth_affils_list.append(new_auth_affil)
+
+        # Updating the corpus data with the corrected lists
+        new_corpus_df.loc[row_idx, authors_col] = "; ".join(new_authors_list)
+        new_corpus_df.loc[row_idx, auth_affil_col] = "; ".join(new_auth_affils_list)
+    if verbose:
+        print(f"  - Corrected lists of authors for publication IDs: {corrected_pub_ids}")        
+    return new_corpus_df
+            
+        
+def _correct_full_rawdata(corpus_df):
+    """Corrects firstname initials and affiliations of authors 
+    in the full rawdata of the corpus.
+
+    Args:
+        corpus_df (dataframe): The full rawdata of the corpus.
+    Returns:
+        (dataframe): The corrected full rawdata of the corpus.
+    """
+    
+    # Globals imports
+    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
+    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS_PLUS
+    
+    # Setting useful aliases    
+    pub_id_col = COL_NAMES['pub_id']
+    authors_col = COLUMN_LABEL_SCOPUS['authors']
+    affil_col = COLUMN_LABEL_SCOPUS['affiliations']
+    auth_affil_col = COLUMN_LABEL_SCOPUS['authors_with_affiliations']
+    fullnames_col = COLUMN_LABEL_SCOPUS_PLUS['auth_fullnames']
+
+    affil_check_cols = [pub_id_col, authors_col, affil_col, auth_affil_col]
+    auth_check_cols = [pub_id_col, authors_col, fullnames_col, auth_affil_col]
+
+    # Setting the pub_id in df index
+    corpus_df.index = range(len(corpus_df))
+
+    # Setting the pub-id as a column
+    corpus_df = corpus_df.rename_axis(pub_id_col).reset_index()
+
+    # Correcting corpus data
+    new_corpus_df = _check_authors_with_affiliations(corpus_df, affil_check_cols,
+                                                     verbose=True)
+    new_corpus_df = _check_authors(new_corpus_df, auth_check_cols,
+                                   verbose=True)
+    # Droping pub_id_col column
+    new_corpus_df.drop(columns=[pub_id_col])
+    return new_corpus_df
+
+
 def _check_affiliation_column_scopus(df):
     
     '''The `_check_affiliation_column_scopus` function checks the correcteness of the column affiliation of a df 
@@ -999,27 +1159,27 @@ def _check_affiliation_column_scopus(df):
 
 
 def read_database_scopus(rawdata_path, scopus_ids=False):
-    
-    '''The `read_database_scopus`function reads the raw scopus-database file `filename`,
-       checks columns and drops unuseful columns using the `check_and_drop_columns` function.
-       It checks the affilation column content using the `_check_affiliation_column_scopus` 
+    """Gets the Scopus rawdata and the Scopus-Ids of the publications.
+
+    First, it corrects the firsname initials and the affiliations 
+    of the authors when required using the `_correct_full_rawdata` 
+    internal function. 
+    Then, :
+    - It checks columns and drops unuseful columns using the \
+    `check_and_drop_columns` function imported from `BiblioParsingUtils` module.
+    - It checks the affilation column content using the `_check_affiliation_column_scopus` \
        internal function. 
-       It replaces the unavailable items values by a string set in the global UNKNOW.
-       It normalizes the journal names using the `normalize_journal_names` function.
-       
+    - It replaces the unavailable items values by a string set in the global UNKNOWN.
+    - It normalizes the journal names using the `normalize_journal_names` function \
+    imported from the `BiblioParsingUtils` module.
+
     Args:
-        filename (str): the full path of the scopus-database file. 
-        
+        rawdata_path (path): The full path to the Scopus-rawdata file.
+        scopus_ids (bool): Optional for building the data of Scopus IDs of publications \
+        (dafault=False).
     Returns:
-        (dataframe): the cleaned corpus dataframe.
-        
-    Note:
-        The functions 'check_and_drop_columns' and 'normalize_journal_names' from `BiblioParsingUtils` module 
-        of `BiblioParsing`module are used.
-        The globals 'SCOPUS' and 'UNKNOWN' from `BiblioSpecificGlobals` module 
-        of `BiblioParsing`module are used.
-        
-    '''
+        (tup): (The cleaned corpus data (dataframe), The optional Scopus-IDs data). 
+    """
     
     # 3rd party library imports
     import numpy as np
@@ -1051,7 +1211,9 @@ def read_database_scopus(rawdata_path, scopus_ids=False):
         full_scopus_rawdata_df = pd.read_csv(rawdata_file_path, dtype=COLUMN_TYPE_SCOPUS)
 
         if len(full_scopus_rawdata_df):
-            # Selecting useful rawdata
+            full_scopus_rawdata_df = _correct_full_rawdata(full_scopus_rawdata_df)
+            
+            # Selecting useful rawdata for parsing
             scopus_rawdata_df = check_and_drop_columns(SCOPUS, full_scopus_rawdata_df)
             scopus_rawdata_df = _check_affiliation_column_scopus(scopus_rawdata_df)
             scopus_rawdata_df = scopus_rawdata_df.replace(np.nan, UNKNOWN, regex=True)
