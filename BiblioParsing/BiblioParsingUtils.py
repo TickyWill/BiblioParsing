@@ -13,6 +13,7 @@ __all__ = ['biblio_parser',
            'rationalize_town_names',
            'remove_special_symbol',
            'set_rawdata_error',
+           'standardize_address',
            'upgrade_col_names',
            ]
 
@@ -71,8 +72,8 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, fa
     return item_df, fails_dict
 
 
-def clean_authors_countries_institutions(auth_addr_country_inst_df, verbose=False):
-    """
+def clean_authors_countries_institutions(auth_addr_country_inst_df):
+    """Gathers author's attributes in a single line for each publication.
     """
     # 3rd party imports
     import pandas as pd
@@ -306,28 +307,25 @@ def merge_database(database,filename,in_dir,out_dir):
     result = pd.concat(list_df, ignore_index = True)
     result.to_csv(out_dir / Path(filename), sep = '\t')
 
-def normalize_name(text):
-    
-    '''The `normalize_name` function normalizes the author name spelling according the three debatable rules:
+
+def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
+    """Normalizes the author name spelling according the three debatable rules:
             - replacing none ascii letters by ascii ones,
             - capitalizing first name, 
             - capitalizing surnames,
-            - supressing comma and dot.
-       It uses the internal funtion `remove_special_symbol`of this module "BiblioParsingUtils".    
+            - removing comma and dot.
+       It uses the internal funtion `remove_special_symbol`of the same module.    
        ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
         >>> "Grol-Bica-Velu D'Aillon E-KJ".
         
     Args:
-        text (str): the text to normalize.
-    
+        text (str): The name to normalize.    
     Returns
-        (str) : The normalized text.
-        
+        (str) : The normalized text.        
     Notes:
         The globals 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' 
-        from `BiblioGeneralGlobals` module of `BiblioParsing` package are used.
-        
-    '''
+        from `BiblioGeneralGlobals` module are used.
+    """
 
     # Standard library imports
     import re
@@ -337,38 +335,61 @@ def normalize_name(text):
     from BiblioParsing.BiblioGeneralGlobals import LANG_CHAR_CHANGE
     from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE
     
+    if "." not in text:
+        text_split = text.split(" ")
+        text = " ".join([x.capitalize() for x in text_split])
+    
     # Translate special character 
     text = text.translate(DASHES_CHANGE)
     text = text.translate(LANG_CHAR_CHANGE)
-    text = text.translate(PONCT_CHANGE)
+    if drop_ponct:
+        text = text.translate(PONCT_CHANGE)
     
     # Removing accentuated characters
     text = remove_special_symbol(text, only_ascii=True, strip=True)
-    
+
+    # capturing "cCc-cC-ccc-CCc"       
     re_minus = re.compile('(-[a-zA-Z]+)')       # Captures: "cCc-cC-ccc-CCc"
-    for text_minus_texts in re.findall(re_minus,text):
-        text = text.replace(text_minus_texts,'-' + text_minus_texts[1:].capitalize() )
-    
-    re_apostrophe = re.compile("('[a-zA-Z]+)")  # Captures: "cCc'cC'ccc'cc'CCc"
-    for text_minus_texts in re.findall(re_apostrophe,text):
-        text = text.replace(text_minus_texts,"'" + text_minus_texts[1:].capitalize() )
-        
-    re_minus = re.compile('([a-zA-Z]+-)')       # Captures: "cCc-" 
-    for text_minus_texts in re.findall(re_minus,text):
-        text = text.replace(text_minus_texts,text_minus_texts[:-1].capitalize() + '-')
-        
-    re_apostrophe = re.compile("([a-zA-Z]+')")  # Captures: "cCc'"
-    for text_minus_texts in re.findall(re_apostrophe,text):
-        text = text.replace(text_minus_texts,text_minus_texts[:-1].capitalize() + "'")
-        
-    re_surname = "[a-zA-Z]+\s"                  # Captures: "cCccC "
-    for text_minus_texts in re.findall(re_surname,text):
-        text = text.replace(text_minus_texts,text_minus_texts.capitalize())
-        
-    re_minus_first_name = '\s[a-zA-Z]+-[a-zA-Z]+$'     # Captures: "cCc-cC" in the first name
-    for x in  re.findall(re_minus_first_name,text):
-        text = text.replace(x,x.upper())
-           
+    for text_minus_texts in re.findall(re_minus, text):
+        text = text.replace(text_minus_texts, '-' + text_minus_texts[1:].capitalize())
+
+    # capturing "cCc'cC'ccc'cc'CCc"        
+    re_apostrophe = re.compile("('[a-zA-Z]+)")
+    for text_minus_texts in re.findall(re_apostrophe, text):
+        text = text.replace(text_minus_texts, "'" + text_minus_texts[1:].capitalize())
+
+    # capturing "cCc-"        
+    re_minus = re.compile('([a-zA-Z]+-)')
+    for text_minus_texts in re.findall(re_minus, text):
+        text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + '-')
+
+    # capturing "cCc'"        
+    re_apostrophe = re.compile("([a-zA-Z]+')")
+    for text_minus_texts in re.findall(re_apostrophe, text):
+        text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + "'")
+
+    # capturing "cCccC "
+    re_surname = re.compile("[a-zA-Z]+\s")
+    for text_minus_texts in re.findall(re_surname, text):
+        text = text.replace(text_minus_texts, text_minus_texts.capitalize())
+
+    if not lastname_only:
+        # Capturing " cCc-cC" in the first name
+        re_minus_first_name = re.compile('\s[a-zA-Z]+-[a-zA-Z]+$')
+        for x in  re.findall(re_minus_first_name, text):
+            text = text.replace(x, x.upper())
+        if firstname_only:
+            # Capturing "cCc-cC " or " cCccC." in the first name
+            re_minus_first_name = re.compile('[a-zA-Z]+-[a-zA-Z]+\.$|\s[a-zA-Z]+\.$')
+            for x in  re.findall(re_minus_first_name, text):
+                text = text.replace(x, x.upper())
+
+    # Capturing "Mc" in name
+    re_mac = re.compile('^Mc[a-zA-Z]')
+    for text_mac_texts in re.findall(re_mac, text):
+        new_text_mac_texts = "Mc" + text_mac_texts[2:].capitalize()
+        text = text.replace(text_mac_texts, new_text_mac_texts)
+      
     return text
 
 
@@ -665,6 +686,75 @@ def remove_special_symbol(text, only_ascii=True, strip=True):
         text = text.strip()
     
     return text
+
+
+def standardize_address(raw_address):
+    """Standardizes the string 'raw_address' by replacing all aliases of a word, 
+    such as 'University', 'Institute', 'Center' and' Department', by a standardized 
+    version.
+
+    The aliases of a given word are captured using a specific regex which is case sensitive defined 
+    by the global 'DIC_WORD_RE_PATTERN' imported from the `BiblioParsing` package imported as "bp". 
+    The aliases may contain symbols from a given list of any language including accentuated ones. 
+    The length of the aliases is limited to a maximum according to the longest alias known.
+        ex: The longest alias known for the word 'University' is 'Universidade'. 
+            Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
+            with possibly before one symbol among a to z and after up to 8 symbols from the list 
+            '[aàäcdeéirstyz]' and possibly finishing with a dot. 
+    Then, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global and apostrophes are replaced 
+    by the standard cote using 'APOSTROPHE_CHANGE' global. 
+    The globals are imported from the `BiblioParsing` package imported as "bp". 
+    Finally, the country is normalized through the `normalize_country` function of the same module.
+
+    Args:
+        raw_address (str): The full address to be standardized.
+    Returns:
+        (str): The full standardized address.
+    """
+    # Standard library imports
+    import re
+    
+    # Local library imports
+    from BiblioParsing.BiblioParsingUtils import normalize_country
+    # remove_special_symbol
+    
+    # Globals imports
+    from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
+    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
+    from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
+    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
+
+    # Uniformizing words
+    standard_address = remove_special_symbol(raw_address)
+    for word_to_substitute, re_pattern in DIC_WORD_RE_PATTERN.items():
+        if word_to_substitute=='University':
+            re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
+        standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
+    standard_address = re.sub(r'\s+', ' ', standard_address)
+    standard_address = re.sub(r'\s,', ',', standard_address)
+
+    # Uniformizing dashes
+    standard_address = standard_address.translate(DASHES_CHANGE)
+
+    # Uniformizing apostrophes
+    standard_address = standard_address.translate(APOSTROPHE_CHANGE)
+
+    # Dropping symbols
+    standard_address = standard_address.translate(SYMB_DROP)
+
+    # Uniformizing countries
+    country_pos = -1
+    first_raw_affiliations_list = standard_address.split(',')
+    # This split below is just for country finding even if affiliation may be separated by dashes
+    raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
+    country = normalize_country(raw_affiliations_list[country_pos].strip())
+    space = " "
+    if country!=UNKNOWN_COUNTRY:
+        standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
+    else:
+        standard_address = ','.join(first_raw_affiliations_list + [space + country])
+    return standard_address
 
 ################################# Deprecated functions ##########################################
 # country_normalization deprecated, replaced by "normalize_country"

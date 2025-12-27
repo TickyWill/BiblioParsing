@@ -3,7 +3,6 @@ __all__ = ['ACCENT_CHANGE',
            'ALIAS_UK',
            'APOSTROPHE_CHANGE',
            'ALIAS_BLR',
-           'CHANGE',
            'COUNTRIES',
            'COUNTRIES_CODES',
            'COUNTRIES_CONTINENT',
@@ -121,19 +120,19 @@ DIC_CHANGE_ACCENT = {'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
 
 ACCENT_CHANGE = str.maketrans(DIC_CHANGE_ACCENT)
 
-#To Do : Check if this global is still used
-DIC_CHANGE_CHAR = {"Ł":"L",   # polish capital to L 
-                   "ł":"l",   # polish l
-                   "ı":"i",    
-                   "‐":"-",   # Non-Breaking Hyphen to hyphen-minus
-                   "—":"-",   # En-dash to hyphen-minus
-                   "–":"-",   # Em-dash to hyphen-minus
-                   "Đ":"D",   # D with stroke (Vietamese,South Slavic) to D
-                   ".":"",
-                   ",":"",
-                   } 
-
-CHANGE = str.maketrans(DIC_CHANGE_CHAR)
+##To Do : Check if this global is still used
+#DIC_CHANGE_CHAR = {"Ł":"L",   # polish capital to L 
+#                   "ł":"l",   # polish l
+#                   "ı":"i",    
+#                   "‐":"-",   # Non-Breaking Hyphen to hyphen-minus
+#                   "—":"-",   # En-dash to hyphen-minus
+#                   "–":"-",   # Em-dash to hyphen-minus
+#                   "Đ":"D",   # D with stroke (Vietamese,South Slavic) to D
+#                   ".":"",
+#                   ",":"",
+#                   } 
+#
+#CHANGE = str.maketrans(DIC_CHANGE_CHAR)
 
 # For changing particularly encoded symbols (particular cote to standard cote)
 DIC_CHANGE_APOST = {"”": "'",
@@ -156,11 +155,12 @@ DIC_CHANGE_DASHES = {"‐": "-",   # Non-Breaking Hyphen to hyphen-minus
 DASHES_CHANGE = str.maketrans(DIC_CHANGE_DASHES)
 
 
-# For changing langages specific characters to standard characters
+# For changing langages specific characters to standard characters in personal names
 DIC_CHANGE_LANG_CHAR = {"Ł": "L",   # polish capital to L 
                         "ł": "l",   # polish l
                         "ı": "i",    
                         "Đ": "D",   # D with stroke (Vietamese,South Slavic) to D
+                        "&": "",
                         } 
 LANG_CHAR_CHANGE = str.maketrans(DIC_CHANGE_LANG_CHAR)
 
@@ -168,6 +168,7 @@ LANG_CHAR_CHANGE = str.maketrans(DIC_CHANGE_LANG_CHAR)
 # For droping ponctuation symbols
 DIC_CHANGE_PONCT = {".": "",
                     ",": "",
+                    ";": "",
                    }
 
 PONCT_CHANGE = str.maketrans(DIC_CHANGE_PONCT)
