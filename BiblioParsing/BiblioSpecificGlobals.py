@@ -208,8 +208,8 @@ COLUMN_LABEL_WOS = {'affiliations'             : '',
                     'language'                 : 'LA',
                     'page_start'               : 'BP',
                     'references'               : 'CR',
-                    'sub_subjects'             : 'SC',
                     'subjects'                 : 'WC',
+                    'sub_subjects'             : 'SC',
                     'title'                    : 'TI',
                     'volume'                   : 'VL',
                     'year'                     : 'PY' ,
@@ -313,7 +313,7 @@ USECOLS_SCOPUS  = [x.strip() for x in _USECOLS_SCOPUS.split(',')]
 # Globals specific to WOS database #
 ####################################
 WOS = 'wos'
-ENCODING = 'iso-8859-1' # encoding used by the function read_database_wos
+ENCODING = 'utf-8' # 'iso-8859-1' # encoding used by the function read_database_wos
 FIELD_SIZE_LIMIT = 256<<10 # extend maximum field size for wos file reading
 WOS_RAWDATA_EXTENT = 'txt'
 
@@ -407,8 +407,8 @@ USER_KEEPING_WORDS   = [remove_special_symbol(x, only_ascii = False,
         # Setting a total list of keeping words
 _KEEPING_WORDS = _GEN_KEEPING_WORDS + _BASIC_KEEPING_WORDS + _USER_KEEPING_WORDS
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-KEEPING_WORDS  =[remove_special_symbol(x, only_ascii = False, 
-                                       strip = False).lower() for x in _KEEPING_WORDS]
+KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False,
+                                        strip = False).lower() for x in _KEEPING_WORDS]
 
 
 # For keeping chunks of addresses with these prefixes followed by 3 or 4 digits for country France

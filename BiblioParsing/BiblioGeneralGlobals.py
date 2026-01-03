@@ -13,6 +13,8 @@ __all__ = ['ACCENT_CHANGE',
            'PONCT_CHANGE',
            'SYMB_CHANGE',
            'SYMB_DROP',
+           'REP_UTILS',
+           'TITLE_SYMB_CHANGE_DIC',
            'USA_STATES',
            'ZIP_CODES',]
 
@@ -85,8 +87,9 @@ def build_countries_globals():
 
 COUNTRIES, COUNTRIES_GPS, COUNTRIES_CODES, ZIP_CODES, COUNTRIES_CONTINENT =  build_countries_globals()
 # Escape dot for the regex
-for country in ZIP_CODES.keys(): ZIP_CODES[country]['letters'] = [x.replace(".", r"\.").lower() 
-                                                                  for x in ZIP_CODES[country]['letters']]
+for country in ZIP_CODES.keys():
+    ZIP_CODES[country]['letters'] = [x.replace(".", r"\.").lower()
+                                     for x in ZIP_CODES[country]['letters']]
 
 
 USA_STATES = '''AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,
@@ -104,7 +107,7 @@ ALIAS_BLR = [x.strip() for x in ALIAS_BLR.split(',')]
 
 #To Do : Check if this global is still used
 # Character replacements
-DIC_CHANGE_ACCENT = {'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
+ACCENT_CHANGE_DIC = {'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
                       'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'ª': 'A',
                       'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E',
                       'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
@@ -118,7 +121,7 @@ DIC_CHANGE_ACCENT = {'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
                       'Ç': 'C', 'ç': 'c',
                       'Ž': 'Z','ž': 'z'}
 
-ACCENT_CHANGE = str.maketrans(DIC_CHANGE_ACCENT)
+ACCENT_CHANGE = str.maketrans(ACCENT_CHANGE_DIC)
 
 ##To Do : Check if this global is still used
 #DIC_CHANGE_CHAR = {"Ł":"L",   # polish capital to L 
@@ -135,47 +138,45 @@ ACCENT_CHANGE = str.maketrans(DIC_CHANGE_ACCENT)
 #CHANGE = str.maketrans(DIC_CHANGE_CHAR)
 
 # For changing particularly encoded symbols (particular cote to standard cote)
-DIC_CHANGE_APOST = {"”": "'",
-                    "’": "'",   
-                    '"': "'",
-                    "“": "'",   
-                    "'": "'",   
-                  } 
-
-APOSTROPHE_CHANGE = str.maketrans(DIC_CHANGE_APOST)
+APOSTROPHE_CHANGE_DIC = {"”": "'",
+                         "’": "'",   
+                         '"': "'",
+                         "“": "'",   
+                         "'": "'",
+                        } 
+APOSTROPHE_CHANGE = str.maketrans(APOSTROPHE_CHANGE_DIC)
 
 
 # For replacing dashes by hyphen-minus
-DIC_CHANGE_DASHES = {"‐": "-",   # Non-Breaking Hyphen to hyphen-minus
+DASHES_CHANGE_DIC = {"‐": "-",   # Non-Breaking Hyphen to hyphen-minus
                      "—": "-",   # En-dash to hyphen-minus
                      "–": "-",   # Em-dash to hyphen-minus
                      "–": "-",
                      }
-
-DASHES_CHANGE = str.maketrans(DIC_CHANGE_DASHES)
+DASHES_CHANGE = str.maketrans(DASHES_CHANGE_DIC)
 
 
 # For changing langages specific characters to standard characters in personal names
-DIC_CHANGE_LANG_CHAR = {"Ł": "L",   # polish capital to L 
+LANG_CHAR_CHANGE_DIC = {"Ł": "L",   # polish capital to L 
                         "ł": "l",   # polish l
                         "ı": "i",    
                         "Đ": "D",   # D with stroke (Vietamese,South Slavic) to D
                         "&": "",
                         } 
-LANG_CHAR_CHANGE = str.maketrans(DIC_CHANGE_LANG_CHAR)
+LANG_CHAR_CHANGE = str.maketrans(LANG_CHAR_CHANGE_DIC)
 
 
 # For droping ponctuation symbols
-DIC_CHANGE_PONCT = {".": "",
+PONCT_CHANGE_DIC = {".": "",
                     ",": "",
                     ";": "",
                    }
 
-PONCT_CHANGE = str.maketrans(DIC_CHANGE_PONCT)
+PONCT_CHANGE = str.maketrans(PONCT_CHANGE_DIC)
 
 
 # For changing particularly encoded symbols
-DIC_CHANGE_SYMB = {"&": "and",
+SYMB_CHANGE_DIC = {"&": "and",
                    "’": "'",   # Particular cote to standard cote
                    ".": "",
                    "-": " ",   # To Do: to be tested from the point of view of the effect on raw institutions
@@ -185,19 +186,26 @@ DIC_CHANGE_SYMB = {"&": "and",
                    "/": " ",
                    "'": " ",   # To Do: to be tested from the point of view of the effect on raw institutions
                   } 
-
-SYMB_CHANGE = str.maketrans(DIC_CHANGE_SYMB)
+SYMB_CHANGE = str.maketrans(SYMB_CHANGE_DIC)
 
 
 # For droping particular symbols 
-DIC_DROP_SYMB = {"'": " ",
+DROP_SYMB_DIC = {"'": " ",
                  "*": " ",
                  "#": " ",
                  "|": " ",
                 } 
+SYMB_DROP = str.maketrans(DROP_SYMB_DIC)
 
-SYMB_DROP = str.maketrans(DIC_DROP_SYMB)
 
+# Changing particular symbols in document-title
+TITLE_SYMB_CHANGE_DIC = {" - ": "-",
+                         "("  : "",
+                         ")"  : "",
+                         " :" : ": ",
+                         "-"  : " ",
+                         "  " : " ",
+                        }
 
 # Conversion factor for inch to millimeter
 IN_TO_MM = 25.4

@@ -1,12 +1,10 @@
-__all__ = ['biblio_parser',
-           'build_item_df_from_tup',
+__all__ = ['build_item_df_from_tup',
            'build_pub_db_ids',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
            'clean_authors_countries_institutions',
            'dict_print',
-           'merge_database',
            'normalize_country',
            'normalize_journal_names',
            'normalize_name',
@@ -18,28 +16,47 @@ __all__ = ['biblio_parser',
            ]
 
 
+# Standard library imports
+import functools
+import numpy as np
+import operator
+import os
+import re
+import sys
+import unicodedata
+from collections import Counter
+from pathlib import Path
+
+
+# 3rd party imports
+import pandas as pd
+import nltk
+from pandas.core.groupby.groupby import DataError
+
+# Local library imports
+import BiblioParsing.BiblioGeneralGlobals as bp_gg
+import BiblioParsing.BiblioRegexpGlobals as bp_rg
+import BiblioParsing.BiblioSpecificGlobals as bp_sg
+
+
 def dict_print(dic):
     for k,v in dic.items():
         print("            ", k, ":", v)
 
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
-    '''
-    '''
-    # Standard library imports
-    import os
-    from pathlib import Path
-    
-    # Listing the available files with raw_extent extension
+    """
+    """
+    # Listing the available files with 'raw_extent' extension
     # ToDo: Management of multiple files to merge with 'merge_database' function
-    list_data_base = []
+    rawdata_list = []
     for path, _, files in os.walk(rawdata_path):
-        list_data_base.extend(Path(path) / Path(file) for file in files 
+        rawdata_list.extend(Path(path) / Path(file) for file in files 
                               if file.endswith(raw_extent))                
-    if list_data_base:
+    if rawdata_list:
         # Selecting the most recent file with raw_extent extension
-        list_data_base.sort(key = lambda x: os.path.getmtime(x), reverse=True)
-        rawdata_file_path = list_data_base[0]
+        rawdata_list.sort(key = lambda x: os.path.getmtime(x), reverse=True)
+        rawdata_file_path = rawdata_list[0]
     else:
         rawdata_file_path = None
     return rawdata_file_path
@@ -53,75 +70,60 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     return error_text
 
 
-def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_alias, fails_dict=None):
-    '''Building a clean item dataframe from a tuple 
-    and accordingly updating the parsing success rate dict.'''
-    
-    # Standard library imports
-    import pandas as pd
+def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fails_dict=None):
+    """Building a clean item dataframe from a tuple 
+    and accordingly updating the parsing success rate dict."""
     
     item_df = pd.DataFrame.from_dict({label:[s[idx] for s in item_list] 
                                       for idx,label in enumerate(item_col_names)})
-    list_id = item_df[item_df[item_col] == ''][pub_id_alias].values
-    list_id = list(set(list_id))
+    pub_ids_list = item_df[item_df[item_col]==''][pub_id_col].values
+    pub_ids_list = list(set(pub_ids_list))
     if fails_dict:
-        df_corpus_len = fails_dict['number of article']
-        fails_dict[item_col] = {'success (%)':100 * ( 1 - len(list_id) / df_corpus_len),
-                                pub_id_alias:[int(x) for x in list(list_id)]}    
-    item_df = item_df[item_df[item_col] != '']
+        corpus_size = fails_dict['number of article']
+        fails_dict[item_col] = {'success (%)':100 * ( 1 - len(pub_ids_list) / corpus_size),
+                                pub_id_col:[int(x) for x in pub_ids_list]}    
+    item_df = item_df[item_df[item_col]!='']
     return item_df, fails_dict
 
 
 def clean_authors_countries_institutions(auth_addr_country_inst_df):
     """Gathers author's attributes in a single line for each publication.
     """
-    # 3rd party imports
-    import pandas as pd
-    
-    #Local imports
-    from BiblioParsing.BiblioSpecificGlobals import EMPTY
-    
-    # Setting useful aliases
-    empty_alias = EMPTY
+    # Setting useful column names
     columns_list = auth_addr_country_inst_df.columns
-    pub_id_alias = columns_list[0]
-    author_alias = columns_list[1]
-    address_alias = columns_list[2]
-    country_alias = columns_list[3]
-    norm_aff_alias = columns_list[4]
-    raw_aff_alias = columns_list[5]
+    (pub_id_col, author_col, address_col, country_col,
+     norm_aff_col, raw_aff_col) = columns_list[0:6]
     
     new_auth_addr_country_inst_df = pd.DataFrame(columns=columns_list)
-    for pub_id, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_alias):
+    for pub_id, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_col):
         new_pub_id_dg = pd.DataFrame(columns=columns_list)
-        for author_id, author_dg in pub_id_dg.groupby(author_alias):
+        for author_id, author_dg in pub_id_dg.groupby(author_col):
             new_author_dg = author_dg.copy()
             if len(author_dg)>1:
-                country_list = list(set(author_dg[country_alias].to_list()))
-                new_author_dg[country_alias] = "; ".join(country_list)
+                country_list = list(set(author_dg[country_col].to_list()))
+                new_author_dg[country_col] = "; ".join(country_list)
                 
-                address_list = author_dg[address_alias].to_list()
-                new_author_dg[address_alias] = "; ".join(address_list)
+                address_list = author_dg[address_col].to_list()
+                new_author_dg[address_col] = "; ".join(address_list)
                 
-                norm_aff_list = list(set(author_dg[norm_aff_alias].to_list()) - {empty_alias})
-                new_author_dg[norm_aff_alias] = "; ".join(norm_aff_list)
+                norm_aff_list = list(set(author_dg[norm_aff_col].to_list()) - {bp_sg.EMPTY})
+                new_author_dg[norm_aff_col] = "; ".join(norm_aff_list)
                 
-                raw_aff_list = list(set(author_dg[raw_aff_alias].to_list()) - {empty_alias})
-                new_author_dg[raw_aff_alias] = "; ".join(raw_aff_list)
+                raw_aff_list = list(set(author_dg[raw_aff_col].to_list()) - {bp_sg.EMPTY})
+                new_author_dg[raw_aff_col] = "; ".join(raw_aff_list)
                 
-                new_author_dg.drop_duplicates(subset=[pub_id_alias, author_alias], inplace=True)
+                new_author_dg.drop_duplicates(subset=[pub_id_col, author_col], inplace=True)
                 new_pub_id_dg = pd.concat([new_pub_id_dg, new_author_dg])
             else:
                 new_pub_id_dg = pd.concat([new_pub_id_dg, author_dg])
         new_auth_addr_country_inst_df = pd.concat([new_auth_addr_country_inst_df, new_pub_id_dg])
-    new_auth_addr_country_inst_df.fillna(empty_alias, inplace=True)
-    new_auth_addr_country_inst_df.replace("", empty_alias, inplace=True)
+    new_auth_addr_country_inst_df.fillna(bp_sg.EMPTY, inplace=True)
+    new_auth_addr_country_inst_df.replace("", bp_sg.EMPTY, inplace=True)
     return new_auth_addr_country_inst_df
 
 
 def build_title_keywords(df):
-    
-    '''Given the dataframe 'df' with one column 'title':
+    """Given the dataframe 'df' with one column 'title':
     
                     Title
             0  Experimental and CFD investigation of inert be...
@@ -141,171 +143,87 @@ def build_title_keywords(df):
        4- Suppress words pertening to BLACKLISTED_WORDS to the list from the bag of words
     
     Args:
-       df (dataframe): pub_id | title_alias 
+       df (dataframe): Data of publication title per publication identifier.
 
     Returns:
        (tup): tuple (df, bag_of_words_occurrences) with df a dataframe 
-       which colums are [pub_id, title_tokens_alias, kept_tokens_alias]  
+       which columns are [pub_id, title_tokens_alias, kept_tokens_alias]  
        where title_tokens_alias contains the list of tokens of the title 
        and kept_tokens_alias the list of tokens with an occurrence frequency 
        >= NOUN_MINIMUM_OCCURRENCES, and bag_of_words_occurrences a list of tuples
-       where tuple i is (word_i,# occurrence_i).
-        
-    '''
+       where tuple i is (word_i,# occurrence_i). 
+    """
     # To Do: update docstring
     
-    # Standard library imports
-    import operator
-    from collections import Counter
-       
-    # 3rd party library imports
-    import nltk
-    import numpy as np
-    
-    # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import BLACKLISTED_WORDS
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import NLTK_VALID_TAG_LIST
-    from BiblioParsing.BiblioSpecificGlobals import NOUN_MINIMUM_OCCURRENCES
-    
     def tokenizer(text):
-        
-        '''
-        Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
+        """Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
         NLTK_VALID_TAG_LIST are kept.
         
         ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
         gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
         
         Args:
-            text (string): string to tokenize
-            
+            text (string): String to tokenize
         Returns
-            The list valid_words_lemmatized 
-        '''
-            
+            (list) : The tokenized and lemmatized words.
+        """
         tokenized = nltk.word_tokenize(text.lower())
         valid_words = [word for (word, pos) in nltk.pos_tag(tokenized) 
-                       if pos in NLTK_VALID_TAG_LIST] 
+                       if pos in bp_sg.NLTK_VALID_TAG_LIST] 
 
         stemmer = nltk.stem.WordNetLemmatizer()
-        valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
-    
+        valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]    
         return valid_words_lemmatized        
 
-    title_alias = COL_NAMES['temp_col'][2]
-    title_tokens_alias = COL_NAMES['temp_col'][3]
-    kept_tokens_alias = COL_NAMES['temp_col'][4]
+    title_alias = bp_sg.COL_NAMES['temp_col'][2]
+    title_tokens_alias = bp_sg.COL_NAMES['temp_col'][3]
+    kept_tokens_alias = bp_sg.COL_NAMES['temp_col'][4]
     
     df[title_tokens_alias] = df[title_alias].apply(tokenizer)
 
-    bag_of_words = np.array(df[title_tokens_alias].sum()) # remove the blacklisted words from the bag of words
-    for remove in BLACKLISTED_WORDS:
-        bag_of_words = bag_of_words[bag_of_words != remove] 
+    # Removing the blacklisted words from the bag of words
+    bag_of_words = np.array(df[title_tokens_alias].sum()) 
+    for remove in bp_sg.BLACKLISTED_WORDS:
+        bag_of_words = bag_of_words[bag_of_words!=remove] 
 
     bag_of_words_occurrences = list(Counter(bag_of_words).items())
-    bag_of_words_occurrences.sort(key = operator.itemgetter(1),reverse=True)
+    bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
 
-    keywords_TK = set([x for x,y in bag_of_words_occurrences if y>=NOUN_MINIMUM_OCCURRENCES])
-    
-    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(keywords_TK.intersection(set(x))))
+    title_keywords = set([x for x, y in bag_of_words_occurrences if y>=bp_sg.NOUN_MINIMUM_OCCURRENCES])    
+    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(title_keywords.intersection(set(x))))
    
     return (df, bag_of_words_occurrences)
 
 
 def normalize_country(country):
-    
-    '''
-    Normalize the country name for coherence seeking between wos and scopus corpuses.
-    '''
+    """Normalizes the country name for coherence seeking between 
+    wos and scopus corpuses.
+    """
     # To Do: update docstring
-    
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import ALIAS_UK
-    from BiblioParsing.BiblioGeneralGlobals import ALIAS_FR
-    from BiblioParsing.BiblioGeneralGlobals import ALIAS_BLR
-    from BiblioParsing.BiblioGeneralGlobals import COUNTRIES
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
 
     country_clean = country
-    if country not in COUNTRIES:
-        if country in  ALIAS_UK:
+    if country not in bp_gg.COUNTRIES:
+        if country in  bp_gg.ALIAS_UK:
             country_clean = 'United Kingdom'
         elif 'USA' in country:
             country_clean = 'United States'
         elif ('china' in country) or ('China' in country):
             country_clean = 'China'
-        elif country == 'Russia':    
+        elif country=='Russia':    
             country_clean = 'Russian Federation'
-        elif country == 'U Arab Emirates':    
+        elif country=='U Arab Emirates':    
             country_clean = 'United Arab Emirates'
-        elif country == 'Vietnam':   
+        elif country=='Vietnam':   
             country_clean = 'Viet Nam'
         elif country=='Palestine':
             country_clean = 'Palestinian Territory'
-        elif country in ALIAS_FR:
+        elif country in bp_gg.ALIAS_FR:
             country_clean = 'France'
-        elif country in ALIAS_BLR:
+        elif country in bp_gg.ALIAS_BLR:
             country_clean = 'Belarus'
         else:
-            country_clean = UNKNOWN_COUNTRY
+            country_clean = bp_sg.UNKNOWN_COUNTRY
     return country_clean
-
-
-def merge_database(database,filename,in_dir,out_dir):
-    
-    '''The `merge_database` function merges several corpus of same database type in one corpus.
-    
-    Args:
-        database (str): database type (scopus or wos).
-        filename (str): name of the merged database.
-        in_dir (str): name of the folder where the corpuses are saved.
-        out_dir (str): name of the folder where the merged corpuses will be saved.
-    
-    Notes:
-        The globals 'SCOPUS' and 'WOS' from `BiblioSpecificGlobals`module 
-        of `BiblioParsing`package are used.
-        The functions 'read_database_scopus' and 'read_database_wos' 
-        from, respectively, `BiblioParsingScopus`module and `BiblioParsingWos` 
-        of `BiblioParsing`package are used. 
-        
-    '''
-    # Standard library imports
-    import os
-    import sys
-    from pathlib import Path   
-
-    # 3rd party library imports
-    import pandas as pd
-    
-    # Local library imports
-    from BiblioParsing.BiblioParsingScopus import read_database_scopus
-    from BiblioParsing.BiblioParsingWos import read_database_wos
-    
-    # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import WOS
-
-    list_data_base = []
-    list_df = []
-    if database == WOS:
-        for path, _, files in os.walk(in_dir):
-            list_data_base.extend(Path(path) / Path(file) for file in files
-                                                          if file.endswith(".txt"))
-        for file in list_data_base:
-            list_df.append(read_database_wos(file))
-
-    elif database == SCOPUS:
-        for path, _, files in os.walk(in_dir):
-            list_data_base.extend(Path(path) / Path(file) for file in files
-                                                          if file.endswith(".csv"))
-        for file in list_data_base:
-            list_df.append(read_database_scopus(file))
-    else:
-        raise Exception(f"Sorry, unrecognized database {database} : should be {WOS} or {SCOPUS} ")
-        
-    result = pd.concat(list_df, ignore_index = True)
-    result.to_csv(out_dir / Path(filename), sep = '\t')
 
 
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
@@ -326,24 +244,15 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
         The globals 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' 
         from `BiblioGeneralGlobals` module are used.
     """
-
-    # Standard library imports
-    import re
-    
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE    
-    from BiblioParsing.BiblioGeneralGlobals import LANG_CHAR_CHANGE
-    from BiblioParsing.BiblioGeneralGlobals import PONCT_CHANGE
-    
     if "." not in text:
         text_split = text.split(" ")
         text = " ".join([x.capitalize() for x in text_split])
     
     # Translate special character 
-    text = text.translate(DASHES_CHANGE)
-    text = text.translate(LANG_CHAR_CHANGE)
+    text = text.translate(bp_gg.DASHES_CHANGE)
+    text = text.translate(bp_gg.LANG_CHAR_CHANGE)
     if drop_ponct:
-        text = text.translate(PONCT_CHANGE)
+        text = text.translate(bp_gg.PONCT_CHANGE)
     
     # Removing accentuated characters
     text = remove_special_symbol(text, only_ascii=True, strip=True)
@@ -393,67 +302,56 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
     return text
 
 
-def normalize_journal_names(database,corpus_df):
-    '''Tadds the column `normalize_journal_names` to the corpus `corpus_df`. The journal normalized names are expurgated from unecessary
-	pieces of information such as : small words defined in a global dict (`DIC_LOW_WORDS`), year, conference edition... These normalized
-	and simplified journal names are mainly uses when concatenating two corpus (wos, scpus, ...) using slightly different name for the same
-	journal.
-    globals.
+def normalize_journal_names(database, corpus_df):
+    """Adds the column `normalize_journal_names` to the corpus. 
+
+    The journal normalized names are expurgated from unecessary
+	pieces of information such as: small words defined in a global 
+    dict (`DIC_LOW_WORDS`), year, conference edition... 
+    These normalized and simplified journal names are mainly used 
+    when concatenating two corpus (wos, scopus, ...) using slightly
+    different name for the same journal.
    
     Args:
-        database (string): type of database among the ones defined by SCOPUS and WOS globals.
-        corpus_df (dataframe): corpus dataframe to be normalized in terms of journal names.
+        database (string): Type of data among the ones defined \
+        by SCOPUS and WOS globals.
+        corpus_df (dataframe): corpus dataframe to be normalized \
+        in terms of journal names.
        
     Returns:
-        (dataframe): the dataframe with an additional columns containing the normalized journal names.
-       
-    Note:
-        The globals 'COLUMN_LABEL_WOS', 'COLUMN_LABEL_SCOPUS','DIC_LOW_WORDS', 'RE_YEAR_JOURNAL', 'SCOPUS' and 'WOS' are used.
-   
-    '''
-   
-    # Globals imports
-    from BiblioParsing.BiblioRegexpGlobals import RE_NUM_CONF
-    from BiblioParsing.BiblioRegexpGlobals import RE_YEAR_JOURNAL
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import DIC_LOW_WORDS
-    from BiblioParsing.BiblioSpecificGlobals import NORM_JOURNAL_COLUMN_LABEL    
-    from BiblioParsing.BiblioSpecificGlobals import SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import WOS
-   
-   
-    import re
+        (dataframe): The data with an additional column containing \
+        the normalized journal names.
+   """
     def _journal_normalizer(journal):
-        journal = ' ' + journal + ' ' # a lazzy trick to simplefy the regexp
+        # Adding a lazzy trick to simplefy the regexp
+        journal = ' ' + journal + ' '
         journal = journal.lower()
-        journal = re.sub(RE_YEAR_JOURNAL, ' ', journal)
-        journal = re.sub(RE_NUM_CONF, ' ', journal)
-        for old_str, new_str in DIC_LOW_WORDS.items():
+        journal = re.sub(bp_rg.RE_YEAR_JOURNAL, ' ', journal)
+        journal = re.sub(bp_rg.RE_NUM_CONF, ' ', journal)
+        for old_str, new_str in bp_sg.DIC_LOW_WORDS.items():
             journal = journal.replace(old_str, new_str)
-        journal = re.sub('\s+',' ',journal)
+        journal = re.sub('\s+', ' ', journal)
         journal = journal.strip()
         return journal
 
-    if database == WOS:
-        journal_alias = COLUMN_LABEL_WOS['journal']
-    elif database == SCOPUS:
-        journal_alias = COLUMN_LABEL_SCOPUS['journal']
+    if database==bp_sg.WOS:
+        journal_alias = bp_sg.COLUMN_LABEL_WOS['journal']
+    elif database==bp_sg.SCOPUS:
+        journal_alias = bp_sg.COLUMN_LABEL_SCOPUS['journal']
     else:
-        raise Exception(f"Sorry, unrecognized database {database}: should be {WOS} or {SCOPUS} ")
+        raise Exception(f"Sorry, unrecognized database {database}: "
+                        f"should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
     
-    norm_journal_alias = NORM_JOURNAL_COLUMN_LABEL
+    norm_journal_alias = bp_sg.NORM_JOURNAL_COLUMN_LABEL
     corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
     
     return corpus_df
 
 
 def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
-    # Local imports
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
 
     # Setting useful aliases
-    pub_id_col_alias = COL_NAMES['pub_id']
+    pub_id_col_alias = bp_sg.COL_NAMES['pub_id']
     
     # Setting the pub_id in rawdata_df index
     rawdata_df.index = range(len(rawdata_df))
@@ -466,76 +364,23 @@ def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
     db_ids_df = init_db_ids_df.rename(columns={init_db_id_col: db_id_col})
     return db_ids_df
 
-
-def biblio_parser(rawdata_path, database, inst_filter_list = None,
-                  country_affiliations_file_path = None,
-                  inst_types_file_path = None,
-                  country_towns_file = None,
-                  country_towns_folder_path = None):
-    
-    '''The `biblio_parser` function parse wos or scopus databases using the appropriate parser.
-    
-    Args:
-    
-    
-    Returns:
-        (dict): The dict of dataframes resulting from the parsing.
-    '''
-    
-    # Local library imports
-    from BiblioParsing.BiblioParsingScopus import biblio_parser_scopus
-    from BiblioParsing.BiblioParsingWos import biblio_parser_wos
-    
-    # Globals imports
-    from BiblioParsing.BiblioSpecificGlobals import SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import WOS
-    
-    if database == WOS:
-        wos_tup = biblio_parser_wos(rawdata_path, inst_filter_list = inst_filter_list,
-                                    country_affiliations_file_path = country_affiliations_file_path,
-                                    inst_types_file_path = inst_types_file_path,
-                                    country_towns_file = country_towns_file,
-                                    country_towns_folder_path = country_towns_folder_path)
-        parsing_dict, fails_dict, database_ids_df = wos_tup
-    elif database == SCOPUS:
-        scopus_tup = biblio_parser_scopus(rawdata_path, inst_filter_list = inst_filter_list,
-                                          country_affiliations_file_path = country_affiliations_file_path,
-                                          inst_types_file_path = inst_types_file_path,
-                                          country_towns_file = country_towns_file,
-                                          country_towns_folder_path = country_towns_folder_path)
-        parsing_dict, fails_dict, database_ids_df = scopus_tup
-    else:
-        raise Exception(f"Sorry, unrecognized database {database} : should be wos or scopus ")
-        
-    return parsing_dict, fails_dict, database_ids_df
-
         
 def check_and_drop_columns(database, init_df):
-    # Standard libraries import
-    import numpy as np
-    
-    # Local imports
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS 
-    from BiblioParsing.BiblioSpecificGlobals import COLUMN_LABEL_WOS_PLUS    
-    from BiblioParsing.BiblioSpecificGlobals import SCOPUS
-    from BiblioParsing.BiblioSpecificGlobals import WOS
     
     df = init_df.copy()
     
     # Setting useful aliases
-    wos_col_issn_alias  = COLUMN_LABEL_WOS["issn"]
-    wos_col_eissn_alias = COLUMN_LABEL_WOS_PLUS["e_issn"]
-    pub_id_col_alias    = COL_NAMES["pub_id"] 
+    pub_id_col_alias    = bp_sg.COL_NAMES["pub_id"]
+    wos_col_issn_alias  = bp_sg.COLUMN_LABEL_WOS["issn"]
+    wos_col_eissn_alias = bp_sg.COLUMN_LABEL_WOS_PLUS["e_issn"] 
 
     # Check for missing mandatory columns
-    if database == WOS:
-        cols_mandatory = set([val for val in COLUMN_LABEL_WOS.values() if val] + [COLUMN_LABEL_WOS_PLUS["e_issn"]])
-    elif database == SCOPUS:
-        cols_mandatory = set([val for val in COLUMN_LABEL_SCOPUS.values() if val])    
+    if database==bp_sg.WOS:
+        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val] + [wos_col_eissn_alias])
+    elif database==bp_sg.SCOPUS:
+        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_SCOPUS.values() if val])    
     else:
-        raise Exception(f"Sorry, unrecognized database {database} : should be {WOS} or {SCOPUS} ")
+        raise Exception(f"Sorry, unrecognized database {database} : should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
         
     cols_available = set(df.columns)
     missing_columns = cols_mandatory.difference(cols_available)
@@ -545,106 +390,81 @@ def check_and_drop_columns(database, init_df):
         raise Exception(error_text)
     
     # Setting issn to e_issn if issn not available for wos
-    if database == WOS:
+    if database==bp_sg.WOS:
         df = df.replace('',np.nan,regex=True) # To allow the use of combine_first
         df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
         df = df.dropna(axis = 0, how = 'all')
-        cols_mandatory = set([val for val in COLUMN_LABEL_WOS.values() if val])
+        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val])
         
         
-    # Columns selection and dataframe reformatting    
+    # Droping unused columns    
     cols_to_drop = list(cols_available.difference(cols_mandatory))
-    df.drop(cols_to_drop,
-            axis=1,
-            inplace=True)                    # Drops unused columns    
-    df.index = range(len(df))                # Sets the pub_id in df index
-    df = df.rename_axis(pub_id_col_alias).reset_index() # Sets the pub-id as a column
+    df.drop(cols_to_drop, axis=1, inplace=True)
+
+    # Setting publication identifier in a column of the data
+    df.index = range(len(df))
+    df = df.rename_axis(pub_id_col_alias).reset_index()
     return df
 
                     
 def upgrade_col_names(corpus_folder):
-    
-    '''Add names to the colummn of the parsing and filter_<i> files to take into account the
-    upgrage of BiblioParsing.
+    """Add names to the colummn of the parsing and filter_<i> files to take into account the
+    upgrage of BiblioParsing package.
     
     Args:
         corpus_folder (str): folder of the corpus to be adapted
-        
-    Notes:
-        The global 'COL_NAMES' from `BiblioSpecificGlobals` module 
-        of `BiblioParsing` package are used.
-    
-    '''
-    # Standard library imports
-    import os
-    
-    # 3rd party library imports
-    import pandas as pd
-    from pandas.core.groupby.groupby import DataError
-    
-    # Local imports
-    from BiblioParsing.BiblioSpecificGlobals import COL_NAMES
-    
+    """
     # Beware: the new file authorsinst.dat is not present in the old parsing folders
-    dict_filename_conversion  = {'addresses.dat':'address',
-                                 'articles.dat': 'articles',
-                                 'authors.dat':'authors',
-                                 'authorsinst.dat':'auth_inst',
-                                 'authorskeywords.dat':'keywords',
-                                 'countries.dat':'country',
-                                 'institutions.dat':'institution',
-                                 'journalkeywords.dat':'keywords',
-                                 'references.dat':'references',
-                                 'subjects.dat': 'subject',
-                                 'subjects2.dat':'sub_subject',
-                                 'titlekeywords.dat':'keywords'}
+    dict_filename_conversion  = {'addresses.dat'      : 'address',
+                                 'articles.dat'       : 'articles',
+                                 'authors.dat'        : 'authors',
+                                 'authorsinst.dat'    : 'auth_inst',
+                                 'authorskeywords.dat': 'keywords',
+                                 'countries.dat'      : 'country',
+                                 'institutions.dat'   : 'institution',
+                                 'journalkeywords.dat': 'keywords',
+                                 'references.dat'     : 'references',
+                                 'subjects.dat'       : 'subject',
+                                 'subjects2.dat'      : 'sub_subject',
+                                 'titlekeywords.dat'  : 'keywords'}
 
     for dirpath, dirs, files in os.walk(corpus_folder):  
         if ('parsing' in   dirpath) |  ('filter_' in  dirpath):
             for file in  [file for file in files
                           if (file.split('.')[1]=='dat') 
-                          and (file!='database.dat')      # Not used this file is no longer generated
-                          and (file!='keywords.dat') ]:   # Not used this file is no longer generated
+                          and (file!='database.dat')      # Unused this file is no longer generated
+                          and (file!='keywords.dat') ]:   # Unused this file is no longer generated
                 try:
-                    df = pd.read_csv(os.path.join(dirpath,file),sep='\t',header=None)
+                    df = pd.read_csv(os.path.join(dirpath, file), sep='\t', header=None)
                     
-                    if df.loc[0].tolist() == COL_NAMES[dict_filename_conversion[file]]:
+                    if df.loc[0].tolist()==bp_sg.COL_NAMES[dict_filename_conversion[file]]:
                         print(f'The file {os.path.join(dirpath,file)} is up to date')
                     else:
-                        df.columns = COL_NAMES[dict_filename_conversion[file]]
-                        df.to_csv(os.path.join(dirpath,file),sep='\t',index=False)
+                        df.columns = bp_sg.COL_NAMES[dict_filename_conversion[file]]
+                        df.to_csv(os.path.join(dirpath,file), sep='\t', index=False)
                         print(f'*** The file {os.path.join(dirpath,file)} has been upgraded ***')
                 except  pd.errors.EmptyDataError:
-                    df = pd.DataFrame(columns=COL_NAMES[dict_filename_conversion[file]])
-                    df.to_csv(os.path.join(dirpath,file),sep='\t',index=False)
+                    df = pd.DataFrame(columns=bp_sg.COL_NAMES[dict_filename_conversion[file]])
+                    df.to_csv(os.path.join(dirpath, file), sep='\t', index=False)
                     print(f'*** The EMPTY file {os.path.join(dirpath,file)} has been upgraded ***')
                 except:
                     print(f'Warning: File {os.path.join(dirpath,file)} not recognized as a parsing file')
 
 
-def rationalize_town_names(text, dic_town_symbols = None, dic_town_words = None):
-    """The function `rationalize_town_names` replaces in the string 'text'
-    symbols and words defined by the keys of the dictionaries 'DIC_TOWN_SYMBOLS'
-    and 'DIC_TOWN_WORDS' by their corresponding values in these dictionaries.
-    
+def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
+    """Replaces in the string 'text' symbols and words defined by the keys 
+    of the dictionaries 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' by their 
+    corresponding values in these dictionaries.
+
     Args:
         text (str): The string where changes will be done.
-        
     Returns:
         (str): The modified string.
-        
-    Notes:
-        The globals 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' are imported from
-        `BiblioSpecificGlobals` module of `BiblioParsing' package.
     """    
-    if dic_town_symbols == None: 
-        # Globals imports
-        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_SYMBOLS    
-        dic_town_symbols = DIC_TOWN_SYMBOLS
-    if dic_town_words == None: 
-        # Globals imports
-        from BiblioParsing.BiblioSpecificGlobals import DIC_TOWN_WORDS
-        dic_town_words = DIC_TOWN_WORDS
+    if dic_town_symbols==None:   
+        dic_town_symbols = bp_sg.DIC_TOWN_SYMBOLS
+    if dic_town_words==None:
+        dic_town_words = bp_sg.DIC_TOWN_WORDS
     
     # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
     for town_symb in dic_town_symbols.keys():
@@ -655,24 +475,20 @@ def rationalize_town_names(text, dic_town_symbols = None, dic_town_words = None)
         text = text.replace(town_word, dic_town_words[town_word])    
     return text
 
+
 def remove_special_symbol(text, only_ascii=True, strip=True):
-    '''The function `remove_special_symbol` removes accentuated characters in the string 'text'
-    and ignore non-ascii characters if 'only_ascii' is true. Finally, spaces at the ends of 'text'
-    are removed if strip is true.
+    """The function `remove_special_symbol` removes accentuated characters in the string 'text'
+    and ignore non-ascii characters if 'only_ascii' is true.
+    
+    Finally, spaces at the ends of 'text' are removed if strip is true.
     
     Args:
         text (str): The text where to remove special symbols.
         only_ascii (boolean): If True, non-ascii characters are removed from 'text' (default: True).
         strip (boolean): If True, spaces at the ends of 'text' are removed (default: True).
-        
     Returns:
         (str): The modified string 'text'.
-    
-    '''
-    # Standard library imports
-    import functools
-    import unicodedata
-
+    """
     if only_ascii:
         nfc = functools.partial(unicodedata.normalize,'NFD')
         text = nfc(text). \
@@ -684,7 +500,6 @@ def remove_special_symbol(text, only_ascii=True, strip=True):
 
     if strip:
         text = text.strip()
-    
     return text
 
 
@@ -711,23 +526,9 @@ def standardize_address(raw_address):
     Returns:
         (str): The full standardized address.
     """
-    # Standard library imports
-    import re
-    
-    # Local library imports
-    from BiblioParsing.BiblioParsingUtils import normalize_country
-    # remove_special_symbol
-    
-    # Globals imports
-    from BiblioParsing.BiblioGeneralGlobals import APOSTROPHE_CHANGE
-    from BiblioParsing.BiblioGeneralGlobals import DASHES_CHANGE
-    from BiblioParsing.BiblioGeneralGlobals import SYMB_DROP
-    from BiblioParsing.BiblioSpecificGlobals import DIC_WORD_RE_PATTERN
-    from BiblioParsing.BiblioSpecificGlobals import UNKNOWN_COUNTRY
-
     # Uniformizing words
     standard_address = remove_special_symbol(raw_address)
-    for word_to_substitute, re_pattern in DIC_WORD_RE_PATTERN.items():
+    for word_to_substitute, re_pattern in bp_sg.DIC_WORD_RE_PATTERN.items():
         if word_to_substitute=='University':
             re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
         standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
@@ -735,13 +536,13 @@ def standardize_address(raw_address):
     standard_address = re.sub(r'\s,', ',', standard_address)
 
     # Uniformizing dashes
-    standard_address = standard_address.translate(DASHES_CHANGE)
+    standard_address = standard_address.translate(bp_gg.DASHES_CHANGE)
 
     # Uniformizing apostrophes
-    standard_address = standard_address.translate(APOSTROPHE_CHANGE)
+    standard_address = standard_address.translate(bp_gg.APOSTROPHE_CHANGE)
 
     # Dropping symbols
-    standard_address = standard_address.translate(SYMB_DROP)
+    standard_address = standard_address.translate(bp_gg.SYMB_DROP)
 
     # Uniformizing countries
     country_pos = -1
@@ -750,15 +551,8 @@ def standardize_address(raw_address):
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     space = " "
-    if country!=UNKNOWN_COUNTRY:
+    if country!=bp_sg.UNKNOWN_COUNTRY:
         standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
     else:
         standard_address = ','.join(first_raw_affiliations_list + [space + country])
     return standard_address
-
-################################# Deprecated functions ##########################################
-# country_normalization deprecated, replaced by "normalize_country"
-# town_names_uniformization deprecated, replaced by "rationalize_town_names"
-# accent_remove deprecated, replaced by "remove_special_symbol"
-# special_symbol_remove deprecated, replaced by "remove_special_symbol"
-

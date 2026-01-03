@@ -1,4 +1,4 @@
-__version__ = '1.2.0'
+__version__ = '2.0.0'
 __author__ = 'BiblioAnalysis team'
 __license__ = 'MIT'
 
@@ -10,6 +10,7 @@ from BiblioParsing.BiblioParsingWos import *
 from BiblioParsing.BiblioParsingScopus import *
 from BiblioParsing.BiblioParsingInstitutions import *
 from BiblioParsing.BiblioParsingConcat import *
+from BiblioParsing.BiblioParsingMain import *
 from BiblioParsing.DemoUtils import *
 
 def download_nltk_data():
