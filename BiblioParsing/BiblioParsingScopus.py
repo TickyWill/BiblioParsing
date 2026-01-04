@@ -1409,7 +1409,7 @@ def biblio_parser_scopus(rawdata_path, inst_filter_list=None, country_affiliatio
             empty_df = pd.DataFrame()
             for item in items_list:
                 _keeping_item_parsing_results(item, empty_df)
-    return_tup = (scopus_parsing_dict, scopus_fails_dic,
-                  corrected_authors_df, corrected_addresses_df, scopus_ids_df)
+    return_tup = (scopus_parsing_dict, scopus_fails_dic, scopus_ids_df,
+                  corrected_authors_df, corrected_addresses_df)
     return return_tup 
         

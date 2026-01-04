@@ -177,7 +177,7 @@ def parse_to_dedup(year, db_raw_dict,
                                inst_types_file_path = user_inst_types_file_path,
                                country_towns_file = user_country_towns_file,
                                country_towns_folder_path = user_country_towns_folder_path)
-    scopus_parsing_dict, scopus_fails_dict, scopus_ids_df = return_tup
+    scopus_parsing_dict, scopus_fails_dict, scopus_ids_df = return_tup[0:3]
         
     # Parsing WoS rawdata 
     wos_raw_path = db_raw_dict[WOS]
@@ -186,7 +186,7 @@ def parse_to_dedup(year, db_raw_dict,
                                inst_types_file_path = user_inst_types_file_path,
                                country_towns_file = user_country_towns_file,
                                country_towns_folder_path = user_country_towns_folder_path)
-    wos_parsing_dict, wos_fails_dict, wos_ids_df = return_tup
+    wos_parsing_dict, wos_fails_dict, wos_ids_df = return_tup[0:3]
     
     # Initializing results dicts
     parsing_dicts_dict = {} 
