@@ -517,7 +517,7 @@ def _search_droping_town(params_list, verbose=False):
     text_mod = rationalize_town_names(text.lower())
     if country in towns_dict.keys():
         for word_to_drop in towns_dict[country]:
-            if word_to_drop == text_mod.strip(): 
+            if word_to_drop==text_mod.strip(): 
                 if verbose:
                     print('Droping word is a town of ', country)
                 flag = True

@@ -171,7 +171,7 @@ COLUMN_LABEL_SCOPUS = {'affiliations'             : 'Affiliations',
 
 
 COLUMN_LABEL_SCOPUS_PLUS = {'scopus_id'     : 'EID',
-                            'auth_fullnames':'Author full names',
+                            'auth_fullnames': 'Author full names',
                            }
 
 

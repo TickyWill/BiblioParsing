@@ -11,6 +11,7 @@ __all__ = ['build_item_df_from_tup',
            'rationalize_town_names',
            'remove_special_symbol',
            'set_rawdata_error',
+           'set_unknown_address',
            'standardize_address',
            'upgrade_col_names',
            ]
@@ -43,6 +44,18 @@ def dict_print(dic):
     for k,v in dic.items():
         print("            ", k, ":", v)
 
+
+def set_unknown_address(author_idx):
+    """Builds unknown address for an author wich address is unknown.
+
+    Args:
+        author_idx (int): Index of the author in the publication's authors list.
+    Returns:
+        (str): The built unknown address.
+    """
+    author_address = f'{author_idx}_{bp_sg.UNKNOWN}, {bp_sg.UNKNOWN_COUNTRY}'
+    return author_address
+        
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     """
@@ -503,7 +516,7 @@ def remove_special_symbol(text, only_ascii=True, strip=True):
     return text
 
 
-def standardize_address(raw_address):
+def standardize_address(raw_address, add_unknown_country=True):
     """Standardizes the string 'raw_address' by replacing all aliases of a word, 
     such as 'University', 'Institute', 'Center' and' Department', by a standardized 
     version.
@@ -523,6 +536,8 @@ def standardize_address(raw_address):
 
     Args:
         raw_address (str): The full address to be standardized.
+        add_unknown_country (bool): If False (default: True), unknown-country key is not added \
+        to the standardized address.
     Returns:
         (str): The full standardized address.
     """
@@ -550,9 +565,13 @@ def standardize_address(raw_address):
     # This split below is just for country finding even if affiliation may be separated by dashes
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
-    space = " "
-    if country!=bp_sg.UNKNOWN_COUNTRY:
-        standard_address = ','.join(first_raw_affiliations_list[:-1] + [space + country])
+    country_chunck = " " + country
+    if country==bp_sg.UNKNOWN_COUNTRY:
+        if add_unknown_country:   
+            standard_address = ','.join(first_raw_affiliations_list + [country_chunck])
+        else:
+            standard_address = ','.join(first_raw_affiliations_list)
     else:
-        standard_address = ','.join(first_raw_affiliations_list + [space + country])
+        standard_address = ','.join(first_raw_affiliations_list[:-1] + [country_chunck])
+    
     return standard_address

@@ -33,6 +33,7 @@ from BiblioParsing.BiblioParsingUtils import normalize_country
 from BiblioParsing.BiblioParsingUtils import normalize_journal_names
 from BiblioParsing.BiblioParsingUtils import normalize_name
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+from BiblioParsing.BiblioParsingUtils import set_unknown_address
 from BiblioParsing.BiblioParsingUtils import standardize_address
 
 
@@ -106,6 +107,21 @@ def _set_wos_parsing_cols():
     return cols_lists_dic, cols_dic, wos_cols_dic
 
 
+def _check_authors_list(authors_str, affiliations_str):
+    # Building the full list of ordered authors full names
+    authors_ordered_list = authors_str.split("; ")
+    authors_ordered_list = [author.strip() for author in authors_ordered_list]
+
+    # Building the list of authors full names in authors-with-affiliation
+    affil_authors_list = [[x.strip() for x in authors.split(';')]
+                    for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
+    flat_authors_list  = list(set(sum(affil_authors_list, [])))
+
+    # Building the list of authors out of authors-with-affiliation
+    out_authors_list = list(set(authors_ordered_list) - set(flat_authors_list))
+    return authors_ordered_list, affil_authors_list, out_authors_list
+
+
 def _build_authors_wos(corpus_df, fails_dic, cols_tup):
     """Builds the data of the co-authors of each publication of the corpus 
     and updates the parsing success rate data.
@@ -131,23 +147,22 @@ def _build_authors_wos(corpus_df, fails_dic, cols_tup):
     cols_keys = ['pub_id_col', 'co_authors_col', ]
     (pub_id_col, co_authors_col) = [cols_dic[key] for key in cols_keys]
     wos_auth_col = wos_cols_dic['wos_auth_col']
-    
+
     # Setting named tuple
-    co_author = namedtuple('co_author', auth_cols_list)    
-    
+    co_author = namedtuple('co_author', auth_cols_list)
+
     authors_list = []
     for pub_id, wos_auth_str in zip(corpus_df[pub_id_col], corpus_df[wos_auth_col]):
         author_idx = 0
         for wos_auth in wos_auth_str.split(';'):
-            author = normalize_name(wos_auth.replace('.','').replace(',',''))  # <----- to be checked
+            author = normalize_name(wos_auth.replace('.','').replace(',',''))
             if author not in ['Dr','Pr','Dr ','Pr ']:
                 authors_list.append(co_author(pub_id, author_idx, author))
                 author_idx += 1
-    
+
     # Building a clean co-authors dataframe and accordingly updating the parsing success rate dict
     co_authors_df, fails_dic = build_item_df_from_tup(authors_list, auth_cols_list,
                                                       co_authors_col, pub_id_col, fails_dic)
-    
     return co_authors_df
 
 
@@ -289,29 +304,35 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
     address_cols_List, country_cols_list, inst_cols_list = [cols_lists_dic[key] for key in cols_lists_keys]
     cols_keys = ['pub_id_col', 'address_col', 'country_col', 'institution_col']
     (pub_id_col, address_col, country_col, institution_col) = [cols_dic[key] for key in cols_keys]
-    wos_auth_with_aff_col = wos_cols_dic['wos_auth_with_aff_col']
+    wos_cols_keys = ['wos_auth_with_aff_col', 'wos_fullnames_col']
+    (wos_auth_with_aff_col, wos_fullnames_col) = [wos_cols_dic[key] for key in wos_cols_keys]
     
     # Setting named tuples
     address_tup = namedtuple('address', address_cols_List)
     country_tup = namedtuple('country', country_cols_list)
-    institution_tup = namedtuple('institution', inst_cols_list) 
-    address = namedtuple('address', address_cols_List )
-    country = namedtuple('country', country_cols_list )
-    institution = namedtuple('institution', inst_cols_list )    
+    institution_tup = namedtuple('institution', inst_cols_list)
+    
+    corpus_series_zip = zip(corpus_df[pub_id_col],
+                            corpus_df[wos_fullnames_col],
+                            corpus_df[wos_auth_with_aff_col])
     
     addresses_list, countries_list, institutions_list = [], [], []
-    for pub_id, pub_addresses in zip(corpus_df[pub_id_col],
-                                     corpus_df[wos_auth_with_aff_col]):       
-        try:
-            if '[' in pub_addresses:
-                # Format case: '[Author1] address1; [Author1, Author2] address2...'
-                # authors = bp_rg.RE_AUTHOR.findall(pub_addresses) # for future use
-                pub_addresses_list = bp_rg.RE_ADDRESS.findall(pub_addresses)
-            else:
-                # Format case: 'address1;address2...'
-                pub_addresses_list = pub_addresses.split(';')   
-        except:
-            print(pub_id, pub_addresses)
+    for pub_id, authors_str, affiliations_str in corpus_series_zip:
+        pub_addresses_list = []
+        if '[' in affiliations_str:
+            # Format case: '[Author1] address1; [Author1, Author2] address2...'
+            # authors = bp_rg.RE_AUTHOR.findall(affiliations_str) # for future use
+            pub_addresses_list = bp_rg.RE_ADDRESS.findall(affiliations_str)
+
+            # Checking authors in authors list and authors-with-affiliation data
+            authors_ordered_list, _, out_authors_list = _check_authors_list(authors_str, affiliations_str)
+            for out_author in out_authors_list:
+                out_author_idx = authors_ordered_list.index(out_author)
+                out_author_address = set_unknown_address(out_author_idx)
+                pub_addresses_list.append(out_author_address)  
+        else:
+            # Format case: 'address1;address2...'
+            pub_addresses_list = affiliations_str.split(';')
         
         if pub_addresses_list:
             for address_idx, pub_raw_address in enumerate(pub_addresses_list):
@@ -443,29 +464,30 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
 
     # Building the "addr_country_inst_list" list
     # with one item per publication and per author identifier
+    corpus_series_zip = zip(corpus_df[pub_id_col],
+                            corpus_df[wos_fullnames_col],
+                            corpus_df[wos_auth_with_aff_col])
     pub_nb = len(corpus_df[pub_id_col])
     pub_num = 0
     addr_country_inst_list = []
-    for pub_id, affiliations_str in zip(corpus_df[pub_id_col],
-                                        corpus_df[wos_auth_with_aff_col]):
+    for pub_id, authors_str, affiliations_str in corpus_series_zip:
         pub_num += 1 
         print("    Publications number:", pub_num, f"/ {pub_nb}", end="\r")
         if '[' in affiliations_str:
-            # Proceeding if the field author is present in affiliations.           
+            # Proceeding if the field author is present in affiliations.
+
+            # Checking authors in authors list and authors-with-affiliation data
+            authors_ordered_list, affil_authors_list, out_authors_list = _check_authors_list(authors_str, affiliations_str)
+
             # Building the list of tuples [([Author1, Author2,...], address1),...]
-            # from the author-with-affiliations field inthe corpus data
-            authors_list = [[x.strip() for x in authors.split(';')] for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
+            # from the author-with-affiliations field in the corpus data
             affiliations_list = [x.strip() for x in bp_rg.RE_ADDRESS.findall(affiliations_str)]
             affiliations_list = affiliations_list if affiliations_list else ['']
-            tuples_list = tuple(zip(authors_list, affiliations_list)) 
+            tuples_list = tuple(zip(affil_authors_list, affiliations_list)) 
 
             # Builds the list of tuples [(Author<0>, address<0>),(Author<0>, address<1>),...,(Author<i>, address<j>)...]
-            author_address_tup_list = [author_address_tup(y, x[1]) for x in tuples_list for y in x[0]]            
-            
-            # Build the list of ordered authors full names
-            authors_ordered_list = corpus_df.loc[pub_id, wos_fullnames_col].split(';')
-            authors_ordered_list = [author.strip() for author in authors_ordered_list]
-                
+            author_address_tup_list = [author_address_tup(y, x[1]) for x in tuples_list for y in x[0]]
+
             for tup_num, tup in enumerate(author_address_tup_list):
                 if tup.author in authors_ordered_list: 
                     author_idx = authors_ordered_list.index(tup.author)
@@ -475,17 +497,23 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
 
                     author_raw_address = tup.address
                     author_std_address = standardize_address(author_raw_address)
+
                     author_institutions_tup = address_inst_full_list(author_std_address, norm_raw_aff_dict,
                                                                      aff_type_dict, towns_dict,
                                                                      drop_status=False)
                     addr_country_inst_list.append(addr_country_inst(pub_id, author_idx, author_std_address, author_country,
                                                                     author_institutions_tup.norm_inst_list,
-                                                                    author_institutions_tup.raw_inst_list,))                
+                                                                    author_institutions_tup.raw_inst_list,))
+            if out_authors_list:
+                for out_author in out_authors_list:
+                    out_author_idx = authors_ordered_list.index(out_author)
+                    out_author_address = set_unknown_address(out_author_idx)
+                    addr_country_inst_list.append(addr_country_inst(pub_id, out_author_idx, out_author_address,
+                                                                    bp_sg.UNKNOWN_COUNTRY, bp_sg.EMPTY, bp_sg.EMPTY,))
         else:
             # If the field author is not present in affiliations complete namedtuple with the global UNKNOWN
             addr_country_inst_list.append(addr_country_inst(pub_id, bp_sg.UNKNOWN, bp_sg.UNKNOWN, 
                                                             bp_sg.UNKNOWN, bp_sg.UNKNOWN, bp_sg.UNKNOWN,))
-
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
     addr_country_inst_df, fails_dic = build_item_df_from_tup(addr_country_inst_list, auth_inst_cols_list[:-1],
                                                              norm_institution_col, pub_id_col, fails_dic)   
@@ -495,7 +523,7 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
         addr_country_inst_df = extend_author_institutions(addr_country_inst_df, inst_filter_list)
         
     # Sorting the values in the dataframe returned by two columns
-    addr_country_inst_df.sort_values(by = [pub_id_col, author_idx_col], inplace = True)
+    addr_country_inst_df.sort_values(by=[pub_id_col, author_idx_col], inplace=True)
 
     return addr_country_inst_df
 

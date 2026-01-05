@@ -33,6 +33,7 @@ from BiblioParsing.BiblioParsingUtils import normalize_country
 from BiblioParsing.BiblioParsingUtils import normalize_journal_names
 from BiblioParsing.BiblioParsingUtils import normalize_name
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+from BiblioParsing.BiblioParsingUtils import set_unknown_address
 from BiblioParsing.BiblioParsingUtils import standardize_address
 
 
@@ -100,6 +101,43 @@ def _set_scopus_parsing_cols():
                       }
 
     return cols_lists_dic, cols_dic, scopus_cols_dic
+
+
+def _set_author_idx(author, author_counter_params):
+    # Updating author's counter and last-author name
+    author_idx, last_author = author_counter_params
+    if author!=last_author:
+        author_idx += 1
+    last_author = author
+    author_counter_params = author_idx, last_author
+    return author_counter_params
+
+
+def _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
+                                  author_counter_params):
+    std_author_affiliations_str = standardize_address(raw_author_affiliations_str,
+                                                      add_unknown_country=False)
+    author_affiliations_list = std_author_affiliations_str.split(',')
+
+    # Using change in scopus on 07/2023 for authors' names
+    auth_item_nbr = 2
+    if "." in author_affiliations_list[0]:
+        auth_item_nbr = 1
+    author = (','.join(author_affiliations_list[0:auth_item_nbr])).strip()        
+    author_counter_params = _set_author_idx(author, author_counter_params)
+
+    # Building "addr_country_inst" namedtuple for the author of the publication
+    author_affiliations_str = ','.join(author_affiliations_list[auth_item_nbr:])
+
+    author_std_affiliations_list = []
+    for raw_affiliation in affiliations_list:
+        std_affiliation = standardize_address(raw_affiliation,
+                                              add_unknown_country=False)
+        if std_affiliation in author_affiliations_str:
+            full_std_affiliation = standardize_address(raw_affiliation,
+                                                       add_unknown_country=True)
+            author_std_affiliations_list.append(full_std_affiliation)
+    return author, author_std_affiliations_list, author_counter_params
 
 
 def _build_authors_scopus(corpus_df, fails_dic, cols_tup):
@@ -287,8 +325,9 @@ def _build_addresses_countries_institutions_scopus(corpus_df, fails_dic, cols_tu
     address_cols_List, country_cols_list, inst_cols_list = [cols_lists_dic[key] for key in cols_lists_keys]
     cols_keys = ['pub_id_col', 'address_col', 'country_col', 'institution_col']
     (pub_id_col, address_col, country_col, institution_col) = [cols_dic[key] for key in cols_keys]
-    scopus_aff_col = scopus_cols_dic['scopus_aff_col']
-    
+    scopus_cols_keys = ['scopus_aff_col', 'scopus_auth_with_aff_col']
+    (scopus_aff_col, scopus_auth_with_aff_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
+
     # Setting named tuples
     address_tup = namedtuple('address', address_cols_List)
     country_tup = namedtuple('country', country_cols_list)
@@ -297,14 +336,34 @@ def _build_addresses_countries_institutions_scopus(corpus_df, fails_dic, cols_tu
     # Building "addresses_list", "countries_list", "institutions_list" lists 
     # with one item per publication and per address identifier
     corpus_series_zip = zip(corpus_df[pub_id_col],
-                            corpus_df[scopus_aff_col])        
+                            corpus_df[scopus_aff_col],
+                            corpus_df[scopus_auth_with_aff_col])
     addresses_list, countries_list, institutions_list = [], [], []       
-    for pub_id, pub_addresses in corpus_series_zip:
-        pub_addresses_list = pub_addresses.split(';')
-        
-        if pub_addresses_list:
-            for address_idx, pub_raw_address in enumerate(pub_addresses_list):
-                pub_address = standardize_address(pub_raw_address)
+    for pub_id, affiliations_str, authors_affiliations_str in corpus_series_zip:
+        affiliations_list = affiliations_str.split(';')
+
+        # Initializing the authors' counter and the last-author name
+        author_counter_params = [-1, '']
+
+        # Checking if all authors have affiliation
+        authors_affiliations_list = authors_affiliations_str.split(';')
+        add_unknown_address = False
+        for raw_author_affiliations_str in authors_affiliations_list:
+            return_tup = _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
+                                                       author_counter_params)
+            author, author_std_affiliations_list, author_counter_params = return_tup
+            author_idx = author_counter_params[0]
+            if not author_std_affiliations_list:
+                add_unknown_address = True
+                full_std_affiliation = set_unknown_address(author_idx)
+                affiliations_list.append(full_std_affiliation) 
+
+        if affiliations_list:
+            address_nb = len(affiliations_list)
+            for address_idx, pub_raw_address in enumerate(affiliations_list):
+                pub_address = pub_raw_address
+                if add_unknown_address and address_idx<address_nb-1:
+                    pub_address = standardize_address(pub_raw_address)
                 addresses_list.append(address_tup(pub_id, address_idx, pub_address))
 
                 addresses_split = pub_address.split(',')
@@ -454,36 +513,24 @@ def _build_authors_countries_institutions_scopus(corpus_df, fails_dic, cols_tup,
     pub_nb = len(corpus_df[pub_id_col])
     pub_num = 0
     addr_country_inst_list = []
-    for pub_id, affiliations, authors_affiliations in corpus_series_zip:
+    for pub_id, affiliations_str, authors_affiliations_str in corpus_series_zip:
         pub_num += 1 
         print("    Publications number:", pub_num, f"/ {pub_nb}", end="\r")
         # Initializing the authors' counter and the last-author name
-        author_idx, last_author = -1, '' 
+        author_counter_params = [-1, '']
 
-        affiliations_list = affiliations.split(';')
-        authors_affiliations_list = authors_affiliations.split(';')
-        for raw_author_affiliations in authors_affiliations_list:
-            auth_item_nbr = 2
-            std_author_affiliations = standardize_address(raw_author_affiliations)
-            author_affiliations_list = std_author_affiliations.split(',')
+        affiliations_list = affiliations_str.split(';')
+        authors_affiliations_list = authors_affiliations_str.split(';')
 
-            # Using change in scopus on 07/2023 for authors' names
-            if "." in author_affiliations_list[0]:
-                auth_item_nbr = 1
-            author = (','.join(author_affiliations_list[0:auth_item_nbr])).strip()
+        for raw_author_affiliations_str in authors_affiliations_list:
+            return_tup = _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
+                                                       author_counter_params)
+            author, author_std_affiliations_list, author_counter_params = return_tup
+            author_idx = author_counter_params[0]
+            if not author_std_affiliations_list:
+                full_std_affiliation = set_unknown_address(author_idx)
+                author_std_affiliations_list.append(full_std_affiliation)
 
-            # Updating author's counter and last-author name
-            if author!=last_author:
-                author_idx += 1
-            last_author = author
-
-            # Building "addr_country_inst" namedtuple for the author of the publication
-            author_affiliations_str = ','.join(author_affiliations_list[auth_item_nbr:])
-            author_std_affiliations_list = []
-            for raw_affiliation in affiliations_list:
-                std_affiliation = standardize_address(raw_affiliation)
-                if std_affiliation in author_affiliations_str:
-                    author_std_affiliations_list.append(std_affiliation) 
             for author_std_affiliation in author_std_affiliations_list:
                 author_country_raw = author_std_affiliation.split(',')[-1].strip()
                 author_country = normalize_country(author_country_raw)
