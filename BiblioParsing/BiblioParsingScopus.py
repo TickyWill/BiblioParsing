@@ -347,23 +347,16 @@ def _build_addresses_countries_institutions_scopus(corpus_df, fails_dic, cols_tu
 
         # Checking if all authors have affiliation
         authors_affiliations_list = authors_affiliations_str.split(';')
-        add_unknown_address = False
         for raw_author_affiliations_str in authors_affiliations_list:
             return_tup = _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
                                                        author_counter_params)
             author, author_std_affiliations_list, author_counter_params = return_tup
             author_idx = author_counter_params[0]
             if not author_std_affiliations_list:
-                add_unknown_address = True
-                full_std_affiliation = set_unknown_address(author_idx)
-                affiliations_list.append(full_std_affiliation) 
+                affiliations_list.append(set_unknown_address(author_idx)) 
 
         if affiliations_list:
-            address_nb = len(affiliations_list)
-            for address_idx, pub_raw_address in enumerate(affiliations_list):
-                pub_address = pub_raw_address
-                if add_unknown_address and address_idx<address_nb-1:
-                    pub_address = standardize_address(pub_raw_address)
+            for address_idx, pub_address in enumerate(affiliations_list):
                 addresses_list.append(address_tup(pub_id, address_idx, pub_address))
 
                 addresses_split = pub_address.split(',')
@@ -397,7 +390,7 @@ def _build_addresses_countries_institutions_scopus(corpus_df, fails_dic, cols_tu
     institution_df, fails_dic = build_item_df_from_tup(institutions_list, inst_cols_list,
                                                        institution_col, pub_id_col, fails_dic)
     
-    if not(len(address_df) == len(country_df) == len(institution_df)):
+    if not(len(address_df)==len(country_df)==len(institution_df)):
         warning = ('\nWARNING: Lengths of "address_df", "country_df" and "institution_df" dataframes are not equal '
                    'in "_build_addresses_countries_institutions_scopus" function of "BiblioParsingScopus.py" module')
         print(warning)
@@ -528,8 +521,8 @@ def _build_authors_countries_institutions_scopus(corpus_df, fails_dic, cols_tup,
             author, author_std_affiliations_list, author_counter_params = return_tup
             author_idx = author_counter_params[0]
             if not author_std_affiliations_list:
-                full_std_affiliation = set_unknown_address(author_idx)
-                author_std_affiliations_list.append(full_std_affiliation)
+                full_unknown_address = set_unknown_address(author_idx, add_unknown_country=True)
+                author_std_affiliations_list.append(full_unknown_address)
 
             for author_std_affiliation in author_std_affiliations_list:
                 author_country_raw = author_std_affiliation.split(',')[-1].strip()
@@ -663,8 +656,8 @@ def _build_subjects_scopus(corpus_df, scopus_cat_codes_path,
                 except:
                     res.extend([(pub_id,'')])
 
-    # Builds the dataframe "df_keyword" out of tuples [(publi_id,scopus category),...]
-    # "df_keyword" has two columns "pub_id" and "scopus_keywords". 
+    # Builds the data of subjects per publication
+    # "subjects_df" has two columns "pub_id" and "scopus_keywords". 
     # The duplicated rows are supressed.
     # ----------------------------------------------------------------            
     pub_ids_list, keywords_list = zip(*res)

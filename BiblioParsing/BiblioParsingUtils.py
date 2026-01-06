@@ -45,15 +45,20 @@ def dict_print(dic):
         print("            ", k, ":", v)
 
 
-def set_unknown_address(author_idx):
+def set_unknown_address(author_idx, add_unknown_country=False):
     """Builds unknown address for an author wich address is unknown.
 
     Args:
         author_idx (int): Index of the author in the publication's authors list.
+        add_unknown_country (bool): If True (default: False), unknown-country key \
+        is added to the unknown address.
     Returns:
         (str): The built unknown address.
     """
-    author_address = f'{author_idx}_{bp_sg.UNKNOWN}, {bp_sg.UNKNOWN_COUNTRY}'
+    if add_unknown_country:
+        author_address = f'{author_idx}_{bp_sg.UNKNOWN}, {bp_sg.UNKNOWN_COUNTRY}'
+    else:
+        author_address = f'{author_idx}_{bp_sg.UNKNOWN}'
     return author_address
         
 

@@ -328,7 +328,7 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
             authors_ordered_list, _, out_authors_list = _check_authors_list(authors_str, affiliations_str)
             for out_author in out_authors_list:
                 out_author_idx = authors_ordered_list.index(out_author)
-                out_author_address = set_unknown_address(out_author_idx)
+                out_author_address = set_unknown_address(out_author_idx, add_unknown_country=False)
                 pub_addresses_list.append(out_author_address)  
         else:
             # Format case: 'address1;address2...'
@@ -336,7 +336,7 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
         
         if pub_addresses_list:
             for address_idx, pub_raw_address in enumerate(pub_addresses_list):
-                pub_address = standardize_address(pub_raw_address)
+                pub_address = standardize_address(pub_raw_address, add_unknown_country=False)
                 addresses_list.append(address_tup(pub_id, address_idx, pub_address))
                 
                 main_institution = pub_address.split(',')[0]
@@ -507,7 +507,7 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
             if out_authors_list:
                 for out_author in out_authors_list:
                     out_author_idx = authors_ordered_list.index(out_author)
-                    out_author_address = set_unknown_address(out_author_idx)
+                    out_author_address = set_unknown_address(out_author_idx, add_unknown_country=True)
                     addr_country_inst_list.append(addr_country_inst(pub_id, out_author_idx, out_author_address,
                                                                     bp_sg.UNKNOWN_COUNTRY, bp_sg.EMPTY, bp_sg.EMPTY,))
         else:
