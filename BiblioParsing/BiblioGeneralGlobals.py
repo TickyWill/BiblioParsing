@@ -98,7 +98,7 @@ NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY'''
 USA_STATES = [x.strip() for x in USA_STATES.split(',')]
 
 ALIAS_USA = '''UNITED STATES,United States of America,USA'''
-ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]
+ALIAS_USA = [x.strip() for x in ALIAS_USA.split(',')]
 
 ALIAS_UK = '''England,Wales,North Ireland,Scotland'''
 ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]
