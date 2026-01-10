@@ -1,6 +1,7 @@
 __all__ = ['ACCENT_CHANGE',
            'ALIAS_FR',
            'ALIAS_UK',
+           'ALIAS_USA',
            'APOSTROPHE_CHANGE',
            'ALIAS_BLR',
            'COUNTRIES',
@@ -95,6 +96,9 @@ for country in ZIP_CODES.keys():
 USA_STATES = '''AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,
 NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY'''
 USA_STATES = [x.strip() for x in USA_STATES.split(',')]
+
+ALIAS_USA = '''UNITED STATES,United States of America,USA'''
+ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]
 
 ALIAS_UK = '''England,Wales,North Ireland,Scotland'''
 ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]

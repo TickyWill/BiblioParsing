@@ -223,7 +223,7 @@ def normalize_country(country):
     if country not in bp_gg.COUNTRIES:
         if country in  bp_gg.ALIAS_UK:
             country_clean = 'United Kingdom'
-        elif 'USA' in country:
+        elif country in bp_gg.ALIAS_USA:
             country_clean = 'United States'
         elif ('china' in country) or ('China' in country):
             country_clean = 'China'
