@@ -223,15 +223,15 @@ def normalize_country(country):
     if country not in bp_gg.COUNTRIES:
         if country in  bp_gg.ALIAS_UK:
             country_clean = 'United Kingdom'
-        elif country in bp_gg.ALIAS_USA:
+        elif country in bp_gg.ALIAS_USA or "USA" in country:
             country_clean = 'United States'
         elif ('china' in country) or ('China' in country):
             country_clean = 'China'
-        elif country=='Russia':    
+        elif country=='Russia':
             country_clean = 'Russian Federation'
-        elif country=='U Arab Emirates':    
+        elif country=='U Arab Emirates':
             country_clean = 'United Arab Emirates'
-        elif country=='Vietnam':   
+        elif country=='Vietnam':
             country_clean = 'Viet Nam'
         elif country=='Palestine':
             country_clean = 'Palestinian Territory'
@@ -239,6 +239,8 @@ def normalize_country(country):
             country_clean = 'France'
         elif country in bp_gg.ALIAS_BLR:
             country_clean = 'Belarus'
+        elif country in bp_gg.ALIAS_TUR:
+            country_clean = 'Turkey'
         else:
             country_clean = bp_sg.UNKNOWN_COUNTRY
     return country_clean
