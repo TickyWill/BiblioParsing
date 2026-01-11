@@ -827,13 +827,17 @@ def _build_articles_scopus(corpus_df, cols_tup):
             return 0
         
     def _treat_author(authors_list):
-        authors_sep = ',' 
+        authors_sep = ','
         if ';' in authors_list:
             # Change in scopus on 07/2023
             authors_sep = ';'
         # Picking the first author
-        raw_first_author = authors_list.split(authors_sep)[0] 
-        first_author = normalize_name(raw_first_author) 
+        raw_first_author = authors_list.split(';')[0]
+        first_author = normalize_name(raw_first_author)
+        # Setting firstname_initials to upper case
+        lastname = (" ").join(first_author.split(" ")[:-1])
+        firstname_initials = first_author.split(" ")[-1]
+        first_author = (" ").join([lastname, firstname_initials.upper()])
         return first_author
     
     def _treat_doctype(doctype):
