@@ -217,12 +217,12 @@ def normalize_country(country):
     """Normalizes the country name for coherence seeking between 
     wos and scopus corpuses.
     """
-    # To Do: update docstring
-
     country_clean = country
     if country not in bp_gg.COUNTRIES:
         if country in  bp_gg.ALIAS_UK:
             country_clean = 'United Kingdom'
+        elif 'Netherlands' in country:
+            country_clean = 'Netherlands'
         elif country in bp_gg.ALIAS_USA or "USA" in country:
             country_clean = 'United States'
         elif ('china' in country) or ('China' in country):
@@ -249,50 +249,50 @@ def normalize_country(country):
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
     """Normalizes the author name spelling according the three debatable rules:
             - replacing none ascii letters by ascii ones,
-            - capitalizing first name, 
+            - capitalizing first name,
             - capitalizing surnames,
             - removing comma and dot.
-       It uses the internal funtion `remove_special_symbol`of the same module.    
+       It uses the internal funtion `remove_special_symbol`of the same module.
        ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
         >>> "Grol-Bica-Velu D'Aillon E-KJ".
-        
+
     Args:
-        text (str): The name to normalize.    
+        text (str): The name to normalize.
     Returns
-        (str) : The normalized text.        
+        (str) : The normalized text.
     Notes:
-        The globals 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' 
+        The globals 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE'
         from `BiblioGeneralGlobals` module are used.
     """
     if "." not in text:
         text_split = text.split(" ")
         text = " ".join([x.capitalize() for x in text_split])
-    
+
     # Translate special character 
     text = text.translate(bp_gg.DASHES_CHANGE)
     text = text.translate(bp_gg.LANG_CHAR_CHANGE)
     if drop_ponct:
         text = text.translate(bp_gg.PONCT_CHANGE)
-    
+
     # Removing accentuated characters
     text = remove_special_symbol(text, only_ascii=True, strip=True)
 
-    # capturing "cCc-cC-ccc-CCc"       
+    # capturing "cCc-cC-ccc-CCc"
     re_minus = re.compile('(-[a-zA-Z]+)')       # Captures: "cCc-cC-ccc-CCc"
     for text_minus_texts in re.findall(re_minus, text):
         text = text.replace(text_minus_texts, '-' + text_minus_texts[1:].capitalize())
 
-    # capturing "cCc'cC'ccc'cc'CCc"        
+    # capturing "cCc'cC'ccc'cc'CCc"
     re_apostrophe = re.compile("('[a-zA-Z]+)")
     for text_minus_texts in re.findall(re_apostrophe, text):
         text = text.replace(text_minus_texts, "'" + text_minus_texts[1:].capitalize())
 
-    # capturing "cCc-"        
+    # capturing "cCc-"
     re_minus = re.compile('([a-zA-Z]+-)')
     for text_minus_texts in re.findall(re_minus, text):
         text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + '-')
 
-    # capturing "cCc'"        
+    # capturing "cCc'"
     re_apostrophe = re.compile("([a-zA-Z]+')")
     for text_minus_texts in re.findall(re_apostrophe, text):
         text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + "'")
@@ -318,7 +318,6 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
     for text_mac_texts in re.findall(re_mac, text):
         new_text_mac_texts = "Mc" + text_mac_texts[2:].capitalize()
         text = text.replace(text_mac_texts, new_text_mac_texts)
-      
     return text
 
 

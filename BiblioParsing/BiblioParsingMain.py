@@ -13,7 +13,7 @@ from BiblioParsing.BiblioParsingWos import read_database_wos
 
 def merge_database(database, filename, in_dir, out_dir):
     """Merges several corpus of same database type in one corpus.
-    
+
     Args:
         database (str): database type (scopus or wos).
         filename (str): name of the merged database.
@@ -38,7 +38,7 @@ def merge_database(database, filename, in_dir, out_dir):
     else:
         raise Exception(f"Sorry, unrecognized database {database}: "
                         f"should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
-        
+
     result = pd.concat(rawdata_list, ignore_index=True)
     result.to_csv(out_dir / Path(filename), sep='\t')
 
@@ -49,11 +49,11 @@ def biblio_parser(rawdata_path, database, inst_filter_list=None,
                   country_towns_file=None,
                   country_towns_folder_path=None):
     """Parses corpus rawdata using the appropriate parser.
-    
+
     Two parsers are available:
     - `biblio_parser_wos` function imported from `BiblioParsingWos` module; 
     - `biblio_parser_scopus` function imported from `BiblioParsingScopus` module.
-    
+
     Args:
         rawdata_path (path): The full path to the corpus rawdata.
         database (str): The type of the rawdata among Scopus or WoS.
@@ -83,5 +83,5 @@ def biblio_parser(rawdata_path, database, inst_filter_list=None,
                                            country_towns_folder_path=country_towns_folder_path)
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be {bp_sg.WOS} or {bp_sg.SCOPUS}")
-        
+
     return parsing_tup

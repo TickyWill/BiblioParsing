@@ -77,13 +77,13 @@ def _set_wos_parsing_cols():
                 'kept_tokens_col'         : bp_sg.COL_NAMES['temp_col'][4],
                 'author_col'              : bp_sg.COL_NAMES['articles'][1],
                 'year_col'                : bp_sg.COL_NAMES['articles'][2],
-                'doc_type_col'            : bp_sg.COL_NAMES['articles'][7], 
+                'doc_type_col'            : bp_sg.COL_NAMES['articles'][7],
                 'title_col'               : bp_sg.COL_NAMES['articles'][9],
                 'issn_col'                : bp_sg.COL_NAMES['articles'][10],
                 'norm_journal_col'        : bp_sg.NORM_JOURNAL_COLUMN_LABEL,
                }
-    
-    wos_cols_dic = {'wos_auth_col'         : bp_sg.COLUMN_LABEL_WOS['authors'],                   
+
+    wos_cols_dic = {'wos_auth_col'         : bp_sg.COLUMN_LABEL_WOS['authors'],
                     'wos_title_kw_col'     : bp_sg.COLUMN_LABEL_WOS['title'],
                     'wos_year_col'         : bp_sg.COLUMN_LABEL_WOS['year'],
                     'wos_journal_col'      : bp_sg.COLUMN_LABEL_WOS['journal'],
@@ -122,6 +122,13 @@ def _check_authors_list(authors_str, affiliations_str):
     return authors_ordered_list, affil_authors_list, out_authors_list
 
 
+def _set_upper_initials(author):
+    names_list = author.split(" ")
+    names_list[-1] = names_list[-1].upper()
+    new_author = " ".join(names_list)
+    return new_author
+
+
 def _build_authors_wos(corpus_df, fails_dic, cols_tup):
     """Builds the data of the co-authors of each publication of the corpus 
     and updates the parsing success rate data.
@@ -155,7 +162,8 @@ def _build_authors_wos(corpus_df, fails_dic, cols_tup):
     for pub_id, wos_auth_str in zip(corpus_df[pub_id_col], corpus_df[wos_auth_col]):
         author_idx = 0
         for wos_auth in wos_auth_str.split(';'):
-            author = normalize_name(wos_auth.replace('.','').replace(',',''))
+            author = normalize_name(wos_auth, drop_ponct=True)
+            author = _set_upper_initials(author)
             if author not in ['Dr','Pr','Dr ','Pr ']:
                 authors_list.append(co_author(pub_id, author_idx, author))
                 author_idx += 1
@@ -177,11 +185,11 @@ def _build_keywords_wos(corpus_df, fails_dic, cols_tup):
              0      AK    Biomass
              0      IK    Gasification
              0      TK    Solar energy
-        with: 
-             type = AK for author's keywords 
+        with:
+             type = AK for author's keywords
              type = IK for indexed keywords
-             type = TK for title keywords 
-         
+             type = TK for title keywords
+
     The author's keywords and the indexed keywords are directly extracted from \
     the corpus data. 
     The title keywords are builds out of the 'TK_corpus' set of the most cited nouns 
@@ -205,14 +213,14 @@ def _build_keywords_wos(corpus_df, fails_dic, cols_tup):
     wos_cols_keys = ['wos_auth_kw_col', 'wos_idx_kw_col', 'wos_title_kw_col']
     (wos_auth_kw_col, wos_idx_kw_col,
      wos_title_kw_col )= [wos_cols_dic[key] for key in wos_cols_keys]
-    
+
     # Setting named tuple
-    key_word = namedtuple('key_word', kw_cols_List)    
-    
-    aks_list = [] 
+    key_word = namedtuple('key_word', kw_cols_List)
+
+    aks_list = []
     aks_df = corpus_df[wos_auth_kw_col].fillna('')
     for pub_id, pub_aks_str in zip(corpus_df[pub_id_col], aks_df):
-        pub_aks_list = pub_aks_str.split(';')      
+        pub_aks_list = pub_aks_str.split(';')
         for pub_ak in pub_aks_list:
             pub_ak = pub_ak.lower().strip()
             aks_list.append(key_word(pub_id,
@@ -224,7 +232,7 @@ def _build_keywords_wos(corpus_df, fails_dic, cols_tup):
         for pub_ik in pub_iks_list:
             pub_ik = pub_ik.lower().strip()
             iks_list.append(key_word(pub_id, pub_ik if pub_ik!='null' else bp_sg.UNKNOWN))
-            
+
     tks_list = []
     title_df = pd.DataFrame(corpus_df[wos_title_kw_col].fillna(''))
     title_df.columns = [title_temp_col]
@@ -232,8 +240,8 @@ def _build_keywords_wos(corpus_df, fails_dic, cols_tup):
     for pub_id in corpus_df[pub_id_col]:
         for token in tks_df.loc[pub_id, kept_tokens_col]:
             token = token.lower().strip()
-            tks_list.append(key_word(pub_id, token if token!='null' else bp_sg.UNKNOWN))                                   
-    
+            tks_list.append(key_word(pub_id, token if token!='null' else bp_sg.UNKNOWN))
+
     # Building a clean author keywords dataframe and accordingly updating the parsing success rate dict
     ak_keywords_df, fails_dic = build_item_df_from_tup(aks_list, kw_cols_List,
                                                        keyword_col, pub_id_col, fails_dic)
@@ -270,7 +278,7 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
         The built data will be as follows.
         - for the addresses data:
 
-             Pub_id  Idx_address                     Address   
+             Pub_id  Idx_address                     Address
                0         0        Tech Univ Carolo Wilhelmina Braunschweig, ...
                0         1        Univ Inst Lisbon, Inst Telecomunicac, Lisbon, Portugal
                0         2        Univ Grenoble Alpes, CEA, Leti, Grenoble, France
@@ -306,16 +314,16 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
     (pub_id_col, address_col, country_col, institution_col) = [cols_dic[key] for key in cols_keys]
     wos_cols_keys = ['wos_auth_with_aff_col', 'wos_fullnames_col']
     (wos_auth_with_aff_col, wos_fullnames_col) = [wos_cols_dic[key] for key in wos_cols_keys]
-    
+
     # Setting named tuples
     address_tup = namedtuple('address', address_cols_List)
     country_tup = namedtuple('country', country_cols_list)
     institution_tup = namedtuple('institution', inst_cols_list)
-    
+
     corpus_series_zip = zip(corpus_df[pub_id_col],
                             corpus_df[wos_fullnames_col],
                             corpus_df[wos_auth_with_aff_col])
-    
+
     addresses_list, countries_list, institutions_list = [], [], []
     for pub_id, authors_str, affiliations_str in corpus_series_zip:
         pub_addresses_list = []
@@ -329,16 +337,16 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
             for out_author in out_authors_list:
                 out_author_idx = authors_ordered_list.index(out_author)
                 out_author_address = set_unknown_address(out_author_idx, add_unknown_country=False)
-                pub_addresses_list.append(out_author_address)  
+                pub_addresses_list.append(out_author_address)
         else:
             # Format case: 'address1;address2...'
             pub_addresses_list = affiliations_str.split(';')
-        
+
         if pub_addresses_list:
             for address_idx, pub_raw_address in enumerate(pub_addresses_list):
                 pub_address = standardize_address(pub_raw_address, add_unknown_country=False)
                 addresses_list.append(address_tup(pub_id, address_idx, pub_address))
-                
+
                 main_institution = pub_address.split(',')[0]
                 institutions_list.append(institution_tup(pub_id, address_idx, main_institution))
 
@@ -349,7 +357,7 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
             addresses_list.append(address_tup(pub_id, 0, ''))
             institutions_list.append(institution_tup(pub_id, 0, ''))
             countries_list.append(country_tup(pub_id, 0, ''))
-    
+
     # Building a clean addresses dataframe and accordingly updating the parsing success rate dict
     address_df, fails_dic = build_item_df_from_tup(addresses_list, address_cols_List,
                                                    address_col, pub_id_col, fails_dic)
@@ -357,16 +365,16 @@ def _build_addresses_countries_institutions_wos(corpus_df, fails_dic, cols_tup):
     # Building a clean countries dataframe and accordingly updating the parsing success rate dict
     country_df, fails_dic = build_item_df_from_tup(countries_list, country_cols_list,
                                                    country_col, pub_id_col, fails_dic)
-    
+
     # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
     institution_df, fails_dic = build_item_df_from_tup(institutions_list, inst_cols_list,
                                                        institution_col, pub_id_col, fails_dic)
-    
+
     if not(len(address_df)==len(country_df)==len(institution_df)):
         warning = (f'WARNING: Lengths of "address_df", "country_df" and "institution_df" dataframes are not equal'
                    f'in "_build_addresses_countries_institutions_wos" function of "BiblioParsingWos.py" module')
         print(warning)
-    
+
     return address_df, country_df, institution_df
 
 
@@ -382,7 +390,7 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
     In addition, the built data may be expanded according to a filtering of affiliations. 
     The parsing is effective only for the format of the following example. Otherwise, the parsing 
     fields are set to UNKNOWN global.
-       
+
     For example, the 'Authors with affiliations' field string:
        '[Boujjat, Houssame] CEA, LITEN Solar & Thermodynam Syst Lab L2ST, F-38054 Grenoble, France; 
         [Boujjat, Houssame] Univ Grenoble Alpes, F-38000 Grenoble, France; 
@@ -394,32 +402,32 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
         [David, David] Lund University, Department of Physical Geography and Ecosystem Science (INES), Lund, Sweden'
 
     will be parsed in the "addr_country_inst_df" dataframe if affiliation filter is not defined (initialization step):
-   
-        Pub_id  Idx_author                     Address               Country    Norm_institutions              Raw_institutions     
+
+        Pub_id  Idx_author                     Address               Country    Norm_institutions              Raw_institutions
             0       0        CEA, LITEN Solar & Thermodynam , ...    France     CEA Nro;LITEN Rto              F-38054 Grenoble
             0       0        Univ Grenoble Alpes,...                 France     UGA Univ                       F-38000 Grenoble
-            0       1        CNRS, Proc Mat Lab, PROMES,...          France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...                          
-            0       2        CNRS, Proc Mat Lab, PROMES, ...         France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...    
-            0       3        CEA, Leti, 17 rue des Martyrs,...       France     CEA Nro;LETI Rto               17 rue des Martyrs;...         
-            0       4        CEA, Liten, INES. 50 avenue...          France     CEA Nro;LITEN Rto;INES Site    50 avenue du Lac Leman;...           
+            0       1        CNRS, Proc Mat Lab, PROMES,...          France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...
+            0       2        CNRS, Proc Mat Lab, PROMES, ...         France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...
+            0       3        CEA, Leti, 17 rue des Martyrs,...       France     CEA Nro;LETI Rto               17 rue des Martyrs;...
+            0       4        CEA, Liten, INES. 50 avenue...          France     CEA Nro;LITEN Rto;INES Site    50 avenue du Lac Leman;...
             0       5        CEA, INES, DTS, 50 avenue...            France     CEA Nro;INES Site              DTS;...
             0       6        Lund University,...(INES),...           Sweden     Lund Univ                      Department of Physical ...
-    
+
     the authors' identifiers are defined using the ordered list of the authors given by the corpus data.
     The institutions are identified and normalized using dedicated data that should be specified by the user.
-        
-    If affiliation filter is defined based on the following list of normalized affiliations: 
-        inst_filter_list = ['LITEN Rto', 'INES Campus', 'PROMES CNRS-Lab'), 'Lund Univ']. 
-        
+
+    If affiliation filter is defined based on the following list of normalized affiliations:
+        inst_filter_list = ['LITEN Rto', 'INES Campus', 'PROMES CNRS-Lab'), 'Lund Univ'].
+
     The "addr_country_inst_df" dataframe will be expended with the following columns (for pub_id = 0):
-            LITEN Rto    INES Site    PROMES CNRS-Lab     Lund Univ                   
-                 1            0              0                0             
-                 0            0              0                0                              
-                 0            0              1                0                     
-                 0            0              1                0             
-                 0            0              0                0             
-                 1            1              0                0                              
-                 0            1              0                0                              
+            LITEN Rto    INES Site    PROMES CNRS-Lab     Lund Univ
+                 1            0              0                0
+                 0            0              0                0
+                 0            0              1                0
+                 0            0              1                0
+                 0            0              0                0
+                 1            1              0                0
+                 0            1              0                0
                  0            0              0                1
 
     Args:
@@ -450,11 +458,11 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
     (pub_id_col, author_idx_col, norm_institution_col) = [cols_dic[key] for key in cols_keys]
     wos_cols_keys = ['wos_auth_with_aff_col', 'wos_fullnames_col']
     (wos_auth_with_aff_col, wos_fullnames_col) = [wos_cols_dic[key] for key in wos_cols_keys]
-    
+
     # Setting namedtuples
     addr_country_inst  = namedtuple('address',auth_inst_cols_list[:-1] )
     author_address_tup = namedtuple('author_address','author address')
-    
+
     # Building the useful data for affiliations normalization
     norm_raw_aff_dict = build_norm_raw_affiliations_dict(country_affiliations_file_path=country_affiliations_file_path,
                                                          verbose=False)
@@ -471,7 +479,7 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
     pub_num = 0
     addr_country_inst_list = []
     for pub_id, authors_str, affiliations_str in corpus_series_zip:
-        pub_num += 1 
+        pub_num += 1
         print("    Publications number:", pub_num, f"/ {pub_nb}", end="\r")
         if '[' in affiliations_str:
             # Proceeding if the field author is present in affiliations.
@@ -512,16 +520,16 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
                                                                     bp_sg.UNKNOWN_COUNTRY, bp_sg.EMPTY, bp_sg.EMPTY,))
         else:
             # If the field author is not present in affiliations complete namedtuple with the global UNKNOWN
-            addr_country_inst_list.append(addr_country_inst(pub_id, bp_sg.UNKNOWN, bp_sg.UNKNOWN, 
+            addr_country_inst_list.append(addr_country_inst(pub_id, bp_sg.UNKNOWN, bp_sg.UNKNOWN,
                                                             bp_sg.UNKNOWN, bp_sg.UNKNOWN, bp_sg.UNKNOWN,))
     # Building a clean addresses-country-inst dataframe and accordingly updating the parsing success rate dict
     addr_country_inst_df, fails_dic = build_item_df_from_tup(addr_country_inst_list, auth_inst_cols_list[:-1],
-                                                             norm_institution_col, pub_id_col, fails_dic)   
+                                                             norm_institution_col, pub_id_col, fails_dic)
     addr_country_inst_df = clean_authors_countries_institutions(addr_country_inst_df)
-    
+
     if inst_filter_list is not None:
         addr_country_inst_df = extend_author_institutions(addr_country_inst_df, inst_filter_list)
-        
+
     # Sorting the values in the dataframe returned by two columns
     addr_country_inst_df.sort_values(by=[pub_id_col, author_idx_col], inplace=True)
 
@@ -531,7 +539,7 @@ def _build_authors_countries_institutions_wos(corpus_df, fails_dic, cols_tup, in
 def _build_subjects_wos(corpus_df, fails_dic, cols_tup):
     """Builds the data of subject per publication of the corpus 
     and updates the parsing success rate data.
-    
+
     The structure of the built data is composed of 2 columns and one row 
     per publication and subject.
         Ex:
@@ -557,15 +565,15 @@ def _build_subjects_wos(corpus_df, fails_dic, cols_tup):
     cols_keys = ['pub_id_col', 'subject_col']
     (pub_id_col, subject_col) = [cols_dic[key] for key in cols_keys]
     wos_subjects_col = wos_cols_dic['wos_subjects_col']
-    
+
     # Setting named tuple
-    subject = namedtuple('subject', subject_cols_list)    
-    
+    subject = namedtuple('subject', subject_cols_list)
+
     subjects_list = []
     for pub_id, pub_subjects_str in zip(corpus_df[pub_id_col], corpus_df[wos_subjects_col]):
         for pub_subject in pub_subjects_str.split(';'):
             subjects_list.append(subject(pub_id, pub_subject.strip()))
-     
+
     # Building a clean subjects dataframe and accordingly updating the parsing success rate dict
     subjects_df, fails_dic = build_item_df_from_tup(subjects_list, subject_cols_list, 
                                                     subject_col, pub_id_col, fails_dic)
@@ -575,7 +583,7 @@ def _build_subjects_wos(corpus_df, fails_dic, cols_tup):
 def _build_sub_subjects_wos(corpus_df, fails_dic, cols_tup):
     """Builds the data of sub-subject per publication of the corpus 
     and updates the parsing success rate data.
-    
+
     The structure of the built data is composed of 2 columns and one row 
     per publication and sub-subject.
         Ex:
@@ -601,7 +609,7 @@ def _build_sub_subjects_wos(corpus_df, fails_dic, cols_tup):
     cols_keys = ['pub_id_col', 'sub_subject_col']
     (pub_id_col, sub_subject_col) = [cols_dic[key] for key in cols_keys]
     wos_sub_subjects_col = wos_cols_dic['wos_sub_subjects_col']
-    
+
     # Setting named tuple
     sub_subject = namedtuple('sub_subject', sub_subject_cols_list ) 
 
@@ -610,7 +618,7 @@ def _build_sub_subjects_wos(corpus_df, fails_dic, cols_tup):
         if isinstance(pub_sub_subjects_str, str):
             for pub_sub_subject in pub_sub_subjects_str.split(';'):
                 sub_subjects_list.append(sub_subject(pub_id, pub_sub_subject.strip()))
-    
+
     # Building a clean sub_subjects dataframe and accordingly updating the parsing success rate dict
     sub_subjects_df, fails_dic = build_item_df_from_tup(sub_subjects_list, sub_subject_cols_list, 
                                                         sub_subject_col, pub_id_col, fails_dic)    
@@ -631,7 +639,7 @@ def _build_articles_wos(corpus_df, cols_tup):
             Document_type	Language      Title         ISSN      Norm_journal
                Article	    English	   Automated...   1613-6810      small
                Article	    English	   The logari...  2731-3395      eng
-    
+
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
         cols_tup (tup): Columns information as built through \
@@ -645,7 +653,7 @@ def _build_articles_wos(corpus_df, cols_tup):
             return(int(float(x)))
         except:
             return 0
-    
+
     def _treat_author(authors_list):
         # Picking the first author
         raw_first_author = authors_list.split(';')[0]
@@ -655,13 +663,13 @@ def _build_articles_wos(corpus_df, cols_tup):
         firstname_initials = first_author.split(" ")[-1]
         first_author = (" ").join([lastname, firstname_initials.upper()])
         return first_author
-    
+
     def _treat_doctype(doctype):
         for doctype_key, doctype_list in bp_sg.DIC_DOCTYPE.items():
             if doctype in doctype_list:
                 doctype = doctype_key
         return doctype
-    
+
     def _treat_title(title):
         title = title.translate(bp_gg.DASHES_CHANGE)
         title = title.translate(bp_gg.LANG_CHAR_CHANGE)
@@ -681,19 +689,19 @@ def _build_articles_wos(corpus_df, cols_tup):
                      'wos_doctype_col', 'wos_language_col', 'wos_title_kw_col',
                      'wos_issn_col']
     wos_cols_list = [wos_cols_dic[key] for key in wos_cols_keys]
-    
+
     articles_wos_cols = wos_cols_list + [norm_journal_col]
     articles_df = corpus_df[articles_wos_cols].astype(str)
     articles_df.rename(columns=dict(zip(articles_wos_cols, articles_cols_list[1:])),
-                       inplace=True)    
-                                                                                                
-    articles_df[author_col] = articles_df[author_col].apply(_treat_author)    
+                       inplace=True)
+
+    articles_df[author_col] = articles_df[author_col].apply(_treat_author)
     articles_df[year_col] = articles_df[year_col].apply(_str_int_convertor)
     articles_df[doc_type_col] = articles_df[doc_type_col].apply(_treat_doctype)
     articles_df[title_col] = articles_df[title_col].apply(_treat_title)
-    
+
     articles_df.insert(0, pub_id_col, list(corpus_df[pub_id_col]))
-   
+
     return articles_df
 
 
@@ -721,10 +729,10 @@ def _build_references_wos(corpus_df, cols_tup):
     ref_cols_list = cols_lists_dic['ref_cols_list']
     pub_id_col = cols_dic['pub_id_col']
     wos_ref_col = wos_cols_dic['wos_ref_col']
- 
+
     # Setting named tuple
     article_ref = namedtuple('article_ref', ref_cols_list)
-    
+
     refs_list =[]
     for pub_id, row in zip(list(corpus_df[pub_id_col]),
                                 corpus_df[wos_ref_col]):
@@ -766,7 +774,7 @@ def _build_references_wos(corpus_df, cols_tup):
 
                 if (vol==0) & (page==0) & (author!=bp_sg.UNKNOWN):
                     pass
-    
+
     references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list] 
                                             for idx,label in enumerate(ref_cols_list)})
     return references_df
@@ -774,7 +782,7 @@ def _build_references_wos(corpus_df, cols_tup):
 
 def read_database_wos(rawdata_path, wos_ids=False):
     """Reads the file of WoS rawdata available in the indicated folder.
- 
+
     The function:
     - Allows to circumvent the error ParserError ('	' expected after '"') generated \
     by the method `pd.read_csv` when reading the raw wos-database file
@@ -805,15 +813,15 @@ def read_database_wos(rawdata_path, wos_ids=False):
     # Initializing returned data to empty dataframes
     wos_rawdata_df = pd.DataFrame()
     wos_ids_df = pd.DataFrame()
-    
+
     # Check if rawdata file is available and get its full path if it is
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.WOS_RAWDATA_EXTENT)
 
-    if rawdata_file_path: 
+    if rawdata_file_path:
         # Extending the field size limit for reading .txt files
         csv.field_size_limit(bp_sg.FIELD_SIZE_LIMIT)
 
-        with open(rawdata_file_path, 'rt', encoding=bp_sg.ENCODING) as csv_file: 
+        with open(rawdata_file_path, 'rt', encoding=bp_sg.ENCODING) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
             csv_list = []
             for row in csv_reader:
@@ -830,7 +838,7 @@ def read_database_wos(rawdata_path, wos_ids=False):
             wos_rawdata_df = wos_rawdata_df.replace(np.nan, bp_sg.UNKNOWN, regex=True)
             wos_rawdata_df = normalize_journal_names(bp_sg.WOS, wos_rawdata_df)
             return_tup = (wos_rawdata_df)
-        
+
             if wos_ids:
                 # Building the WoS-IDs data
                 wos_ids_df = build_pub_db_ids(full_wos_rawdata_df, init_wos_id_col, wos_id_col)
@@ -874,7 +882,7 @@ def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_
         (tup): (The parsed data (dataframes) as values of a dict keyed by parsing items, \
         The parsing success rate data (dict), The data (dataframe) of WoS IDs of publications.
     """
-    # Internal functions    
+    # Internal functions
     def _keeping_item_parsing_results(item, item_df):
         wos_parsing_dict[item] = item_df
 
@@ -887,26 +895,26 @@ def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_
     (articles_item, authors_item, addresses_item, countries_item, institutions_item,
      auth_inst_item, authors_kw_item, index_kw_item, title_kw_item, subjects_item,
      sub_subjects_item, references_item) = items_list
-    
+
     # Reading and checking the raw corpus file
     corpus_df, wos_ids_df = read_database_wos(rawdata_path, wos_ids=True)
-    
+
     # Initializing the fails_dic dict for the parsing control
-    wos_fails_dic = {}    
-    
+    wos_fails_dic = {}
+
     # Initializing the dict of dataframes resulting from the parsing
     wos_parsing_dict = {}
-    
+
     if corpus_df is not None:
-        
+
         # Keeping the number of articles in wos_fails_dic dict
         wos_fails_dic['number of article'] = len(corpus_df)
-    
+
         # Building the dataframe of articles
         print(f"  - {articles_item} parsing...", end="\r")
         articles_df = _build_articles_wos(corpus_df, cols_tup)
         _keeping_item_parsing_results(articles_item, articles_df)
-        print(f"  - {articles_item} parsed    ")    
+        print(f"  - {articles_item} parsed    ")
 
         # Building the dataframe of authors
         print(f"  - {authors_item} parsing...", end="\r")
@@ -959,5 +967,5 @@ def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_
         references_df = _build_references_wos(corpus_df, cols_tup)
         _keeping_item_parsing_results(references_item, references_df)
         print(f"  - {references_item} parsed    ")
-        
+
     return wos_parsing_dict, wos_fails_dic, wos_ids_df
