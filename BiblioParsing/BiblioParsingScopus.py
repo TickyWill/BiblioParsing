@@ -35,6 +35,7 @@ from BiblioParsing.BiblioParsingUtils import normalize_name
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 from BiblioParsing.BiblioParsingUtils import set_unknown_address
 from BiblioParsing.BiblioParsingUtils import standardize_address
+from BiblioParsing.BiblioParsingUtils import standardize_str
 
 
 def _set_scopus_parsing_cols():
@@ -1036,8 +1037,7 @@ def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
         auth_affil_nb = len(check_auth_affil_list)
         if authors_nb!=auth_affil_nb:
             authors_status, affil_status = 0, 0
-            auth_false_sep = ";"
-            auth_correct_sep = ""
+            auth_false_sep, auth_correct_sep= ";", ""
             if any(auth_false_sep in s for s in authors_list):
                 new_authors_list = [x.replace(auth_false_sep, auth_correct_sep) for x in authors_list]
                 new_auth_affil_list = [x.replace(auth_false_sep, auth_correct_sep) for x in auth_affil_list]
@@ -1132,7 +1132,7 @@ def _check_authors(corpus_df, check_cols, verbose=False):
         (tup): (The corrected full rawdata of the corpus (dataframe), \
         The data (dataframe) of corrected authors).
     """
-    pub_id_col, authors_col, fullname_col, auth_affil_col = check_cols
+    pub_id_col, authors_col, fullname_col, affil_col, auth_affil_col = check_cols
     corrected_authors_data = []
     new_corpus_df = corpus_df.copy()
     for row_idx, row in corpus_df.iterrows():
@@ -1141,7 +1141,8 @@ def _check_authors(corpus_df, check_cols, verbose=False):
         # Removing accentuated characters
         authors_str = remove_special_symbol(row[authors_col])
         fullnames_str = remove_special_symbol(row[fullname_col])
-        auth_affil_str = remove_special_symbol(row[auth_affil_col])
+        auth_affil_str = standardize_str(row[auth_affil_col])
+        aff_str = standardize_str(row[affil_col])
 
         # Building dict keyyed by author and valued by a tuple
         # composed of fullname and author-with-affiliations
@@ -1164,6 +1165,7 @@ def _check_authors(corpus_df, check_cols, verbose=False):
         # Updating the corpus data with the corrected lists
         new_corpus_df.loc[row_idx, authors_col] = "; ".join(new_authors_list)
         new_corpus_df.loc[row_idx, auth_affil_col] = "; ".join(new_auth_affils_list)
+        new_corpus_df.loc[row_idx, affil_col] = aff_str
     correction_cols = [pub_id_col, authors_col, "Corrected " + authors_col]
     corrected_authors_df = pd.DataFrame(corrected_authors_data, columns=correction_cols)
     return new_corpus_df, corrected_authors_df
@@ -1191,8 +1193,8 @@ def _correct_scopus_full_rawdata(corpus_df, cols_tup):
 
     affil_check_cols = [pub_id_col, scopus_auth_col,
                         scopus_aff_col, scopus_auth_with_aff_col]
-    auth_check_cols = [pub_id_col, scopus_auth_col,
-                       scopus_fullnames_col, scopus_auth_with_aff_col]
+    auth_check_cols = [pub_id_col, scopus_auth_col, scopus_fullnames_col,
+                       scopus_aff_col, scopus_auth_with_aff_col]
 
     # Setting the pub_id in df index
     corpus_df.index = range(len(corpus_df))

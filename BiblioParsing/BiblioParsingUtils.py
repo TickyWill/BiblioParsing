@@ -13,6 +13,7 @@ __all__ = ['build_item_df_from_tup',
            'set_rawdata_error',
            'set_unknown_address',
            'standardize_address',
+           'standardize_str',
            'upgrade_col_names',
            ]
 
@@ -522,15 +523,39 @@ def remove_special_symbol(text, only_ascii=True, strip=True):
     return text
 
 
+def standardize_str(raw_str):
+    """Standardize a general string without implicite origin of the string.
+
+    First, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global, apostrophes are replaced 
+    by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are droped 
+    using 'SYMB_DROP' global. These globals are imported from the `BiblioParsing` package imported as "bp". 
+    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion of the same module.
+
+    Args:
+        raw_str (str): the raw string to be standardized.
+    Returns:
+        (str): The standardized string.
+    """
+    # Uniformizing dashes
+    standard_str = raw_str.translate(bp_gg.DASHES_CHANGE)
+
+    # Uniformizing apostrophes
+    standard_str = standard_str.translate(bp_gg.APOSTROPHE_CHANGE)
+
+    # Dropping symbols
+    standard_str = standard_str.translate(bp_gg.SYMB_DROP)
+
+    # Uniformizing words
+    standard_str = remove_special_symbol(standard_str)
+    return standard_str
+
+
 def standardize_address(raw_address, add_unknown_country=True):
     """Standardizes the string 'raw_address' by replacing all aliases of a word, 
     such as 'University', 'Institute', 'Center' and' Department', by a standardized 
     version.
 
-    First, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global, apostrophes are replaced 
-    by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are droped 
-    using 'SYMB_DROP' global. These globals are imported from the `BiblioParsing` package imported as "bp". 
-    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion of the same module. 
+    First, the address string is standardized through the `standardize_str` function of the same module. 
     Then, the aliases of a given word are captured using a specific regex which is case sensitive defined 
     by the global 'DIC_WORD_RE_PATTERN' imported from the `BiblioParsing` package imported as "bp". 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
@@ -548,17 +573,10 @@ def standardize_address(raw_address, add_unknown_country=True):
     Returns:
         (str): The full standardized address.
     """
-    # Uniformizing dashes
-    standard_address = raw_address.translate(bp_gg.DASHES_CHANGE)
-
-    # Uniformizing apostrophes
-    standard_address = standard_address.translate(bp_gg.APOSTROPHE_CHANGE)
-
-    # Dropping symbols
-    standard_address = standard_address.translate(bp_gg.SYMB_DROP)
+    # Removing particular characters
+    standard_address = standardize_str(raw_address)
 
     # Uniformizing words
-    standard_address = remove_special_symbol(standard_address)
     for word_to_substitute, re_pattern in bp_sg.DIC_WORD_RE_PATTERN.items():
         if word_to_substitute=='University':
             re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
