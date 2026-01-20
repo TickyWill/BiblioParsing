@@ -111,7 +111,7 @@ def clean_authors_countries_institutions(auth_addr_country_inst_df):
     columns_list = auth_addr_country_inst_df.columns
     (pub_id_col, author_col, address_col, country_col,
      norm_aff_col, raw_aff_col) = columns_list[0:6]
-    
+
     new_auth_addr_country_inst_df = pd.DataFrame(columns=columns_list)
     for pub_id, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_col):
         new_pub_id_dg = pd.DataFrame(columns=columns_list)
@@ -120,16 +120,16 @@ def clean_authors_countries_institutions(auth_addr_country_inst_df):
             if len(author_dg)>1:
                 country_list = list(set(author_dg[country_col].to_list()))
                 new_author_dg[country_col] = "; ".join(country_list)
-                
+
                 address_list = author_dg[address_col].to_list()
                 new_author_dg[address_col] = "; ".join(address_list)
-                
+
                 norm_aff_list = list(set(author_dg[norm_aff_col].to_list()) - {bp_sg.EMPTY})
                 new_author_dg[norm_aff_col] = "; ".join(norm_aff_list)
-                
+
                 raw_aff_list = list(set(author_dg[raw_aff_col].to_list()) - {bp_sg.EMPTY})
                 new_author_dg[raw_aff_col] = "; ".join(raw_aff_list)
-                
+
                 new_author_dg.drop_duplicates(subset=[pub_id_col, author_col], inplace=True)
                 new_pub_id_dg = pd.concat([new_pub_id_dg, new_author_dg])
             else:
@@ -142,13 +142,13 @@ def clean_authors_countries_institutions(auth_addr_country_inst_df):
 
 def build_title_keywords(df):
     """Given the dataframe 'df' with one column 'title':
-    
+
                     Title
             0  Experimental and CFD investigation of inert be...
             1  Impact of Silicon/Graphite Composite Electrode...
-            
+
     the function 'build_title_keywords':
-    
+
        1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
     in all the article titles of the corpus. The tokens are the words of the title with nltk tags 
     belonging to the global list 'NLTK_VALID_TAG_LIST'.
@@ -159,7 +159,7 @@ def build_title_keywords(df):
     [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
     of # occurrences token_i.
        4- Suppress words pertening to BLACKLISTED_WORDS to the list from the bag of words
-    
+
     Args:
        df (dataframe): Data of publication title per publication identifier.
 
@@ -172,14 +172,14 @@ def build_title_keywords(df):
        where tuple i is (word_i,# occurrence_i). 
     """
     # To Do: update docstring
-    
+
     def tokenizer(text):
         """Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
         NLTK_VALID_TAG_LIST are kept.
-        
+
         ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
         gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
-        
+
         Args:
             text (string): String to tokenize
         Returns
@@ -190,26 +190,26 @@ def build_title_keywords(df):
                        if pos in bp_sg.NLTK_VALID_TAG_LIST] 
 
         stemmer = nltk.stem.WordNetLemmatizer()
-        valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]    
-        return valid_words_lemmatized        
+        valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
+        return valid_words_lemmatized
 
     title_alias = bp_sg.COL_NAMES['temp_col'][2]
     title_tokens_alias = bp_sg.COL_NAMES['temp_col'][3]
     kept_tokens_alias = bp_sg.COL_NAMES['temp_col'][4]
-    
+
     df[title_tokens_alias] = df[title_alias].apply(tokenizer)
 
     # Removing the blacklisted words from the bag of words
-    bag_of_words = np.array(df[title_tokens_alias].sum()) 
+    bag_of_words = np.array(df[title_tokens_alias].sum())
     for remove in bp_sg.BLACKLISTED_WORDS:
-        bag_of_words = bag_of_words[bag_of_words!=remove] 
+        bag_of_words = bag_of_words[bag_of_words!=remove]
 
     bag_of_words_occurrences = list(Counter(bag_of_words).items())
     bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
 
-    title_keywords = set([x for x, y in bag_of_words_occurrences if y>=bp_sg.NOUN_MINIMUM_OCCURRENCES])    
+    title_keywords = set([x for x, y in bag_of_words_occurrences if y>=bp_sg.NOUN_MINIMUM_OCCURRENCES])
     df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(title_keywords.intersection(set(x))))
-   
+
     return (df, bag_of_words_occurrences)
 
 
@@ -330,13 +330,13 @@ def normalize_journal_names(database, corpus_df):
     These normalized and simplified journal names are mainly used 
     when concatenating two corpus (wos, scopus, ...) using slightly
     different name for the same journal.
-   
+
     Args:
         database (string): Type of data among the ones defined \
         by SCOPUS and WOS globals.
         corpus_df (dataframe): corpus dataframe to be normalized \
         in terms of journal names.
-       
+
     Returns:
         (dataframe): The data with an additional column containing \
         the normalized journal names.
@@ -360,10 +360,10 @@ def normalize_journal_names(database, corpus_df):
     else:
         raise Exception(f"Sorry, unrecognized database {database}: "
                         f"should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
-    
+
     norm_journal_alias = bp_sg.NORM_JOURNAL_COLUMN_LABEL
     corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
-    
+
     return corpus_df
 
 
@@ -371,7 +371,7 @@ def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
 
     # Setting useful aliases
     pub_id_col_alias = bp_sg.COL_NAMES['pub_id']
-    
+
     # Setting the pub_id in rawdata_df index
     rawdata_df.index = range(len(rawdata_df))
 
@@ -383,40 +383,40 @@ def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
     db_ids_df = init_db_ids_df.rename(columns={init_db_id_col: db_id_col})
     return db_ids_df
 
-        
+
 def check_and_drop_columns(database, init_df):
-    
+
     df = init_df.copy()
-    
+
     # Setting useful aliases
     pub_id_col_alias    = bp_sg.COL_NAMES["pub_id"]
     wos_col_issn_alias  = bp_sg.COLUMN_LABEL_WOS["issn"]
-    wos_col_eissn_alias = bp_sg.COLUMN_LABEL_WOS_PLUS["e_issn"] 
+    wos_col_eissn_alias = bp_sg.COLUMN_LABEL_WOS_PLUS["e_issn"]
 
     # Check for missing mandatory columns
     if database==bp_sg.WOS:
         cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val] + [wos_col_eissn_alias])
     elif database==bp_sg.SCOPUS:
-        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_SCOPUS.values() if val])    
+        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_SCOPUS.values() if val])
     else:
         raise Exception(f"Sorry, unrecognized database {database} : should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
-        
+
     cols_available = set(df.columns)
     missing_columns = cols_mandatory.difference(cols_available)
     if missing_columns:
         error_text  = f'The mandarory columns: {",".join(missing_columns)} are missing '
         error_text += f'in rawdata extracted from {database}.\nPlease correct before proceeding.'
         raise Exception(error_text)
-    
+
     # Setting issn to e_issn if issn not available for wos
     if database==bp_sg.WOS:
         df = df.replace('',np.nan,regex=True) # To allow the use of combine_first
         df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
         df = df.dropna(axis = 0, how = 'all')
         cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val])
-        
-        
-    # Droping unused columns    
+
+
+    # Droping unused columns
     cols_to_drop = list(cols_available.difference(cols_mandatory))
     df.drop(cols_to_drop, axis=1, inplace=True)
 
@@ -425,11 +425,11 @@ def check_and_drop_columns(database, init_df):
     df = df.rename_axis(pub_id_col_alias).reset_index()
     return df
 
-                    
+
 def upgrade_col_names(corpus_folder):
     """Add names to the colummn of the parsing and filter_<i> files to take into account the
     upgrage of BiblioParsing package.
-    
+
     Args:
         corpus_folder (str): folder of the corpus to be adapted
     """
@@ -455,7 +455,7 @@ def upgrade_col_names(corpus_folder):
                           and (file!='keywords.dat') ]:   # Unused this file is no longer generated
                 try:
                     df = pd.read_csv(os.path.join(dirpath, file), sep='\t', header=None)
-                    
+
                     if df.loc[0].tolist()==bp_sg.COL_NAMES[dict_filename_conversion[file]]:
                         print(f'The file {os.path.join(dirpath,file)} is up to date')
                     else:
@@ -479,28 +479,28 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
         text (str): The string where changes will be done.
     Returns:
         (str): The modified string.
-    """    
-    if dic_town_symbols==None:   
+    """
+    if dic_town_symbols==None:
         dic_town_symbols = bp_sg.DIC_TOWN_SYMBOLS
     if dic_town_words==None:
         dic_town_words = bp_sg.DIC_TOWN_WORDS
-    
+
     # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
     for town_symb in dic_town_symbols.keys():
         text = text.replace(town_symb, dic_town_symbols[town_symb])
 
     # Uniformizing words in town names using the dict 'DIC_TOWN_WORDS'
     for town_word in dic_town_words.keys():
-        text = text.replace(town_word, dic_town_words[town_word])    
+        text = text.replace(town_word, dic_town_words[town_word])
     return text
 
 
 def remove_special_symbol(text, only_ascii=True, strip=True):
     """The function `remove_special_symbol` removes accentuated characters in the string 'text'
     and ignore non-ascii characters if 'only_ascii' is true.
-    
+
     Finally, spaces at the ends of 'text' are removed if strip is true.
-    
+
     Args:
         text (str): The text where to remove special symbols.
         only_ascii (boolean): If True, non-ascii characters are removed from 'text' (default: True).
@@ -527,7 +527,11 @@ def standardize_address(raw_address, add_unknown_country=True):
     such as 'University', 'Institute', 'Center' and' Department', by a standardized 
     version.
 
-    The aliases of a given word are captured using a specific regex which is case sensitive defined 
+    First, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global, apostrophes are replaced 
+    by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are droped 
+    using 'SYMB_DROP' global. These globals are imported from the `BiblioParsing` package imported as "bp". 
+    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion of the same module. 
+    Then, the aliases of a given word are captured using a specific regex which is case sensitive defined 
     by the global 'DIC_WORD_RE_PATTERN' imported from the `BiblioParsing` package imported as "bp". 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
     The length of the aliases is limited to a maximum according to the longest alias known.
@@ -535,9 +539,6 @@ def standardize_address(raw_address, add_unknown_country=True):
             Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
             with possibly before one symbol among a to z and after up to 8 symbols from the list 
             '[aàäcdeéirstyz]' and possibly finishing with a dot. 
-    Then, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global and apostrophes are replaced 
-    by the standard cote using 'APOSTROPHE_CHANGE' global. 
-    The globals are imported from the `BiblioParsing` package imported as "bp". 
     Finally, the country is normalized through the `normalize_country` function of the same module.
 
     Args:
@@ -547,23 +548,23 @@ def standardize_address(raw_address, add_unknown_country=True):
     Returns:
         (str): The full standardized address.
     """
-    # Uniformizing words
-    standard_address = remove_special_symbol(raw_address)
-    for word_to_substitute, re_pattern in bp_sg.DIC_WORD_RE_PATTERN.items():
-        if word_to_substitute=='University':
-            re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
-        standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
-    standard_address = re.sub(r'\s+', ' ', standard_address)
-    standard_address = re.sub(r'\s,', ',', standard_address)
-
     # Uniformizing dashes
-    standard_address = standard_address.translate(bp_gg.DASHES_CHANGE)
+    standard_address = raw_address.translate(bp_gg.DASHES_CHANGE)
 
     # Uniformizing apostrophes
     standard_address = standard_address.translate(bp_gg.APOSTROPHE_CHANGE)
 
     # Dropping symbols
     standard_address = standard_address.translate(bp_gg.SYMB_DROP)
+
+    # Uniformizing words
+    standard_address = remove_special_symbol(standard_address)
+    for word_to_substitute, re_pattern in bp_sg.DIC_WORD_RE_PATTERN.items():
+        if word_to_substitute=='University':
+            re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
+        standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
+    standard_address = re.sub(r'\s+', ' ', standard_address)
+    standard_address = re.sub(r'\s,', ',', standard_address)
 
     # Uniformizing countries
     country_pos = -1
@@ -573,11 +574,11 @@ def standardize_address(raw_address, add_unknown_country=True):
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     country_chunck = " " + country
     if country==bp_sg.UNKNOWN_COUNTRY:
-        if add_unknown_country:   
+        if add_unknown_country:
             standard_address = ','.join(first_raw_affiliations_list + [country_chunck])
         else:
             standard_address = ','.join(first_raw_affiliations_list)
     else:
         standard_address = ','.join(first_raw_affiliations_list[:-1] + [country_chunck])
-    
+
     return standard_address
