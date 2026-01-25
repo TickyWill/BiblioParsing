@@ -940,7 +940,7 @@ def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_
                                                                  country_towns_file = country_towns_file,
                                                                  country_towns_folder_path = country_towns_folder_path)
         _keeping_item_parsing_results(auth_inst_item, auth_inst_df)
-        print(f"       {auth_inst_item} parsed    ")
+        print(f"  - {auth_inst_item} parsed                     ")
 
         # Building the dataframes of keywords
         print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsing...", end="\r")
