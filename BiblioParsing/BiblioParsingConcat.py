@@ -1,4 +1,4 @@
-__all__ = ['concatenate_parsing', 
+__all__ = ['concatenate_parsing',
            'deduplicate_parsing']
 
 
@@ -29,7 +29,7 @@ def _set_dedup_cols():
                 'authors_col'            : bp_sg.COL_NAMES['articles'][1],
                 'page_col'               : bp_sg.COL_NAMES['articles'][5],
                 'doi_col'                : bp_sg.COL_NAMES['articles'][6],
-                'doc_type_col'           : bp_sg.COL_NAMES['articles'][7], 
+                'doc_type_col'           : bp_sg.COL_NAMES['articles'][7],
                 'title_col'              : bp_sg.COL_NAMES['articles'][9],
                 'issn_col'               : bp_sg.COL_NAMES['articles'][10],
                 'author_idx_col'         : bp_sg.COL_NAMES['authors'][1],
@@ -37,7 +37,7 @@ def _set_dedup_cols():
                 'country_addr_idx_col'   : bp_sg.COL_NAMES['country'][1],
                 'inst_addr_idx_col'      : bp_sg.COL_NAMES['institution'][1],
                 'auth_inst_auth_idx_col' : bp_sg.COL_NAMES['auth_inst'][1],
-                'lc_title_col'           : bp_sg.COL_NAMES['temp_col'][0], 
+                'lc_title_col'           : bp_sg.COL_NAMES['temp_col'][0],
                 'lc_doc_type_col'        : bp_sg.COL_NAMES['temp_col'][5],
                 'lc_doi_col'             : bp_sg.COL_NAMES['temp_col'][6],
                 'same_journal_col'       : bp_sg.COL_NAMES['temp_col'][1],
@@ -58,7 +58,7 @@ def _concatenate_item_dfs(item, first_corpus_df, second_corpus_df, pub_id_col):
     Returns:
         (dataframe): The item's concatenated data.
     """
-    # Incrementing the "pub_id_col" column values of second corpus by first corpus length 
+    # Incrementing the "pub_id_col" column values of second corpus by first corpus length
     first_corpus_articles_nb = max(first_corpus_df[pub_id_col]) + 1
     new_second_corpus_df = second_corpus_df.copy()
     new_second_corpus_df[pub_id_col] = new_second_corpus_df[pub_id_col] + first_corpus_articles_nb
@@ -86,7 +86,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
                                     resulting from the parsing of the second corpus.
         inst_filter_list (list): The affiliations-filter composed of a list of normalized \
         affiliations (str), optional (default=None).
-    Returns: 
+    Returns:
         (dict): Dict with keys as parsing items (str) and values (dataframe) as \
         the concatenated data.
     """
@@ -136,7 +136,7 @@ def _find_value_to_keep(dg, column_name, length_max=False):
 
 
 def _setting_same_journal_name(df, norm_journal_col, same_journal_col, similar):
-    print("    Setting same journal names...")
+    print("      - Setting same journal names...")
     journals_list = df[norm_journal_col].to_list()
     journal_df = pd.DataFrame(journals_list, columns=[same_journal_col])
     lines_nb = len(journal_df)
@@ -148,17 +148,17 @@ def _setting_same_journal_name(df, norm_journal_col, same_journal_col, similar):
                 j1_set, j2_set = set(j1.split()), set(j2.split())
                 common_words = j2_set.intersection(j1_set)
                 j1_specific_words, j2_specific_words = (j1_set - common_words), (j2_set - common_words)
-                similarity = round(similar(j1, j2)*100)    
+                similarity = round(similar(j1, j2)*100)
                 if (similarity>bp_sg.SIMILARITY_THRESHOLD) or (j1_specific_words==set() or j2_specific_words==set()):
                     journal_df.loc[journal_df[same_journal_col]==j2] = j1
-        print(f"        Number of journals searched: {j1_idx} / {lines_nb}", end="\r")
+        print(f"            Number of journals searched: {j1_idx} / {lines_nb}", end="\r")
     df.reset_index(inplace=True, drop=True)
     same_journal_name_df = pd.concat([df, journal_df], axis=1)
     return same_journal_name_df
 
 
 def _setting_same_article_title(df, title_col, lc_title_col, similar, norm_title):
-    print("\n    Setting same publication's title...")
+    print("      - Setting same publication's title...")
     titles_list = df[title_col].to_list()
     title_df = pd.DataFrame(titles_list, columns=[lc_title_col])
     lines_nb = len(title_df)
@@ -173,7 +173,7 @@ def _setting_same_article_title(df, title_col, lc_title_col, similar, norm_title
                 similarity = round(similar(t1, t2)*100)
                 if (similarity>bp_sg.SIMILARITY_THRESHOLD) or (t1_specific_words==set() or t2_specific_words==set()):
                     title_df.loc[title_df[lc_title_col]==t2] = t1
-            print(f"        Number of titles searched: {t1_idx}  / {lines_nb}", end="\r")
+            print(f"            Number of titles searched: {t1_idx}  / {lines_nb}", end="\r")
     title_df[lc_title_col] = title_df[lc_title_col].str.lower()
     title_df[lc_title_col] = title_df[lc_title_col].apply(norm_title)
     df.reset_index(inplace=True, drop=True)
@@ -322,7 +322,7 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
                 a list of dataframes each of them containing a line that is a duplicate in the articles dataframe,
                 and a list of the duplicate indices.
     """
-    print("\nDeduplicating publications main data...")
+    print("  - Deduplicating publications main data...")
 
     # Setting useful internal functions
 
@@ -363,17 +363,17 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     # Setting same journal name for similar journal names
     inter1_articles_concat_df = _setting_same_journal_name(init_articles_concat_df, norm_journal_col,
                                                            same_journal_col, similar)
-    print("\n    Column with unique journal name added to the initial concatenated-data of the publications.")
+    print("  - Column with unique journal name added to the initial concatenated-data of the publications.")
 
     # Setting same article title for similar article title
     inter2_articles_concat_df = _setting_same_article_title(inter1_articles_concat_df, title_col,
                                                             lc_title_col, similar, norm_title)
-    print("\n    Publications' titles standardized.")
+    print("  - Titles of publications standardized.                        ")
 
     # Setting issn when unknown for given article ID using available issn values
     # of journals of same normalized names from other article IDs
     issn_articles_concat_df = _setting_issn(inter2_articles_concat_df, same_journal_col, issn_col)
-    print("\n    Available ISSN value set common to journals with same name.")
+    print("  - Available ISSN value set common to journals with same name.")
 
     # Adding useful temporal columns
     issn_articles_concat_df[lc_title_col] = issn_articles_concat_df[lc_title_col].str.lower()
@@ -384,20 +384,20 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     # of articles of same title from other article IDs
     # Modification on 09-2023
     doi_articles_concat_df = _setting_doi(issn_articles_concat_df, lc_title_col, doi_col)
-    print("    Available DOI value set common to publications with same title.")
+    print("  - Available DOI value set common to publications with same title.")
 
     # Setting document type when unknown for given article ID using available document type values
     # of articles of same DOI from other article IDs
     # Modification on 09-2023
     doctype_articles_concat_df = _setting_doc_type(doi_articles_concat_df, doi_col, doc_type_col)
-    print("    Available document-type value set common to publications with same DOI.")
+    print("  - Available document-type value set common to publications with same DOI.")
 
     # Setting same DOI for similar titles when any DOI is unknown
     # for same first author, page, document type and ISSN
     # Modification on 09-2023
     cols_list = [authors_col, lc_doc_type_col, issn_col, page_col, doi_col, lc_title_col, lc_doi_col]
     title_articles_concat_df = _setting_same_doi(doctype_articles_concat_df, cols_list)
-    print("    Available DOI value set common to publications with same first author, page, document type and ISSN.")
+    print("  - Available DOI value set common to publications with same first author, page, document type and ISSN.")
 
     # Setting same first author name for same page, document type and ISSN 
     # when DOI is unknown or DOIs are different
@@ -405,7 +405,7 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     cols_list = [lc_doc_type_col, issn_col, lc_title_col, page_col,
                  pub_id_col, authors_col, lc_doi_col]
     author_articles_concat_df = _setting_same_first_author_name(title_articles_concat_df, cols_list)
-    print("    Same first author name set common to publications with same page, document type and ISSN.")
+    print("  - Same first author name set common to publications with same page, document type and ISSN.")
 
     # Keeping copy of author_articles_concat_df with completed same_journal_col, issn_col, doi_col and doc_type_col columns
     full_articles_concat_df = author_articles_concat_df.copy()
@@ -413,19 +413,19 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     # Dropping duplicated publication data after merging by doi or, for unknown doi, by title and document type
     cols_list = [lc_doi_col, title_col, doc_type_col, lc_title_col, lc_doc_type_col]
     doi_articles_dedup_df = _dropping_duplicate_article1(author_articles_concat_df, cols_list)
-    print("    Publication data with same DOI deduplicated on DOI except for unknown DOI.")
-    print("    Publication data with unknown DOI deduplicated on title and document type.")
+    print("  - Publication data with same DOI deduplicated on DOI except for unknown DOI.")
+    print("  - Publication data with unknown DOI deduplicated on title and document type.")
 
     # Dropping duplicated publication data after merging by title, document type and journal
     cols_list = [lc_title_col, lc_doc_type_col, same_journal_col, lc_doi_col, pub_id_col]
     articles_dedup_df = _dropping_duplicate_article2(doi_articles_dedup_df, cols_list)
-    print("    Publication data deduplicated on title, document type and journal.")
+    print("  - Publication data deduplicated on title, document type and journal.")
 
     # Identifying the set of articles IDs to drop in the other parsing files of the concatenated corpus
     pub_id_set_init = set(full_articles_concat_df[pub_id_col].to_list())
     pub_id_set_end  = set(articles_dedup_df[pub_id_col].to_list())
     pub_id_to_drop  = pub_id_set_init - pub_id_set_end
-    print("    List of publication identifiers to drop in other concatenated parsing data built.")
+    print("  - List of publication identifiers to drop in other concatenated parsing data built.")
 
     # Setting usefull prints
     articles_nb_init = len(full_articles_concat_df)
