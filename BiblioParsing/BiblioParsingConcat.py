@@ -296,7 +296,7 @@ def _dropping_duplicate_article2(df, cols_list):
                                   f'in "_deduplicate_articles" function '
                                   f'called by "parsing_concatenate_deduplicate" function '
                                   f'of "BiblioParsingConcat.py" module.\n'
-                                  f'Publications data with DOIs "{bp_sg.UNKNOWN}" has been droped.')
+                                  f'Publications data with DOIs "{bp_sg.UNKNOWN}" has been droped')
             print(warning)
         dfs_list.append(dg)
     if dfs_list!=[]:

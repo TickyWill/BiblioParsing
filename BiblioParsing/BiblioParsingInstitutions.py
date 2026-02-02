@@ -42,6 +42,7 @@ def _set_norm_affiliations_cols():
                      }
 
     cols_dic = {'pub_id_col'          : bp_sg.COL_NAMES['pub_id'],
+                'address_id_col'      : bp_sg.COL_NAMES['address'][1],
                 'address_col'         : bp_sg.COL_NAMES['address'][2],
                 'country_col'         : bp_sg.COL_NAMES['country'][2],
                 'institution_col'     : bp_sg.COL_NAMES['institution'][2],
@@ -206,7 +207,7 @@ def _build_address_affiliations_lists(std_address, norm_raw_aff_dict, aff_type_d
         print()
         print('Affiliations list:                 ', affiliations_list)
         print('Modified affiliations list:        ', affiliations_list_mod)
-        print('Affiliations dropped:              ', affiliations_drop) 
+        print('Affiliations dropped:              ', affiliations_drop)
 
     if country in norm_raw_aff_dict.keys():
         return_tup = _get_norm_affiliations_list(country, affiliations_list_mod, norm_raw_aff_dict, 
@@ -1167,8 +1168,8 @@ def build_norm_raw_institutions(addresses_df, inst_types_file_path=None, country
     cols_lists_dic, cols_dic = _set_norm_affiliations_cols()
     cols_lists_keys = ['country_cols_list', 'inst_cols_list']
     country_cols_list, inst_cols_list = [cols_lists_dic[key] for key in cols_lists_keys]
-    cols_keys = ['pub_id_col', 'address_col', 'country_col', 'institution_col']
-    pub_id_col, address_col, country_col, institution_col = [cols_dic[key] for key in cols_keys]
+    cols_keys = ['pub_id_col', 'address_id_col', 'address_col', 'country_col', 'institution_col']
+    pub_id_col, address_id_col, address_col, country_col, institution_col = [cols_dic[key] for key in cols_keys]
 
     # Setting useful cols lists
     norm_inst_cols_list = inst_cols_list
@@ -1200,11 +1201,13 @@ def build_norm_raw_institutions(addresses_df, inst_types_file_path=None, country
         countries_list = []
         norm_institutions_list = []
         raw_institutions_list = []
-        for pub_id, address_dg in addresses_df.groupby(pub_id_col):
+        for pub_id, pub_id_addresses_dg in addresses_df.groupby(pub_id_col):
             if verbose:
                 print("\n\nPub_id:", pub_id)
-                print("\naddress_dg:\n", address_dg)
-            for idx, raw_address in enumerate(address_dg[address_col].tolist()):
+                print("\npub_id_addresses_dg:\n", pub_id_addresses_dg)
+            for idx, row in pub_id_addresses_dg.iterrows():
+                address_idx = row[address_id_col]
+                raw_address = row[address_col]
                 std_address = standardize_address(raw_address)
                 address_country = ""
                 address_norm_affiliation_list = []
@@ -1216,7 +1219,7 @@ def build_norm_raw_institutions(addresses_df, inst_types_file_path=None, country
                     address_country, address_norm_affiliation_list, address_raw_affiliation_list = aff_list_tup
                 except KeyError:
                     print("\n\nError Pub_id / idx:", pub_id," / ", idx)
-                    print("\naddress_dg:\n", address_dg[address_col].tolist()[idx])
+                    print("\npub_id_addresses_dg:\n", pub_id_addresses_dg[address_col].tolist()[idx])
                     pass
                 address_norm_affiliations = bp_sg.EMPTY
                 address_raw_affiliations = bp_sg.EMPTY
@@ -1225,13 +1228,13 @@ def build_norm_raw_institutions(addresses_df, inst_types_file_path=None, country
                 if address_raw_affiliation_list:
                     address_raw_affiliations = "; ".join(address_raw_affiliation_list)
                 if address_country:
-                    countries_list.append(country(pub_id, idx, address_country))
-                norm_institutions_list.append(norm_institution(pub_id, idx, address_norm_affiliations))
-                raw_institutions_list.append(raw_institution(pub_id, idx, address_raw_affiliations, std_address))
+                    countries_list.append(country(pub_id, address_idx, address_country))
+                norm_institutions_list.append(norm_institution(pub_id, address_idx, address_norm_affiliations))
+                raw_institutions_list.append(raw_institution(pub_id, address_idx, address_raw_affiliations, std_address))
                 step += 1
 
                 if verbose:
-                    print('\nIdx address:                       ', idx)
+                    print('\nIdx address:                       ', address_idx)
                     print('Country:                           ', address_country)
                     print('address_norm_affiliation_list:     ', address_norm_affiliations)
                     print('address_unknown_affiliations_list: ', address_raw_affiliations)

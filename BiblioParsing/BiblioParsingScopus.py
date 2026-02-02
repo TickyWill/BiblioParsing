@@ -1018,7 +1018,7 @@ def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
     """
     pub_id_col, authors_col, affil_col, auth_affil_col = check_cols
     corrected_addresses_data = []
-    new_corpus_df = corpus_df.copy()
+    corrected_corpus_df = corpus_df.copy()
     for row_idx, row in corpus_df.iterrows():
         pub_id = row[pub_id_col]
         init_authors_str = row[authors_col]
@@ -1036,48 +1036,68 @@ def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
         authors_nb = len(authors_list)
         auth_affil_nb = len(check_auth_affil_list)
         if authors_nb!=auth_affil_nb:
-            authors_status, affil_status = 0, 0
+            authors_status, affil_status, auth_affil_status = 0, 0, 0
             auth_false_sep, auth_correct_sep= ";", ""
             if any(auth_false_sep in s for s in authors_list):
-                new_authors_list = [x.replace(auth_false_sep, auth_correct_sep) for x in authors_list]
+                correct_authors_list = [x.replace(auth_false_sep, auth_correct_sep) for x in authors_list]
                 new_auth_affil_list = [x.replace(auth_false_sep, auth_correct_sep) for x in auth_affil_list]
                 authors_status = 1
             else:
-                new_authors_list = authors_list
+                correct_authors_list = authors_list
                 new_auth_affil_list = auth_affil_list
 
-            addr_false_sep = ";, "
-            addr_correct_sep = ", "
-            if any(addr_false_sep in s for s in affil_list):
-                new_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in affil_list]
-                new_auth_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in new_auth_affil_list]
+#            addr_false_sep = ";, "
+#            addr_correct_sep = ", "
+#            if any(addr_false_sep in s for s in affil_list):
+#                new_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in affil_list]
+#                new_auth_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in new_auth_affil_list]
+#                affil_status = 1
+#            else:
+#                new_affil_list = affil_list
+
+            if any(re.search(bp_rg.RE_AWA, s) for s in affil_list):
+                correct_affil_list = []
+                for affil in affil_list:
+                    new_affil = ", ".join(affil.split(";, "))
+                    new_affil = ", ".join(new_affil.split(";"))
+                    correct_affil_list.append(new_affil)
                 affil_status = 1
             else:
-                new_affil_list = affil_list
+                correct_affil_list = affil_list
 
-            new_authors_str = std_sep.join(new_authors_list)
-            new_affil_str = std_sep.join(new_affil_list)
-            new_auth_affil_str = std_sep.join(new_auth_affil_list)
-            corrected_addresses_data.append([pub_id, authors_status, affil_status,
-                                             init_authors_str, new_authors_str,
-                                             init_affil_str, new_affil_str,
-                                             init_auth_affil_str, new_auth_affil_str])
+            if any(re.search(bp_rg.RE_AWA, s) for s in new_auth_affil_list):
+                correct_auth_affil_list = []
+                for auth_affil in new_auth_affil_list:
+                    new_auth_affil = ", ".join(auth_affil.split(";, "))
+                    new_auth_affil = ", ".join(new_auth_affil.split(";"))
+                    correct_auth_affil_list.append(new_auth_affil)
+                auth_affil_status = 1
+            else:
+                correct_auth_affil_list = new_auth_affil_list
+
+            correct_authors_str = std_sep.join(correct_authors_list)
+            correct_affil_str = std_sep.join(correct_affil_list)
+            correct_auth_affil_str = std_sep.join(correct_auth_affil_list)
+            corrected_addresses_data.append([pub_id, authors_status, affil_status, auth_affil_status,
+                                             init_authors_str, correct_authors_str,
+                                             init_affil_str, correct_affil_str,
+                                             init_auth_affil_str, correct_auth_affil_str])
         else:
-            new_authors_str = init_authors_str
-            new_affil_str = init_affil_str
-            new_auth_affil_str = init_auth_affil_str
+            correct_authors_str = init_authors_str
+            correct_affil_str = init_affil_str
+            correct_auth_affil_str = init_auth_affil_str
 
         # Updating corpus data
-        new_corpus_df.loc[row_idx, authors_col] = new_authors_str
-        new_corpus_df.loc[row_idx, affil_col] = new_affil_str
-        new_corpus_df.loc[row_idx, auth_affil_col] = new_auth_affil_str
+        corrected_corpus_df.loc[row_idx, authors_col] = correct_authors_str
+        corrected_corpus_df.loc[row_idx, affil_col] = correct_affil_str
+        corrected_corpus_df.loc[row_idx, auth_affil_col] = correct_auth_affil_str
 
-    correction_cols = [pub_id_col, "Authors status", "Address status",
+    correction_cols = [pub_id_col, "Authors status", "Affiliations status", "Auth with affil status",
                        authors_col, "Corrected " + authors_col,
                        affil_col, "Corrected " + affil_col,
                        auth_affil_col, "Corrected " + auth_affil_col]
     corrected_addresses_df = pd.DataFrame(corrected_addresses_data, columns=correction_cols)
-    return new_corpus_df, corrected_addresses_df
+    return corrected_corpus_df, corrected_addresses_df
 
 
 def _correct_firstname_initials(author, fullname):
