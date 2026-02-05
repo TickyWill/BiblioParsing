@@ -29,6 +29,7 @@ from BiblioParsing.BiblioParsingUtils import build_title_keywords
 from BiblioParsing.BiblioParsingUtils import check_and_drop_columns
 from BiblioParsing.BiblioParsingUtils import check_and_get_rawdata_file_path
 from BiblioParsing.BiblioParsingUtils import clean_authors_countries_institutions
+from BiblioParsing.BiblioParsingUtils import drop_rawdata
 from BiblioParsing.BiblioParsingUtils import normalize_country
 from BiblioParsing.BiblioParsingUtils import normalize_journal_names
 from BiblioParsing.BiblioParsingUtils import normalize_name
@@ -81,7 +82,7 @@ def _set_scopus_parsing_cols():
                 'issn_col'                : bp_sg.COL_NAMES['articles'][10],
                 'norm_journal_col'        : bp_sg.NORM_JOURNAL_COLUMN_LABEL,
                }
-    
+
     scopus_cols_dic = {'scopus_auth_col'         : bp_sg.COLUMN_LABEL_SCOPUS['authors'],
                        'scopus_title_kw_col'     : bp_sg.COLUMN_LABEL_SCOPUS['title'],
                        'scopus_year_col'         : bp_sg.COLUMN_LABEL_SCOPUS['year'],
@@ -742,7 +743,7 @@ def _build_sub_subjects_scopus(corpus_df, scopus_cat_codes_path,
     #       "keyword_id": list of keywords id asoociated to the journal or the issn
     # -----------------------------------------------------------------------------
     scopus_journals_issn_cat_df = pd.read_csv(scopus_journals_issn_cat_path, sep='\t',
-                                              header=None).fillna(0) 
+                                              header=None).fillna(0)
     scopus_journals_issn_cat_df[2] = scopus_journals_issn_cat_df[2].str.split(';')
     scopus_journals_issn_cat_df.columns = ['journal','issn','keyword_id']
 
@@ -752,7 +753,7 @@ def _build_sub_subjects_scopus(corpus_df, scopus_cat_codes_path,
     # ----------------------------------------------------------------
     corpus_series_zip = zip(corpus_df[pub_id_col], corpus_df[scopus_journal_col],
                             corpus_df[scopus_issn_col])
-    res = [] 
+    res = []
     for pub_id, journal, issn in corpus_series_zip:
         # Searching journal by name or by ISSN
         keywords = scopus_journals_issn_cat_df.query('journal==@journal')['keyword_id']
@@ -776,7 +777,7 @@ def _build_sub_subjects_scopus(corpus_df, scopus_cat_codes_path,
                     res.extend([(pub_id,'')])
 
     # Builds the dataframe "df_keyword" out of tuples [(publ_id, scopus category),...]
-    # "df_keyword" has two columns "pub_id" and "scopus_keywords". 
+    # "df_keyword" has two columns "pub_id" and "scopus_keywords".
     # The duplicated rows are supressed.
     # ----------------------------------------------------------------
     pub_ids_list, keywords_list = zip(*res)
@@ -1046,15 +1047,6 @@ def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
                 correct_authors_list = authors_list
                 new_auth_affil_list = auth_affil_list
 
-#            addr_false_sep = ";, "
-#            addr_correct_sep = ", "
-#            if any(addr_false_sep in s for s in affil_list):
-#                new_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in affil_list]
-#                new_auth_affil_list = [x.replace(addr_false_sep, addr_correct_sep) for x in new_auth_affil_list]
-#                affil_status = 1
-#            else:
-#                new_affil_list = affil_list
-
             if any(re.search(bp_rg.RE_AWA, s) for s in affil_list):
                 correct_affil_list = []
                 for affil in affil_list:
@@ -1100,11 +1092,16 @@ def _check_authors_with_affiliations(corpus_df, check_cols, verbose=False):
     return corrected_corpus_df, corrected_addresses_df
 
 
-def _correct_firstname_initials(author, fullname):
+def _correct_firstname_initials(author, fullname_init):
+    fullname = fullname_init
     # Remove author digital identifier
-    if "(" in fullname:
-        fullname = fullname.split(" (")[0]
-    lastname, firstname = fullname.split(", ")
+    if "(" in fullname_init:
+        fullname = fullname_init.split(" (")[0]
+    if ',' in fullname:
+        lastname, firstname = fullname.split(", ")
+    else:
+        # Assuming a team as author
+        lastname, firstname = fullname, "Unknown First Name"
 
     # Normalizing author's name and last-name with ponctuation drop (specically ";")
     author = normalize_name(author, drop_ponct=True)
@@ -1234,6 +1231,7 @@ def _correct_scopus_full_rawdata(corpus_df, cols_tup):
 def _check_affiliation_column_scopus(df, scopus_aff_col):
     """The `_check_affiliation_column_scopus` function checks the correcteness of the column affiliation of a df 
     read from a csv scopus file.
+
     A cell of the column affiliation should read:
     address<0>, country<0>;...; address<i>, country<i>;...
 
@@ -1302,6 +1300,7 @@ def read_database_scopus(rawdata_path, correct_data=False, scopus_ids=False):
     scopus_id_col = cols_dic['scopus_id_col']
     scopus_cols_keys = ['init_scopus_id_col', 'scopus_aff_col']
     (init_scopus_id_col, scopus_aff_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
+    scopus_ids_cols_list = [scopus_id_col, init_scopus_id_col]
 
     # Initializing returned data to empty dataframes
     scopus_rawdata_df = pd.DataFrame()
@@ -1313,9 +1312,12 @@ def read_database_scopus(rawdata_path, correct_data=False, scopus_ids=False):
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.SCOPUS_RAWDATA_EXTENT)
 
     if rawdata_file_path:
-        full_scopus_rawdata_df = pd.read_csv(rawdata_file_path, dtype=bp_sg.COLUMN_TYPE_SCOPUS)
+        init_full_scopus_rawdata_df = pd.read_csv(rawdata_file_path, dtype=bp_sg.COLUMN_TYPE_SCOPUS)
 
-        if len(full_scopus_rawdata_df):
+        if len(init_full_scopus_rawdata_df):
+            # Trying to drop data by scopus identifier given in an XLSX file
+            full_scopus_rawdata_df = drop_rawdata(rawdata_path, init_full_scopus_rawdata_df, scopus_ids_cols_list)
+
             if correct_data:
                 return_tup = _correct_scopus_full_rawdata(full_scopus_rawdata_df, cols_tup)
                 full_scopus_rawdata_df, corrected_authors_df, corrected_addresses_df = return_tup

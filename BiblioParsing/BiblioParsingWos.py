@@ -2,7 +2,7 @@ __all__ = ['biblio_parser_wos',
            'read_database_wos']
 
 
-# Standard library imports 
+# Standard library imports
 import csv
 import json
 import numpy as np
@@ -29,6 +29,7 @@ from BiblioParsing.BiblioParsingUtils import build_title_keywords
 from BiblioParsing.BiblioParsingUtils import check_and_drop_columns
 from BiblioParsing.BiblioParsingUtils import check_and_get_rawdata_file_path
 from BiblioParsing.BiblioParsingUtils import clean_authors_countries_institutions
+from BiblioParsing.BiblioParsingUtils import drop_rawdata
 from BiblioParsing.BiblioParsingUtils import normalize_country
 from BiblioParsing.BiblioParsingUtils import normalize_journal_names
 from BiblioParsing.BiblioParsingUtils import normalize_name
@@ -809,8 +810,10 @@ def read_database_wos(rawdata_path, wos_ids=False):
     _, cols_dic, wos_cols_dic = cols_tup
     wos_id_col = cols_dic['wos_id_col']
     init_wos_id_col = wos_cols_dic['init_wos_id_col']
+    wos_ids_cols_list = [wos_id_col, init_wos_id_col]
 
     # Initializing returned data to empty dataframes
+    full_wos_rawdata_df = pd.DataFrame()
     wos_rawdata_df = pd.DataFrame()
     wos_ids_df = pd.DataFrame()
 
@@ -826,12 +829,15 @@ def read_database_wos(rawdata_path, wos_ids=False):
             csv_list = []
             for row in csv_reader:
                 csv_list.append(row)
-        full_wos_rawdata_df = pd.DataFrame(csv_list)
+        init_full_wos_rawdata_df = pd.DataFrame(csv_list)
 
-        if len(full_wos_rawdata_df):
+        if len(init_full_wos_rawdata_df):
             # Setting columns name to raw 0
-            full_wos_rawdata_df.columns = full_wos_rawdata_df.iloc[0]
-            full_wos_rawdata_df = full_wos_rawdata_df.drop(0)
+            init_full_wos_rawdata_df.columns = init_full_wos_rawdata_df.iloc[0]
+            init_full_wos_rawdata_df = init_full_wos_rawdata_df.drop(0)
+
+            # Trying to drop data by wos identifier given in an XLSX file
+            full_wos_rawdata_df = drop_rawdata(rawdata_path, init_full_wos_rawdata_df, wos_ids_cols_list)
 
             # Selecting useful rawdata
             wos_rawdata_df = check_and_drop_columns(bp_sg.WOS, full_wos_rawdata_df)

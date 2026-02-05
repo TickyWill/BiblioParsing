@@ -13,13 +13,13 @@ def _get_demo_config():
     # Standard library imports
     import json
     from pathlib import Path
-    
+
     config_json_file_name = 'BiblioParsing_config.json'
-    
+
     # Reads the default json_file_name config file
     pck_config_file_path = Path(__file__).parent / Path('DemoConfig') / Path(config_json_file_name)
     with open(pck_config_file_path) as file:
-        config_dict = json.load(file)       
+        config_dict = json.load(file)
 
     return config_dict
 

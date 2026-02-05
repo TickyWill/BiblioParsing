@@ -5,6 +5,7 @@ __all__ = ['build_item_df_from_tup',
            'check_and_get_rawdata_file_path',
            'clean_authors_countries_institutions',
            'dict_print',
+           'drop_rawdata',
            'normalize_country',
            'normalize_journal_names',
            'normalize_name',
@@ -61,7 +62,7 @@ def set_unknown_address(author_idx, add_unknown_country=False):
     else:
         author_address = f'{author_idx}_{bp_sg.UNKNOWN}'
     return author_address
-        
+
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     """
@@ -70,8 +71,8 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     # ToDo: Management of multiple files to merge with 'merge_database' function
     rawdata_list = []
     for path, _, files in os.walk(rawdata_path):
-        rawdata_list.extend(Path(path) / Path(file) for file in files 
-                              if file.endswith(raw_extent))                
+        rawdata_list.extend(Path(path) / Path(file) for file in files
+                              if file.endswith(raw_extent))
     if rawdata_list:
         # Selecting the most recent file with raw_extent extension
         rawdata_list.sort(key = lambda x: os.path.getmtime(x), reverse=True)
@@ -79,6 +80,20 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     else:
         rawdata_file_path = None
     return rawdata_file_path
+
+
+def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list):
+    """Trying to drop data by wos identifier given in an XLSX file"""
+    full_rawdata_df = init_full_rawdata_df.copy()
+    id_col, init_id_col = ids_cols_list
+    rawdata_todrop_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.XLSX_EXTENT)
+    if rawdata_todrop_path:
+        rawdata_todrop = pd.read_excel(rawdata_todrop_path)
+        if len(rawdata_todrop):
+            ids_todrop_list = rawdata_todrop[id_col].to_list()
+            for data_id in ids_todrop_list:
+                full_rawdata_df = full_rawdata_df[full_rawdata_df[init_id_col]!=data_id]
+    return full_rawdata_df
 
 
 def set_rawdata_error(database, rawdata_path, raw_extent):

@@ -1,8 +1,5 @@
-'''The BiblioGlobals module defines global parameters 
-   used in other BiblioParsing modules.
-   modidied 04/12/2023
-
-'''
+"""The BiblioGlobals module defines global parameters used in other BiblioParsing modules.
+"""
 
 __all__ = ['BASIC_KEEPING_WORDS',
            'BLACKLISTED_WORDS',
@@ -53,9 +50,13 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'USER_KEEPING_WORDS',
            'WOS',
            'WOS_RAWDATA_EXTENT',
+           'XLSX_EXTENT',
           ]
 
-# Local imports 
+# Standard library imports
+import re
+
+# Local imports
 from BiblioParsing.BiblioGeneralGlobals import REP_UTILS
 from BiblioParsing.BiblioParsingInstitutions import read_towns_per_country
 from BiblioParsing.BiblioParsingUtils import remove_special_symbol
@@ -68,6 +69,12 @@ from BiblioParsing.BiblioParsingUtils import remove_special_symbol
 BLACKLISTED_WORDS = [] #['null','nan'] for title keywords
 
 
+##################
+# Shared globals #
+##################
+
+XLSX_EXTENT = "xlsx"
+
 ################
 # Column names #
 ################
@@ -75,7 +82,7 @@ BLACKLISTED_WORDS = [] #['null','nan'] for title keywords
 # Particular column names
 NORM_JOURNAL_COLUMN_LABEL = 'Norm_journal'
 
-# Column names common to column names dicts 
+# Column names common to column names dicts
 pub_id      = 'Pub_id'
 idx_author  = 'Idx_author'
 idx_address = 'Idx_address'
@@ -222,12 +229,12 @@ COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
 
 
 ###############################
-# Globals specific to parsing #
+# Specific globals to parsing #
 ###############################
 
-PARSING_ITEMS_LIST = ["articles", "authors", "addresses", "countries", 
-                      "institutions", "authors_institutions",  
-                      "authors_keywords", "indexed_keywords", "title_keywords", 
+PARSING_ITEMS_LIST = ["articles", "authors", "addresses", "countries",
+                      "institutions", "authors_institutions",
+                      "authors_keywords", "indexed_keywords", "title_keywords",
                       "subjects", "sub_subjects", "references",
                       "norm_institutions","raw_institutions",]
 
@@ -239,18 +246,18 @@ DIC_DOCTYPE = {'Article'              : ['Article'],
                'Conference paper'     : ['Conference Paper','Proceedings Paper','Article; Proceedings Paper'],
                'Data paper'           : ['Data Paper','Article; Data Paper'],
                'Correction'           : ['Correction'],
-               'Editorial material'   : ['Editorial Material','Editorial Material; Book Chapter'],               
+               'Editorial material'   : ['Editorial Material','Editorial Material; Book Chapter'],
                'Erratum'              : ['Erratum'],
                'Letter'               : ['Letter'],
                'Meeting Abstract'     : ['Meeting Abstract'],
-               'Note'                 : ['Note'], 
+               'Note'                 : ['Note'],
                'Review'               : ['Review'],
                'Review; early access' : ['Review; Early Access'],
                'Short survey'         : ['Short survey']
               }
 
 
-# For uniformization of journal names 
+# For uniformization of journal names
 DIC_LOW_WORDS = {'proceedings of'        : '',
                  'conference record of'  : '',
                  'proceedings'           : '',
@@ -264,7 +271,7 @@ DIC_LOW_WORDS = {'proceedings of'        : '',
                  'science'               : 'sci',
                  'technology'            : 'tech',
                  'engineering'           : 'eng',
-                 '&'                     : 'and',                # & to and 
+                 '&'                     : 'and',                # & to and
                  ':'                     : ' ',                  # colon to space
                  '-'                     : ' ',                  # hyphen-minus to space
                  ','                     : ' ',                  # comma to space
@@ -281,9 +288,9 @@ SIMILARITY_THRESHOLD = 80
 
 # General parsing globals
 NLTK_VALID_TAG_LIST = ['NN','NNS','VBG','JJ'] # you can find help on the nltk tags set
-                                              # using nltk.help.upenn_tagset() 
+                                              # using nltk.help.upenn_tagset()
 
-NOUN_MINIMUM_OCCURRENCES = 3 # Minimum occurrences of a noun to be retained when 
+NOUN_MINIMUM_OCCURRENCES = 3 # Minimum occurrences of a noun to be retained when
                              # building the set of title keywords see "build_title_keywords" function
 
 SYMBOL  = '\s,;:.\-\/'
@@ -323,9 +330,9 @@ _USECOLS_WOS ='''AB,AU,BP,BS,C1,CR,DE,DI,DT,ID,IS,LA,PY,RP,
 USECOLS_WOS  = [x.strip() for x in _USECOLS_WOS.split(',')]
 
 
-#################
-# Built globals #
-#################
+#############################################
+# Specific globals for institutions parsing #
+#############################################
 
 # For replacing symbols in town names
 DIC_TOWN_SYMBOLS = {"-": " ",
@@ -340,18 +347,7 @@ DIC_TOWN_WORDS = {" lez " : " les ",
 # Setting the file name of the file for droping towns in addresses
 COUNTRY_TOWNS_FILE = 'Country_towns.xlsx'
 
-COUNTRY_TOWNS = read_towns_per_country(country_towns_file = None, country_towns_folder_path = None)
-
-
-#############################################
-# Specific globals for institutions parsing #
-#############################################
-
-# Standard library imports
-import re
-
-# Local library imports 
-from BiblioParsing.BiblioParsingUtils import remove_special_symbol
+COUNTRY_TOWNS = read_towns_per_country(country_towns_file=None, country_towns_folder_path=None)
 
 # Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
 COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'
@@ -360,7 +356,7 @@ COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'
 INSTITUTE_AFFILIATIONS_FILE = "Institute_affiliations.xlsx"
 
 # Setting the file name for the file of institutions types description and order level with the useful columns
-INST_TYPES_FILE    = "Institutions_types.xlsx"                                                                                         
+INST_TYPES_FILE    = "Institutions_types.xlsx"
 INST_TYPES_USECOLS = ['Level', 'Abbreviation']
 
 # Potentialy ambiguous words in institutions names
@@ -379,7 +375,7 @@ DIC_WORD_RE_PATTERN['Center']     = re.compile(r"\b[CZ]ent[erum]{1,3}\b\.?")
 DIC_WORD_RE_PATTERN['Department'] = re.compile(r"\bD[eé]{1}p[artemnot]{0,9}\b\.?")
 DIC_WORD_RE_PATTERN['Institute']  = re.compile( r"\bInst[ituteosky]{0,7}\b\.?" \
                                                + "|" \
-                                               + r"\bIstituto\b") 
+                                               + r"\bIstituto\b")
 DIC_WORD_RE_PATTERN['Faculty']    = re.compile(r"\bFac[lutey]{0,4}\b\.?")
 DIC_WORD_RE_PATTERN['School']     = re.compile(r"\bSch[ol]{0,3}\b\.?")
 
@@ -388,27 +384,27 @@ DIC_WORD_RE_PATTERN['School']     = re.compile(r"\bSch[ol]{0,3}\b\.?")
     # Setting a list of keeping words
         # Setting a list of general keeping words
 _GEN_KEEPING_WORDS = list(DIC_WORD_RE_PATTERN.keys())
-GEN_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, 
-                                            strip = False).lower() for x in _GEN_KEEPING_WORDS]
+GEN_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii=False,
+                                            strip=False).lower() for x in _GEN_KEEPING_WORDS]
 
         # Setting a list of basic keeping words only for country = 'France'
 _BASIC_KEEPING_WORDS = ['Beamline', 'CRG', 'EA', 'ED', 'Equipe', 'ULR', 'UMR', 'UMS', 'UPR']
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-BASIC_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False, 
-                                              strip = False).lower() for x in _BASIC_KEEPING_WORDS]
+BASIC_KEEPING_WORDS  = [remove_special_symbol(x, only_ascii=False,
+                                              strip=False).lower() for x in _BASIC_KEEPING_WORDS]
 
         # Setting a user list of keeping words
 _USER_KEEPING_WORDS  = ['CEA', 'CEMHTI', 'CNRS', 'ESRF', 'FEMTO ST', 'IMEC', 'INES', 'INSA', 'INSERM', 'IRCELYON', 
                         'KU Leuven', 'LaMCoS', 'LEPMI', 'LITEN', 'LOCIE', 'spLine', 'STMicroelectronics', 'TNO', 'UMI', 'VTT']
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-USER_KEEPING_WORDS   = [remove_special_symbol(x, only_ascii = False, 
-                                              strip = False).lower() for x in _USER_KEEPING_WORDS]
+USER_KEEPING_WORDS   = [remove_special_symbol(x, only_ascii=False,
+                                              strip=False).lower() for x in _USER_KEEPING_WORDS]
 
         # Setting a total list of keeping words
 _KEEPING_WORDS = _GEN_KEEPING_WORDS + _BASIC_KEEPING_WORDS + _USER_KEEPING_WORDS
         # Removing accents keeping non adcii characters and converting to lower case the words, by default
-KEEPING_WORDS  = [remove_special_symbol(x, only_ascii = False,
-                                        strip = False).lower() for x in _KEEPING_WORDS]
+KEEPING_WORDS  = [remove_special_symbol(x, only_ascii=False,
+                                        strip=False).lower() for x in _KEEPING_WORDS]
 
 
 # For keeping chunks of addresses with these prefixes followed by 3 or 4 digits for country France
@@ -419,61 +415,55 @@ KEEPING_PREFIX  = [x.lower() for x in _KEEPING_PREFIX]
 # For droping chunks of addresses (without accents and in lower case)
     # Setting a list of droping suffixes
 _DROPING_SUFFIX = ["campus", "laan", "park", "platz", "staal", "strae", "strasse", "straße", "vej", "waldring", "weg",
-                   "schule", "-ku", "-cho", "-ken", "-shi", "-gun", "alleen", "vagen", "vei", "-gu", "-do", "-si", "shire"] 
+                   "schule", "-ku", "-cho", "-ken", "-shi", "-gun", "alleen", "vagen", "vei", "-gu", "-do", "-si", "shire"]
 
         # added "ring" but drops chunks containing "Engineering"
         # Removing accents keeping non adcii characters and converting to lower case the droping suffixes, by default
-DROPING_SUFFIX = [remove_special_symbol(x, only_ascii = False, 
-                                        strip = False).lower() for x in _DROPING_SUFFIX]
+DROPING_SUFFIX = [remove_special_symbol(x, only_ascii=False,
+                                        strip=False).lower() for x in _DROPING_SUFFIX]
 
 
     # Setting a list of droping words for country different from France
-_DROPING_WORDS = ["alle", "alleen", "area", "avda", "avda.",  
+_DROPING_WORDS = ["alle", "alleen", "area", "avda", "avda.",
                   "bd", "bldg", "box", "bp", "building",
                   "c", "calla", "calle", "camino", "carrera", "carretera", "cesta", "cho",
-                  "circuito", "city", "ciudad", "complejo", "corso", "country", "ctra", "cubillos",  
+                  "circuito", "city", "ciudad", "complejo", "corso", "country", "ctra", "cubillos",
                   "district", "edificio", "east", "esplanade", "estrada", "floor", "jardim", "jardins", "km", "ku",
                   "lane", "largo", "linder", "mall", "marg",
-                  "p.", "p.le", "p.o.box", "parcella", "passeig", "pk", "playa", "plaza", "parc", "park", 
+                  "p.", "p.le", "p.o.box", "parcella", "passeig", "pk", "playa", "plaza", "parc", "park",
                   "parque", "piazza", "piazzale", "po", "pob", "pola", "pza", "pzza",
                   "rambla", "rd", "rua", "road", "sec.", "sc", "s-n", "s/n", "sp", "st", "st.", "strada", "street", "str", "str.",
                   "tietotie", "vei", "veien", "vej", "via", "viale", "vialle", "voc.", "w", "way", "west", "zona"]
 
         # Removing accents keeping non adcii characters and converting to lower case the droping words, by default
-_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, 
-                                        strip = False).lower() for x in _DROPING_WORDS]
+_DROPING_WORDS = [remove_special_symbol(x, only_ascii=False,
+                                        strip=False).lower() for x in _DROPING_WORDS]
         # Escaping the regex meta-character "." from the droping words, by default
 _DROPING_WORDS = [x.replace(".", r"\.") for x in _DROPING_WORDS]
 DROPING_WORDS  = [x.replace("/", r"\/") for x in _DROPING_WORDS]
 
 
         # Setting a list of droping words for France
-_FR_DROPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue", 
+_FR_DROPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue",
                      "ba", "bat", "bat.", "batiment", "blv.", "blvd", "boulevard",
                      "campus", "cedex", "ch.", "chemin", "complexe", "cours", "cs",
-                     "domaine", "esplanade", "foret", "immeuble", 
+                     "domaine", "esplanade", "foret", "immeuble",
                      "montee", "no.", "p", "p°", "parcelle", "parvis", "pl", "pl.", "place", "parc",
                      "plan", "pole", "quai", "r", "r.", "rambla", "region", "route", "rue",
                      "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
 
         # Removing accents keeping non adcii characters and converting to lower case the droping words, by default
-_FR_DROPING_WORDS = [remove_special_symbol(x, only_ascii = False, 
-                                           strip = False).lower() for x in _FR_DROPING_WORDS]
+_FR_DROPING_WORDS = [remove_special_symbol(x, only_ascii=False,
+                                           strip=False).lower() for x in _FR_DROPING_WORDS]
         # Escaping the regex meta-character "." from the droping words, by default
 _FR_DROPING_WORDS = [x.replace(".", r"\.") for x in _FR_DROPING_WORDS]
 FR_DROPING_WORDS  = [x.replace("/", r"\/") for x in _FR_DROPING_WORDS]
 
 
-# List of small words to drop in raw affiliations for affiliations normalization 
+# List of small words to drop in raw affiliations for affiliations normalization
 SMALL_WORDS_DROP = ['the', 'and','of', 'for', 'de', 'et', 'la', 'aux', 'a', 'sur', 'pour', 'en', 'l', 'd', 'le']
 
 
-# List of acronyms for detecting missing space in raw affiliations for affiliations normalization 
+# List of acronyms for detecting missing space in raw affiliations for affiliations normalization
 _MISSING_SPACE_ACRONYMS = ['FR', 'FRE', 'ULR', 'UMR', 'UMS', 'U', 'UPR', 'UR']
 MISSING_SPACE_ACRONYMS  = [x.lower() for x in _MISSING_SPACE_ACRONYMS]
-
-
-
-    
-
-
