@@ -837,7 +837,8 @@ def read_database_wos(rawdata_path, wos_ids=False):
             init_full_wos_rawdata_df = init_full_wos_rawdata_df.drop(0)
 
             # Trying to drop data by wos identifier given in an XLSX file
-            full_wos_rawdata_df = drop_rawdata(rawdata_path, init_full_wos_rawdata_df, wos_ids_cols_list)
+            full_wos_rawdata_df = drop_rawdata(rawdata_path, init_full_wos_rawdata_df,
+                                               wos_ids_cols_list, bp_sg.WOS)
 
             # Selecting useful rawdata
             wos_rawdata_df = check_and_drop_columns(bp_sg.WOS, full_wos_rawdata_df)

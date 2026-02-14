@@ -24,6 +24,7 @@ __all__ = ['BASIC_KEEPING_WORDS',
            'ENCODING',
            'FIELD_SIZE_LIMIT',
            'FR_DROPING_WORDS',
+           'IDS_TO_DROP_FILE_BASE',
            'INST_TYPES_FILE',
            'INST_TYPES_USECOLS',
            'INSTITUTE_AFFILIATIONS_FILE',
@@ -298,6 +299,8 @@ PARTIAL = 'partial'    # For unparsed partial references
 EMPTY   = 'empty'
 UNKNOWN = 'unknown'
 UNKNOWN_COUNTRY = 'Unknown'
+
+IDS_TO_DROP_FILE_BASE = "_IDs à supprimer.xlsx"
 
 
 #######################################

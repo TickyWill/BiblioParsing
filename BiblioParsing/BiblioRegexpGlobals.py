@@ -97,4 +97,4 @@ RE_YEAR_JOURNAL = re.compile(r'\s\d{4}\s')                                      
 
 RE_ZIP_CODE = re.compile(',\s[a-zA-Z]?[\-]?\d+.*',)                              # Captures text begining with ', '
                                                                                  # and that possibly contains letters and hyphen-minus
-RE_AWA = re.compile('[a-zA-Z];,\s[a-zA-Z]|[a-zA-Z];[a-zA-Z]')                    # Captures ';, ' or ';' surrounded by letters
+RE_AWA = re.compile('\w+;,\s\w+|\w+;\w+')                                        # Captures ';, ' or ';' surrounded by letters

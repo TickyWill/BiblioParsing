@@ -82,17 +82,24 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     return rawdata_file_path
 
 
-def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list):
-    """Trying to drop data by wos identifier given in an XLSX file"""
+def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_type):
+    """Trying to drop data by database identifier given in an XLSX file"""
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
-    rawdata_todrop_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.XLSX_EXTENT)
-    if rawdata_todrop_path:
-        rawdata_todrop = pd.read_excel(rawdata_todrop_path)
+    ids_todrop_file = database_type.capitalize() + bp_sg.IDS_TO_DROP_FILE_BASE
+    ids_todrop_path = rawdata_path / Path(ids_todrop_file)
+    if ids_todrop_path.is_file():
+        rawdata_todrop = pd.read_excel(ids_todrop_path)
         if len(rawdata_todrop):
             ids_todrop_list = rawdata_todrop[id_col].to_list()
             for data_id in ids_todrop_list:
                 full_rawdata_df = full_rawdata_df[full_rawdata_df[init_id_col]!=data_id]
+    else:
+        # Creating empty file for collecting identifiers set by the user
+        data_row = [""]
+        data = sum([], [data_row]*10)
+        ids_todrop_df = pd.DataFrame(data, columns=[id_col])
+        ids_todrop_df.to_excel(ids_todrop_path, index=False)
     return full_rawdata_df
 
 
@@ -107,15 +114,14 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
 def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fails_dict=None):
     """Building a clean item dataframe from a tuple 
     and accordingly updating the parsing success rate dict."""
-    
-    item_df = pd.DataFrame.from_dict({label:[s[idx] for s in item_list] 
+    item_df = pd.DataFrame.from_dict({label:[s[idx] for s in item_list]
                                       for idx,label in enumerate(item_col_names)})
     pub_ids_list = item_df[item_df[item_col]==''][pub_id_col].values
     pub_ids_list = list(set(pub_ids_list))
     if fails_dict:
         corpus_size = fails_dict['number of article']
         fails_dict[item_col] = {'success (%)':100 * ( 1 - len(pub_ids_list) / corpus_size),
-                                pub_id_col:[int(x) for x in pub_ids_list]}    
+                                pub_id_col:[int(x) for x in pub_ids_list]}
     item_df = item_df[item_df[item_col]!='']
     return item_df, fails_dict
 

@@ -1316,7 +1316,8 @@ def read_database_scopus(rawdata_path, correct_data=False, scopus_ids=False):
 
         if len(init_full_scopus_rawdata_df):
             # Trying to drop data by scopus identifier given in an XLSX file
-            full_scopus_rawdata_df = drop_rawdata(rawdata_path, init_full_scopus_rawdata_df, scopus_ids_cols_list)
+            full_scopus_rawdata_df = drop_rawdata(rawdata_path, init_full_scopus_rawdata_df,
+                                                  scopus_ids_cols_list, bp_sg.SCOPUS)
 
             if correct_data:
                 return_tup = _correct_scopus_full_rawdata(full_scopus_rawdata_df, cols_tup)
