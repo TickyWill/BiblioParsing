@@ -166,13 +166,14 @@ def _setting_same_article_title(df, title_col, lc_title_col, similar, norm_title
     for t1 in title_df[lc_title_col]:
         t1_idx += 1
         for t2 in title_df[lc_title_col]:
-            if t2!=t1 and (len(t1)>bp_sg.LENGTH_THRESHOLD and len(t2)>bp_sg.LENGTH_THRESHOLD):
-                t1_set, t2_set = set(t1.split()), set(t2.split())
-                common_words = t2_set.intersection(t1_set)
-                t1_specific_words, t2_specific_words = (t1_set - common_words), (t2_set - common_words)
-                similarity = round(similar(t1, t2)*100)
-                if (similarity>bp_sg.SIMILARITY_THRESHOLD) or (t1_specific_words==set() or t2_specific_words==set()):
-                    title_df.loc[title_df[lc_title_col]==t2] = t1
+            if not "part " in t1 or not "part " in t2:
+                if t2!=t1 and (len(t1)>bp_sg.LENGTH_THRESHOLD and len(t2)>bp_sg.LENGTH_THRESHOLD):
+                    t1_set, t2_set = set(t1.split()), set(t2.split())
+                    common_words = t2_set.intersection(t1_set)
+                    t1_specific_words, t2_specific_words = (t1_set - common_words), (t2_set - common_words)
+                    similarity = round(similar(t1, t2)*100)
+                    if (similarity>bp_sg.SIMILARITY_THRESHOLD) or (t1_specific_words==set() or t2_specific_words==set()):
+                        title_df.loc[title_df[lc_title_col]==t2] = t1
             print(f"            Number of titles checked: {t1_idx}  / {lines_nb}", end="\r")
     title_df[lc_title_col] = title_df[lc_title_col].str.lower()
     title_df[lc_title_col] = title_df[lc_title_col].apply(norm_title)
