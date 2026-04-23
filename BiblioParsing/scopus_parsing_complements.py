@@ -1,0 +1,671 @@
+__all__ = ['build_scopus_references',
+           'build_scopus_subjects_and_sub_subjects',
+          ]
+
+
+# Standard library imports
+import re
+from collections import namedtuple
+
+# 3rd party library imports
+import pandas as pd
+
+# Local libray imports
+import BiblioParsing.regex_globals as bp_rg
+import BiblioParsing.specific_globals as bp_sg
+
+
+def _set_pub_subjects_list(pub_id, codes_df, code_cat_dict, sub_subject):
+    pub_res = [(pub_id,'')]
+    codes_lists = codes_df.tolist()
+    # Building subjects list of the publication for the given codes data
+    pub_subjects = []
+    for codes_list in codes_lists:
+        # Droping empty code
+        codes_list = codes_list[:-1]
+        for code in codes_list:
+            # Selecting only subjects of codes multiple of 100 if sub_subject is False
+            # otherwise selecting subjects and sub-subjects
+            int_code = int(code)
+            if not sub_subject:
+                int_code = int(code.strip()[0:2] + "00")
+            if int_code in code_cat_dict.keys():
+                subject = code_cat_dict[int_code]
+                if not sub_subject:
+                    subject = subject.replace("General","")
+                pub_subjects.append(subject)
+    if pub_subjects:
+        pub_res = [(pub_id, subject) for subject in pub_subjects]
+    return pub_res
+
+
+def _build_scopus_selected_subjects(corpus_df, scopus_journals_issn_cat_df, code_cat_dict,
+                                    fails_dic, sub_subject, cols_list):
+    # Builds the list of tuples [(pub ID, scopus category),...]
+    # ex: [(0, 'Applied Mathematics'), (0, 'Materials Chemistry'),...]
+    pub_id_col, scopus_journal_col, scopus_issn_col, keywords_col = cols_list
+    corpus_series_zip = zip(corpus_df[pub_id_col], corpus_df[scopus_journal_col], corpus_df[scopus_issn_col])
+    res = []
+    for pub_id, pub_journal, pub_issn in corpus_series_zip:
+        # Searching journal by name or by ISSN
+        journal_keywords_df = scopus_journals_issn_cat_df.query('journal==@pub_journal')['keyword_id']
+        if not journal_keywords_df.empty:
+            journal_pub_res = _set_pub_subjects_list(pub_id, journal_keywords_df, code_cat_dict, sub_subject)
+            res.extend(journal_pub_res)
+        else:
+            issn_keywords_df = scopus_journals_issn_cat_df.query('issn==@pub_issn')['keyword_id']
+            if not issn_keywords_df.empty:
+                issn_pub_res = _set_pub_subjects_list(pub_id, issn_keywords_df, code_cat_dict, sub_subject)
+                res.extend(issn_pub_res)
+
+    # Builds the data of subjects or sub_subjects per publication
+    # The duplicated rows are suppressed.
+    pub_ids_list, keywords_list = [[]] * 2
+    if res:
+        pub_ids_list, keywords_list = zip(*res)
+    keywords_df = pd.DataFrame.from_dict({pub_id_col  : pub_ids_list,
+                                          keywords_col: keywords_list})
+    fails_dic[keywords_col] = {'success (%)': 0,
+                               pub_id_col   : []}
+    if pub_ids_list:
+        out_pub_ids_list = keywords_df[keywords_df[keywords_col]==''][pub_id_col].values
+        fails_dic[keywords_col] = {'success (%)': 100 * (1-len(out_pub_ids_list) / len(pub_ids_list)),
+                                   pub_id_col   : [int(x) for x in list(out_pub_ids_list)]}
+
+    keywords_df.drop_duplicates(inplace=True)
+    keywords_df = keywords_df[keywords_df[keywords_col]!='']
+    return keywords_df
+
+
+def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
+                                           scopus_journals_issn_cat_path, fails_dic, cols_tup):
+    """Builds the data of subjects and sub-subjects per publication of the corpus 
+    and updates the parsing success rate data.
+
+    The built data are composed of 2 columns and one row per publication and subject or sub-subjects.
+        Ex:
+            Pub_id   Subject
+              0      Mathematics
+              0      Engineering
+              1	     Physics and Astronomy
+              1	     Biochemistry, Genetics and Molecular Biology
+
+    The subjects are attributed using 2 files provided by Elsevier.
+    The "scopus_cat_codes.txt" file gives a code per category:
+
+                         Category            Code
+            General Medicine                 2700    => Subject
+            Medicine (miscellaneous)         2701    => Sub-subject
+            Anatomy                          2702
+            Anesthesiology and Pain Medicine 2703
+            Biochemistry, medical            2704
+            ...
+
+    The "scopus_journals_issn_cat.txt" file give the categories codes attached to a journal:
+
+                Journal            ISSN           Codes
+            21st Century Music   15343219     1210;
+            2D Materials                      2210; 2211; 3104; 2500; 1600;
+            3 Biotech            2190572X     1101; 2301; 1305;
+            ...
+
+    For "2D Materials journal":
+        - The subjects are given by the codes multiple of 100: 2500; 1600
+        - The sub-subjects are given by the other codes: 2210; 2211; 3104
+
+    Args:
+        corpus_df (dataframe): The selected rawdata of the corpus.
+        scopus_cat_codes_path (path): The full path to the file "scopus_cat_codes.txt".
+        scopus_journals_issn_cat_path=None): The full path to the file "scopus_journals_issn_cat.txt".
+        fails_dic (dict): Parsing success rate data.
+        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+    Returns:
+        (tuple): The subjects data (dataframe) and sub-subjects data (dataframe) built.
+    """
+    # Setting useful column names
+    _, cols_dic, scopus_cols_dic = cols_tup
+    cols_keys = ['pub_id_col', 'subject_col', 'sub_subject_col']
+    (pub_id_col, subject_col, sub_subject_col) = [cols_dic[key] for key in cols_keys]
+    scopus_cols_keys = ['scopus_journal_col', 'scopus_issn_col']
+    (scopus_journal_col, scopus_issn_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
+
+    # Builds the dict "code_cat_dict" {ASJC classification codes:description} out
+    # of the file "scopus_cat_codes.txt"
+    # ex: {1000: 'Multidisciplinary', 1100: 'General Agricultural',...}
+    # -----------------------------------------------------------------------
+    scopus_cat_codes_df = pd.read_csv(scopus_cat_codes_path, sep='\t', header=None)
+    code_cat_dict = dict(zip(scopus_cat_codes_df[1].fillna(0.0).astype(int), scopus_cat_codes_df[0]))
+
+    # Builds the dataframe "scopus_journals_issn_cat_df" out of the file
+    # "scopus_journals_issn_cat.txt"
+    # "scopus_journals_issn_cat_df" has 3 columns:
+    #       "journal": scopus journal name
+    #       "issn": journal issn
+    #       "keyword_id": list of keywords id asociated to the journal or the issn
+    # -----------------------------------------------------------------------------
+    scopus_journals_issn_cat_df = pd.read_csv(scopus_journals_issn_cat_path, sep='\t',
+                                              header=None).fillna(0)
+    scopus_journals_issn_cat_df[2] = scopus_journals_issn_cat_df[2].str.split(';')
+    scopus_journals_issn_cat_df.columns = ['journal','issn','keyword_id']
+
+    # Building subjects data
+    sub_subject = False
+    cols_list = [pub_id_col, scopus_journal_col, scopus_issn_col, subject_col]
+    subjects_df = _build_scopus_selected_subjects(corpus_df, scopus_journals_issn_cat_df, code_cat_dict,
+                                                  fails_dic, sub_subject, cols_list)
+
+    # Building sub-subjects data
+    sub_subject = True
+    cols_list = [pub_id_col, scopus_journal_col, scopus_issn_col, sub_subject_col]
+    sub_subjects_df = _build_scopus_selected_subjects(corpus_df, scopus_journals_issn_cat_df, code_cat_dict,
+                                                      fails_dic, sub_subject, cols_list)
+
+    return subjects_df, sub_subjects_df
+
+
+def _try_list_idx(item_idx, value_idx, values_list):
+    try:
+        value_item_idx, value = item_idx, values_list[value_idx].strip()
+    except IndexError:
+        value_item_idx, value = 0, bp_sg.UNKNOWN
+    return value_item_idx, value
+
+
+def _find_ref_doi(ref_items_list):
+    dois_list = []
+    for item_idx, ref_item in enumerate(ref_items_list):
+        dois_list = re.findall(bp_rg.RE_SCOPUS_REF_DOI, ref_item)
+        if dois_list:
+            break
+    doi_item_idx, doi = _try_list_idx(item_idx, 0, dois_list)
+    return doi_item_idx, doi
+
+
+def _find_ref_year(ref_items_list, doi_item_idx, doi, ref):
+    years_list = []
+    for item_idx, ref_item in enumerate(ref_items_list):
+        years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEAR, ref_item)
+        if years_list:
+            break
+    if not years_list:
+        # Getting possible years in full ref
+        all_years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, ref)
+        for item_idx, ref_item in enumerate(ref_items_list):
+            if item_idx==doi_item_idx and doi!=bp_sg.UNKNOWN:
+                years_list = re.findall(bp_rg.RE_SCOPUS_REF_DOI_YEAR, ref_item)
+                if years_list:
+                    # Droping surrounding dots
+                    years_list = [x[1:-1] for x in years_list if x]
+                    break
+            else:
+                years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, ref_item)
+                if years_list:
+                    break
+                else:
+                    if re.findall(bp_rg.RE_SCOPUS_REF_CONF, ref_item):
+                        years_list = re.findall(bp_rg.RE_SCOPUS_REF_DIGITS, ref_item)
+                        if not all_years_list:
+                            break
+    year_item_idx, year = _try_list_idx(item_idx, 0, years_list)
+    return year_item_idx, year
+
+
+def _search_authors_in_items(ref_items_list):
+    # Searching for possible author names and specifying the author names structure
+    first_author, et_al, authors_case = bp_sg.UNKNOWN, "", 'no_authors'
+    first_item = ref_items_list[0]
+    if not re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item):
+        second_item = ref_items_list[1]
+        if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, first_item):
+            authors_case = 'single_one_item'
+            first_author = first_item
+            if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
+                authors_case = 'multiple_one_item_w_dot'
+                if '.' not in second_item:
+                    authors_case = 'multiple_one_item_wo_dot'
+                et_al = "et al."
+        else:
+            if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
+                authors_case = 'single_two_items'
+                first_author = f'{first_item} {second_item}'
+                if len(ref_items_list)>3:
+                    fourth_item = ref_items_list[3]
+                    if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, fourth_item):
+                        authors_case = 'multiple_two_items_w_dot'
+                        if '.' not in second_item:
+                            authors_case = 'multiple_two_items_wo_dot'
+                        et_al = "et al."
+    return first_author, et_al, authors_case
+
+
+def _build_authors_attr(ref_items_list):
+    first_author, et_al, authors_case = bp_sg.UNKNOWN, "", 'no_authors'
+    author_max_len = 30
+    first_item = ref_items_list[0]
+    if re.findall(bp_rg.RE_SCOPUS_REF_EL_AL, first_item):
+        authors_case = 'with_et_al'
+        first_author = first_item
+    else:
+        if ":" in first_item or len(first_item)>author_max_len:
+            authors_case = 'first_item_too_long'
+        if len(ref_items_list)>1:
+            if authors_case=='first_item_too_long':
+                # Searching for possible author name in second item
+                second_item = ref_items_list[1]
+                if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
+                    authors_case = 'partial_one_item'
+                    first_author = second_item
+                    et_al = "etc."
+            else:
+                # Searching for possible author names beginning from first item
+                first_author, et_al, authors_case = _search_authors_in_items(ref_items_list)
+    return first_author, et_al, authors_case
+
+
+def _set_dotted_initials(first_author):
+    dotted_first_author = first_author
+    initial_dot = '.'
+    if first_author!=bp_sg.UNKNOWN and not (initial_dot in first_author):
+        lastname = (' ').join(first_author.split(" ")[:-1])
+        initials = first_author.split(" ")[-1]
+        initials_list = [f'{x}{initial_dot}' for x in initials.split("-") if x]
+        new_initials = ('-').join(initials_list)
+        dotted_first_author = f'{lastname} {new_initials}'
+    return dotted_first_author
+
+
+def _find_ref_authors(ref_items_list):
+    first_author, et_al, authors_case = _build_authors_attr(ref_items_list)
+    dotted_first_author = _set_dotted_initials(first_author)
+    authors = dotted_first_author
+    if dotted_first_author!=bp_sg.UNKNOWN and not ('et al.' in dotted_first_author):
+        authors = f'{dotted_first_author} {et_al}'
+    return authors, authors_case
+
+
+def _found_ref_title(ref_items_list, search_title_params):
+    authors_case, year, year_item_idx, doi, doi_item_idx = search_title_params
+    mod_ref_items_list = [x.strip() + ", " for x in ref_items_list]
+    idx = 0
+    if authors_case not in ['no_authors', 'first_item_too_long', 'partial_one_item']:
+        if authors_case in ['with_et_al', 'single_one_item']:
+            idx = 1
+        elif authors_case=='multiple_one_item_w_dot':
+            while "., " in mod_ref_items_list[idx]:
+                idx += 1
+        elif authors_case=='multiple_one_item_wo_dot':
+            while re.findall(RE_SCOPUS_AUTHOR_NAME, mod_ref_items_list[idx]):
+                idx += 1
+        elif authors_case=='single_two_items':
+            idx += 2
+        elif authors_case=='multiple_two_items_w_dot':
+            while "., " in mod_ref_items_list[idx + 1]:
+                idx += 2
+            while re.findall(bp_rg.RE_SCOPUS_REF_DOT, mod_ref_items_list[idx]):
+                # Incrementing idx for presence of dot after 1 or 2 characters")
+                idx += 1
+        elif authors_case=='multiple_two_items_wo_dot':
+            while re.findall(RE_SCOPUS_AUTHOR_INITIALS, mod_ref_items_list[idx + 1]):
+                idx += 2
+            while re.findall(bp_rg.RE_SCOPUS_REF_DOT, mod_ref_items_list[idx]):
+                # Incrementing idx for presence of dot after 1 or 2 characters")
+                idx += 1
+        if ((idx==doi_item_idx and doi!=bp_sg.UNKNOWN)
+            or (year_item_idx==0 and year!=bp_sg.UNKNOWN)):
+            # Incrementing idx for conflicts with doi or year indices")
+            idx += 1
+    title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
+    if title==f'({year})' and year!=bp_sg.UNKNOWN:
+        # Incrementing idx for title equality with (dddd) as year-item
+        idx += 1
+        title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
+    if title==ref_items_list[doi_item_idx] and doi!=bp_sg.UNKNOWN:
+        # Not keeping DOI as title
+        title = bp_sg.UNKNOWN
+    journal_in_title = False
+    if re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, title):
+        # Setting status of journal in title
+        journal_in_title = True
+    return title_item_idx, title, journal_in_title
+
+
+def _split_long_item_by_dot(item_txt):
+    item_parts_list = item_txt.split(". ")
+    item_txt_start = item_parts_list[0]
+    item_txt_end = (". ").join(item_parts_list[1:])
+    return item_txt_start, item_txt_end
+
+
+def _select_journal_part(item_txt, colon, journal):
+    journal_item_part = item_txt
+    if colon:
+        item_parts_list = item_txt.split(":")
+        for part in item_parts_list:
+            if re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, part):
+                journal, journal_item_part = part, part
+                break
+    else:
+        if " in " in item_txt:
+            txt = item_txt
+            while txt:
+                txt_parts = txt.split(" in ")
+                txt_start, txt_end = txt_parts[0], txt_parts[-1]
+                txt_start_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_start)
+                txt_end_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_end)
+                if len(txt_parts)==2:
+                    if txt_start_search:
+                        journal, journal_item_part = txt, txt
+                        txt = ''
+                    elif txt_end_search:
+                        journal, journal_item_part = f'in {txt_end}', txt_end
+                        txt = ''
+                else:
+                    txt = (" in ").join(txt_parts[0:-1])
+                    if txt_end_search:
+                        journal, journal_item_part = f'in {txt_end}', txt_end
+                        txt = ''
+        years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEAR, item_txt)
+        if years_list:
+            journal_item_part = item_txt.split(years_list[0])[-1]
+            journal = f'{years_list[0]}{journal_item_part}'
+    return journal, journal_item_part
+
+
+def _check_item_date(item_txt):
+    item_date_status = False
+    if item_txt!=bp_sg.UNKNOWN:
+        item_dates_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, item_txt)
+        if item_dates_list:
+            item_date = item_dates_list[0].strip()
+            if item_date in item_txt:
+                item_date_status = True
+    return item_date_status
+
+
+def _try_next_items(ref_items_list, init_item_idx, doi):
+    item_idx_max = len(ref_items_list) - 1
+    search_item_idx, search_item = init_item_idx, ref_items_list[init_item_idx]
+    check_status = True
+    while check_status and search_item_idx<item_idx_max:
+        search_item_idx += 1
+        search_item_idx, search_item = _try_list_idx(search_item_idx, search_item_idx, ref_items_list)
+        check_status = any([_check_item_date(search_item), search_item==doi,
+                            re.findall(bp_rg.RE_SCOPUS_REF_ONLY_DIGITS, search_item)])
+    if check_status and search_item_idx==item_idx_max:
+        search_item = bp_sg.UNKNOWN
+    return search_item_idx, search_item
+
+
+def _clean_journal_and_title(cleaning_params):
+    (journal_item_idx, journal, title_item_idx, title, doi,
+     journal_in_title, journal_item_parts_list, ref_items_list) = cleaning_params
+    if journal==title and title!=bp_sg.UNKNOWN:
+        if journal_item_parts_list:
+            journal = (' - ').join(journal_item_parts_list)
+        title_item_idx, title = _try_next_items(ref_items_list, title_item_idx, doi)
+    if journal==doi and doi!=bp_sg.UNKNOWN:
+        journal = bp_sg.UNKNOWN
+    if journal!=bp_sg.UNKNOWN:
+        if journal in title:
+            title = title.replace(journal, "")
+            if not title:
+                title = bp_sg.UNKNOWN
+    else:
+        check_dots =  ["." in title_word for title_word in title.split(" ")]
+        if all(check_dots):
+            journal = title
+            title = bp_sg.UNKNOWN
+    clean_journal = journal.replace("(", "").replace(")", "")
+    clean_title = title.replace("(", "").replace(")", "")
+    return clean_journal, clean_title
+
+
+def _find_ref_journal(ref_items_list, search_journal_params):
+    authors_case, title_item_idx, title_item, doi, journal_in_title = search_journal_params
+    title = title_item
+    journal_item_idx, journal, journal_item_part = 0, bp_sg.UNKNOWN, ''
+    journal_item_idx_list, journals_list, journal_item_parts_list = [], [], []
+    if authors_case in ['first_item_too_long', 'partial_one_item']:
+        # First item too long as author names
+        title_item_end = title_item
+        if ". " in title_item:
+            title, title_item_end = _split_long_item_by_dot(title_item)
+        if re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, title_item):
+            item_txt, colon = title_item, False
+            if ":" in title_item_end:
+                item_txt, colon = title_item_end, True
+            journal, journal_item_part = _select_journal_part(item_txt, colon, journal)
+    else:
+        # First item not too long as author names
+        idx_init = 0
+        if len(ref_items_list)>1:
+            idx_init = 1
+        for item_idx, ref_item in enumerate(ref_items_list):
+            check_journal = all([re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, ref_item),
+                                 ref_item!=doi, item_idx>=idx_init])
+            if check_journal:
+                colon, _journal_item_idx, _journal = False, item_idx, ref_item.strip()
+                _journal, _journal_item_part = _select_journal_part(ref_item, colon, _journal)
+                journal_item_idx_list.append(_journal_item_idx)
+                journals_list.append(_journal)
+                journal_item_parts_list.append(_journal_item_part)
+            check_dots = all([len(part)>2 and '.' in part for part in ref_item.split(" ")]
+                             + [ref_item!=doi, item_idx>=idx_init])
+            if check_dots:
+                _journal_item_idx, _journal, _journal_item_part = item_idx, ref_item.strip(), ref_item
+                journal_item_idx_list.append(_journal_item_idx)
+                journals_list.append(_journal)
+                journal_item_parts_list.append(_journal_item_part)
+        if journals_list:
+            journal_item_idx, journal = journal_item_idx_list[0], journals_list[0]
+        else:
+            # No results of journal search in all items
+            journal_item_idx, journal = _try_next_items(ref_items_list, title_item_idx, doi)
+            journal_item_idx_list = [journal_item_idx]
+            journal_item_parts_list = [journal]
+            journal = journal
+    cleaning_params = [journal_item_idx, journal, title_item_idx, title, doi,
+                       journal_in_title, journal_item_parts_list, ref_items_list]
+    clean_journal, clean_title = _clean_journal_and_title(cleaning_params)
+    return journal_item_idx, clean_journal, clean_title
+
+
+def _merge_ref_item(item_idx, ref_item, ref_items_list, new_item_idx, ref_new_item):
+    items_idx_max = len(ref_items_list) - 1
+    item_end_part = ref_item.split(": ")[1]
+    if not re.findall(bp_rg.RE_SCOPUS_REF_AND, item_end_part):
+        and_found = False
+        while not and_found and new_item_idx<items_idx_max:
+            #  if ' and ' not found before searching ref_next_item
+            ref_next_item = ref_items_list[new_item_idx + 1]
+            ref_new_item += " " + ref_next_item
+            new_item_idx += 1
+            if re.findall(bp_rg.RE_SCOPUS_REF_AND, ref_next_item):
+                #  if ' and ' found after searching ref_next_item
+                and_found = True
+    return new_item_idx, ref_new_item
+
+
+def _check_merge_ref_items_colon(item_idx, ref_item, ref_items_list, raw_ref):
+    new_item_idx, ref_new_item = item_idx, ref_item
+    if ": " in ref_item:
+        next_item_idx = item_idx + 1
+        ref_end_part = (", ").join(raw_ref.split(", ")[next_item_idx:])
+        if re.findall(bp_rg.RE_SCOPUS_REF_AND, ref_end_part):
+            # and in ref after ref_item
+            new_item_idx, ref_new_item = _merge_ref_item(item_idx, ref_item, ref_items_list,
+                                                         new_item_idx, ref_new_item)
+    return new_item_idx, ref_new_item
+
+
+def _count_upper_len(txt):
+    len_max = len(txt)
+    upper_len, is_upper = 0, True
+    while is_upper and upper_len<len_max:
+        if txt[upper_len].isupper():
+            upper_len += 1
+        else:
+            is_upper = False
+    return upper_len
+
+
+def _cases_check(txt):
+    upper_len = _count_upper_len(txt)
+    firstchar = txt[0]
+    firstchar_is_lower = firstchar.islower()
+    firstchar_is_upper = firstchar.isupper()
+    nextchars_are_upper = all([firstchar.isupper(), upper_len>1,
+                               not re.findall(bp_rg.RE_JOURNAL_ACRONYMS, txt)])
+    return firstchar_is_lower, nextchars_are_upper
+
+
+def _check_merge_ref_items_lowercase(item_idx, ref_item, ref_items_list):
+    new_item_idx, ref_new_item = item_idx, ref_item
+    items_idx_max = len(ref_items_list) - 1
+    lowercase = True
+    new_item_idx = item_idx
+    while lowercase and new_item_idx<items_idx_max:
+        ref_next_item = ref_items_list[new_item_idx + 1]
+        firstchar_is_lower, nextchars_are_upper = _cases_check(ref_next_item)
+        if firstchar_is_lower or nextchars_are_upper:
+            ref_new_item += " " + ref_next_item
+            new_item_idx += 1
+        else:
+            lowercase = False
+    return new_item_idx, ref_new_item
+
+
+def _drop_ref_items(value_regex, ref_items_list):
+    new_ref_items_list = []
+    for item_idx, ref_item in enumerate(ref_items_list):
+        values_list = re.findall(value_regex, ref_item)
+        if values_list:
+            ref_item = ''
+        new_ref_items_list.append(ref_item)
+    ref_items_list = [x for x in new_ref_items_list if x]
+    return ref_items_list
+
+
+def _check_move_first_item(value_regex, ref_items_list):
+    values_list = re.findall(value_regex, ref_items_list[0])
+    if values_list:
+        ref_items_list = ref_items_list[1:] + [ref_items_list[0]]
+    return ref_items_list
+
+
+def _clean_ref(raw_ref):
+    ref = raw_ref.replace(',” ', ', ').replace('”', '').replace(', 0,', ', ')
+    init_ref_items_list = ref.split(", ")
+    ref_items_list = init_ref_items_list
+
+    # Cleaning first item
+    ref_items_list = _check_move_first_item(bp_rg.RE_SCOPUS_REF_YEAR, ref_items_list)
+    ref_items_list = _check_move_first_item(bp_rg.RE_SCOPUS_REF_DOI, ref_items_list)
+
+    # Droping useless items
+    ref_items_list = _drop_ref_items(bp_rg.RE_SCOPUS_REF_MONTHS_DROP, ref_items_list)
+    ref_items_list = _drop_ref_items(bp_rg.RE_SCOPUS_REF_WORDS_DROP, ref_items_list)
+    ref_items_list = _drop_ref_items(bp_rg.RE_SCOPUS_REF_PAGES, ref_items_list)
+    ref_items_list = _drop_ref_items(bp_rg.RE_SCOPUS_REF_SYMB, ref_items_list)
+    ref_items_list = _drop_ref_items(bp_rg.RE_SCOPUS_REF_WORDS_DROP, ref_items_list)
+
+    # Merging items when colon is present
+    items_nb = len(ref_items_list)
+    new_ref_items_list = []
+    item_idx = 0
+    while item_idx<items_nb:
+        ref_item = ref_items_list[item_idx]
+        new_item_idx, ref_new_item = _check_merge_ref_items_colon(item_idx, ref_item,
+                                                                   ref_items_list, raw_ref)
+        new_ref_items_list.append(ref_new_item)
+        item_idx = new_item_idx + 1
+    mod_ref_items_list = [x for x in new_ref_items_list if x]
+
+    # Merging items if items are not capitalized
+    new_ref_items_list = mod_ref_items_list
+    items_idx_max = len(mod_ref_items_list)-1
+    if items_idx_max>0:
+        new_ref_items_list = [mod_ref_items_list[0]]
+        item_idx, ref_item = 1, mod_ref_items_list[1]
+        new_item_idx, ref_new_item = _check_merge_ref_items_lowercase(item_idx, ref_item,
+                                                                      mod_ref_items_list)
+        new_ref_items_list.append(ref_new_item)
+        if new_item_idx<items_idx_max:
+            new_ref_items_list += mod_ref_items_list[new_item_idx + 1:]
+    clean_ref_items_list = [x for x in new_ref_items_list if x]
+    new_ref = ', '.join(clean_ref_items_list)
+    return new_ref
+
+
+def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
+    # Setting named tuple
+    article_ref = namedtuple('article_ref', ref_cols_list)
+
+    pub_refs_list =[]
+    if isinstance(ref_field, str):
+        # If the reference field is not empty and not an URL
+        raw_refs_list = [x for x in ref_field.split("; ") if x]
+        for raw_ref in raw_refs_list:
+            if verbose:
+                print("\n\nraw_ref       :", raw_ref)
+            ref = _clean_ref(raw_ref)
+            ref_items_list = ref.split(", ")
+            if verbose:
+                print("ref           :", ref)
+                print("ref_items_list:", ref_items_list)
+
+            doi_item_idx, doi = _find_ref_doi(ref_items_list)
+            year_item_idx, year = _find_ref_year(ref_items_list, doi_item_idx, doi, ref)
+            authors, authors_case = _find_ref_authors(ref_items_list)
+            search_title_params = [authors_case, year, year_item_idx, doi, doi_item_idx]
+            title_item_idx, title_item, journal_in_title = _found_ref_title(ref_items_list, search_title_params)
+            search_journal_params = [authors_case, title_item_idx, title_item, doi, journal_in_title]
+            journal_item_idx, journal, title = _find_ref_journal(ref_items_list, search_journal_params)
+
+            if verbose:
+                print("    year          :", year)
+                print("    authors       :", authors)
+                print("    journal       :", journal)
+                print("    doi           :", doi)
+                print("    title         :", title)
+
+            if authors==bp_sg.UNKNOWN:
+                authors = bp_sg.PARTIAL
+                if journal!=bp_sg.UNKNOWN and title!=bp_sg.UNKNOWN:
+                    title = f'{title}, {journal}'
+                    journal = bp_sg.UNKNOWN
+
+            pub_refs_list.append(article_ref(pub_id, authors, year, journal, doi, title, raw_ref))
+    return pub_refs_list
+
+
+def build_scopus_references(corpus_df, cols_tup, verbose=False):
+    """Builds the data of cited references per publication of the corpus.
+
+    The structure of the built data is composed of 6 columns and one row per reference and per publication.
+        Ex:
+           Pub_id  Author            Year         Journal             DOI                Title              Full_reference
+            0    Bellouard Q et al.  2017   Int. J. Hydrog. Energy    10.23919/...  Thermal management...   Bellouard Q,...
+            0    Bellouard Q.         2020   Energy Fuels              unknown       Design and add...      Bellouard Q.,...
+
+    Args:
+        corpus_df (dataframe): The selected rawdata of the corpus.
+        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+    Returns:
+        (dataframe): The built data.
+    """
+    # Setting useful column names
+    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
+    ref_cols_list = cols_lists_dic['ref_cols_list']
+    pub_id_col = cols_dic['pub_id_col']
+    scopus_ref_col = scopus_cols_dic['scopus_ref_col']
+
+    refs_list =[]
+    for pub_id, ref_field in zip(list(corpus_df[pub_id_col]), corpus_df[scopus_ref_col]):
+        if verbose:
+            print("\n\npub_id:", pub_id)
+        pub_refs_list = _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose)
+        refs_list += pub_refs_list
+    references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
+                                            for idx, label in enumerate(ref_cols_list)})
+    return references_df

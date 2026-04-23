@@ -3,7 +3,8 @@ __all__ = ['build_item_df_from_tup',
            'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
-           'clean_authors_countries_institutions',
+           'clean_authors_countries_affils',
+           'convert_issn',
            'dict_print',
            'drop_rawdata',
            'normalize_country',
@@ -11,10 +12,15 @@ __all__ = ['build_item_df_from_tup',
            'normalize_name',
            'rationalize_town_names',
            'remove_special_symbol',
+           'set_address_uniform_words',
            'set_rawdata_error',
            'set_unknown_address',
            'standardize_address',
            'standardize_str',
+           'str_int_convertor',
+           'treat_author',
+           'treat_doctype',
+           'treat_title',
            'upgrade_col_names',
            ]
 
@@ -37,9 +43,53 @@ import nltk
 from pandas.core.groupby.groupby import DataError
 
 # Local library imports
-import BiblioParsing.BiblioGeneralGlobals as bp_gg
-import BiblioParsing.BiblioRegexpGlobals as bp_rg
-import BiblioParsing.BiblioSpecificGlobals as bp_sg
+import BiblioParsing.general_globals as bp_gg
+import BiblioParsing.regex_globals as bp_rg
+import BiblioParsing.specific_globals as bp_sg
+
+
+def str_int_convertor(x):
+    try:
+        return(int(float(x)))
+    except ValueError:
+        return 0
+
+
+def convert_issn(text):
+    new_text = bp_sg.UNKNOWN
+    y = ''.join(re.findall(bp_rg.RE_ISSN, text))
+    if y.strip():
+        new_text = y[0:4] + "-" + y[4:]
+    return new_text
+
+
+def treat_doctype(doctype):
+    for doctype_key, doctype_list in bp_sg.DIC_DOCTYPE.items():
+        if doctype in doctype_list:
+            doctype = doctype_key
+    return doctype
+
+
+def treat_title(title):
+    title = title.translate(bp_gg.DASHES_CHANGE)
+    title = title.translate(bp_gg.LANG_CHAR_CHANGE)
+    title = title.translate(bp_gg.PONCT_CHANGE)
+    return title
+
+
+def treat_author(authors_list):
+    authors_sep = ','
+    if ';' in authors_list:
+        # Change in scopus on 07/2023
+        authors_sep = ';'
+    # Picking the first author
+    raw_first_author = authors_list.split(authors_sep)[0]
+    first_author = normalize_name(raw_first_author)
+    # Setting firstname_initials to upper case
+    lastname = (" ").join(first_author.split(" ")[:-1])
+    firstname_initials = first_author.split(" ")[-1]
+    first_author = (" ").join([lastname, firstname_initials.upper()])
+    return first_author
 
 
 def dict_print(dic):
@@ -105,7 +155,7 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_typ
 
 def set_rawdata_error(database, rawdata_path, raw_extent):
     error_text  = f"\n   !!! No {database} raw-data file available !!! \n"
-    error_text += f"\nBefore new launch of the cell, "
+    error_text += f"\nBefore new launch of the parsing, "
     error_text += f"please make available a {database} raw-data file "
     error_text += f"with {raw_extent} extension in:\n   {rawdata_path}."
     return error_text
@@ -120,13 +170,13 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fail
     pub_ids_list = list(set(pub_ids_list))
     if fails_dict:
         corpus_size = fails_dict['number of article']
-        fails_dict[item_col] = {'success (%)':100 * ( 1 - len(pub_ids_list) / corpus_size),
+        fails_dict[item_col] = {'success (%)':100 * (1 - len(pub_ids_list) / corpus_size),
                                 pub_id_col:[int(x) for x in pub_ids_list]}
     item_df = item_df[item_df[item_col]!='']
     return item_df, fails_dict
 
 
-def clean_authors_countries_institutions(auth_addr_country_inst_df):
+def clean_authors_countries_affils(auth_addr_country_inst_df):
     """Gathers author's attributes in a single line for each publication.
     """
     # Setting useful column names
@@ -208,8 +258,8 @@ def build_title_keywords(df):
             (list) : The tokenized and lemmatized words.
         """
         tokenized = nltk.word_tokenize(text.lower())
-        valid_words = [word for (word, pos) in nltk.pos_tag(tokenized) 
-                       if pos in bp_sg.NLTK_VALID_TAG_LIST] 
+        valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
+                       if pos in bp_sg.NLTK_VALID_TAG_LIST]
 
         stemmer = nltk.stem.WordNetLemmatizer()
         valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
@@ -407,7 +457,6 @@ def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
 
 
 def check_and_drop_columns(database, init_df):
-
     df = init_df.copy()
 
     # Setting useful aliases
@@ -469,10 +518,10 @@ def upgrade_col_names(corpus_folder):
                                  'subjects2.dat'      : 'sub_subject',
                                  'titlekeywords.dat'  : 'keywords'}
 
-    for dirpath, dirs, files in os.walk(corpus_folder):  
+    for dirpath, dirs, files in os.walk(corpus_folder):
         if ('parsing' in   dirpath) |  ('filter_' in  dirpath):
             for file in  [file for file in files
-                          if (file.split('.')[1]=='dat') 
+                          if (file.split('.')[1]=='dat')
                           and (file!='database.dat')      # Unused this file is no longer generated
                           and (file!='keywords.dat') ]:   # Unused this file is no longer generated
                 try:
@@ -571,6 +620,15 @@ def standardize_str(raw_str):
     return standard_str
 
 
+def set_address_uniform_words(address):
+    for word_to_substitute, pattern in bp_rg.AFFIL_WORD_SUBSTITUTE_PATTERN_DIC.items():
+        re_pattern = re.compile(pattern)
+        uniform_address = re.sub(re_pattern, word_to_substitute + ' ', address)
+    uniform_address = re.sub(r'\s+', ' ', uniform_address)
+    uniform_address = re.sub(r'\s,', ',', uniform_address)
+    return uniform_address
+
+
 def standardize_address(raw_address, add_unknown_country=True):
     """Standardizes the string 'raw_address' by replacing all aliases of a word, 
     such as 'University', 'Institute', 'Center' and' Department', by a standardized 
@@ -578,7 +636,7 @@ def standardize_address(raw_address, add_unknown_country=True):
 
     First, the address string is standardized through the `standardize_str` function of the same module. 
     Then, the aliases of a given word are captured using a specific regex which is case sensitive defined 
-    by the global 'DIC_WORD_RE_PATTERN' imported from the `BiblioParsing` package imported as "bp". 
+    by the global 'RE_AFFIL_WORD_PATTERN_DIC' imported from the `BiblioParsing.regex_globals` module. 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
     The length of the aliases is limited to a maximum according to the longest alias known.
         ex: The longest alias known for the word 'University' is 'Universidade'. 
@@ -597,13 +655,12 @@ def standardize_address(raw_address, add_unknown_country=True):
     # Removing particular characters
     standard_address = standardize_str(raw_address)
 
+    # Removing ambiguous words
+    for re_amb_word in bp_rg.RE_AFFIL_AMB_WORDS_LIST:
+        standard_address = re.sub(re_amb_word, ' ', standard_address)
+
     # Uniformizing words
-    for word_to_substitute, re_pattern in bp_sg.DIC_WORD_RE_PATTERN.items():
-        if word_to_substitute=='University':
-            re_pattern = re.compile(r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?')
-        standard_address = re.sub(re_pattern, word_to_substitute + ' ', standard_address)
-    standard_address = re.sub(r'\s+', ' ', standard_address)
-    standard_address = re.sub(r'\s,', ',', standard_address)
+    standard_address = set_address_uniform_words(standard_address)
 
     # Uniformizing countries
     country_pos = -1

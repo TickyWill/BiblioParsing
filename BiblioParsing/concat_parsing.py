@@ -11,11 +11,11 @@ from difflib import SequenceMatcher
 import pandas as pd
 
 # Local library imports
-import BiblioParsing.BiblioGeneralGlobals as bp_gg
-import BiblioParsing.BiblioSpecificGlobals as bp_sg
-from BiblioParsing.BiblioParsingInstitutions import build_norm_raw_institutions
-from BiblioParsing.BiblioParsingInstitutions import extend_author_institutions
-from BiblioParsing.BiblioParsingUtils import dict_print
+import BiblioParsing.general_globals as bp_gg
+import BiblioParsing.specific_globals as bp_sg
+from BiblioParsing.affiliations_parsing import build_norm_and_raw_affils
+from BiblioParsing.affiliations_parsing import extend_author_affils
+from BiblioParsing.parsing_utils import dict_print
 
 
 def _set_dedup_cols():
@@ -46,49 +46,47 @@ def _set_dedup_cols():
     return cols_dic
 
 
-def _concatenate_item_dfs(item, first_corpus_df, second_corpus_df, pub_id_col):
+def _concatenate_item_dfs(item_first_corpus_df, item_second_corpus_df, pub_id_col):
     """Concatenates the parsing item's data of two corpuses referenced as first corpus 
     and second corpus.
 
     Args:
-        item (string): The parsing item's name.
-        first_corpus_df (dataframe): The parsing item's data of the first corpus.
-        second_corpus_df (dataframe): The parsing item's data of the second corpus.
+        item_first_corpus_df (dataframe): The parsing item's data of the first corpus.
+        item_second_corpus_df (dataframe): The parsing item's data of the second corpus.
         pub_id_col (str): Name of the column of the publications identifiers.
     Returns:
         (dataframe): The item's concatenated data.
     """
     # Incrementing the "pub_id_col" column values of second corpus by first corpus length
-    first_corpus_articles_nb = max(first_corpus_df[pub_id_col]) + 1
-    new_second_corpus_df = second_corpus_df.copy()
-    new_second_corpus_df[pub_id_col] = new_second_corpus_df[pub_id_col] + first_corpus_articles_nb
+    first_corpus_articles_nb = max(item_first_corpus_df[pub_id_col]) + 1
+    new_item_second_corpus_df = item_second_corpus_df.copy()
+    new_item_second_corpus_df[pub_id_col] = new_item_second_corpus_df[pub_id_col] + first_corpus_articles_nb
 
     # Concatenating the two dataframes
-    dfs_list = [first_corpus_df, new_second_corpus_df]
+    dfs_list = [item_first_corpus_df, new_item_second_corpus_df]
     concat_df = pd.concat(dfs_list)
     concat_df.sort_values(by=[pub_id_col], inplace=True)
 
     return concat_df
 
 
-def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_list=None):
-    """Concatenates parsing dfs of two corpuses using the `_concatenate_item_dfs` 
-    internal function to the module. 
+def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_list=None):
+    """Concatenates parsing data of two corpuses using the `_concatenate_item_dfs` 
+    internal function to the module.
 
     Then it proceeds with extending the "author with institutions" parsing data 
-    using the `extend_author_institutions` function. 
-    The outputs are the concatenated parsing data of the corpus.
+    using the `extend_author_affils` function imported from the 
+    `BiblioParsing.BiblioParsingInstitutions` module.
 
     Args:
-        first_parsing_dict (dict): Dict with keys as items parsing and values as the dfs 
-                                   resulting from the parsing of the first corpus.
-        second_parsing_dict (dict): Dict with keys as items parsing and values as the dfs 
-                                    resulting from the parsing of the second corpus.
-        inst_filter_list (list): The affiliations-filter composed of a list of normalized \
-        affiliations (str), optional (default=None).
+        first_parsing_dict (dict): The dict keyed by parsing items (str) and valued by data \
+        resulting from the parsing of the first corpus (dataframe).
+        second_parsing_dict (dict): The dict keyed by parsing items (str) and valued by data \
+        resulting from the parsing of the second corpus (dataframe).
+        affil_filter_list (list): Optional (default=None), the affiliations-filter composed of a list \
+        of normalized affiliations (str).
     Returns:
-        (dict): Dict with keys as parsing items (str) and values (dataframe) as \
-        the concatenated data.
+        (dict): The dict keyed by parsing items (str) and valued by the concatenated parsing data (dataframe).
     """
     # Setting useful aliases
     pub_id_alias = bp_sg.COL_NAMES['pub_id']
@@ -103,7 +101,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
     concat_parsing_dict = {}
     for item in common_items_list:
         if len(first_parsing_dict[item]) and len(second_parsing_dict[item]):
-            concat_parsing_dict[item] = _concatenate_item_dfs(item, first_parsing_dict[item],
+            concat_parsing_dict[item] = _concatenate_item_dfs(first_parsing_dict[item],
                                                               second_parsing_dict[item], pub_id_alias)
         elif len(second_parsing_dict[item]):
             concat_parsing_dict[item] = second_parsing_dict[item]
@@ -113,15 +111,15 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, inst_filter_lis
             concat_parsing_dict[item] = None
 
     # Extending the author with institutions parsing df
-    if inst_filter_list and concat_parsing_dict[auth_inst_item_alias] is not None:
-        concat_parsing_dict[auth_inst_item_alias] = extend_author_institutions(concat_parsing_dict[auth_inst_item_alias],
-                                                                               inst_filter_list)
+    if affil_filter_list and concat_parsing_dict[auth_inst_item_alias] is not None:
+        concat_parsing_dict[auth_inst_item_alias] = extend_author_affils(concat_parsing_dict[auth_inst_item_alias],
+                                                                               affil_filter_list)
     return concat_parsing_dict
 
 
 def _find_value_to_keep(dg, column_name, length_max=False):
     col_values_list = dg[column_name].to_list()
-    col_values_list = list(dict.fromkeys(col_values_list)) 
+    col_values_list = list(dict.fromkeys(col_values_list))
     if bp_sg.UNKNOWN in col_values_list:
         col_values_list.remove(bp_sg.UNKNOWN)
     if length_max and len(col_values_list)>1:
@@ -135,7 +133,14 @@ def _find_value_to_keep(dg, column_name, length_max=False):
     return value_to_keep
 
 
-def _setting_same_journal_name(df, norm_journal_col, same_journal_col, similar):
+def _norm_title(title):
+    for init_symb, new_symb in bp_gg.TITLE_SYMB_CHANGE_DIC.items():
+        title.replace(init_symb, new_symb)
+    new_title = title.strip()
+    return new_title
+
+
+def _set_same_journal_name(df, norm_journal_col, same_journal_col, similar):
     print("      - Setting same journal names...")
     journals_list = df[norm_journal_col].to_list()
     journal_df = pd.DataFrame(journals_list, columns=[same_journal_col])
@@ -157,7 +162,7 @@ def _setting_same_journal_name(df, norm_journal_col, same_journal_col, similar):
     return same_journal_name_df
 
 
-def _setting_same_article_title(df, title_col, lc_title_col, similar, norm_title):
+def _set_same_article_title(df, title_col, lc_title_col, similar):
     print("      - Setting same publication's title...")
     titles_list = df[title_col].to_list()
     title_df = pd.DataFrame(titles_list, columns=[lc_title_col])
@@ -176,91 +181,85 @@ def _setting_same_article_title(df, title_col, lc_title_col, similar, norm_title
                         title_df.loc[title_df[lc_title_col]==t2] = t1
             print(f"            Number of titles checked: {t1_idx}  / {lines_nb}", end="\r")
     title_df[lc_title_col] = title_df[lc_title_col].str.lower()
-    title_df[lc_title_col] = title_df[lc_title_col].apply(norm_title)
+    title_df[lc_title_col] = title_df[lc_title_col].apply(_norm_title)
     df.reset_index(inplace=True, drop=True)
     same_title_df = pd.concat([df, title_df], axis=1)
     return same_title_df
 
 
-def _setting_issn(df, same_journal_col, issn_col):
+def _set_issn(df, same_journal_col, issn_col):
+    issn_df = df.copy()
     dfs_list = []
     for _, journal_dg in df.groupby(same_journal_col):
         if bp_sg.UNKNOWN in journal_dg[issn_col].to_list():
             journal_dg[issn_col] = _find_value_to_keep(journal_dg, issn_col)
         dfs_list.append(journal_dg)
-    if dfs_list!=[]:
+    if dfs_list:
         issn_df = pd.concat(dfs_list)
-    else:
-        issn_df = df.copy()
     return issn_df
 
 
-def _setting_doi(df, lc_title_col, doi_col):
+def _set_doi(df, lc_title_col, doi_col):
+    doi_df = df.copy()
     dfs_list = []
     for _, title_dg in df.groupby(lc_title_col):
         if bp_sg.UNKNOWN in title_dg[doi_col].to_list():
             title_dg[doi_col] = _find_value_to_keep(title_dg, doi_col)
         dfs_list.append(title_dg)
-    if dfs_list != []:
+    if dfs_list:
         doi_df = pd.concat(dfs_list)
-    else:
-        doi_df = df.copy()
     return doi_df
 
 
-def _setting_doc_type(df, doi_col, doc_type_col):
+def _set_doc_type(df, doi_col, doc_type_col):
+    doctype_df = df.copy()
     dfs_list = []
     for _, doi_dg in df.groupby(doi_col):
         if bp_sg.UNKNOWN in doi_dg[doc_type_col].to_list():
             doi_dg[doc_type_col] = _find_value_to_keep(doi_dg, doc_type_col)
         dfs_list.append(doi_dg)
-    if dfs_list != []:
+    if dfs_list:
         doctype_df = pd.concat(dfs_list)
-    else:
-        doctype_df = df.copy()
     return doctype_df
 
 
-def _setting_same_doi(df, cols_list):
+def _set_same_doi(df, cols_list):
     authors_col, lc_doc_type_col, issn_col, page_col, doi_col, lc_title_col, lc_doi_col = cols_list
+    title_same_doi_df = df.copy()
     dfs_list = []
     for _, sub_df in df.groupby([authors_col, lc_doc_type_col, issn_col, page_col]):
-        dois_nb = len(list(set(sub_df[doi_col].to_list())))
+        dois_list = sub_df[doi_col].to_list()
         titles_nb = len(list(set(sub_df[lc_title_col].to_list())))
-        if bp_sg.UNKNOWN in sub_df[doi_col].to_list() and titles_nb>1:
+        if titles_nb>1 and bp_sg.UNKNOWN in dois_list:
             sub_df[doi_col] = _find_value_to_keep(sub_df, doi_col)
             sub_df[lc_title_col] = _find_value_to_keep(sub_df, lc_title_col)
         dfs_list.append(sub_df)
-    if dfs_list != []:
+    if dfs_list:
         title_same_doi_df = pd.concat(dfs_list)
-    else:
-        title_same_doi_df = df.copy()
     title_same_doi_df[lc_doi_col] = title_same_doi_df[doi_col].str.lower()
     return title_same_doi_df
 
 
-def _setting_same_first_author_name(df, cols_list):
+def _set_same_first_author_name(df, cols_list):
     (lc_doc_type_col, issn_col, lc_title_col, page_col,
      pub_id_col, authors_col, lc_doi_col) = cols_list
+    same_author_df = df.copy()
     dfs_list = []
     for _, sub_df in df.groupby([lc_doc_type_col, issn_col, lc_title_col, page_col]):
         authors_list = list(set(sub_df[authors_col].to_list()))
-        dois_list = list(set(sub_df[lc_doi_col].to_list()))
+        lc_dois_list = list(set(sub_df[lc_doi_col].to_list()))
         authors_nb = len(authors_list)
-        dois_nb = len(dois_list)
-        if authors_nb>1 and bp_sg.UNKNOWN in dois_list:
+        if authors_nb>1 and bp_sg.UNKNOWN in lc_dois_list:
             sub_df[authors_col] = _find_value_to_keep(sub_df, authors_col, length_max=True)
             sub_df[lc_doi_col] = _find_value_to_keep(sub_df, lc_doi_col)
         dfs_list.append(sub_df)
-    if dfs_list!=[]:
+    if dfs_list:
         same_author_df = pd.concat(dfs_list)
-    else:
-        same_author_df = df.copy()
     same_author_df.sort_values(by=[pub_id_col], inplace=True)
     return same_author_df
 
 
-def _dropping_duplicate_article1(df, cols_list):
+def _drop_duplicate_article1(df, cols_list):
     lc_doi_col, title_col, doc_type_col, lc_title_col, lc_doc_type_col = cols_list
     dfs_list = []
     for doi, dg in df.groupby(lc_doi_col):
@@ -277,11 +276,12 @@ def _dropping_duplicate_article1(df, cols_list):
     return doi_dedup_df
 
 
-def _dropping_duplicate_article2(df, cols_list):
+def _drop_duplicate_article2(df, cols_list):
     lc_title_col, lc_doc_type_col, same_journal_col, lc_doi_col, pub_id_col = cols_list
+    dedup_df = df.copy()
     dfs_list = []
-    for idx, dg in df.groupby([lc_title_col, lc_doc_type_col, same_journal_col]):
-        if len(dg) < 3:
+    for _, dg in df.groupby([lc_title_col, lc_doc_type_col, same_journal_col]):
+        if len(dg)<3:
             # Deduplicating article lines with same title, document type, first author and journal
             # and also with same DOI if not bp_sg.UNKNOWN
             dg[lc_doi_col] = _find_value_to_keep(dg, lc_doi_col)
@@ -300,13 +300,23 @@ def _dropping_duplicate_article2(df, cols_list):
                                   f'Publications data with DOIs "{bp_sg.UNKNOWN}" has been droped')
             print(warning)
         dfs_list.append(dg)
-    if dfs_list!=[]:
+    if dfs_list:
         dedup_df = pd.concat(dfs_list)
-    else:
-        dedup_df = df.copy()
     dedup_df = dedup_df.drop([lc_title_col, lc_doc_type_col, lc_doi_col], axis=1)
     dedup_df.sort_values(by=[pub_id_col], inplace=True)
     return dedup_df
+
+
+def _norm_doctype(doctype):
+    # Normalizing document type
+    lc_doctype = doctype.lower()
+    norm_doctype = lc_doctype
+    for key, values in bp_sg.LC_DOCTYPE_DIC.items():
+        if lc_doctype in values:
+            norm_doctype = key
+        else:
+            pass
+    return norm_doctype
 
 
 def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
@@ -325,26 +335,8 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     """
     print("  - Deduplicating publications main data...")
 
-    # Setting useful internal functions
-
-    def _norm_doctype(doctype):
-        lc_doctype = doctype.lower()
-        norm_doctype = lc_doctype
-        for key, values in lc_doctype_dic.items():
-            if lc_doctype in values:
-                norm_doctype = key
-            else:
-                pass
-        return norm_doctype
-
-    def _norm_title(title):
-        for init_symb, new_symb in bp_gg.TITLE_SYMB_CHANGE_DIC.items():
-            title.replace(init_symb, new_symb)
-        new_title = title.strip()
-        return new_title
-
+    # Setting useful lambda function
     similar = lambda a, b: SequenceMatcher(None, a, b).ratio()
-    norm_title = lambda x: _norm_title(x)
 
     # Setting useful column names
     cols_keys = ['pub_id_col', 'authors_col', 'page_col', 'doi_col',
@@ -356,48 +348,43 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
      lc_title_col, lc_doc_type_col, lc_doi_col,
      norm_journal_col, same_journal_col) = [cols_dic[key] for key in cols_keys]
 
-    # Setting lower case doc-type dict for normalization of doc-types
-    lc_doctype_dic = {}
-    for key, values in bp_sg.DIC_DOCTYPE.items():
-        lc_doctype_dic[key.lower()] = [x.lower() for x in values]
-
     # Setting same journal name for similar journal names
-    inter1_articles_concat_df = _setting_same_journal_name(init_articles_concat_df, norm_journal_col,
+    inter1_articles_concat_df = _set_same_journal_name(init_articles_concat_df, norm_journal_col,
                                                            same_journal_col, similar)
     print("      - Column with unique journal name added to the publications data")
 
     # Setting same article title for similar article title
-    inter2_articles_concat_df = _setting_same_article_title(inter1_articles_concat_df, title_col,
-                                                            lc_title_col, similar, norm_title)
+    inter2_articles_concat_df = _set_same_article_title(inter1_articles_concat_df, title_col,
+                                                        lc_title_col, similar)
     print("      - Titles of publications standardized                        ")
 
     # Setting issn when unknown for given article ID using available issn values
     # of journals of same normalized names from other article IDs
-    issn_articles_concat_df = _setting_issn(inter2_articles_concat_df, same_journal_col, issn_col)
+    issn_articles_concat_df = _set_issn(inter2_articles_concat_df, same_journal_col, issn_col)
     print("      - Available ISSN value set common to journals with same name")
 
     # Adding useful temporal columns
     issn_articles_concat_df[lc_title_col] = issn_articles_concat_df[lc_title_col].str.lower()
-    issn_articles_concat_df[lc_doc_type_col] = issn_articles_concat_df[doc_type_col].apply(lambda x: _norm_doctype(x))
+    issn_articles_concat_df[lc_doc_type_col] = issn_articles_concat_df[doc_type_col].apply(_norm_doctype)
     issn_articles_concat_df[title_col] = issn_articles_concat_df[title_col].str.strip()
 
     # Setting DOI when unknown for given article ID using available DOI values
     # of articles of same title from other article IDs
     # Modification on 09-2023
-    doi_articles_concat_df = _setting_doi(issn_articles_concat_df, lc_title_col, doi_col)
+    doi_articles_concat_df = _set_doi(issn_articles_concat_df, lc_title_col, doi_col)
     print("      - Available DOI value set common to publications with same title")
 
     # Setting document type when unknown for given article ID using available document type values
     # of articles of same DOI from other article IDs
     # Modification on 09-2023
-    doctype_articles_concat_df = _setting_doc_type(doi_articles_concat_df, doi_col, doc_type_col)
+    doctype_articles_concat_df = _set_doc_type(doi_articles_concat_df, doi_col, doc_type_col)
     print("      - Available document-type value set common to publications with same DOI")
 
     # Setting same DOI for similar titles when any DOI is unknown
     # for same first author, page, document type and ISSN
     # Modification on 09-2023
     cols_list = [authors_col, lc_doc_type_col, issn_col, page_col, doi_col, lc_title_col, lc_doi_col]
-    title_articles_concat_df = _setting_same_doi(doctype_articles_concat_df, cols_list)
+    title_articles_concat_df = _set_same_doi(doctype_articles_concat_df, cols_list)
     print("      - Available DOI value set common to publications with same first author, page, document type and ISSN")
 
     # Setting same first author name for same page, document type and ISSN
@@ -405,7 +392,7 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
     # Modification on 09-2023
     cols_list = [lc_doc_type_col, issn_col, lc_title_col, page_col,
                  pub_id_col, authors_col, lc_doi_col]
-    author_articles_concat_df = _setting_same_first_author_name(title_articles_concat_df, cols_list)
+    author_articles_concat_df = _set_same_first_author_name(title_articles_concat_df, cols_list)
     print("      - Same first author name set common to publications with same page, document type and ISSN")
 
     # Keeping copy of author_articles_concat_df with completed same_journal_col, issn_col, doi_col and doc_type_col columns
@@ -413,13 +400,13 @@ def _deduplicate_articles(init_articles_concat_df, cols_dic, verbose=False):
 
     # Dropping duplicated publication data after merging by doi or, for unknown doi, by title and document type
     cols_list = [lc_doi_col, title_col, doc_type_col, lc_title_col, lc_doc_type_col]
-    doi_articles_dedup_df = _dropping_duplicate_article1(author_articles_concat_df, cols_list)
+    doi_articles_dedup_df = _drop_duplicate_article1(author_articles_concat_df, cols_list)
     print("      - Publication data with same DOI deduplicated on DOI except for unknown DOI")
     print("      - Publication data with unknown DOI deduplicated on title and document type")
 
     # Dropping duplicated publication data after merging by title, document type and journal
     cols_list = [lc_title_col, lc_doc_type_col, same_journal_col, lc_doi_col, pub_id_col]
-    articles_dedup_df = _dropping_duplicate_article2(doi_articles_dedup_df, cols_list)
+    articles_dedup_df = _drop_duplicate_article2(doi_articles_dedup_df, cols_list)
     print("      - Publication data deduplicated on title, document type and journal")
 
     # Identifying the set of articles IDs to drop in the other parsing files of the concatenated corpus
@@ -464,39 +451,33 @@ def _deduplicate_item_df(pub_ids_to_drop, item_df, pub_id_col, second_col):
     return item_dg
 
 
-def deduplicate_parsing(concat_parsing_dict, norm_inst_status=False, inst_types_file_path=None,
-                        country_affiliations_file_path=None, country_towns_file=None,
-                        country_towns_folder_path=None, verbose=False):
+def deduplicate_parsing(concat_parsing_dict, norm_affil_status=False, affil_params_dic=None, verbose=False):
     """Deduplicates parsing data from the concatenated parsing data.
 
     It proceeds with deduplication of publications data using the `_deduplicate_articles` internal 
     function of the module. 
-    Then, it rationalizes the content of the other parsing data using the publication identifiers
-    of the droped publications data using the `_deduplicate_item_df` internal function of the module.
+    Then, it rationalizes the content of the other parsing data using the publication identifiers 
+    of the droped publications data using the `_deduplicate_item_df` internal function of the module. 
     The outputs are the deduplicated parsing data of the corpus.
 
     Args:
         concat_parsing_dict (dict): Dict with keys as items parsing (str) and values (dataframe) as \
         the data resulting from the concatenation of corpuses parsings.
-        norm_inst_status (bool): If true (dafault= False)of normalized institutions and of not-yet \
-        normalized institutions.
-        inst_types_file_path (path): The full path to the data of institutions-types used to normalize \
-        the affiliations, optional (default=None).
-        country_affiliations_file_path (path): The full path to the data per country of raw affiliations \
-        per normalized one, optional (default=None).
-        country_towns_file (str): The name of the file of the data of towns per country, optional (default=None).
-        country_towns_folder_path (path): The full path to the folder where the 'country_towns_file' file \
-        is available, optional (default=None).
+        norm_affil_status (bool): If true (dafault= False), normalized institutions and of not-yet \
+        normalized institutions are built.
+        affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', 'country_affils_file_path', \
+        'country_towns_folder_path', 'country_towns_file'] and valued by the user as the full path to the data \
+        per country of raw affiliations per normalized one, the full path to the data of affiliations-types \
+        used to normalize the affiliations, the name of the file of the data of towns per country and the full \
+        path to the folder where these data are available.
         verbose (bool): True for allowing control prints (default: False).
     Returns:
-        (dict): Dict with keys as parsing items (str) and values (dataframe) as the deduplicated data.
+        (dict): The dict keyed by parsing items (str) and valued by deduplicated parsing data(dataframe).
     """
     # Setting useful col names
     cols_dic = _set_dedup_cols()
     cols_keys = ['pub_id_col', 'author_idx_col', 'address_idx_col', 'country_addr_idx_col',
                  'inst_addr_idx_col', 'auth_inst_auth_idx_col']
-    (pub_id_col, author_idx_col, address_idx_col, country_addr_idx_col,
-     inst_addr_idx_col, auth_inst_auth_idx_col) = [cols_dic[key] for key in cols_keys]
     cols_list = [cols_dic[key] for key in cols_keys]
     pub_id_col = cols_list[0]
 
@@ -523,22 +504,18 @@ def deduplicate_parsing(concat_parsing_dict, norm_inst_status=False, inst_types_
             second_col = sorting_second_col_dict[item]
         dedup_parsing_dict[item] = _deduplicate_item_df(pub_ids_to_drop, item_df, pub_id_col, second_col)
 
-    if norm_inst_status:
+    if norm_affil_status:
         # Creating data of normalized institutions and of not-yet normalized institutions
         address_df = dedup_parsing_dict[addresses_item]
-        return_tup = build_norm_raw_institutions(address_df,
-                                                 inst_types_file_path=inst_types_file_path,
-                                                 country_affiliations_file_path=country_affiliations_file_path,
-                                                 country_towns_file=country_towns_file,
-                                                 country_towns_folder_path=country_towns_folder_path,
-                                                 verbose=False)
+        return_tup = build_norm_and_raw_affils(address_df, affil_params_dic=affil_params_dic,
+                                               verbose=verbose)
         _, norm_institution_df, raw_institution_df, wrong_affil_types_dict = return_tup
         dedup_parsing_dict[norm_inst_item] = norm_institution_df
         dedup_parsing_dict[raw_inst_item] = raw_institution_df
 
         if wrong_affil_types_dict:
             print("\nWARNING: Uncorrect normalized-affiliation types found in the file: "
-                  f"\n         {user_country_affiliations_file_path}"
+                  f"\n         {country_affiliations_file_path}"
                   "\n\n         Please, correct the following affiliation types:")
             dict_print(country_affiliations_file_path)
 
