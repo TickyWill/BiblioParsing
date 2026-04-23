@@ -5,6 +5,7 @@ __all__ = ['AFFIL_DROPPING_PATTERNS_DIC',
            'AFFIL_KEEPING_PATTERNS_DIC',
            'AFFIL_WORDS_SET_TEMPLATE',
            'AFFIL_WORD_SUBSTITUTE_PATTERN_DIC',
+           'AFFIL_WORD_TO_DROP_TEMPLATE',
            'RE_ADDRESS',
            'RE_ADDS_JOURNAL',
            'RE_AFFIL_AMB_WORDS_LIST',
@@ -298,7 +299,7 @@ AFFIL_DROPPING_SUFFIX_TEMPLATE = Template(r'\B$word\b' + '|' + r'\b$word\b')
 AFFIL_DROPPING_WORD_TEMPLATE = Template(r'[\s(]$word[\s)]' + '|' + r'[\s]$word$$' + '|' + r'^$word\b')
 
 
-# Template for capturing prefix attached to 3 or 4 digits given, the prefix by given
+# Template for capturing prefix attached to 3 or 4 digits, the prefix by given
 # by the KEEPING_PREFIX global in BiblioParsing.specific_globals module
 AFFIL_KEEPING_PREFIX_TEMPLATE = Template(r'\b$prefix\d{3,4}\b')
 
@@ -321,3 +322,11 @@ AFFIL_KEEPING_PATTERNS_DIC = {'digits_prefix'     : AFFIL_DIGITS_KEEPING_PREFIX_
                               'word'              : AFFIL_KEEPING_WORD_TEMPLATE,
                              }
 
+
+# Template for capturing small words or accronyms given by the SMALL_WORDS_DROP
+# and the MISSING_SPACE_ACRONYMS globals in BiblioParsing.specific_globals module
+# For instance capturing 'of' in 'technical university of denmark'
+# capturing 'd' in 'institut d ingenierie'
+# capturing 'the' in 'the denmark university'
+# or capturing 'umr' in 'umr dddd' or 'umr dd'
+AFFIL_WORD_TO_DROP_TEMPLATE = Template(r'[\s(]$word[\s)]|[\s]$word$$|^$word\b')

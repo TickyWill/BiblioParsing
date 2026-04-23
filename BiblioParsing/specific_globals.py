@@ -2,7 +2,8 @@
 """
 
 __all__ = ['AFFIL_COL_NAMES',
-           'AFFIL_FILE_BASE_DIC',
+           'AFFIL_DEFAULT_FILES_DIC',
+           'AFFIL_TYPES_USECOLS',
            'AUTHORS_SMALL_WORDS',
            'BASIC_KEEPING_WORDS',
            'BLACKLISTED_WORDS',
@@ -12,9 +13,6 @@ __all__ = ['AFFIL_COL_NAMES',
            'COLUMN_LABEL_WOS',
            'COLUMN_LABEL_WOS_PLUS',
            'COLUMN_TYPE_SCOPUS',
-           'COUNTRY_AFFILIATIONS_FILE',
-           'COUNTRY_TOWNS',
-           'COUNTRY_TOWNS_FILE',
            'DIC_DOCTYPE',
            'DIC_LOW_WORDS',
            'DIC_TOWN_SYMBOLS',
@@ -26,9 +24,6 @@ __all__ = ['AFFIL_COL_NAMES',
            'FIELD_SIZE_LIMIT',
            'FR_DROPPING_WORDS',
            'IDS_TO_DROP_FILE_BASE',
-           'INST_TYPES_FILE',
-           'INST_TYPES_USECOLS',
-           'INSTITUTE_AFFILIATIONS_FILE',
            'KEEPING_WORDS',
            'KEEPING_PREFIX',
            'LC_DOCTYPE_DIC',
@@ -67,7 +62,8 @@ from BiblioParsing.parsing_utils import remove_special_symbol
 # Globals to be set #
 #####################
 
-BLACKLISTED_WORDS = [] #['null','nan'] for title keywords
+#['null','nan'] for  parsing title keywords
+BLACKLISTED_WORDS = [] 
 
 
 ##################
@@ -357,31 +353,14 @@ DIC_TOWN_WORDS = {" lez " : " les ",
                   "saint ": "st ",
                  }
 
-
-# ToDo: Check the use of this globals by their own
-# Setting the file name of the file for dropping towns in addresses
-COUNTRY_TOWNS_FILE = 'Country_towns.xlsx'
-
-# Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
-COUNTRY_AFFILIATIONS_FILE = 'Country_affiliations.xlsx'
-
-# Setting the file name of the file gathering de normalized affiliations with their raw affiliations per country
-INSTITUTE_AFFILIATIONS_FILE = "Institute_affiliations.xlsx"
-
-# Setting the file name for the file of institutions types description and order level with the useful columns
-INST_TYPES_FILE = "Institutions_types.xlsx"
-
-AFFIL_FILE_BASE_DIC = {'root'                 : 'Traitement Institutions',
-                       'country_towns_file'   : 'Country_towns.xlsx',
-                       'country_affils_file'  : 'Country_affiliations.xlsx',
-                       'institute_affils_file': 'Institute_affiliations.xlsx',
-                       'affil_types_file'     : 'Institutions_types.xlsx',
-                      }
+AFFIL_TYPES_USECOLS = ['Level', 'Abbreviation']
 
 
-COUNTRY_TOWNS = read_towns_per_country(country_towns_file=None, country_towns_folder_path=None)
-
-INST_TYPES_USECOLS = ['Level', 'Abbreviation']
+AFFIL_DEFAULT_FILES_DIC = {'country_towns_file'   : 'Country_towns.xlsx',
+                           'country_affils_file'  : 'Country_affiliations.xlsx',
+                           'institute_affils_file': 'Institute_affiliations.xlsx',
+                           'affil_types_file'     : 'Affiliations_types.xlsx',
+                          }
 
 
 # For keeping chunks of addresses (without accents and in lower case)

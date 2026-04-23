@@ -37,17 +37,7 @@ def _build_words_set(raw_aff, verbose=False):
         accronyms are present in the first set of words.
     """
     # Setting substitution templates for searching small words or acronyms
-    small_words_template = Template(r'[\s(]$word[\s)]' # For instance capturing 'of' in 'technical university of denmark'
-                                    + '|'
-                                    + r'[\s]$word$$' # For instance capturing 'd' in 'institut d ingenierie'
-                                    + '|'
-                                    + r'^$word\b') # For instance capturing 'the' in 'the denmark university'
-
-    acronyms_template = Template(r'[\s(]$word[\s)]' # For instance capturing 'umr' in 'umr dddd' or 'umr dd'
-                                  + '|'
-                                  + r'[\s]$word$$'
-                                  + '|'
-                                  + r'^$word\b')
+    word_to_drop_template = bp_rg.AFFIL_WORD_TO_DROP_TEMPLATE
 
     # Removing accents and spaces at ends
     raw_aff_mod = remove_special_symbol(raw_aff, only_ascii=False, strip=True)
@@ -77,14 +67,14 @@ def _build_words_set(raw_aff, verbose=False):
     # to particuliar institutions cases such as UMR or U followed by digits
     std_raw_aff_add = ""
     for accron in bp_sg.MISSING_SPACE_ACRONYMS:
-        re_accron = re.compile(acronyms_template.substitute({"word":accron}))
-        if re.search(re_accron,std_raw_aff.lower()) and len(raw_aff_words_set)==2:
+        re_accron = re.compile(word_to_drop_template.substitute({"word":accron}))
+        if re.search(re_accron, std_raw_aff.lower()) and len(raw_aff_words_set)==2:
             std_raw_aff_add = "".join(std_raw_aff.split(" "))
 
     # Droping small words
     for word_to_drop in bp_sg.SMALL_WORDS_DROP:
-        re_drop_words = re.compile(small_words_template.substitute({"word":word_to_drop}))
-        if re.search(re_drop_words,std_raw_aff.lower()):
+        re_drop_words = re.compile(word_to_drop_template.substitute({"word":word_to_drop}))
+        if re.search(re_drop_words, std_raw_aff.lower()):
             raw_aff_words_set = raw_aff_words_set - {word_to_drop}
 
     # Updating raw_aff_words_set_list using std_raw_aff_add
@@ -137,7 +127,9 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
 
     # Setting the path for the 'Country_affiliations.xlsx' file
     if not country_affiliations_file_path:
-        country_affiliations_file_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_sg.COUNTRY_AFFILIATIONS_FILE)
+        rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
+        country_affils_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['country_affils_file']
+        country_affiliations_file_path = rep_utils_path / Path(country_affils_file)
 
     # Reading the 'Country_affiliations.xlsx' multisheet XLSX file in a dict
     wb = openpyxl.load_workbook(country_affiliations_file_path)
@@ -182,18 +174,19 @@ def read_affil_types(affil_types_file_path=None):
         (dict): The built dict.
     """
     # Setting useful column names
-    level_col, short_col = bp_sg.INST_TYPES_USECOLS
+    level_col, short_col = bp_sg.AFFIL_TYPES_USECOLS
 
     # Setting the full path for the file of ordered institutions types
     if not affil_types_file_path:
-        inst_types_file = bp_sg.INST_TYPES_FILE
-        affil_types_file_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS) / Path(inst_types_file)
+        rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
+        affil_types_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['affil_types_file']
+        affil_types_file_path = rep_utils_path / Path(affil_types_file)
 
     # Reading the file in a dataframe
-    inst_types_df = pd.read_excel(affil_types_file_path, usecols=bp_sg.INST_TYPES_USECOLS)
+    affil_types_df = pd.read_excel(affil_types_file_path, usecols=bp_sg.AFFIL_TYPES_USECOLS)
 
-    levels = list(inst_types_df[level_col])
-    abbreviations = list(inst_types_df[short_col])
+    levels = list(affil_types_df[level_col])
+    abbreviations = list(affil_types_df[short_col])
     aff_type_dict = dict(zip(abbreviations, levels))
 
     return aff_type_dict
@@ -216,9 +209,8 @@ def read_towns_per_country(country_towns_file=None, country_towns_folder_path=No
     if not country_towns_folder_path:
         country_towns_folder_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
     if not country_towns_file:
-        file_path = country_towns_folder_path / Path(bp_sg.COUNTRY_TOWNS_FILE)
-    else:
-        file_path = country_towns_folder_path / Path(country_towns_file)
+        country_towns_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['country_towns_file']
+    file_path = country_towns_folder_path / Path(country_towns_file)
 
     # Reading the file of towns per country in a dict of dataframes
     wb = openpyxl.load_workbook(file_path)

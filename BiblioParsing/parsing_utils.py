@@ -504,7 +504,6 @@ def upgrade_col_names(corpus_folder):
     Args:
         corpus_folder (str): folder of the corpus to be adapted
     """
-    # Beware: the new file authorsinst.dat is not present in the old parsing folders
     dict_filename_conversion  = {'addresses.dat'      : 'address',
                                  'articles.dat'       : 'articles',
                                  'authors.dat'        : 'authors',

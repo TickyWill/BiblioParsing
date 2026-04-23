@@ -222,46 +222,24 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict
     return message
 
 
-def _build_institute_file_name(institute, file_base):
-    file = institute + "_" + file_base
-    return file
-
-
-def _set_user_affil_parsing_files(wf_path, institute):
-    # Setting user's affiliations root path
-    user_rep_utils = wf_path / Path(bp_sg.AFFIL_FILE_BASE_DIC['root'])
-
-    # Setting user's affiliations-parsing files
-    affil_file_base_values = list(bp_sg.AFFIL_FILE_BASE_DIC.values())[1:]
-    user_affil_files_values = [_build_institute_file_name(institute, v) for v in affil_file_base_values]
-    user_affil_files_keys = list(bp_sg.AFFIL_FILE_BASE_DIC.keys())[1:]
-    user_affil_files_dic = dict(zip(user_affil_files_keys, user_affil_files_values))
-
-    return user_rep_utils, user_affil_files_dic
-
-
-def set_step_affil_parsing_paths(wf_path, institute, parsing_step, verbose=False):
-
-    user_rep_utils, user_affil_files_dic = _set_user_affil_parsing_files(wf_path, institute)
+def set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic, rawdata_parsing_step=False, verbose=False):
+    # Setting the filename for the affiliations-per-country data for parsings deduplication step
+    parsing_step_norm_affil_file = user_affil_files_dic['country_affils_file']
+    if rawdata_parsing_step:
+        # Setting the filename for the affiliations-per-country data for parsing rawdata step
+        parsing_step_norm_affil_file = user_affil_files_dic['institute_affils_file']
 
     # Setting user's affiliations-parsing paths
     user_affil_params_dic = {'affil_types_file_path'    : user_rep_utils / Path(user_affil_files_dic['affil_types_file']),
                              'country_towns_folder_path': user_rep_utils,
                              'country_towns_file'       : user_affil_files_dic['country_towns_file'],
+                             'country_affils_file_path' : user_rep_utils / Path(parsing_step_norm_affil_file),
                             }
 
-    if parsing_step=="Rawdata parsing":
-        # Setting the value of user-affiliations parameter for parsing rawdata
-        parsing_step_norm_affil_file = user_affil_files_dic['institute_affils_file']
-    else:
-        # Setting the value of user-affiliations parameter for parsing deduplication
-        parsing_step_norm_affil_file = user_affil_files_dic['country_affils_file']
-    user_affil_params_dic['country_affils_file_path'] = user_rep_utils / Path(parsing_step_norm_affil_file)
-
     if verbose:
-        print(f"User's affiliations-parsing files set for '{parsing_step}' as:\n"
+        print(f"User's affiliations-parsing files set for rawdata-parsing-step '{rawdata_parsing_step}' as:\n"
               f"\n  - affil_types_file    : {user_affil_files_dic['affil_types_file']}"
               f"\n  - country_affils_file : {parsing_step_norm_affil_file}"
               f"\n  - country_towns_file  : {user_affil_files_dic['country_towns_file']}\n"
               f"\navailable at: {user_rep_utils}\n")
-    return user_rep_utils, user_affil_params_dic
+    return user_affil_params_dic

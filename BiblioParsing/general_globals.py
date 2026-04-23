@@ -43,7 +43,7 @@ COUNTRIES_COL_NAMES = {"country"    : "Country",
                        "continent"  : "Continent",
                       }
 
-REP_UTILS = 'BiblioParsing_RefFiles'
+REP_UTILS = 'RefFiles'
 
 def build_countries_globals():
     """Builds countries list and their attributes as given in the dedicated EXCEL file.
