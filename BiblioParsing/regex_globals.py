@@ -1,4 +1,4 @@
-"""Defines regex as globals used in other BiblioParsing modules.
+"""Module to set regex as globals used in other modules.
 """
 
 __all__ = ['AFFIL_DROPPING_PATTERNS_DIC',
@@ -53,11 +53,11 @@ __all__ = ['AFFIL_DROPPING_PATTERNS_DIC',
 import re
 from string import Template
 
-RE_ADDRESS = re.compile('''(?<=\]\s)                                             # Captures: "xxxxx" in string between "]" and "["
-                        [^;]*                                                    # or  between "]" and end of string or ";"
-                        (?=; | $ )''',re.X)
+RE_ADDRESS = re.compile(r'''(?<=\]\s)           # Captures: "xxxxx" in string between "]" and "["
+                        [^;]*                          # or  between "]" and end of string or ";"
+                        (?=; | $ )''', re.X)
 
-RE_ADDS_JOURNAL = re.compile(r'\([^\)]+\)')                                      # Captures string between "()" in journal name   (unused)
+RE_ADDS_JOURNAL = re.compile(r'\([^\)]+\)')        # Captures string between "()" in journal name   (unused)
 
 # Potentialy ambiguous words in affiliations names
 AFFIL_AMB_WORDS_LIST = ['des', '@']
@@ -65,168 +65,202 @@ SET_AMB_WORDS_TEMPLATE = Template(r'\s$word\s')
 RE_AFFIL_AMB_WORDS_LIST = [SET_AMB_WORDS_TEMPLATE.substitute({"word":word}) for word in AFFIL_AMB_WORDS_LIST]
 
 
-RE_AUTHOR = re.compile('''(?<=\[)
-                      [a-zA-Z,;\s\.\-']*(?=, | \s )
-                      [a-zA-Z,;\s\.\-']*
-                      (?=\])''',re.X)                                            # Captures: "xxxx, xxx" or "xxxx xxx" in string between "[" and "]"
+RE_AUTHOR = re.compile(r'''(?<=\[)
+                       [a-zA-Z,;\s\.\-']*(?=, | \s )
+                       [a-zA-Z,;\s\.\-']*
+                       (?=\])''', re.X)              # Captures: "xxxx, xxx" or "xxxx xxx" in string between "[" and "]"
 
-RE_NUM_CONF = re.compile(r'\s\d+th\s|\s\d+nd\s')                                 # Captures: " d...dth " or " d...dnd " in string
+RE_NUM_CONF = re.compile(r'\s\d+th\s|\s\d+nd\s')     # Captures: " d...dth " or " d...dnd " in string
 
 
-RE_SUB = re.compile('''[a-z]?Univ[\.a-zé]{0,6}\s                                 # Captures alias of University surrounded by texts
-                    |[a-z]?Univ[\.a-zé]{0,6}$''',re.X)
+RE_SUB = re.compile(r'''[a-z]?Univ[\.a-zé]{0,6}\s # Captures alias of University surrounded by texts
+                    |[a-z]?Univ[\.a-zé]{0,6}$''', re.X)
 
-RE_SUB_FIRST = re.compile('''[a-z]?Univ[,]\s ''',re.X)                           # Captures alias of University before a coma
+RE_SUB_FIRST = re.compile(r'''[a-z]?Univ[,]\s ''', re.X) # Captures alias of University before a coma
 
-RE_YEAR = re.compile(r'\d{4}')                                                   # Captures "dddd" as the string giving the year
+RE_YEAR = re.compile(r'\d{4}')                           # Captures "dddd" as the string giving the year
 
-RE_YEAR_JOURNAL = re.compile(r'\s\d{4}\s')                                       # Captures " dddd " as the year in journal name
+RE_YEAR_JOURNAL = re.compile(r'\s\d{4}\s')               # Captures " dddd " as the year in journal name
 
-RE_ZIP_CODE = re.compile(',\s[a-zA-Z]?[\-]?\d+.*',)                              # Captures text begining with ', '
-                                                                                 # and that possibly contains letters and hyphen-minus
-RE_AWA = re.compile('\w+;,\s\w+|\w+;\w+')                                        # Captures ';, ' or ';' surrounded by letters
+RE_ZIP_CODE = re.compile(r',\s[a-zA-Z]?[\-]?\d+.*',)     # Captures text begining with ', '
+                                                         # and that possibly contains letters and hyphen-minus
+RE_AWA = re.compile(r'\w+;,\s\w+|\w+;\w+')               # Captures ';, ' or ';' surrounded by letters
 
 
 AUTHORS_SMALL_WORDS_LIST = ['de', 'von']
 
 _JOURNAL_NAMES_LIST = ['Arxiv']
-_JOURNAL_SHORTS_LIST = ['Adv', 'Bull', 'Chem', 'Commun', 'Conf', 'J', 'Lett', 'Proc', 'Rev', 'Ser', 'Symp', 'Trans', 'Transact']
-_JOURNAL_WORDS_LIST = ['Acta', 'Conference', 'Journal', 'Letters', 'Magazine', 'Procedia', 'Proceedings', 'Series', 'Symposium', 'Transactions', 'Workshop']
+_JOURNAL_SHORTS_LIST = ['Adv', 'Bull', 'Chem', 'Commun', 'Conf', 'J', 'Lett', 'Proc', 'Rev', 'Ser', 'Symp',
+                        'Trans', 'Transact']
+_JOURNAL_WORDS_LIST = ['Acta', 'Conference', 'Journal', 'Letters', 'Magazine', 'Procedia', 'Proceedings',
+                       'Series', 'Symposium', 'Transactions', 'Workshop']
 
 JOURNAL_ACRONYMS_LIST = ['ACS', 'IEEE', 'RRL']
-JOURNAL_NAMES_LIST = _JOURNAL_NAMES_LIST + [x.lower() for x in _JOURNAL_NAMES_LIST] + [x.upper() for x in _JOURNAL_NAMES_LIST]
-JOURNAL_SHORTS_LIST = _JOURNAL_SHORTS_LIST + [x.lower() for x in _JOURNAL_SHORTS_LIST] + [x.upper() for x in _JOURNAL_SHORTS_LIST]
-JOURNAL_WORDS_LIST = _JOURNAL_WORDS_LIST + [x.lower() for x in _JOURNAL_WORDS_LIST] + [x.upper() for x in _JOURNAL_WORDS_LIST]
+JOURNAL_NAMES_LIST = (_JOURNAL_NAMES_LIST
+                      + [x.lower() for x in _JOURNAL_NAMES_LIST]
+                      + [x.upper() for x in _JOURNAL_NAMES_LIST])
+JOURNAL_SHORTS_LIST = (_JOURNAL_SHORTS_LIST
+                       + [x.lower() for x in _JOURNAL_SHORTS_LIST]
+                       + [x.upper() for x in _JOURNAL_SHORTS_LIST])
+JOURNAL_WORDS_LIST = (_JOURNAL_WORDS_LIST
+                      + [x.lower() for x in _JOURNAL_WORDS_LIST]
+                      + [x.upper() for x in _JOURNAL_WORDS_LIST])
 JOURNAL_FULLS_LIST =  JOURNAL_WORDS_LIST + JOURNAL_ACRONYMS_LIST
 
-SET_ACRONYMS_TEMPLATE = Template('^$word\s')
-SET_AUTH_SMALL_WORDS_TEMPLATE = Template('^$word\s')
-SET_FULLS_TEMPLATE = Template('^$word\s' + '|' + '\s$word[,\s]?')
-SET_SHORTS_TEMPLATE = Template('^$word\.\s' + '|' + '\s$word\.[,\s]?')
-SET_UNDOTTED_SHORTS_TEMPLATE = Template('^$word\s' + '|' + '\s$word\s'+ '|' + '\s$word$$')
-SET_NAMES_TEMPLATE = Template('^$word$$')
+SET_ACRONYMS_TEMPLATE = Template(r'^$word\s')
+SET_AUTH_SMALL_WORDS_TEMPLATE = Template(r'^$word\s')
+SET_FULLS_TEMPLATE = Template(r'^$word\s' + '|' + r'\s$word[,\s]?')
+SET_SHORTS_TEMPLATE = Template(r'^$word\.\s' + '|' + r'\s$word\.[,\s]?')
+SET_UNDOTTED_SHORTS_TEMPLATE = Template(r'^$word\s' + '|' + r'\s$word\s'+ '|' + r'\s$word$$')
+SET_NAMES_TEMPLATE = Template(r'^$word$$')
 
-RE_JOURNAL_ACRONYMS = re.compile(('|').join([SET_ACRONYMS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_ACRONYMS_LIST]))
+RE_JOURNAL_ACRONYMS = re.compile(('|').join([SET_ACRONYMS_TEMPLATE.substitute({"word":word})
+                                             for word in JOURNAL_ACRONYMS_LIST]))
 
 
-RE_AUTHORS_SMALL_WORDS = re.compile(('|').join([SET_AUTH_SMALL_WORDS_TEMPLATE.substitute({"word":word}) for word in AUTHORS_SMALL_WORDS_LIST]))
+RE_AUTHORS_SMALL_WORDS = re.compile(('|').join([SET_AUTH_SMALL_WORDS_TEMPLATE.substitute({"word":word})
+                                                for word in AUTHORS_SMALL_WORDS_LIST]))
 
 
 # ************************************************************************
 # * Regex specific to parsing of publications' references in Scopus data *
 # ************************************************************************
 
-RE_SCOPUS_REF_JOURNAL = re.compile(('|').join([SET_FULLS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_FULLS_LIST])
+RE_SCOPUS_REF_JOURNAL = re.compile(('|').join([SET_FULLS_TEMPLATE.substitute({"word":word})
+                                               for word in JOURNAL_FULLS_LIST])
                                    + '|' +
-                                   ('|').join([SET_SHORTS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_SHORTS_LIST]))
+                                   ('|').join([SET_SHORTS_TEMPLATE.substitute({"word":word})
+                                               for word in JOURNAL_SHORTS_LIST]))
 
 # Captures: "dddd" after, before or within parenthesis in string or at end of string
-RE_SCOPUS_REF_YEARS = re.compile('(?<=\()\d{4}|\d{4}(?=\))|\s\d{4}$|(?<=/)\d{4}|\d{4}(?=/)|\s\d{4}(?=,)|\s\d{4}\s')
+RE_SCOPUS_REF_YEARS = re.compile(r'(?<=\()\d{4}' + '|' + r'\d{4}(?=\))' + '|' + r'\s\d{4}$'
+                                 + '|' + r'(?<=/)\d{4}' + '|' + r'\d{4}(?=/)'
+                                 + '|' + r'\s\d{4}(?=,)' + '|' + r'\s\d{4}\s')
 
 # Captures: "dddd" within parenthesis in string or at end of string
-RE_SCOPUS_REF_YEAR = re.compile('(?<=\()\d{4}(?=\))')
+RE_SCOPUS_REF_YEAR = re.compile(r'(?<=\()\d{4}(?=\))')
 
 
-RE_SCOPUS_REF_DOI_YEAR = re.compile('\.\d{4}\.')
+RE_SCOPUS_REF_DOI_YEAR = re.compile(r'\.\d{4}\.')
 
 
-RE_SCOPUS_REF_DIGITS = re.compile('\s\d{4}\s')
+RE_SCOPUS_REF_DIGITS = re.compile(r'\s\d{4}\s')
 
 
-RE_SCOPUS_REF_CONF = re.compile('[a-zA-Z0-9]?\sConference\s[a-zA-Z0-9]?')
+RE_SCOPUS_REF_CONF = re.compile(r'[a-zA-Z0-9]?\sConference\s[a-zA-Z0-9]?')
 
 
-RE_SCOPUS_REF_DOI = re.compile('[\s]?10\.[\d]{4,}\/.*$')
+RE_SCOPUS_REF_DOI = re.compile(r'[\s]?10\.[\d]{4,}\/.*$')
 
 
-RE_SCOPUS_REF_DOT = re.compile('^[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s'
-                               '|\s[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s')
+RE_SCOPUS_REF_DOT = re.compile(r'^[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s'
+                               + '|' +
+                               r'\s[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s')
 
 
-RE_REF_AUTHOR_DROP = re.compile('^[A-Z]{3,}\s|\s[A-Z]{3,}\s|\s[A-Z]{4,}$')
+RE_REF_AUTHOR_DROP = re.compile(r'^[A-Z]{3,}\s' + '|' + r'\s[A-Z]{3,}\s' + '|' + r'\s[A-Z]{4,}$')
 
 
-RE_SCOPUS_REF_AUTHOR = re.compile('^[a-zA-Z]*\s[a-zA-Z][\.]?$'
-                                  '|^[a-zA-Z]*\s[a-zA-Z][\.]?-?[a-zA-Z][\.]?$'
-                                  '|\set\sal\.$'
-                                  '|^[a-zA-Z]{1,2}[\.]?$'
-                                  '|[a-zA-Z]{1}-[a-zA-Z]{1}[\.]?$'
-                                  '|[a-zA-Z]{1}[\.]?-[a-zA-Z]{1}[\.]?$')
+RE_SCOPUS_REF_AUTHOR = re.compile(r'^[a-zA-Z]*\s[a-zA-Z][\.]?$'
+                                  + '|' +
+                                  r'^[a-zA-Z]*\s[a-zA-Z][\.]?-?[a-zA-Z][\.]?$'
+                                  + '|' +
+                                  r'\set\sal\.$'
+                                  + '|' +
+                                  r'^[a-zA-Z]{1,2}[\.]?$'
+                                  + '|' +
+                                  r'[a-zA-Z]{1}-[a-zA-Z]{1}[\.]?$'
+                                  + '|' +
+                                  r'[a-zA-Z]{1}[\.]?-[a-zA-Z]{1}[\.]?$')
 
 
-RE_SCOPUS_AUTHOR_INITIALS = re.compile('^[a-zA-Z]{1,2},\s$'
-                                       '|^[a-zA-Z]-?[a-zA-Z],\s$')
+RE_SCOPUS_AUTHOR_INITIALS = re.compile(r'^[a-zA-Z]{1,2},\s$'
+                                       + '|' +
+                                       r'^[a-zA-Z]-?[a-zA-Z],\s$')
 
 
-RE_SCOPUS_AUTHOR_NAME = re.compile('^[a-zA-Z]*\s[a-zA-Z]{1,2},\s$'
-                                   '|^[a-zA-Z]*\s[a-zA-Z]-[a-zA-Z],\s$')
+RE_SCOPUS_AUTHOR_NAME = re.compile(r'^[a-zA-Z]*\s[a-zA-Z]{1,2},\s$'
+                                   + '|' +
+                                   r'^[a-zA-Z]*\s[a-zA-Z]-[a-zA-Z],\s$')
 
 
-RE_SCOPUS_REF_PAGES = re.compile('^pp\.\s\d')
+RE_SCOPUS_REF_PAGES = re.compile(r'^pp\.\s\d')
 
 
-RE_SCOPUS_REF_EL_AL = re.compile('[eE]t\-al\.$|[eE]t\sal\.$')
+RE_SCOPUS_REF_EL_AL = re.compile(r'[eE]t\-al\.$' + '|' + r'[eE]t\sal\.$')
 
 
-RE_SCOPUS_JOURNAL_DIGITS = re.compile('^[\d]+[^a-zA-Z]*')
+RE_SCOPUS_JOURNAL_DIGITS = re.compile(r'^[\d]+[^a-zA-Z]*')
 
 
-RE_SCOPUS_REF_AND = re.compile('\sand\s|^and\s')
+RE_SCOPUS_REF_AND = re.compile(r'\sand\s' + '|' + r'^and\s')
 
 
-RE_SCOPUS_REF_SYMB = re.compile('^[^a-zA-Z0-9]+$')
+RE_SCOPUS_REF_SYMB = re.compile(r'^[^a-zA-Z0-9]+$')
 
 
-RE_SCOPUS_REF_ONLY_DIGITS = re.compile('^[\d]+$')
+RE_SCOPUS_REF_ONLY_DIGITS = re.compile(r'^[\d]+$')
 
 
-REF_DROPING_SHORT_MONTHS_LIST = ['Jan', 'Feb', 'Apr', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec', 'janv', 'févr', 'avr', 'juill', 'sept', 'oct', 'nov', 'déc']
+REF_DROPING_SHORT_MONTHS_LIST = ['Jan', 'Feb', 'Apr', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov',
+                                 'Dec', 'janv', 'févr', 'avr', 'juill', 'sept', 'oct', 'nov', 'déc']
 REF_DROPING_FULL_MONTHS_LIST = ['March', 'May', 'June', 'October', 'mars', 'mai', 'juin', 'août']
 REF_DROPING_ALL_MONTHS_LIST = REF_DROPING_SHORT_MONTHS_LIST + REF_DROPING_FULL_MONTHS_LIST
 
-SET_DROP_SHORT_MONTH_TEMPLATE = Template('^$word\.\s' + '|' + '\s$word\.\s' + '|' + '\s$word\.$$' + '|' + '^$word\.$$')
-SET_DROP_ALL_MONTH_TEMPLATE = Template('^$word\s' + '|' + '\s$word\s' + '|' + '\s$word$$' + '|' + '^$word$$')
+SET_DROP_SHORT_MONTH_TEMPLATE = Template(r'^$word\.\s' + '|' + r'\s$word\.\s'
+                                         + '|' +
+                                         r'\s$word\.$$' + '|' + r'^$word\.$$')
 
-RE_SCOPUS_REF_MONTHS_DROP = re.compile(('|').join([SET_DROP_SHORT_MONTH_TEMPLATE.substitute({"word":word}) for word in REF_DROPING_SHORT_MONTHS_LIST])
+SET_DROP_ALL_MONTH_TEMPLATE = Template(r'^$word\s' + '|' + r'\s$word\s' + '|' +
+                                       r'\s$word$$' + '|' + r'^$word$$')
+
+RE_SCOPUS_REF_MONTHS_DROP = re.compile(('|').join([SET_DROP_SHORT_MONTH_TEMPLATE.substitute({"word":word})
+                                                   for word in REF_DROPING_SHORT_MONTHS_LIST])
                                        + '|' +
-                                       ('|').join([SET_DROP_ALL_MONTH_TEMPLATE.substitute({"word":word}) for word in REF_DROPING_ALL_MONTHS_LIST]))
+                                       ('|').join([SET_DROP_ALL_MONTH_TEMPLATE.substitute({"word":word})
+                                                   for word in REF_DROPING_ALL_MONTHS_LIST]))
 
-REF_DROPING_WORDS_LIST = ['Appendix', 'available', 'Available', '\[?Online\]?', 'presented', 'Presented']
-SET_DROP_WORD_TEMPLATE = Template('^$word[,\s]?')
+REF_DROPING_WORDS_LIST = ['Appendix', 'available', 'Available', r'\[?Online\]?', 'presented', 'Presented']
+SET_DROP_WORD_TEMPLATE = Template(r'^$word[,\s]?')
 
-RE_SCOPUS_REF_WORDS_DROP = re.compile(('|').join([SET_DROP_WORD_TEMPLATE.substitute({"word":word}) for word in REF_DROPING_WORDS_LIST]))
+RE_SCOPUS_REF_WORDS_DROP = re.compile(('|').join([SET_DROP_WORD_TEMPLATE.substitute({"word":word})
+                                                  for word in REF_DROPING_WORDS_LIST]))
 
 
 # Setting regex for normalization of ISSN to the form dddd-dddd or dddd-dddX
-RE_ISSN = re.compile(r'^[0-9]{8}|[0-9]{4}|[0-9]{3}X')
+RE_ISSN = re.compile(r'^[0-9]{8}' + '|' + r'[0-9]{4}' + '|' + r'[0-9]{3}X')
 
 
 # ************************************************************************
 # * Regex specific to parsing of publications' references in WoS data *
 # ************************************************************************
-RE_WOS_REF_DOI = re.compile('[\s]?10\.[\d]{4,}\/.*$|^DOI\s')
+RE_WOS_REF_DOI = re.compile(r'[\s]?10\.[\d]{4,}\/.*$' + '|' + r'^DOI\s')
 
 
 RE_WOS_REF_YEAR = re.compile(r'^\d{4}$')
 
 
-RE_WOS_REF_JOURNAL = re.compile(('|').join([SET_FULLS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_FULLS_LIST])
+RE_WOS_REF_JOURNAL = re.compile(('|').join([SET_FULLS_TEMPLATE.substitute({"word":word})
+                                            for word in JOURNAL_FULLS_LIST])
                                 + '|' +
-                                ('|').join([SET_SHORTS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_SHORTS_LIST])
+                                ('|').join([SET_SHORTS_TEMPLATE.substitute({"word":word})
+                                            for word in JOURNAL_SHORTS_LIST])
                                 + '|' +
-                                ('|').join([SET_NAMES_TEMPLATE.substitute({"word":word}) for word in JOURNAL_NAMES_LIST])
+                                ('|').join([SET_NAMES_TEMPLATE.substitute({"word":word})
+                                            for word in JOURNAL_NAMES_LIST])
                                 + '|' +
-                                ('|').join([SET_UNDOTTED_SHORTS_TEMPLATE.substitute({"word":word}) for word in JOURNAL_SHORTS_LIST]))
+                                ('|').join([SET_UNDOTTED_SHORTS_TEMPLATE.substitute({"word":word})
+                                            for word in JOURNAL_SHORTS_LIST]))
 
 
 # For replacing aliases of a word by a word (case sensitive)
 AFFIL_WORD_SUBSTITUTE_PATTERN_DIC = {'University': r'\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?',
-                                     'Laboratory': r"'?\bLab\b\.?|'?\bLabor[aeimorstuy]{0,7}\b\.?",
-                                     'Center'    : r"\b[CZ]ent[erum]{1,3}\b\.?",
-                                     'Department': r"\bD[eé]{1}p[artemnot]{0,9}\b\.?",
-                                     'Institute' : r"\bInst[ituteosky]{0,7}\b\.?|\bIstituto\b",
-                                     'Faculty'   : r"\bFac[lutey]{0,4}\b\.?",
-                                     'School'    : r"\bSch[ol]{0,3}\b\.?",
+                                     'Laboratory': r"'?\bLab\b\.?" + "|" + r"'?\bLabor[aeimorstuy]{0,7}\b\.?",
+                                     'Center'    : r'\b[CZ]ent[erum]{1,3}\b\.?',
+                                     'Department': r'\bD[eé]{1}p[artemnot]{0,9}\b\.?',
+                                     'Institute' : r'\bInst[ituteosky]{0,7}\b\.?' + '|' + r'\bIstituto\b',
+                                     'Faculty'   : r'\bFac[lutey]{0,4}\b\.?',
+                                     'School'    : r'\bSch[ol]{0,3}\b\.?',
                                     }
 
 

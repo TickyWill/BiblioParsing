@@ -1,3 +1,11 @@
+"""Module of useful functions for parsings demonstration.
+
+This covers:
+    - Configuration setting such as working folder architecture;
+    - Saving parsings results;
+    - Setting paths to user's files to use for authors' affiliations parsing.
+"""
+
 __all__ = ['save_db_ids_data',
            'save_fails_dict',
            'save_parsing_dict',
@@ -13,11 +21,7 @@ import os
 from pathlib import Path
 
 # Local library imports
-import BiblioParsing.specific_globals as bp_sg
-from BiblioParsing.main_parsing import biblio_parser
-from BiblioParsing.parsing_utils import set_rawdata_error
-from BiblioParsing.concat_parsing import concatenate_parsing
-from BiblioParsing.concat_parsing import deduplicate_parsing
+import BiblioParsing.parsing_globals as bp_pg
 
 
 def _get_demo_config():
@@ -25,7 +29,7 @@ def _get_demo_config():
 
     # Reads the default json_file_name config file
     pck_config_file_path = Path(__file__).parent / Path('DemoConfig') / Path(config_json_file_name)
-    with open(pck_config_file_path) as file:
+    with open(pck_config_file_path, encoding='utf-8') as file:
         config_dict = json.load(file)
     return config_dict
 
@@ -53,10 +57,12 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     # Internal functions
     def _create_folder(parsing_folder_dict, keys_list, folder_root):
         key_dict = parsing_folder_dict
-        for key in keys_list: key_dict = key_dict[key]
+        for key in keys_list:
+            key_dict = key_dict[key]
         folder_name = key_dict
         folder_path = folder_root / Path(folder_name)
-        if not os.path.exists(folder_path): os.makedirs(folder_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
         return (folder_path, folder_name)
 
     # Updating 'parsing_folder_dict' using the list of databases 'db_list'
@@ -64,11 +70,12 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
 
     # Creating the 'Biblioparsing_files' if not available
     keys_list = ['folder_root']
-    BiblioParsing_files_path,_ = _create_folder(parsing_folder_dict, keys_list, root_path)
+    wf_path, _ = _create_folder(parsing_folder_dict, keys_list, root_path)
 
     # Creating the year folder if not available
-    year_files_path = BiblioParsing_files_path / Path(str(year))
-    if not os.path.exists(year_files_path): os.makedirs(year_files_path)
+    year_files_path = wf_path / Path(str(year))
+    if not os.path.exists(year_files_path):
+        os.makedirs(year_files_path)
 
     # Creating the corpuses folder if not available
     keys_list = ['corpus', 'corpus_root']
@@ -92,7 +99,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
 
     # Creating the concatenation folder if not available
     keys_list = ['corpus', 'concat', 'root']
-    concat_root_path, concat_root_name = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
+    concat_root_path, _ = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
 
     keys_list = ['corpus', 'concat', 'parsing']
     concat_parsing_path, _ = _create_folder(parsing_folder_dict, keys_list, concat_root_path)
@@ -100,7 +107,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
 
     # Creating the deduplication folder if not available
     keys_list = ['corpus', 'dedup', 'root']
-    dedup_root_path, dedup_root_name = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
+    dedup_root_path, _ = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
 
     keys_list = ['corpus', 'dedup', 'parsing']
     dedup_parsing_path, _ = _create_folder(parsing_folder_dict, keys_list, dedup_root_path)
@@ -119,14 +126,14 @@ def set_user_config(year=None, db_list=None):
     # Getting the working folder architecture base
     parsing_folder_dict = config_dict['PARSING_FOLDER_ARCHI']
 
-    # Setting the working folder name 
-    working_folder_name = parsing_folder_dict['folder_root']
+    # Setting the working folder name
+    wf_name = parsing_folder_dict['folder_root']
 
     # Getting the user's root path
     root_path = Path.home()
 
     # Setting the working folder path
-    working_folder_path = root_path / Path(working_folder_name)
+    wf_path = root_path / Path(wf_name)
 
     if year and db_list:
         # Building the working folder architecture for a corpus single year "year" and getting useful paths
@@ -135,13 +142,13 @@ def set_user_config(year=None, db_list=None):
     # Getting the filenames for each parsing item
     item_filename_dict = config_dict['PARSING_FILE_NAMES']
 
-    return (working_folder_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
+    return (wf_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
 
 
 def save_parsing_dict(parsing_dict, parsing_path,
                       item_filename_dict, save_extent):
     # Cycling on parsing items
-    for item in bp_sg.PARSING_ITEMS_LIST:
+    for item in bp_pg.PARSING_ITEMS_LIST:
         if item in parsing_dict.keys():
             item_df = parsing_dict[item]
             if save_extent == "xlsx":
@@ -151,11 +158,11 @@ def save_parsing_dict(parsing_dict, parsing_path,
             elif save_extent == "dat":
                 item_tsv_file = item_filename_dict[item] + ".dat"
                 item_tsv_path = parsing_path / Path(item_tsv_file)
-                item_df.to_csv(item_tsv_path, index = False, sep = '\t')
+                item_df.to_csv(item_tsv_path, index=False, sep='\t')
             else:
                 item_tsv_file = item_filename_dict[item] + ".csv"
                 item_tsv_path = parsing_path / Path(item_tsv_file)
-                item_df.to_csv(item_tsv_path, index = False, sep = '\,')
+                item_df.to_csv(item_tsv_path, index=False, sep=',')
         else:
             pass
     message = f"All parsing results saved as {save_extent} files"
@@ -163,18 +170,19 @@ def save_parsing_dict(parsing_dict, parsing_path,
 
 
 def save_fails_dict(fails_dict, parsing_path):
-    """The function `save_fails_dict` saves parsing fails in a json file
-    named "failed.json".
+    """Saves parsing performance indicators in a json file.
 
     Args:
         fails_dict (dict): The dict of parsing fails.
         parsing_path (path): The full path of the parsing results folder 
         where the json file is being saved.
     """
-    with open(parsing_path / Path('failed.json'), 'w') as write_json:
+    perf_json_file_name = "Parsing_perf.json"
+    perf_json_path = parsing_path / Path(perf_json_file_name)
+    with open(perf_json_path, 'w', encoding='utf-8') as write_json:
         json.dump(fails_dict, write_json, indent=4)
-    message = f"Parsing-fails results saved as json file"
-    return message 
+    message = "Parsing-performance indicators saved as json file"
+    return message
 
 
 def save_db_ids_data(db_ids_df, parsing_path, database):
@@ -190,7 +198,7 @@ def save_db_ids_data(db_ids_df, parsing_path, database):
 
     db_ids_df.to_excel(file_path, index=False)
 
-    message = f"Database-IDs data saved as xlsx file"
+    message = "Database-IDs data saved as xlsx file"
     return message
 
 
@@ -215,14 +223,15 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict
 
     message = f"All parsing-to-deduplication results saved as files with .{save_extent} extension."
     if fails_save_status:
-        message += f"\n All parsing-fails results saved as json files."
+        message += "\n All parsing-fails results saved as json files."
     if db_ids_save_status:
-        message += f"\n All database-IDs data saved as xlsx files."
+        message += "\n All database-IDs data saved as xlsx files."
 
     return message
 
 
 def set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic, rawdata_parsing_step=False, verbose=False):
+    """Sets paths to user's files to use for authors' affiliations parsing."""
     # Setting the filename for the affiliations-per-country data for parsings deduplication step
     parsing_step_norm_affil_file = user_affil_files_dic['country_affils_file']
     if rawdata_parsing_step:
@@ -230,10 +239,12 @@ def set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic, rawdata_p
         parsing_step_norm_affil_file = user_affil_files_dic['institute_affils_file']
 
     # Setting user's affiliations-parsing paths
-    user_affil_params_dic = {'affil_types_file_path'    : user_rep_utils / Path(user_affil_files_dic['affil_types_file']),
+    affil_types_file_path = user_rep_utils / Path(user_affil_files_dic['affil_types_file'])
+    country_affils_file_path = user_rep_utils / Path(parsing_step_norm_affil_file)
+    user_affil_params_dic = {'affil_types_file_path'    : affil_types_file_path,
+                             'country_affils_file_path' : country_affils_file_path,
                              'country_towns_folder_path': user_rep_utils,
                              'country_towns_file'       : user_affil_files_dic['country_towns_file'],
-                             'country_affils_file_path' : user_rep_utils / Path(parsing_step_norm_affil_file),
                             }
 
     if verbose:

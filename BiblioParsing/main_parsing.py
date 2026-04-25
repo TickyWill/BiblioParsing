@@ -1,3 +1,6 @@
+"""Module of main functions for parsing rawdata.
+"""
+
 __all__ = ['biblio_parser',
            'merge_database',
            ]
@@ -10,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 # Local library imports
-import BiblioParsing.specific_globals as bp_sg
+import BiblioParsing.parsing_globals as bp_pg
 from BiblioParsing.scopus_parsing import scopus_parser
 from BiblioParsing.scopus_rawdata_utils import read_scopus_rawdata
 from BiblioParsing.wos_parsing import wos_parser
@@ -28,22 +31,22 @@ def merge_database(database, filename, in_dir, out_dir):
     """
     rawdata_paths_list = []
     rawdata_list = []
-    if database==bp_sg.WOS:
+    if database==bp_pg.WOS:
         for path, _, files in os.walk(in_dir):
             rawdata_paths_list.extend(Path(path) / Path(file) for file in files
                                       if file.endswith(".txt"))
         for file_path in rawdata_paths_list:
-            rawdata_list.append(read_database_wos(file_path)[0])
+            rawdata_list.append(read_wos_rawdata(file_path)[0])
 
-    elif database==bp_sg.SCOPUS:
+    elif database==bp_pg.SCOPUS:
         for path, _, files in os.walk(in_dir):
             rawdata_paths_list.extend(Path(path) / Path(file) for file in files
                                       if file.endswith(".csv"))
         for file_path in rawdata_paths_list:
-            rawdata_list.append(read_database_scopus(file_path)[0])
+            rawdata_list.append(read_scopus_rawdata(file_path)[0])
     else:
         print(f"WARNING: Sorry, unrecognized database {database}: "
-              f"it should be {bp_sg.WOS} or {bp_sg.SCOPUS}")
+              f"it should be {bp_pg.WOS} or {bp_pg.SCOPUS}")
 
     result = pd.concat(rawdata_list, ignore_index=True)
     result.to_csv(out_dir / Path(filename), sep='\t')
@@ -70,13 +73,14 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
     Returns:
         (tup): The tuple of parsing results returned by the used appropriate parser.
     """
-    if database==bp_sg.WOS:
+    parsing_tup = ()
+    if database==bp_pg.WOS:
         parsing_tup = wos_parser(rawdata_path, affil_filter_list=affil_filter_list,
                                  affil_params_dic=affil_params_dic)
-    elif database==bp_sg.SCOPUS:
+    elif database==bp_pg.SCOPUS:
         parsing_tup = scopus_parser(rawdata_path, affil_filter_list=affil_filter_list,
                                     affil_params_dic=affil_params_dic)
     else:
-        print(f"WARNING: Sorry, unrecognized database {database}: it should be {bp_sg.WOS} or {bp_sg.SCOPUS}")
+        print(f"WARNING: Sorry, unrecognized database {database}: it should be {bp_pg.WOS} or {bp_pg.SCOPUS}")
 
     return parsing_tup

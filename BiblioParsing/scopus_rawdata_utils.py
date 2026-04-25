@@ -1,3 +1,6 @@
+"""Module of functions for reading and cleaning of Scopus rawdata.
+"""
+
 __all__ = ['read_scopus_rawdata']
 
 
@@ -9,8 +12,9 @@ import numpy as np
 import pandas as pd
 
 # Local libray imports
+import BiblioParsing.parsing_cols_globals as bp_pcg
+import BiblioParsing.parsing_globals as bp_pg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
 from BiblioParsing.parsing_utils import build_pub_db_ids
 from BiblioParsing.parsing_utils import check_and_drop_columns
 from BiblioParsing.parsing_utils import check_and_get_rawdata_file_path
@@ -31,15 +35,15 @@ def _set_scopus_rawdata_cols():
         'COL_NAMES' global, A dict valued by column names of rawdata defined \
         by the 'COLUMN_LABEL_SCOPUS' and 'COLUMN_LABEL_SCOPUS_PLUS' globals).
     """
-    cols_dic = {'scopus_id_col'           : bp_sg.COL_NAMES['scopus_id'][0],
-                'pub_id_col'              : bp_sg.COL_NAMES['pub_id'],
+    cols_dic = {'scopus_id_col'           : bp_pcg.COL_NAMES['scopus_id'][0],
+                'pub_id_col'              : bp_pcg.COL_NAMES['pub_id'],
                }
 
-    scopus_cols_dic = {'scopus_auth_col'         : bp_sg.COLUMN_LABEL_SCOPUS['authors'],
-                       'scopus_aff_col'          : bp_sg.COLUMN_LABEL_SCOPUS['affiliations'],
-                       'scopus_auth_with_aff_col': bp_sg.COLUMN_LABEL_SCOPUS['authors_with_affiliations'],
-                       'scopus_fullnames_col'    : bp_sg.COLUMN_LABEL_SCOPUS_PLUS['auth_fullnames'],
-                       'init_scopus_id_col'      : bp_sg.COLUMN_LABEL_SCOPUS_PLUS['scopus_id'],
+    scopus_cols_dic = {'scopus_auth_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['authors'],
+                       'scopus_aff_col'          : bp_pcg.COLUMN_LABEL_SCOPUS['affiliations'],
+                       'scopus_auth_with_aff_col': bp_pcg.COLUMN_LABEL_SCOPUS['authors_with_affiliations'],
+                       'scopus_fullnames_col'    : bp_pcg.COLUMN_LABEL_SCOPUS_PLUS['auth_fullnames'],
+                       'init_scopus_id_col'      : bp_pcg.COLUMN_LABEL_SCOPUS_PLUS['scopus_id'],
                       }
 
     return cols_dic, scopus_cols_dic
@@ -285,13 +289,14 @@ def _check_scopus_affiliation_column(df, scopus_aff_col):
             if normalize_country(raw_country):
                 valid_affiliation_list.append(affiliation)
             else:
-                warning = (f'\nWARNING in "_check_scopus_affiliation_column" function of "scopus_rawdata_utils.py" module:'
+                warning = ('\nWARNING in "_check_scopus_affiliation_column" function "'
+                           '"of "scopus_rawdata_utils.py" module:'
                            f'\nAt row {idx} of the scopus corpus, the invalid affiliation "{affiliation}" '
-                           f'has been dropped from the list of affiliations. '
-                           f'\nTherefore, attention should be given to the resulting list of affiliations '
-                           f'for each of the authors of this publication.\n' )
+                           'has been dropped from the list of affiliations. '
+                           '\nTherefore, attention should be given to the resulting list of affiliations '
+                           'for each of the authors of this publication.\n' )
                 print(warning)
-        new_affiliations_str = bp_sg.UNKNOWN
+        new_affiliations_str = bp_pg.UNKNOWN
         if  valid_affiliation_list:
             new_affiliations_str = '; '.join(valid_affiliation_list)
         return new_affiliations_str
@@ -344,25 +349,25 @@ def read_scopus_rawdata(rawdata_path, correct_data=False, scopus_ids=False):
     scopus_ids_df = pd.DataFrame()
 
     # Check if rawdata file is available and get its full path if it is
-    rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.SCOPUS_RAWDATA_EXTENT)
+    rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_pg.SCOPUS_RAWDATA_EXTENT)
 
     if rawdata_file_path:
-        init_full_scopus_rawdata_df = pd.read_csv(rawdata_file_path, dtype=bp_sg.COLUMN_TYPE_SCOPUS)
+        init_full_scopus_rawdata_df = pd.read_csv(rawdata_file_path, dtype=bp_pcg.COLUMN_TYPE_SCOPUS)
 
         if len(init_full_scopus_rawdata_df):
             # Trying to drop data by scopus identifier given in an XLSX file
             full_scopus_rawdata_df = drop_rawdata(rawdata_path, init_full_scopus_rawdata_df,
-                                                  scopus_ids_cols_list, bp_sg.SCOPUS)
+                                                  scopus_ids_cols_list, bp_pg.SCOPUS)
 
             if correct_data:
                 return_tup = _correct_scopus_full_rawdata(full_scopus_rawdata_df, cols_tup)
                 full_scopus_rawdata_df, corrected_authors_df, corrected_addresses_df = return_tup
 
             # Selecting useful rawdata for parsing
-            scopus_rawdata_df = check_and_drop_columns(bp_sg.SCOPUS, full_scopus_rawdata_df)
+            scopus_rawdata_df = check_and_drop_columns(bp_pg.SCOPUS, full_scopus_rawdata_df)
             scopus_rawdata_df = _check_scopus_affiliation_column(scopus_rawdata_df, scopus_aff_col)
-            scopus_rawdata_df = scopus_rawdata_df.replace(np.nan, bp_sg.UNKNOWN, regex=True)
-            scopus_rawdata_df = normalize_journal_names(bp_sg.SCOPUS, scopus_rawdata_df)
+            scopus_rawdata_df = scopus_rawdata_df.replace(np.nan, bp_pg.UNKNOWN, regex=True)
+            scopus_rawdata_df = normalize_journal_names(bp_pg.SCOPUS, scopus_rawdata_df)
 
             if scopus_ids:
                 # Building the Scopus-IDs data

@@ -1,3 +1,6 @@
+"""Module of functions for parsing of authors' affiliations.
+"""
+
 __all__ = ['build_addr_affils_tup',
            'build_norm_and_raw_affils',
            'extend_author_affils',
@@ -12,9 +15,10 @@ from collections import namedtuple
 import pandas as pd
 
 # Local library imports
+import BiblioParsing.affiliations_globals as bp_ag
 import BiblioParsing.general_globals as bp_gg
+import BiblioParsing.parsing_cols_globals as bp_pcg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
 from BiblioParsing.affil_norm_utils import build_affils_useful_dicts
 from BiblioParsing.parsing_utils import remove_special_symbol
 from BiblioParsing.parsing_utils import rationalize_town_names
@@ -31,17 +35,17 @@ def _set_norm_affils_cols():
         (tup): (A dict valued by column-names lists defined by the 'COL_NAMES' global, \
         A dict valued by column names of parsing results defined by the 'COL_NAMES' global).
     """
-    cols_lists_dic = {'country_cols_list'   : bp_sg.COL_NAMES['country'],
-                      'affil_cols_list'     : bp_sg.COL_NAMES['institution'],
-                      'auth_affil_cols_list': bp_sg.COL_NAMES['auth_inst'],
+    cols_lists_dic = {'country_cols_list'   : bp_pcg.COL_NAMES['country'],
+                      'affil_cols_list'     : bp_pcg.COL_NAMES['institution'],
+                      'auth_affil_cols_list': bp_pcg.COL_NAMES['auth_inst'],
                      }
 
-    cols_dic = {'pub_id_col'     : bp_sg.COL_NAMES['pub_id'],
-                'address_id_col' : bp_sg.COL_NAMES['address'][1],
-                'address_col'    : bp_sg.COL_NAMES['address'][2],
-                'country_col'    : bp_sg.COL_NAMES['country'][2],
-                'affil_col'      : bp_sg.COL_NAMES['institution'][2],
-                'norm_affils_col': bp_sg.COL_NAMES['auth_inst'][4],
+    cols_dic = {'pub_id_col'     : bp_pcg.COL_NAMES['pub_id'],
+                'address_id_col' : bp_pcg.COL_NAMES['address'][1],
+                'address_col'    : bp_pcg.COL_NAMES['address'][2],
+                'country_col'    : bp_pcg.COL_NAMES['country'][2],
+                'affil_col'      : bp_pcg.COL_NAMES['institution'][2],
+                'norm_affils_col': bp_pcg.COL_NAMES['auth_inst'][4],
                }
     return cols_lists_dic, cols_dic
 
@@ -111,7 +115,7 @@ def _set_digits_keeping_prefix_regex():
     # Setting search regex of keeping-prefix
     prefix_template = bp_rg.AFFIL_KEEPING_PATTERNS_DIC['digits_prefix']
     pattern_prefix_list = [prefix_template.substitute({"prefix": prefix})
-                           for prefix in bp_sg.KEEPING_PREFIX]
+                           for prefix in bp_ag.KEEPING_PREFIX]
     re_digits_keeping_prefix = re.compile('|'.join(pattern_prefix_list))
 
     return re_digits_keeping_prefix
@@ -190,7 +194,7 @@ def _search_dropping_suffix(params_list, verbose=False):
     # Setting regex for dropping-suffix search
     suffix_template = bp_rg.AFFIL_DROPPING_PATTERNS_DIC['suffix']
     flag = False
-    for word_to_drop in bp_sg.DROPPING_SUFFIX:
+    for word_to_drop in bp_ag.DROPPING_SUFFIX:
         re_drop_words = re.compile(suffix_template.substitute({"word":word_to_drop}))
         result = re.search(re_drop_words, text.lower())
         if result is not None:
@@ -252,9 +256,9 @@ def _search_dropping_words(params_list, verbose=False):
 
     flag = False
     if country.lower()=='france':
-        dropping_words_to_search = bp_sg.FR_DROPPING_WORDS
+        dropping_words_to_search = bp_ag.FR_DROPPING_WORDS
     else:
-        dropping_words_to_search = bp_sg.FR_DROPPING_WORDS + bp_sg.DROPPING_WORDS
+        dropping_words_to_search = bp_ag.FR_DROPPING_WORDS + bp_ag.DROPPING_WORDS
 
     for word_to_drop in dropping_words_to_search:
         re_drop_words = re.compile(dropping_words_template.substitute({"word":word_to_drop}))
@@ -287,7 +291,7 @@ def _search_keeping_prefix(params_list, verbose=False):
 
     flag = False
     if country.lower()=='france':
-        for prefix_to_keep in bp_sg.KEEPING_PREFIX:
+        for prefix_to_keep in bp_ag.KEEPING_PREFIX:
             re_keep_prefix = re.compile(keeping_prefix_template.substitute({"prefix":prefix_to_keep}))
             result = re.search(re_keep_prefix, text.lower())
             if result is not None:
@@ -320,17 +324,17 @@ def _search_keeping_words(params_list, verbose=False):
     keeping_word_template = bp_rg.AFFIL_KEEPING_PATTERNS_DIC['word']
 
     gen_flag, basic_flag, user_flag = False, False, False
-    for word_to_keep in bp_sg.KEEPING_WORDS:
+    for word_to_keep in bp_ag.KEEPING_WORDS:
         re_keeping_word = re.compile(keeping_word_template.substitute({"word":word_to_keep}))
         result = re.search(re_keeping_word, text.lower())
         if result is not None:
             if verbose:
                 print('Keeping word is the full word:', word_to_keep)
-            if word_to_keep in bp_sg.GEN_KEEPING_WORDS:
+            if word_to_keep in bp_ag.GEN_KEEPING_WORDS:
                 gen_flag = True
-            if word_to_keep in bp_sg.BASIC_KEEPING_WORDS:
+            if word_to_keep in bp_ag.BASIC_KEEPING_WORDS:
                 basic_flag = True
-            if word_to_keep in bp_sg.USER_KEEPING_WORDS:
+            if word_to_keep in bp_ag.USER_KEEPING_WORDS:
                 user_flag = True
     return [gen_flag, basic_flag, user_flag]
 
@@ -404,13 +408,14 @@ def _check_dropping_digits_flag(digits_drop_params, found_item_flags,
                 if not add_affiliation_flag:
                     affils_list.append(affiliation)
                     add_affiliation_flag = True
-                if found_item_flags.basic_keeping_words:
-                    break_id = 'dropping_digits aborted by basic_keeping_words'
-                if found_item_flags.user_keeping_words:
-                    break_id = 'dropping_digits aborted by user_keeping_words'
-                if found_item_flags.keeping_prefix:
-                    break_id = 'dropping_digits aborted by keeping_prefix'
                 if verbose:
+                    break_id = ''
+                    if found_item_flags.basic_keeping_words:
+                        break_id = 'dropping_digits aborted by basic_keeping_words'
+                    if found_item_flags.user_keeping_words:
+                        break_id = 'dropping_digits aborted by user_keeping_words'
+                    if found_item_flags.keeping_prefix:
+                        break_id = 'dropping_digits aborted by keeping_prefix'
                     print('Break identification:', break_id, '\n')
     else:
         if not found_item_flags.gen_keeping_words and not found_item_flags.user_keeping_words:
@@ -446,13 +451,14 @@ def _check_dropping_words_flag(words_drop_params, found_item_flags,
         if not add_affiliation_flag:
             affils_list.append(affiliation)
             add_affiliation_flag = True
-        if found_item_flags.user_keeping_words:
-            break_id = 'dropping_word aborted by user_keeping_words'
-        if found_item_flags.basic_keeping_words:
-            break_id = 'dropping_word aborted by basic_keeping_words'
-        if found_item_flags.gen_keeping_words:
-            break_id = 'dropping_word aborted by gen_keeping_words'
         if verbose:
+            break_id = ''
+            if found_item_flags.user_keeping_words:
+                break_id = 'dropping_word aborted by user_keeping_words'
+            if found_item_flags.basic_keeping_words:
+                break_id = 'dropping_word aborted by basic_keeping_words'
+            if found_item_flags.gen_keeping_words:
+                break_id = 'dropping_word aborted by gen_keeping_words'
             print('Break identification:', break_id, '\n')
     else:
         # Dropping affiliation from affiliations list
@@ -467,8 +473,7 @@ def _check_dropping_words_flag(words_drop_params, found_item_flags,
     return affils_list, affils_drop, add_affiliation_flag, break_status
 
 
-def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags,
-                                keeping_words_flags, verbose):
+def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags, verbose):
     (affiliation, sub_check_affils_list, affils_list,
      affils_drop, add_affiliation_flag) = suffix_drop_params
     break_status = False
@@ -476,11 +481,12 @@ def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags,
         if not add_affiliation_flag:
             affils_list.append(affiliation)
             add_affiliation_flag = True
-        if found_item_flags.gen_keeping_words:
-            break_id = 'dropping_suffix aborted by gen_keeping_words'
-        if found_item_flags.user_keeping_words:
-            break_id = 'dropping_suffix aborted by user_keeping_words'
         if verbose:
+            break_id = ''
+            if found_item_flags.gen_keeping_words:
+                break_id = 'dropping_suffix aborted by gen_keeping_words'
+            if found_item_flags.user_keeping_words:
+                break_id = 'dropping_suffix aborted by user_keeping_words'
             print('Break identification:', break_id, '\n')
     else:
         affils_drop.append(('dropping_suffix', sub_check_affils_list))
@@ -549,7 +555,7 @@ def _clean_affils(affils_drop_params, towns_dict, verbose=False):
                 suffix_drop_params = [affiliation, sub_check_affils_list, affils_list,
                                       affils_drop, add_affiliation_flag]
                 suffix_tup = _check_dropping_suffix_flag(suffix_drop_params, found_item_flags,
-                                                         keeping_words_flags, verbose)
+                                                         verbose)
                 affils_list, affils_drop, add_affiliation_flag, break_status = suffix_tup
 
             if found_item_flags.dropping_words and not break_status:
@@ -776,20 +782,19 @@ def _get_norm_affils_list(country, affiliations_list, norm_raw_aff_dict,
     return address_norm_affiliation_list, address_unknown_affiliations_list
 
 
-def _build_addr_affils_lists(std_address, affil_params_dic, drop_status, verbose=False):
+def _build_addr_affils_lists(std_address, affil_dicts, drop_status, verbose=False):
     """Builds the list of normalized affiliations for a standardized address.
 
     It also returns the country and the unknown affiliations for this address. 
     To do that, it uses the `_get_affils_list` and `_get_norm_affils_list` 
-    internal functions.
+    internal functions. 
+    The 'affil_dicts' data for affiliations normalization are built through 
+    the `build_affils_useful_dicts` function imported from the `affil_norm_utils` 
+    module.
 
     Args:
         std_address (str): The standardized address for which the list of normalized affiliations is built.
-        affil_params_dic (dict): Keyed by ['affil_types_file_path', 'country_affils_file_path', \
-        'country_towns_folder_path', 'country_towns_file'] and valued by the user as the full path to the data \
-        per country of raw affiliations per normalized one, the full path to the data of affiliations-types \
-        used to normalize the affiliations, the name of the file of the data of towns per country and the full \
-        path to the folder where these are available.
+        affil_dicts (dict): The data (dict) for affiliations normalization.
         drop_status (bool): If true, dropping items are searched to drop chunks from the address.
         verbose (bool): True for allowing control prints (default: False).
     Returns:
@@ -801,7 +806,8 @@ def _build_addr_affils_lists(std_address, affil_params_dic, drop_status, verbose
         print('\nStandardized address:              ', std_address)
 
     # Building the useful data for affiliations normalization
-    affil_types_dict, norm_raw_affils_dict, towns_dict = build_affils_useful_dicts(affil_params_dic)
+    affils_dicts_keys = ['affil_types_dict', 'norm_raw_affils_dict', 'towns_dict']
+    affil_types_dict, norm_raw_affils_dict, towns_dict = [affil_dicts[key] for key in affils_dicts_keys]
     affil_countries = list(norm_raw_affils_dict.keys())
 
     return_tup = _get_affils_list(std_address, towns_dict, drop_status=drop_status)
@@ -841,19 +847,26 @@ def build_addr_affils_tup(full_address, affil_params_dic, drop_status):
         of the full address with no fully corresponding normalized names.
     """
     affils_full_list_ntup = namedtuple('affils_full_list_ntup', ['norm_affils_list','raw_affils_list'])
+    norm_affils_full_list_str = ""
+    raw_affils_full_list_str = ""
 
-    aff_list_tup = _build_addr_affils_lists(full_address, affil_params_dic, drop_status, verbose=False)
-    _, norm_affils_full_list, raw_affils_full_list = aff_list_tup
+    # Getting useful data for affiliations normalization
+    affil_dicts = build_affils_useful_dicts(affil_params_dic)
+    wrong_affil_types_dict = affil_dicts['wrong_affil_types_dict']
 
-    raw_affils_full_list_str = bp_sg.EMPTY
-    if raw_affils_full_list:
-        raw_affils_full_list_str = ";".join(raw_affils_full_list)
+    if not wrong_affil_types_dict:
+        aff_list_tup = _build_addr_affils_lists(full_address, affil_dicts, drop_status, verbose=False)
+        _, norm_affils_full_list, raw_affils_full_list = aff_list_tup
 
-    # Building a string from the final list of normalized affiliations without duplicates
-    norm_affils_full_list = list(set(norm_affils_full_list))
-    norm_affils_full_list_str = bp_sg.EMPTY
-    if norm_affils_full_list:
-        norm_affils_full_list_str = ";".join(norm_affils_full_list)
+        raw_affils_full_list_str = bp_ag.EMPTY
+        if raw_affils_full_list:
+            raw_affils_full_list_str = ";".join(raw_affils_full_list)
+
+        # Building a string from the final list of normalized affiliations without duplicates
+        norm_affils_full_list = list(set(norm_affils_full_list))
+        norm_affils_full_list_str = bp_ag.EMPTY
+        if norm_affils_full_list:
+            norm_affils_full_list_str = ";".join(norm_affils_full_list)
 
     # Setting the namedtuple to return
     affils_full_list_tup =  affils_full_list_ntup(norm_affils_full_list_str, raw_affils_full_list_str)
@@ -917,19 +930,6 @@ def extend_author_affils(item_df, affil_filter_list):
     return new_item_df
 
 
-def _check_norm_raw_affils_dict(affil_params_dic):
-    affil_types_dict, norm_raw_affils_dict, _ = build_affils_useful_dicts(affil_params_dic)
-    wrong_affil_types_dict = {}
-    affil_types_set = set(affil_types_dict.keys())
-    for country, country_dict in norm_raw_affils_dict.items():
-        norm_affil_types_set = {norm_affil.split(' ')[-1] for norm_affil in country_dict.keys()}
-        norm_affil_types_in = affil_types_set.intersection(norm_affil_types_set)
-        norm_affil_types_out = norm_affil_types_set - norm_affil_types_in
-        if norm_affil_types_out:
-            wrong_affil_types_dict[country] = list(norm_affil_types_out)
-    return wrong_affil_types_dict
-
-
 def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False, progress_param=None):
     """Parses the addresses of each publication of the corpus to retrieve the country, 
     the normalized affiliations and the affiliations not yet normalized for each address.
@@ -968,8 +968,9 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
     norm_institution = namedtuple('norm_institution', norm_affil_cols_list)
     raw_institution = namedtuple('raw_institution', raw_affil_cols_list)
 
-    # Checking affiliation types in data of affiliations normalization
-    wrong_affil_types_dict = _check_norm_raw_affils_dict(affil_params_dic)
+    # Getting useful data for affiliations normalization
+    affil_dicts = build_affils_useful_dicts(affil_params_dic)
+    wrong_affil_types_dict = affil_dicts['wrong_affil_types_dict']
 
     if not wrong_affil_types_dict:
         step_nb = len(addresses_df)
@@ -994,14 +995,14 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
                 addr_norm_affils_list = []
                 addr_raw_affils_list = []
                 try:
-                    affil_list_tup = _build_addr_affils_lists(std_address, affil_params_dic,
+                    affil_list_tup = _build_addr_affils_lists(std_address, affil_dicts,
                                                               drop_status=True, verbose=False)
                     address_country, addr_norm_affils_list, addr_raw_affils_list = affil_list_tup
                 except KeyError:
                     print("\n\nError Pub_id / idx:", pub_id," / ", idx)
                     print("\npub_id_addresses_dg:\n", pub_id_addresses_dg[address_col].tolist()[idx])
-                addr_norm_affils = bp_sg.EMPTY
-                addr_raw_affils = bp_sg.EMPTY
+                addr_norm_affils = bp_ag.EMPTY
+                addr_raw_affils = bp_ag.EMPTY
                 if addr_norm_affils_list:
                     addr_norm_affils = "; ".join(addr_norm_affils_list)
                 if addr_raw_affils_list:

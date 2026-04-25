@@ -1,8 +1,10 @@
+"""Module of functions for parsing of Scopus rawdata.
+"""
+
 __all__ = ['scopus_parser']
 
 
 # Standard library imports
-import re
 from collections import namedtuple
 from pathlib import Path
 
@@ -11,7 +13,8 @@ import pandas as pd
 
 # Local libray imports
 import BiblioParsing.general_globals as bp_gg
-import BiblioParsing.specific_globals as bp_sg
+import BiblioParsing.parsing_cols_globals as bp_pcg
+import BiblioParsing.parsing_globals as bp_pg
 from BiblioParsing.affiliations_parsing import build_addr_affils_tup
 from BiblioParsing.affiliations_parsing import extend_author_affils
 from BiblioParsing.parsing_utils import build_item_df_from_tup
@@ -19,7 +22,6 @@ from BiblioParsing.parsing_utils import build_title_keywords
 from BiblioParsing.parsing_utils import clean_authors_countries_affils
 from BiblioParsing.parsing_utils import convert_issn
 from BiblioParsing.parsing_utils import normalize_country
-from BiblioParsing.parsing_utils import normalize_name
 from BiblioParsing.parsing_utils import set_unknown_address
 from BiblioParsing.parsing_utils import standardize_address
 from BiblioParsing.parsing_utils import str_int_convertor
@@ -42,56 +44,56 @@ def _set_scopus_parsing_cols():
         'COL_NAMES' global, A dict valued by column names of rawdata defined \
         by the 'COLUMN_LABEL_SCOPUS' and 'COLUMN_LABEL_SCOPUS_PLUS' globals).
     """
-    cols_lists_dic = {'articles_cols_list'  : bp_sg.COL_NAMES['articles'],
-                      'address_cols_list'   : bp_sg.COL_NAMES['address'],
-                      'auth_cols_list'      : bp_sg.COL_NAMES['authors'],
-                      'auth_affil_cols_list': bp_sg.COL_NAMES['auth_inst'],
-                      'country_cols_list'   : bp_sg.COL_NAMES['country'],
-                      'affil_cols_list'     : bp_sg.COL_NAMES['institution'],
-                      'kw_cols_list'        : bp_sg.COL_NAMES['keywords'],
-                      'tmp_cols_list'       : bp_sg.COL_NAMES['temp_col'],
-                      'ref_cols_list'       : bp_sg.COL_NAMES['references'],
+    cols_lists_dic = {'articles_cols_list'  : bp_pcg.COL_NAMES['articles'],
+                      'address_cols_list'   : bp_pcg.COL_NAMES['address'],
+                      'auth_cols_list'      : bp_pcg.COL_NAMES['authors'],
+                      'auth_affil_cols_list': bp_pcg.COL_NAMES['auth_inst'],
+                      'country_cols_list'   : bp_pcg.COL_NAMES['country'],
+                      'affil_cols_list'     : bp_pcg.COL_NAMES['institution'],
+                      'kw_cols_list'        : bp_pcg.COL_NAMES['keywords'],
+                      'tmp_cols_list'       : bp_pcg.COL_NAMES['temp_col'],
+                      'ref_cols_list'       : bp_pcg.COL_NAMES['references'],
                      }
 
-    cols_dic = {'scopus_id_col'       : bp_sg.COL_NAMES['scopus_id'][0],
-                'pub_id_col'          : bp_sg.COL_NAMES['pub_id'],
-                'subject_col'         : bp_sg.COL_NAMES['subject'][1],
-                'sub_subject_col'     : bp_sg.COL_NAMES['sub_subject'][1],
-                'affil_author_idx_col': bp_sg.COL_NAMES['auth_inst'][1],
-                'norm_affils_col'     : bp_sg.COL_NAMES['auth_inst'][4],
-                'address_col'         : bp_sg.COL_NAMES['address'][2],
-                'country_col'         : bp_sg.COL_NAMES['country'][2],
-                'affil_col'           : bp_sg.COL_NAMES['institution'][2],
-                'author_idx_col'      : bp_sg.COL_NAMES['authors'][1],
-                'co_authors_col'      : bp_sg.COL_NAMES['authors'][2],
-                'keyword_col'         : bp_sg.COL_NAMES['keywords'][1],
-                'title_temp_col'      : bp_sg.COL_NAMES['temp_col'][2],
-                'kept_tokens_col'     : bp_sg.COL_NAMES['temp_col'][4],
-                'author_col'          : bp_sg.COL_NAMES['articles'][1],
-                'year_col'            : bp_sg.COL_NAMES['articles'][2],
-                'doc_type_col'        : bp_sg.COL_NAMES['articles'][7],
-                'title_col'           : bp_sg.COL_NAMES['articles'][9],
-                'issn_col'            : bp_sg.COL_NAMES['articles'][10],
-                'norm_journal_col'    : bp_sg.NORM_JOURNAL_COLUMN_LABEL,
+    cols_dic = {'scopus_id_col'       : bp_pcg.COL_NAMES['scopus_id'][0],
+                'pub_id_col'          : bp_pcg.COL_NAMES['pub_id'],
+                'subject_col'         : bp_pcg.COL_NAMES['subject'][1],
+                'sub_subject_col'     : bp_pcg.COL_NAMES['sub_subject'][1],
+                'affil_author_idx_col': bp_pcg.COL_NAMES['auth_inst'][1],
+                'norm_affils_col'     : bp_pcg.COL_NAMES['auth_inst'][4],
+                'address_col'         : bp_pcg.COL_NAMES['address'][2],
+                'country_col'         : bp_pcg.COL_NAMES['country'][2],
+                'affil_col'           : bp_pcg.COL_NAMES['institution'][2],
+                'author_idx_col'      : bp_pcg.COL_NAMES['authors'][1],
+                'co_authors_col'      : bp_pcg.COL_NAMES['authors'][2],
+                'keyword_col'         : bp_pcg.COL_NAMES['keywords'][1],
+                'title_temp_col'      : bp_pcg.COL_NAMES['temp_col'][2],
+                'kept_tokens_col'     : bp_pcg.COL_NAMES['temp_col'][4],
+                'author_col'          : bp_pcg.COL_NAMES['articles'][1],
+                'year_col'            : bp_pcg.COL_NAMES['articles'][2],
+                'doc_type_col'        : bp_pcg.COL_NAMES['articles'][7],
+                'title_col'           : bp_pcg.COL_NAMES['articles'][9],
+                'issn_col'            : bp_pcg.COL_NAMES['articles'][10],
+                'norm_journal_col'    : bp_pcg.NORM_JOURNAL_COLUMN_LABEL,
                }
 
-    scopus_cols_dic = {'scopus_auth_col'         : bp_sg.COLUMN_LABEL_SCOPUS['authors'],
-                       'scopus_title_kw_col'     : bp_sg.COLUMN_LABEL_SCOPUS['title'],
-                       'scopus_year_col'         : bp_sg.COLUMN_LABEL_SCOPUS['year'],
-                       'scopus_journal_col'      : bp_sg.COLUMN_LABEL_SCOPUS['journal'],
-                       'scopus_volume_col'       : bp_sg.COLUMN_LABEL_SCOPUS['volume'],
-                       'scopus_page_col'         : bp_sg.COLUMN_LABEL_SCOPUS['page_start'],
-                       'scopus_doi_col'          : bp_sg.COLUMN_LABEL_SCOPUS['doi'],
-                       'scopus_aff_col'          : bp_sg.COLUMN_LABEL_SCOPUS['affiliations'],
-                       'scopus_auth_with_aff_col': bp_sg.COLUMN_LABEL_SCOPUS['authors_with_affiliations'],
-                       'scopus_auth_kw_col'      : bp_sg.COLUMN_LABEL_SCOPUS['author_keywords'],
-                       'scopus_idx_kw_col'       : bp_sg.COLUMN_LABEL_SCOPUS['index_keywords'],
-                       'scopus_ref_col'          : bp_sg.COLUMN_LABEL_SCOPUS['references'],
-                       'scopus_issn_col'         : bp_sg.COLUMN_LABEL_SCOPUS['issn'],
-                       'scopus_language_col'     : bp_sg.COLUMN_LABEL_SCOPUS['language'],
-                       'scopus_doctype_col'      : bp_sg.COLUMN_LABEL_SCOPUS['document_type'],
-                       'scopus_fullnames_col'    : bp_sg.COLUMN_LABEL_SCOPUS_PLUS['auth_fullnames'],
-                       'init_scopus_id_col'      : bp_sg.COLUMN_LABEL_SCOPUS_PLUS['scopus_id'],
+    scopus_cols_dic = {'scopus_auth_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['authors'],
+                       'scopus_title_kw_col'     : bp_pcg.COLUMN_LABEL_SCOPUS['title'],
+                       'scopus_year_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['year'],
+                       'scopus_journal_col'      : bp_pcg.COLUMN_LABEL_SCOPUS['journal'],
+                       'scopus_volume_col'       : bp_pcg.COLUMN_LABEL_SCOPUS['volume'],
+                       'scopus_page_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['page_start'],
+                       'scopus_doi_col'          : bp_pcg.COLUMN_LABEL_SCOPUS['doi'],
+                       'scopus_aff_col'          : bp_pcg.COLUMN_LABEL_SCOPUS['affiliations'],
+                       'scopus_auth_with_aff_col': bp_pcg.COLUMN_LABEL_SCOPUS['authors_with_affiliations'],
+                       'scopus_auth_kw_col'      : bp_pcg.COLUMN_LABEL_SCOPUS['author_keywords'],
+                       'scopus_idx_kw_col'       : bp_pcg.COLUMN_LABEL_SCOPUS['index_keywords'],
+                       'scopus_ref_col'          : bp_pcg.COLUMN_LABEL_SCOPUS['references'],
+                       'scopus_issn_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['issn'],
+                       'scopus_language_col'     : bp_pcg.COLUMN_LABEL_SCOPUS['language'],
+                       'scopus_doctype_col'      : bp_pcg.COLUMN_LABEL_SCOPUS['document_type'],
+                       'scopus_fullnames_col'    : bp_pcg.COLUMN_LABEL_SCOPUS_PLUS['auth_fullnames'],
+                       'init_scopus_id_col'      : bp_pcg.COLUMN_LABEL_SCOPUS_PLUS['scopus_id'],
                       }
 
     return cols_lists_dic, cols_dic, scopus_cols_dic
@@ -234,7 +236,7 @@ def _build_scopus_keywords(corpus_df, fails_dic, cols_tup):
         pub_aks_list = pub_aks_str.split(';')
         for pub_ak in pub_aks_list:
             pub_ak = pub_ak.lower().strip()
-            aks_list.append(key_word(pub_id, pub_ak if pub_ak!='null' else bp_sg.UNKNOWN))
+            aks_list.append(key_word(pub_id, pub_ak if pub_ak!='null' else bp_pg.UNKNOWN))
 
     iks_list = []
     iks_df = corpus_df[scopus_idx_kw_col].fillna('')
@@ -242,7 +244,7 @@ def _build_scopus_keywords(corpus_df, fails_dic, cols_tup):
         pub_iks_list = pub_iks_str.split(';')
         for pub_ik in pub_iks_list:
             pub_ik = pub_ik.lower().strip()
-            iks_list.append(key_word(pub_id, pub_ik if pub_ik!='null' else bp_sg.UNKNOWN))
+            iks_list.append(key_word(pub_id, pub_ik if pub_ik!='null' else bp_pg.UNKNOWN))
 
     tks_list = []
     title_df = pd.DataFrame(corpus_df[scopus_title_kw_col].fillna(''))
@@ -251,7 +253,7 @@ def _build_scopus_keywords(corpus_df, fails_dic, cols_tup):
     for pub_id in corpus_df[pub_id_col]:
         for token in tks_df.loc[pub_id, kept_tokens_col]:
             token = token.lower().strip()
-            tks_list.append(key_word(pub_id, token if token!='null' else bp_sg.UNKNOWN))
+            tks_list.append(key_word(pub_id, token if token!='null' else bp_pg.UNKNOWN))
 
     # Building a clean author keywords dataframe and accordingly updating the parsing success rate dict
     auth_kw_df, fails_dic = build_item_df_from_tup(aks_list, kw_cols_list,
@@ -401,35 +403,35 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
 
     For example, the 'Authors with affiliations' field string:
 
-       'Boujjat, H., CEA, LITEN Solar & Thermodynam Syst Lab L2ST, F-38054 Grenoble, France,
+       'Boujjat, H., CEA, LITEN Solar & Thermod Syst Lab L2ST, F-38054 Grenoble, France,
         Univ Grenoble Alpes, F-38000 Grenoble, France;
         Rodat, S., CNRS, Proc Mat & Solar Energy Lab, PROMES, 7 Rue Four Solaire, F-66120 Font Romeu, France;
         Chuayboon, S., CNRS, Proc Mat & Solar Energy Lab, PROMES, 7 Rue Four Solaire, F-66120 Font Romeu, France;
         Abanades, S., CEA, Leti, 17 rue des Martyrs, F-38054 Grenoble, France;
-        Dupont, S., CEA, Liten, INES. 50 avenue du Lac Leman, F-73370 Le Bourget-du-Lac, France;
-        Durand, M., CEA, INES, DTS, 50 avenue du Lac Leman, F-73370 Le Bourget-du-Lac, France;
-        David, D., Lund University, Department of Physical Geography and Ecosystem Science (INES), Lund, Sweden'
+        Dupont, S., CEA, Liten, INES. 50 avenue du Lac, F-73370 Le Bourget-du-Lac, France;
+        Durand, M., CEA, INES, DTS, 50 avenue du Lac, F-73370 Le Bourget-du-Lac, France;
+        David, D., Lund University, Department of Phys Geography and Ecosystem Science (INES), Lund, Sweden'
 
      will be parsed in the "auth_affils_df" dataframe if affiliation filter is not defined (initialization step):
 
-        Pub_id  Idx_author                     Address               Country    Norm_affiliations              Raw_affiliations
-            0       0        CEA, LITEN Solar & Thermodynam , ...    France     CEA Nro;LITEN Rto              F-38054 Grenoble
-            0       0        Univ Grenoble Alpes,...                 France     UGA Univ                       F-38000 Grenoble
-            0       1        CNRS, Proc Mat Lab, PROMES,...          France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...
-            0       2        CNRS, Proc Mat Lab, PROMES, ...         France     CNRS Nro;PROMES CNRS-Lab       7 Rue Four Solaire;...
-            0       3        CEA, Leti, 17 rue des Martyrs,...       France     CEA Nro;LETI Rto               17 rue des Martyrs;...
-            0       4        CEA, Liten, INES. 50 avenue...          France     CEA Nro;LITEN Rto;INES Site    50 avenue du Lac Leman;...
-            0       5        CEA, INES, DTS, 50 avenue...            France     CEA Nro;INES Site              DTS;...
-            0       6        Lund University,...(INES),...           Sweden     Lund Univ                      Department of Physical ...
+        Pub_id  Idx_author                   Address         Country Norm_affiliations            Raw_affiliations
+            0       0      CEA, LITEN Solar & Thermod , ...  France  CEA Nro;LITEN Rto            F-38054 Grenoble
+            0       0      Univ Grenoble Alpes,...           France  UGA Univ                     F-38000 Grenoble
+            0       1      CNRS, Proc Mat Lab, PROMES,...    France  CNRS Nro;PROMES CNRS-Lab     7 Rue Four Solaire;...
+            0       2      CNRS, Proc Mat Lab, PROMES, ...   France  CNRS Nro;PROMES CNRS-Lab     7 Rue Four Solaire;...
+            0       3      CEA, Leti, 17 rue des Martyrs,... France  CEA Nro;LETI Rto             17 rue des Martyrs;...
+            0       4      CEA, Liten, INES. 50 avenue...    France  CEA Nro;LITEN Rto;INES Site  50 avenue du Lac;...
+            0       5      CEA, INES, DTS, 50 avenue...      France  CEA Nro;INES Site            DTS;...
+            0       6      Lund University,...(INES),...     Sweden  Lund Univ                    Department of Phys ...
 
     given that the 'Affiliations' field string is:
 
-        'CEA, LITEN Solar & Thermodynam Syst Lab L2ST, F-38054 Grenoble, France;
+        'CEA, LITEN Solar & Thermod Syst Lab L2ST, F-38054 Grenoble, France;
          Univ Grenoble Alpes, F-38000 Grenoble, France;
          CNRS, Proc Mat & Solar Energy Lab, PROMES, 7 Rue Four Solaire, F-66120 Font Romeu, France;
          CEA, Leti, 17 rue des Martyrs, F-38054 Grenoble, France;
-         CEA, Liten, INES. 50 avenue du Lac Leman, F-73370 Le Bourget-du-Lac, France;
-         CEA, INES, DTS, 50 avenue du Lac Leman, F-73370 Le Bourget-du-Lac, France;
+         CEA, Liten, INES. 50 avenue du Lac, F-73370 Le Bourget-du-Lac, France;
+         CEA, INES, DTS, 50 avenue du Lac, F-73370 Le Bourget-du-Lac, France;
          Lund University, Department of Physical Geography and Ecosystem Science (INES), Lund, Sweden'
 
     The affiliations are identified and normalized using dedicated data that should be specified by the user.
@@ -454,11 +456,11 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
         cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
         affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
         optional (default=None).
-        affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', 'country_affils_file_path', \
-        'country_towns_folder_path', 'country_towns_file'] and valued by the user as the full path to the data \
-        per country of raw affiliations per normalized one, the full path to the data of affiliations-types \
-        used to normalize the affiliations, the name of the file of the data of towns per country and the full \
-        path to the folder where these data are available.
+        affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
+        'country_affils_file_path', 'country_towns_folder_path', 'country_towns_file'] and valued by the user as \
+        the full path to the data per country of raw affiliations per normalized one, the full path to the data of \
+        affiliations-types used to normalize the affiliations, the name of the file of the data of towns per country \
+        and the full path to the folder where these data are available.
     Returns:
         (dataframe): The built data.
     """
@@ -596,11 +598,11 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
         rawdata_path (path): The full path to the corpus rawdata.
         affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
         optional (default=None).
-        affil_params_dic (dict); Optional dict (default=None) keyed by ['affil_types_file_path', 'country_affils_file_path', \
-        'country_towns_folder_path', 'country_towns_file'] and valued by the user as the full path to the data \
-        per country of raw affiliations per normalized one, the full path to the data of affiliations-types \
-        used to normalize the affiliations, the name of the file of the data of towns per country and the full \
-        path to the folder where these are available.
+        affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
+        'country_affils_file_path', 'country_towns_folder_path', 'country_towns_file'] and valued by the user as \
+        the full path to the data per country of raw affiliations per normalized one, the full path to the data of \
+        affiliations-types used to normalize the affiliations, the name of the file of the data of towns per country \
+        and the full path to the folder where these data are available.
     Returns:
         (tup): (The parsed data (dataframes) as values of a dict keyed by parsing items, \
         The parsing success rate data (dict), The data (dataframe) of the corrected author names, \
@@ -610,14 +612,14 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
     cols_tup = _set_scopus_parsing_cols()
 
     # Setting items list and values
-    items_list = [bp_sg.PARSING_ITEMS_LIST[x] for x in range(12)]
+    items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(12)]
     (articles_item, authors_item, addresses_item, countries_item, affiliations_item,
      auth_affil_item, authors_kw_item, index_kw_item, title_kw_item, subjects_item,
      sub_subjects_item, references_item) = items_list
 
     # Setting the specific file paths for subjects and sub-subjects assignment for Scopus corpuses
-    scopus_cat_codes_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_sg.SCOPUS_CAT_CODES)
-    scopus_journals_issn_cat_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_sg.SCOPUS_JOURNALS_ISSN_CAT)
+    scopus_cat_codes_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_CAT_CODES)
+    scopus_journals_issn_cat_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_JOURNALS_ISSN_CAT)
 
     # Reading and checking the corpus file
     raw_data_return_tup = read_scopus_rawdata(rawdata_path, correct_data=True, scopus_ids=True)

@@ -10,8 +10,10 @@ import nltk
 
 # Local imports
 from BiblioParsing.general_globals import *
+from BiblioParsing.parsing_cols_globals import *
+from BiblioParsing.parsing_globals import *
 from BiblioParsing.regex_globals import *
-from BiblioParsing.specific_globals import *
+from BiblioParsing.affiliations_globals import *
 from BiblioParsing.parsing_utils import *
 from BiblioParsing.affil_norm_utils import *
 from BiblioParsing.scopus_rawdata_utils import *

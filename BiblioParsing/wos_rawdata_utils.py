@@ -1,3 +1,6 @@
+"""Module of functions for reading and cleaning of WoS rawdata.
+"""
+
 __all__ = ['read_wos_rawdata']
 
 # Standard library imports
@@ -8,7 +11,8 @@ import numpy as np
 import pandas as pd
 
 # Local libray imports
-import BiblioParsing.specific_globals as bp_sg
+import BiblioParsing.parsing_cols_globals as bp_pcg
+import BiblioParsing.parsing_globals as bp_pg
 from BiblioParsing.parsing_utils import build_pub_db_ids
 from BiblioParsing.parsing_utils import check_and_drop_columns
 from BiblioParsing.parsing_utils import check_and_get_rawdata_file_path
@@ -24,11 +28,11 @@ def _set_wos_rawdata_cols():
         'COL_NAMES' global, A dict valued by column names of rawdata defined \
         by the 'COLUMN_LABEL_WOS' and 'COLUMN_LABEL_WOS_PLUS' globals).
     """
-    cols_dic = {'wos_id_col': bp_sg.COL_NAMES['wos_id'][0],
-                'pub_id_col': bp_sg.COL_NAMES['pub_id'],
+    cols_dic = {'wos_id_col': bp_pcg.COL_NAMES['wos_id'][0],
+                'pub_id_col': bp_pcg.COL_NAMES['pub_id'],
                }
 
-    wos_cols_dic = {'init_wos_id_col': bp_sg.COLUMN_LABEL_WOS_PLUS['wos_id'],
+    wos_cols_dic = {'init_wos_id_col': bp_pcg.COLUMN_LABEL_WOS_PLUS['wos_id'],
                    }
 
     return cols_dic, wos_cols_dic
@@ -71,13 +75,13 @@ def read_wos_rawdata(rawdata_path, wos_ids=False):
     wos_ids_df = pd.DataFrame()
 
     # Check if rawdata file is available and get its full path if it is
-    rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.WOS_RAWDATA_EXTENT)
+    rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_pg.WOS_RAWDATA_EXTENT)
 
     if rawdata_file_path:
         # Extending the field size limit for reading .txt files
-        csv.field_size_limit(bp_sg.FIELD_SIZE_LIMIT)
+        csv.field_size_limit(bp_pg.FIELD_SIZE_LIMIT)
 
-        with open(rawdata_file_path, 'rt', encoding=bp_sg.ENCODING) as csv_file:
+        with open(rawdata_file_path, 'rt', encoding=bp_pg.ENCODING) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
             csv_list = []
             for row in csv_reader:
@@ -91,13 +95,12 @@ def read_wos_rawdata(rawdata_path, wos_ids=False):
 
             # Trying to drop data by wos identifier given in an XLSX file
             full_wos_rawdata_df = drop_rawdata(rawdata_path, init_full_wos_rawdata_df,
-                                               wos_ids_cols_list, bp_sg.WOS)
+                                               wos_ids_cols_list, bp_pg.WOS)
 
             # Selecting useful rawdata
-            wos_rawdata_df = check_and_drop_columns(bp_sg.WOS, full_wos_rawdata_df)
-            wos_rawdata_df = wos_rawdata_df.replace(np.nan, bp_sg.UNKNOWN, regex=True)
-            wos_rawdata_df = normalize_journal_names(bp_sg.WOS, wos_rawdata_df)
-            return_tup = (wos_rawdata_df)
+            wos_rawdata_df = check_and_drop_columns(bp_pg.WOS, full_wos_rawdata_df)
+            wos_rawdata_df = wos_rawdata_df.replace(np.nan, bp_pg.UNKNOWN, regex=True)
+            wos_rawdata_df = normalize_journal_names(bp_pg.WOS, wos_rawdata_df)
 
             if wos_ids:
                 # Building the WoS-IDs data

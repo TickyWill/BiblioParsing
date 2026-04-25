@@ -1,3 +1,6 @@
+"""Module of useful functions for normalization of authors' affiliations.
+"""
+
 __all__ = ['build_affils_useful_dicts',
            'build_norm_raw_affils_dict',
            'read_affil_types',
@@ -8,7 +11,6 @@ __all__ = ['build_affils_useful_dicts',
 # Standard library imports
 import re
 from pathlib import Path
-from string import Template
 
 # 3rd party imports
 import openpyxl
@@ -16,9 +18,10 @@ import pandas as pd
 
 # Local library imports
 import BiblioParsing as bp
+import BiblioParsing.affiliations_globals as bp_ag
 import BiblioParsing.general_globals as bp_gg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
+from BiblioParsing.parsing_utils import dict_print
 from BiblioParsing.parsing_utils import remove_special_symbol
 from BiblioParsing.parsing_utils import rationalize_town_names
 from BiblioParsing.parsing_utils import set_address_uniform_words
@@ -66,13 +69,13 @@ def _build_words_set(raw_aff, verbose=False):
     # Managing missing space in raw affiliations related
     # to particuliar institutions cases such as UMR or U followed by digits
     std_raw_aff_add = ""
-    for accron in bp_sg.MISSING_SPACE_ACRONYMS:
+    for accron in bp_ag.MISSING_SPACE_ACRONYMS:
         re_accron = re.compile(word_to_drop_template.substitute({"word":accron}))
         if re.search(re_accron, std_raw_aff.lower()) and len(raw_aff_words_set)==2:
             std_raw_aff_add = "".join(std_raw_aff.split(" "))
 
     # Droping small words
-    for word_to_drop in bp_sg.SMALL_WORDS_DROP:
+    for word_to_drop in bp_ag.SMALL_WORDS_DROP:
         re_drop_words = re.compile(word_to_drop_template.substitute({"word":word_to_drop}))
         if re.search(re_drop_words, std_raw_aff.lower()):
             raw_aff_words_set = raw_aff_words_set - {word_to_drop}
@@ -123,12 +126,12 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
         (dict): The built dict.
     """
     # Setting useful column names
-    norm_affil_col = bp_sg.AFFIL_COL_NAMES['norm_affil_col']
+    norm_affil_col = bp_ag.AFFIL_COL_NAMES['norm_affil_col']
 
     # Setting the path for the 'Country_affiliations.xlsx' file
     if not country_affiliations_file_path:
         rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
-        country_affils_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['country_affils_file']
+        country_affils_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['country_affils_file']
         country_affiliations_file_path = rep_utils_path / Path(country_affils_file)
 
     # Reading the 'Country_affiliations.xlsx' multisheet XLSX file in a dict
@@ -174,16 +177,16 @@ def read_affil_types(affil_types_file_path=None):
         (dict): The built dict.
     """
     # Setting useful column names
-    level_col, short_col = bp_sg.AFFIL_TYPES_USECOLS
+    level_col, short_col = bp_ag.AFFIL_TYPES_USECOLS
 
     # Setting the full path for the file of ordered institutions types
     if not affil_types_file_path:
         rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
-        affil_types_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['affil_types_file']
+        affil_types_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['affil_types_file']
         affil_types_file_path = rep_utils_path / Path(affil_types_file)
 
     # Reading the file in a dataframe
-    affil_types_df = pd.read_excel(affil_types_file_path, usecols=bp_sg.AFFIL_TYPES_USECOLS)
+    affil_types_df = pd.read_excel(affil_types_file_path, usecols=[level_col, short_col])
 
     levels = list(affil_types_df[level_col])
     abbreviations = list(affil_types_df[short_col])
@@ -209,7 +212,7 @@ def read_towns_per_country(country_towns_file=None, country_towns_folder_path=No
     if not country_towns_folder_path:
         country_towns_folder_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
     if not country_towns_file:
-        country_towns_file = bp_sg.AFFIL_DEFAULT_FILES_DIC['country_towns_file']
+        country_towns_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['country_towns_file']
     file_path = country_towns_folder_path / Path(country_towns_file)
 
     # Reading the file of towns per country in a dict of dataframes
@@ -221,13 +224,25 @@ def read_towns_per_country(country_towns_file=None, country_towns_folder_path=No
         list_towns = []
         for town in towns_dict[country]:
             town = town.lower()
-            town = rationalize_town_names(town, dic_town_symbols=bp_sg.DIC_TOWN_SYMBOLS,
-                                          dic_town_words=bp_sg.DIC_TOWN_WORDS)
+            town = rationalize_town_names(town, dic_town_symbols=bp_ag.DIC_TOWN_SYMBOLS,
+                                          dic_town_words=bp_ag.DIC_TOWN_WORDS)
             town = remove_special_symbol(town, only_ascii=False, strip=False)
             town = town.strip()
             list_towns.append(town)
         towns_dict[country] = list_towns
     return towns_dict
+
+
+def _check_norm_raw_affils_dict(affil_types_dict, norm_raw_affils_dict):
+    wrong_affil_types_dict = {}
+    affil_types_set = set(affil_types_dict.keys())
+    for country, country_dict in norm_raw_affils_dict.items():
+        norm_affil_types_set = {norm_affil.split(' ')[-1] for norm_affil in country_dict.keys()}
+        norm_affil_types_in = affil_types_set.intersection(norm_affil_types_set)
+        norm_affil_types_out = norm_affil_types_set - norm_affil_types_in
+        if norm_affil_types_out:
+            wrong_affil_types_dict[country] = list(norm_affil_types_out)
+    return wrong_affil_types_dict
 
 
 def build_affils_useful_dicts(affil_params_dic):
@@ -263,4 +278,19 @@ def build_affils_useful_dicts(affil_params_dic):
                                                      verbose=False)
     towns_dict = read_towns_per_country(country_towns_file=country_towns_file,
                                         country_towns_folder_path=country_towns_folder_path)
-    return affil_types_dict, norm_raw_affils_dict, towns_dict
+
+    # Checking affiliations-types in 'norm_raw_affils_dict' dict
+    wrong_affil_types_dict = _check_norm_raw_affils_dict(affil_types_dict, norm_raw_affils_dict)
+    if wrong_affil_types_dict:
+        print("\nWARNING: Uncorrect normalized-affiliation types found in the file: "
+              f"\n         {country_affils_file_path}"
+              "\n\n         Please, correct the following affiliation types:")
+        dict_print(wrong_affil_types_dict)
+
+    # Building returned dict
+    affil_dicts = {'affil_types_dict'      : affil_types_dict,
+                   'norm_raw_affils_dict'  : norm_raw_affils_dict,
+                   'towns_dict'            : towns_dict,
+                   'wrong_affil_types_dict': wrong_affil_types_dict,
+                  }
+    return affil_dicts

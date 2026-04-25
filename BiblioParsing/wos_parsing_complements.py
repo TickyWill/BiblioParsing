@@ -1,3 +1,7 @@
+"""Module of functions for parsing of subjects and references fields 
+of WoS rawdata.
+"""
+
 __all__ = ['build_wos_references',
            'build_wos_subjects_and_sub_subjects',
           ]
@@ -11,10 +15,10 @@ from collections import namedtuple
 import pandas as pd
 
 # Local libray imports
+import BiblioParsing.parsing_globals as bp_pg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
+
 from BiblioParsing.parsing_utils import build_item_df_from_tup
-from BiblioParsing.parsing_utils import normalize_name
 
 
 def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
@@ -88,7 +92,7 @@ def _try_list_idx(item_idx, value_idx, values_list):
     try:
         value_item_idx, value = item_idx, values_list[value_idx].strip()
     except IndexError:
-        value_item_idx, value = 0, bp_sg.UNKNOWN
+        value_item_idx, value = 0, bp_pg.UNKNOWN
     return value_item_idx, value
 
 
@@ -98,18 +102,18 @@ def _find_wos_ref_doi(ref_items_list):
         if re.findall(bp_rg.RE_WOS_REF_DOI, ref_item):
             dois_idx_list.append(item_idx)
             init_dois_items_list.append(ref_item)
-    dois_list = list(set([x.replace("DOI","").strip().lower() for x in init_dois_items_list]))
+    dois_list = list(set(x.replace("DOI","").strip().lower() for x in init_dois_items_list))
     dois_list_str = ", ".join(dois_list)
     return dois_list_str
 
 
 def _find_wos_ref_year(ref_items_list):
-    years_list = []
+    item_idx, years_list = 0, []
     for item_idx, ref_item in enumerate(ref_items_list):
         years_list = re.findall(bp_rg.RE_WOS_REF_YEAR, ref_item)
         if years_list:
             break
-    year_item_idx, year = _try_list_idx(item_idx, 0, years_list)
+    _, year = _try_list_idx(item_idx, 0, years_list)
     return year
 
 
@@ -118,7 +122,7 @@ def _set_wos_dotted_initials(first_item):
     mod_first_item = first_item
     initial_dot = '.'
     name_parts_list = first_item.split(" ")
-    check_parts_list = [x for x in name_parts_list]
+    check_parts_list = list(name_parts_list)
     for part in re.findall(bp_rg.RE_AUTHORS_SMALL_WORDS, first_item):
         check_parts_list.remove(part.strip())
     name_check_nb = len(check_parts_list)
@@ -160,10 +164,10 @@ def _search_journal_words(item, title, journal):
 
 
 def _find_wos_ref_title_journal(ref_items_list, authors_case, year):
-    journal = bp_sg.UNKNOWN
-    title = bp_sg.UNKNOWN
+    journal = bp_pg.UNKNOWN
+    title = bp_pg.UNKNOWN
     ref_items_nb = len(ref_items_list)
-    if ref_items_nb>2 and year!=bp_sg.UNKNOWN:
+    if ref_items_nb>2 and year!=bp_pg.UNKNOWN:
         second_item, third_item = ref_items_list[1], ref_items_list[2]
         if authors_case in ["Anonymous", "Undotted"]:
             title = third_item
@@ -171,11 +175,11 @@ def _find_wos_ref_title_journal(ref_items_list, authors_case, year):
             journal = third_item
         else:
             title, journal = _search_journal_words(third_item, title, journal)
-    elif ref_items_nb==2 and year==bp_sg.UNKNOWN:
+    elif ref_items_nb==2 and year==bp_pg.UNKNOWN:
         second_item = ref_items_list[1]
         title, journal = _search_journal_words(second_item, title, journal)
     else:
-        title = bp_sg.UNKNOWN
+        title = bp_pg.UNKNOWN
     return title, journal
 
 
@@ -246,79 +250,3 @@ def build_wos_references(corpus_df, cols_tup, verbose=False):
     references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
                                             for idx, label in enumerate(ref_cols_list)})
     return references_df
-
-
-#def build_wos_references(corpus_df, cols_tup):
-#    """Builds the data of cited references per publication of the corpus.
-#
-#    The structure of the built data is composed of 6 columns and one row 
-#    per reference and per publication.
-#        Ex:
-#
-#           Pub_id  Author     Year         Journal           Volume  Page
-#            0    Bellouard Q  2017   Int. J. Hydrog. Energy    42    13486
-#            0    Nishinaka H  2020   Energy Fuels              31    10933
-#            0    Bellouard Q  2018   Int. J. Hydrog. Energy    44    19193
-#
-#    Args:
-#        corpus_df (dataframe): The selected rawdata of the corpus.
-#        cols_tup (tup): Columns information as built through \
-#        the `_set_wos_parsing_cols` internal function.
-#    Returns:
-#        (dataframe): The built data.
-#    """
-#    # Setting useful column names
-#    cols_lists_dic, cols_dic, wos_cols_dic = cols_tup
-#    ref_cols_list = cols_lists_dic['ref_cols_list']
-#    pub_id_col = cols_dic['pub_id_col']
-#    wos_ref_col = wos_cols_dic['wos_ref_col']
-#
-#    # Setting named tuple
-#    article_ref = namedtuple('article_ref', ref_cols_list)
-#
-#    refs_list =[]
-#    for pub_id, row in zip(list(corpus_df[pub_id_col]),
-#                                corpus_df[wos_ref_col]):
-#        if isinstance(row, str):
-#            # If the reference field is not empty and not an URL
-#            for field in row.split(";"):
-#                year = re.findall(bp_rg.RE_REF_YEAR_WOS, field) 
-#                if len(year):
-#                    year = year[0][1:-1]
-#                else:
-#                    year = 0
-#
-#                vol = re.findall(bp_rg.RE_REF_VOL_WOS, field)
-#                if len(vol):
-#                    vol = vol[0][3:]
-#                else:
-#                    vol = 0
-#
-#                page = re.findall(bp_rg.RE_REF_PAGE_WOS, field)
-#                if len(page):
-#                    page = page[0][3:]
-#                else:
-#                    page = 0
-#
-#                journal = re.findall(bp_rg.RE_REF_JOURNAL_WOS, field)
-#                if len(journal):
-#                    journal = journal[0].strip()
-#                else:
-#                    journal = bp_sg.UNKNOWN
-#
-#                author = re.findall(bp_rg.RE_REF_AUTHOR_WOS, field)
-#                if len(author):
-#                    author = normalize_name(author[0][:-1])
-#                else:
-#                    author = bp_sg.UNKNOWN
-#
-#                if (author!=bp_sg.UNKNOWN) and (journal!=bp_sg.UNKNOWN):
-#                    refs_list.append(article_ref(pub_id, author, year, journal, vol,page))
-#
-#                if (vol==0) & (page==0) & (author!=bp_sg.UNKNOWN):
-#                    pass
-#
-#    references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
-#                                            for idx,label in enumerate(ref_cols_list)})
-#    return references_df
-

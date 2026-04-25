@@ -1,3 +1,7 @@
+"""Module of global parameters built from generic information 
+such as countries with their specific structure of zip codes.
+"""
+
 __all__ = ['ACCENT_CHANGE',
            'ALIAS_BLR',
            'ALIAS_FR',

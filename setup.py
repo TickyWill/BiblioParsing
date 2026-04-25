@@ -1,7 +1,11 @@
+"""Module for building package"""
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+# Standard library imports
 from os import path
+
+# 3rd party imports
+from setuptools import setup, find_packages
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))

@@ -1,3 +1,7 @@
+"""Module of useful functions for rawdata parsings 
+and concatenation/deduplication of parsings.
+"""
+
 __all__ = ['build_item_df_from_tup',
            'build_pub_db_ids',
            'build_title_keywords',
@@ -27,25 +31,25 @@ __all__ = ['build_item_df_from_tup',
 
 # Standard library imports
 import functools
-import numpy as np
 import operator
 import os
 import re
-import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
 
 
 # 3rd party imports
+import numpy as np
 import pandas as pd
 import nltk
-from pandas.core.groupby.groupby import DataError
 
 # Local library imports
+import BiblioParsing.affiliations_globals as bp_ag
 import BiblioParsing.general_globals as bp_gg
+import BiblioParsing.parsing_cols_globals as bp_pcg
+import BiblioParsing.parsing_globals as bp_pg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
 
 
 def str_int_convertor(x):
@@ -56,7 +60,7 @@ def str_int_convertor(x):
 
 
 def convert_issn(text):
-    new_text = bp_sg.UNKNOWN
+    new_text = bp_pg.UNKNOWN
     y = ''.join(re.findall(bp_rg.RE_ISSN, text))
     if y.strip():
         new_text = y[0:4] + "-" + y[4:]
@@ -64,7 +68,7 @@ def convert_issn(text):
 
 
 def treat_doctype(doctype):
-    for doctype_key, doctype_list in bp_sg.DIC_DOCTYPE.items():
+    for doctype_key, doctype_list in bp_pg.DIC_DOCTYPE.items():
         if doctype in doctype_list:
             doctype = doctype_key
     return doctype
@@ -108,17 +112,18 @@ def set_unknown_address(author_idx, add_unknown_country=False):
         (str): The built unknown address.
     """
     if add_unknown_country:
-        author_address = f'{author_idx}_{bp_sg.UNKNOWN}, {bp_sg.UNKNOWN_COUNTRY}'
+        author_address = f'{author_idx}_{bp_pg.UNKNOWN}, {bp_pg.UNKNOWN_COUNTRY}'
     else:
-        author_address = f'{author_idx}_{bp_sg.UNKNOWN}'
+        author_address = f'{author_idx}_{bp_pg.UNKNOWN}'
     return author_address
 
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
     """
+    Notes:
+        ToDo: Management of multiple files to merge with 'merge_database' function.
     """
     # Listing the available files with 'raw_extent' extension
-    # ToDo: Management of multiple files to merge with 'merge_database' function
     rawdata_list = []
     for path, _, files in os.walk(rawdata_path):
         rawdata_list.extend(Path(path) / Path(file) for file in files
@@ -136,7 +141,7 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_typ
     """Trying to drop data by database identifier given in an XLSX file"""
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
-    ids_todrop_file = database_type.capitalize() + bp_sg.IDS_TO_DROP_FILE_BASE
+    ids_todrop_file = database_type.capitalize() + bp_pg.IDS_TO_DROP_FILE_BASE
     ids_todrop_path = rawdata_path / Path(ids_todrop_file)
     if ids_todrop_path.is_file():
         rawdata_todrop = pd.read_excel(ids_todrop_path)
@@ -154,10 +159,10 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_typ
 
 
 def set_rawdata_error(database, rawdata_path, raw_extent):
-    error_text  = f"\n   !!! No {database} raw-data file available !!! \n"
-    error_text += f"\nBefore new launch of the parsing, "
-    error_text += f"please make available a {database} raw-data file "
-    error_text += f"with {raw_extent} extension in:\n   {rawdata_path}."
+    error_text  = (f"\n   !!! No {database} raw-data file available !!! \n"
+                   "\nBefore new launch of the parsing, "
+                   f"please make available a {database} raw-data file "
+                   f"with {raw_extent} extension in:\n   {rawdata_path}.")
     return error_text
 
 
@@ -185,9 +190,9 @@ def clean_authors_countries_affils(auth_addr_country_inst_df):
      norm_aff_col, raw_aff_col) = columns_list[0:6]
 
     new_auth_addr_country_inst_df = pd.DataFrame(columns=columns_list)
-    for pub_id, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_col):
+    for _, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_col):
         new_pub_id_dg = pd.DataFrame(columns=columns_list)
-        for author_id, author_dg in pub_id_dg.groupby(author_col):
+        for _, author_dg in pub_id_dg.groupby(author_col):
             new_author_dg = author_dg.copy()
             if len(author_dg)>1:
                 country_list = list(set(author_dg[country_col].to_list()))
@@ -196,10 +201,10 @@ def clean_authors_countries_affils(auth_addr_country_inst_df):
                 address_list = author_dg[address_col].to_list()
                 new_author_dg[address_col] = "; ".join(address_list)
 
-                norm_aff_list = list(set(author_dg[norm_aff_col].to_list()) - {bp_sg.EMPTY})
+                norm_aff_list = list(set(author_dg[norm_aff_col].to_list()) - {bp_ag.EMPTY})
                 new_author_dg[norm_aff_col] = "; ".join(norm_aff_list)
 
-                raw_aff_list = list(set(author_dg[raw_aff_col].to_list()) - {bp_sg.EMPTY})
+                raw_aff_list = list(set(author_dg[raw_aff_col].to_list()) - {bp_ag.EMPTY})
                 new_author_dg[raw_aff_col] = "; ".join(raw_aff_list)
 
                 new_author_dg.drop_duplicates(subset=[pub_id_col, author_col], inplace=True)
@@ -207,8 +212,8 @@ def clean_authors_countries_affils(auth_addr_country_inst_df):
             else:
                 new_pub_id_dg = pd.concat([new_pub_id_dg, author_dg])
         new_auth_addr_country_inst_df = pd.concat([new_auth_addr_country_inst_df, new_pub_id_dg])
-    new_auth_addr_country_inst_df.fillna(bp_sg.EMPTY, inplace=True)
-    new_auth_addr_country_inst_df.replace("", bp_sg.EMPTY, inplace=True)
+    new_auth_addr_country_inst_df.fillna(bp_ag.EMPTY, inplace=True)
+    new_auth_addr_country_inst_df.replace("", bp_ag.EMPTY, inplace=True)
     return new_auth_addr_country_inst_df
 
 
@@ -236,12 +241,12 @@ def build_title_keywords(df):
        df (dataframe): Data of publication title per publication identifier.
 
     Returns:
-       (tup): tuple (df, bag_of_words_occurrences) with df a dataframe 
-       which columns are [pub_id, title_tokens_alias, kept_tokens_alias]  
-       where title_tokens_alias contains the list of tokens of the title 
-       and kept_tokens_alias the list of tokens with an occurrence frequency 
-       >= NOUN_MINIMUM_OCCURRENCES, and bag_of_words_occurrences a list of tuples
-       where tuple i is (word_i,# occurrence_i). 
+       (tup): tuple (df, bag_of_words_occurrences) with df a dataframe \
+       which columns are [pub_id, title_tokens_alias, kept_tokens_alias] \
+       where title_tokens_alias contains the list of tokens of the title \
+       and kept_tokens_alias the list of tokens with an occurrence frequency \
+       >= NOUN_MINIMUM_OCCURRENCES, and bag_of_words_occurrences a list of tuples \
+       where tuple i is (word_i,# occurrence_i).
     """
     # To Do: update docstring
 
@@ -259,27 +264,27 @@ def build_title_keywords(df):
         """
         tokenized = nltk.word_tokenize(text.lower())
         valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
-                       if pos in bp_sg.NLTK_VALID_TAG_LIST]
+                       if pos in bp_pg.NLTK_VALID_TAG_LIST]
 
         stemmer = nltk.stem.WordNetLemmatizer()
         valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
         return valid_words_lemmatized
 
-    title_alias = bp_sg.COL_NAMES['temp_col'][2]
-    title_tokens_alias = bp_sg.COL_NAMES['temp_col'][3]
-    kept_tokens_alias = bp_sg.COL_NAMES['temp_col'][4]
+    title_alias = bp_pcg.COL_NAMES['temp_col'][2]
+    title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
+    kept_tokens_alias = bp_pcg.COL_NAMES['temp_col'][4]
 
     df[title_tokens_alias] = df[title_alias].apply(tokenizer)
 
     # Removing the blacklisted words from the bag of words
     bag_of_words = np.array(df[title_tokens_alias].sum())
-    for remove in bp_sg.BLACKLISTED_WORDS:
+    for remove in bp_pg.BLACKLISTED_WORDS:
         bag_of_words = bag_of_words[bag_of_words!=remove]
 
     bag_of_words_occurrences = list(Counter(bag_of_words).items())
     bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
 
-    title_keywords = set([x for x, y in bag_of_words_occurrences if y>=bp_sg.NOUN_MINIMUM_OCCURRENCES])
+    title_keywords = set(x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES)
     df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(title_keywords.intersection(set(x))))
 
     return (df, bag_of_words_occurrences)
@@ -314,7 +319,7 @@ def normalize_country(country):
         elif country in bp_gg.ALIAS_TUR:
             country_clean = 'Turkey'
         else:
-            country_clean = bp_sg.UNKNOWN_COUNTRY
+            country_clean = bp_pg.UNKNOWN_COUNTRY
     return country_clean
 
 
@@ -340,7 +345,7 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
         text_split = text.split(" ")
         text = " ".join([x.capitalize() for x in text_split])
 
-    # Translate special character 
+    # Translate special character
     text = text.translate(bp_gg.DASHES_CHANGE)
     text = text.translate(bp_gg.LANG_CHAR_CHANGE)
     if drop_ponct:
@@ -360,33 +365,33 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
         text = text.replace(text_minus_texts, "'" + text_minus_texts[1:].capitalize())
 
     # capturing "cCc-"
-    re_minus = re.compile('([a-zA-Z]+-)')
+    re_minus = re.compile(r'([a-zA-Z]+-)')
     for text_minus_texts in re.findall(re_minus, text):
         text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + '-')
 
     # capturing "cCc'"
-    re_apostrophe = re.compile("([a-zA-Z]+')")
+    re_apostrophe = re.compile(r"([a-zA-Z]+')")
     for text_minus_texts in re.findall(re_apostrophe, text):
         text = text.replace(text_minus_texts, text_minus_texts[:-1].capitalize() + "'")
 
     # capturing "cCccC "
-    re_surname = re.compile("[a-zA-Z]+\s")
+    re_surname = re.compile(r"[a-zA-Z]+\s")
     for text_minus_texts in re.findall(re_surname, text):
         text = text.replace(text_minus_texts, text_minus_texts.capitalize())
 
     if not lastname_only:
         # Capturing " cCc-cC" in the first name
-        re_minus_first_name = re.compile('\s[a-zA-Z]+-[a-zA-Z]+$')
+        re_minus_first_name = re.compile(r'\s[a-zA-Z]+-[a-zA-Z]+$')
         for x in  re.findall(re_minus_first_name, text):
             text = text.replace(x, x.upper())
         if firstname_only:
             # Capturing "cCc-cC " or " cCccC." in the first name
-            re_minus_first_name = re.compile('[a-zA-Z]+-[a-zA-Z]+\.$|\s[a-zA-Z]+\.$')
+            re_minus_first_name = re.compile(r'[a-zA-Z]+-[a-zA-Z]+\.$|\s[a-zA-Z]+\.$')
             for x in  re.findall(re_minus_first_name, text):
                 text = text.replace(x, x.upper())
 
     # Capturing "Mc" in name
-    re_mac = re.compile('^Mc[a-zA-Z]')
+    re_mac = re.compile(r'^Mc[a-zA-Z]')
     for text_mac_texts in re.findall(re_mac, text):
         new_text_mac_texts = "Mc" + text_mac_texts[2:].capitalize()
         text = text.replace(text_mac_texts, new_text_mac_texts)
@@ -396,7 +401,7 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
 def normalize_journal_names(database, corpus_df):
     """Adds the column `normalize_journal_names` to the corpus. 
 
-    The journal normalized names are expurgated from unecessary
+    The journal normalized names are expurgated from unnecessary
 	pieces of information such as: small words defined in a global 
     dict (`DIC_LOW_WORDS`), year, conference edition... 
     These normalized and simplified journal names are mainly used 
@@ -414,27 +419,30 @@ def normalize_journal_names(database, corpus_df):
         the normalized journal names.
    """
     def _journal_normalizer(journal):
-        # Adding a lazzy trick to simplefy the regexp
+        # Adding a lazy trick to simplify the regexp
         journal = ' ' + journal + ' '
         journal = journal.lower()
         journal = re.sub(bp_rg.RE_YEAR_JOURNAL, ' ', journal)
         journal = re.sub(bp_rg.RE_NUM_CONF, ' ', journal)
-        for old_str, new_str in bp_sg.DIC_LOW_WORDS.items():
+        for old_str, new_str in bp_pg.DIC_LOW_WORDS.items():
             journal = journal.replace(old_str, new_str)
-        journal = re.sub('\s+', ' ', journal)
+        journal = re.sub(r'\s+', ' ', journal)
         journal = journal.strip()
         return journal
 
-    if database==bp_sg.WOS:
-        journal_alias = bp_sg.COLUMN_LABEL_WOS['journal']
-    elif database==bp_sg.SCOPUS:
-        journal_alias = bp_sg.COLUMN_LABEL_SCOPUS['journal']
-    else:
-        raise Exception(f"Sorry, unrecognized database {database}: "
-                        f"should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
 
-    norm_journal_alias = bp_sg.NORM_JOURNAL_COLUMN_LABEL
-    corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
+    if database==bp_pg.WOS:
+        journal_alias = bp_pcg.COLUMN_LABEL_WOS['journal']
+    elif database==bp_pg.SCOPUS:
+        journal_alias = bp_pcg.COLUMN_LABEL_SCOPUS['journal']
+    else:
+        journal_alias = ''
+        print(f"Sorry, unrecognized database {database}: "
+              f"should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
+
+    if journal_alias:
+        norm_journal_alias = bp_pcg.NORM_JOURNAL_COLUMN_LABEL
+        corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
 
     return corpus_df
 
@@ -442,7 +450,7 @@ def normalize_journal_names(database, corpus_df):
 def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
 
     # Setting useful aliases
-    pub_id_col_alias = bp_sg.COL_NAMES['pub_id']
+    pub_id_col_alias = bp_pcg.COL_NAMES['pub_id']
 
     # Setting the pub_id in rawdata_df index
     rawdata_df.index = range(len(rawdata_df))
@@ -460,49 +468,51 @@ def check_and_drop_columns(database, init_df):
     df = init_df.copy()
 
     # Setting useful aliases
-    pub_id_col_alias    = bp_sg.COL_NAMES["pub_id"]
-    wos_col_issn_alias  = bp_sg.COLUMN_LABEL_WOS["issn"]
-    wos_col_eissn_alias = bp_sg.COLUMN_LABEL_WOS_PLUS["e_issn"]
+    pub_id_col_alias    = bp_pcg.COL_NAMES["pub_id"]
+    wos_col_issn_alias  = bp_pcg.COLUMN_LABEL_WOS["issn"]
+    wos_col_eissn_alias = bp_pcg.COLUMN_LABEL_WOS_PLUS["e_issn"]
 
     # Check for missing mandatory columns
-    if database==bp_sg.WOS:
-        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val] + [wos_col_eissn_alias])
-    elif database==bp_sg.SCOPUS:
-        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_SCOPUS.values() if val])
+    if database==bp_pg.WOS:
+        cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val) + (wos_col_eissn_alias)
+    elif database==bp_pg.SCOPUS:
+        cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_SCOPUS.values() if val)
     else:
-        raise Exception(f"Sorry, unrecognized database {database} : should be {bp_sg.WOS} or {bp_sg.SCOPUS} ")
+        cols_mandatory = ()
+        print(f"Sorry, unrecognized database {database} : should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
 
-    cols_available = set(df.columns)
-    missing_columns = cols_mandatory.difference(cols_available)
-    if missing_columns:
-        error_text  = f'The mandarory columns: {",".join(missing_columns)} are missing '
-        error_text += f'in rawdata extracted from {database}.\nPlease correct before proceeding.'
-        raise Exception(error_text)
+    if cols_mandatory:
+        cols_available = set(df.columns)
+        missing_columns = cols_mandatory.difference(cols_available)
+        if missing_columns:
+            error_text  = (f'The mandatory columns: {",".join(missing_columns)} are missing '
+                           f'in rawdata extracted from {database}.\nPlease correct before proceeding.')
+            print(error_text)
 
-    # Setting issn to e_issn if issn not available for wos
-    if database==bp_sg.WOS:
-        df = df.replace('',np.nan,regex=True) # To allow the use of combine_first
-        df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
-        df = df.dropna(axis = 0, how = 'all')
-        cols_mandatory = set([val for val in bp_sg.COLUMN_LABEL_WOS.values() if val])
+        # Setting issn to e_issn if issn not available for wos
+        if database==bp_pg.WOS:
+            df = df.replace('', np.nan, regex=True) # To allow the use of combine_first
+            df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
+            df = df.dropna(axis = 0, how = 'all')
+            cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val)
 
 
-    # Droping unused columns
-    cols_to_drop = list(cols_available.difference(cols_mandatory))
-    df.drop(cols_to_drop, axis=1, inplace=True)
+        # Dropping unused columns
+        cols_to_drop = list(cols_available.difference(cols_mandatory))
+        df.drop(cols_to_drop, axis=1, inplace=True)
 
-    # Setting publication identifier in a column of the data
-    df.index = range(len(df))
-    df = df.rename_axis(pub_id_col_alias).reset_index()
+        # Setting publication identifier in a column of the data
+        df.index = range(len(df))
+        df = df.rename_axis(pub_id_col_alias).reset_index()
     return df
 
 
 def upgrade_col_names(corpus_folder):
-    """Add names to the colummn of the parsing and filter_<i> files to take into account the
-    upgrage of BiblioParsing package.
+    """Add names to the column of the parsing and filter_<i> files to take into account the
+    upgrade of BiblioParsing package.
 
     Args:
-        corpus_folder (str): folder of the corpus to be adapted
+        corpus_folder (str): folder of the corpus to be adapted.
     """
     dict_filename_conversion  = {'addresses.dat'      : 'address',
                                  'articles.dat'       : 'articles',
@@ -517,27 +527,22 @@ def upgrade_col_names(corpus_folder):
                                  'subjects2.dat'      : 'sub_subject',
                                  'titlekeywords.dat'  : 'keywords'}
 
-    for dirpath, dirs, files in os.walk(corpus_folder):
+    for dirpath, _, files in os.walk(corpus_folder):
         if ('parsing' in   dirpath) |  ('filter_' in  dirpath):
-            for file in  [file for file in files
-                          if (file.split('.')[1]=='dat')
-                          and (file!='database.dat')      # Unused this file is no longer generated
-                          and (file!='keywords.dat') ]:   # Unused this file is no longer generated
+            for file in [file for file in files if file.split('.')[1]=='dat']:
                 try:
                     df = pd.read_csv(os.path.join(dirpath, file), sep='\t', header=None)
 
-                    if df.loc[0].tolist()==bp_sg.COL_NAMES[dict_filename_conversion[file]]:
+                    if df.loc[0].tolist()==bp_pcg.COL_NAMES[dict_filename_conversion[file]]:
                         print(f'The file {os.path.join(dirpath,file)} is up to date')
                     else:
-                        df.columns = bp_sg.COL_NAMES[dict_filename_conversion[file]]
+                        df.columns = bp_pcg.COL_NAMES[dict_filename_conversion[file]]
                         df.to_csv(os.path.join(dirpath,file), sep='\t', index=False)
                         print(f'*** The file {os.path.join(dirpath,file)} has been upgraded ***')
                 except  pd.errors.EmptyDataError:
-                    df = pd.DataFrame(columns=bp_sg.COL_NAMES[dict_filename_conversion[file]])
+                    df = pd.DataFrame(columns=bp_pcg.COL_NAMES[dict_filename_conversion[file]])
                     df.to_csv(os.path.join(dirpath, file), sep='\t', index=False)
                     print(f'*** The EMPTY file {os.path.join(dirpath,file)} has been upgraded ***')
-                except:
-                    print(f'Warning: File {os.path.join(dirpath,file)} not recognized as a parsing file')
 
 
 def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
@@ -550,10 +555,10 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     Returns:
         (str): The modified string.
     """
-    if dic_town_symbols==None:
-        dic_town_symbols = bp_sg.DIC_TOWN_SYMBOLS
-    if dic_town_words==None:
-        dic_town_words = bp_sg.DIC_TOWN_WORDS
+    if dic_town_symbols is None:
+        dic_town_symbols = bp_ag.DIC_TOWN_SYMBOLS
+    if dic_town_words is None:
+        dic_town_words = bp_ag.DIC_TOWN_WORDS
 
     # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
     for town_symb in dic_town_symbols.keys():
@@ -668,7 +673,7 @@ def standardize_address(raw_address, add_unknown_country=True):
     raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     country_chunck = " " + country
-    if country==bp_sg.UNKNOWN_COUNTRY:
+    if country==bp_pg.UNKNOWN_COUNTRY:
         if add_unknown_country:
             standard_address = ','.join(first_raw_affiliations_list + [country_chunck])
         else:

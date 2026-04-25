@@ -1,3 +1,7 @@
+"""Module of functions for parsing of subjects and references fields 
+of Scopus rawdata.
+"""
+
 __all__ = ['build_scopus_references',
            'build_scopus_subjects_and_sub_subjects',
           ]
@@ -11,8 +15,8 @@ from collections import namedtuple
 import pandas as pd
 
 # Local libray imports
+import BiblioParsing.parsing_globals as bp_pg
 import BiblioParsing.regex_globals as bp_rg
-import BiblioParsing.specific_globals as bp_sg
 
 
 def _set_pub_subjects_list(pub_id, codes_df, code_cat_dict, sub_subject):
@@ -167,12 +171,12 @@ def _try_list_idx(item_idx, value_idx, values_list):
     try:
         value_item_idx, value = item_idx, values_list[value_idx].strip()
     except IndexError:
-        value_item_idx, value = 0, bp_sg.UNKNOWN
+        value_item_idx, value = 0, bp_pg.UNKNOWN
     return value_item_idx, value
 
 
 def _find_ref_doi(ref_items_list):
-    dois_list = []
+    item_idx, dois_list = 0, []
     for item_idx, ref_item in enumerate(ref_items_list):
         dois_list = re.findall(bp_rg.RE_SCOPUS_REF_DOI, ref_item)
         if dois_list:
@@ -191,7 +195,7 @@ def _find_ref_year(ref_items_list, doi_item_idx, doi, ref):
         # Getting possible years in full ref
         all_years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, ref)
         for item_idx, ref_item in enumerate(ref_items_list):
-            if item_idx==doi_item_idx and doi!=bp_sg.UNKNOWN:
+            if item_idx==doi_item_idx and doi!=bp_pg.UNKNOWN:
                 years_list = re.findall(bp_rg.RE_SCOPUS_REF_DOI_YEAR, ref_item)
                 if years_list:
                     # Droping surrounding dots
@@ -201,18 +205,17 @@ def _find_ref_year(ref_items_list, doi_item_idx, doi, ref):
                 years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, ref_item)
                 if years_list:
                     break
-                else:
-                    if re.findall(bp_rg.RE_SCOPUS_REF_CONF, ref_item):
-                        years_list = re.findall(bp_rg.RE_SCOPUS_REF_DIGITS, ref_item)
-                        if not all_years_list:
-                            break
+                if re.findall(bp_rg.RE_SCOPUS_REF_CONF, ref_item):
+                    years_list = re.findall(bp_rg.RE_SCOPUS_REF_DIGITS, ref_item)
+                    if not all_years_list:
+                        break
     year_item_idx, year = _try_list_idx(item_idx, 0, years_list)
     return year_item_idx, year
 
 
 def _search_authors_in_items(ref_items_list):
     # Searching for possible author names and specifying the author names structure
-    first_author, et_al, authors_case = bp_sg.UNKNOWN, "", 'no_authors'
+    first_author, et_al, authors_case = bp_pg.UNKNOWN, "", 'no_authors'
     first_item = ref_items_list[0]
     if not re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item):
         second_item = ref_items_list[1]
@@ -239,7 +242,7 @@ def _search_authors_in_items(ref_items_list):
 
 
 def _build_authors_attr(ref_items_list):
-    first_author, et_al, authors_case = bp_sg.UNKNOWN, "", 'no_authors'
+    first_author, et_al, authors_case = bp_pg.UNKNOWN, "", 'no_authors'
     author_max_len = 30
     first_item = ref_items_list[0]
     if re.findall(bp_rg.RE_SCOPUS_REF_EL_AL, first_item):
@@ -265,7 +268,7 @@ def _build_authors_attr(ref_items_list):
 def _set_dotted_initials(first_author):
     dotted_first_author = first_author
     initial_dot = '.'
-    if first_author!=bp_sg.UNKNOWN and not (initial_dot in first_author):
+    if first_author!=bp_pg.UNKNOWN and not initial_dot in first_author:
         lastname = (' ').join(first_author.split(" ")[:-1])
         initials = first_author.split(" ")[-1]
         initials_list = [f'{x}{initial_dot}' for x in initials.split("-") if x]
@@ -278,7 +281,7 @@ def _find_ref_authors(ref_items_list):
     first_author, et_al, authors_case = _build_authors_attr(ref_items_list)
     dotted_first_author = _set_dotted_initials(first_author)
     authors = dotted_first_author
-    if dotted_first_author!=bp_sg.UNKNOWN and not ('et al.' in dotted_first_author):
+    if dotted_first_author!=bp_pg.UNKNOWN and not "et al." in dotted_first_author:
         authors = f'{dotted_first_author} {et_al}'
     return authors, authors_case
 
@@ -294,7 +297,7 @@ def _found_ref_title(ref_items_list, search_title_params):
             while "., " in mod_ref_items_list[idx]:
                 idx += 1
         elif authors_case=='multiple_one_item_wo_dot':
-            while re.findall(RE_SCOPUS_AUTHOR_NAME, mod_ref_items_list[idx]):
+            while re.findall(bp_rg.RE_SCOPUS_AUTHOR_NAME, mod_ref_items_list[idx]):
                 idx += 1
         elif authors_case=='single_two_items':
             idx += 2
@@ -305,28 +308,28 @@ def _found_ref_title(ref_items_list, search_title_params):
                 # Incrementing idx for presence of dot after 1 or 2 characters")
                 idx += 1
         elif authors_case=='multiple_two_items_wo_dot':
-            while re.findall(RE_SCOPUS_AUTHOR_INITIALS, mod_ref_items_list[idx + 1]):
+            while re.findall(bp_rg.RE_SCOPUS_AUTHOR_INITIALS, mod_ref_items_list[idx + 1]):
                 idx += 2
             while re.findall(bp_rg.RE_SCOPUS_REF_DOT, mod_ref_items_list[idx]):
                 # Incrementing idx for presence of dot after 1 or 2 characters")
                 idx += 1
-        if ((idx==doi_item_idx and doi!=bp_sg.UNKNOWN)
-            or (year_item_idx==0 and year!=bp_sg.UNKNOWN)):
+        if ((idx==doi_item_idx and doi!=bp_pg.UNKNOWN)
+            or (year_item_idx==0 and year!=bp_pg.UNKNOWN)):
             # Incrementing idx for conflicts with doi or year indices")
             idx += 1
     title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
-    if title==f'({year})' and year!=bp_sg.UNKNOWN:
+    if title==f'({year})' and year!=bp_pg.UNKNOWN:
         # Incrementing idx for title equality with (dddd) as year-item
         idx += 1
         title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
-    if title==ref_items_list[doi_item_idx] and doi!=bp_sg.UNKNOWN:
+    if title==ref_items_list[doi_item_idx] and doi!=bp_pg.UNKNOWN:
         # Not keeping DOI as title
-        title = bp_sg.UNKNOWN
-    journal_in_title = False
-    if re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, title):
-        # Setting status of journal in title
-        journal_in_title = True
-    return title_item_idx, title, journal_in_title
+        title = bp_pg.UNKNOWN
+#    journal_in_title = False
+#    if re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, title):
+#        # Setting status of journal in title
+#        journal_in_title = True
+    return title_item_idx, title
 
 
 def _split_long_item_by_dot(item_txt):
@@ -373,7 +376,7 @@ def _select_journal_part(item_txt, colon, journal):
 
 def _check_item_date(item_txt):
     item_date_status = False
-    if item_txt!=bp_sg.UNKNOWN:
+    if item_txt!=bp_pg.UNKNOWN:
         item_dates_list = re.findall(bp_rg.RE_SCOPUS_REF_YEARS, item_txt)
         if item_dates_list:
             item_date = item_dates_list[0].strip()
@@ -392,38 +395,37 @@ def _try_next_items(ref_items_list, init_item_idx, doi):
         check_status = any([_check_item_date(search_item), search_item==doi,
                             re.findall(bp_rg.RE_SCOPUS_REF_ONLY_DIGITS, search_item)])
     if check_status and search_item_idx==item_idx_max:
-        search_item = bp_sg.UNKNOWN
+        search_item = bp_pg.UNKNOWN
     return search_item_idx, search_item
 
 
 def _clean_journal_and_title(cleaning_params):
-    (journal_item_idx, journal, title_item_idx, title, doi,
-     journal_in_title, journal_item_parts_list, ref_items_list) = cleaning_params
-    if journal==title and title!=bp_sg.UNKNOWN:
+    (journal, title_item_idx, title, doi, journal_item_parts_list, ref_items_list) = cleaning_params
+    if journal==title and title!=bp_pg.UNKNOWN:
         if journal_item_parts_list:
             journal = (' - ').join(journal_item_parts_list)
         title_item_idx, title = _try_next_items(ref_items_list, title_item_idx, doi)
-    if journal==doi and doi!=bp_sg.UNKNOWN:
-        journal = bp_sg.UNKNOWN
-    if journal!=bp_sg.UNKNOWN:
+    if journal==doi and doi!=bp_pg.UNKNOWN:
+        journal = bp_pg.UNKNOWN
+    if journal!=bp_pg.UNKNOWN:
         if journal in title:
             title = title.replace(journal, "")
             if not title:
-                title = bp_sg.UNKNOWN
+                title = bp_pg.UNKNOWN
     else:
         check_dots =  ["." in title_word for title_word in title.split(" ")]
         if all(check_dots):
             journal = title
-            title = bp_sg.UNKNOWN
+            title = bp_pg.UNKNOWN
     clean_journal = journal.replace("(", "").replace(")", "")
     clean_title = title.replace("(", "").replace(")", "")
     return clean_journal, clean_title
 
 
 def _find_ref_journal(ref_items_list, search_journal_params):
-    authors_case, title_item_idx, title_item, doi, journal_in_title = search_journal_params
+    authors_case, title_item_idx, title_item, doi = search_journal_params
     title = title_item
-    journal_item_idx, journal, journal_item_part = 0, bp_sg.UNKNOWN, ''
+    journal_item_idx, journal, journal_item_part = 0, bp_pg.UNKNOWN, ''
     journal_item_idx_list, journals_list, journal_item_parts_list = [], [], []
     if authors_case in ['first_item_too_long', 'partial_one_item']:
         # First item too long as author names
@@ -434,28 +436,32 @@ def _find_ref_journal(ref_items_list, search_journal_params):
             item_txt, colon = title_item, False
             if ":" in title_item_end:
                 item_txt, colon = title_item_end, True
-            journal, journal_item_part = _select_journal_part(item_txt, colon, journal)
+            journal, _ = _select_journal_part(item_txt, colon, journal)
     else:
         # First item not too long as author names
         idx_init = 0
         if len(ref_items_list)>1:
             idx_init = 1
+
         for item_idx, ref_item in enumerate(ref_items_list):
+
             check_journal = all([re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, ref_item),
                                  ref_item!=doi, item_idx>=idx_init])
             if check_journal:
                 colon, _journal_item_idx, _journal = False, item_idx, ref_item.strip()
-                _journal, _journal_item_part = _select_journal_part(ref_item, colon, _journal)
+                _journal, journal_item_part = _select_journal_part(ref_item, colon, _journal)
                 journal_item_idx_list.append(_journal_item_idx)
                 journals_list.append(_journal)
-                journal_item_parts_list.append(_journal_item_part)
+                journal_item_parts_list.append(journal_item_part)
+
             check_dots = all([len(part)>2 and '.' in part for part in ref_item.split(" ")]
                              + [ref_item!=doi, item_idx>=idx_init])
             if check_dots:
-                _journal_item_idx, _journal, _journal_item_part = item_idx, ref_item.strip(), ref_item
+                _journal_item_idx, _journal, journal_item_part = item_idx, ref_item.strip(), ref_item
                 journal_item_idx_list.append(_journal_item_idx)
                 journals_list.append(_journal)
-                journal_item_parts_list.append(_journal_item_part)
+                journal_item_parts_list.append(journal_item_part)
+
         if journals_list:
             journal_item_idx, journal = journal_item_idx_list[0], journals_list[0]
         else:
@@ -463,14 +469,12 @@ def _find_ref_journal(ref_items_list, search_journal_params):
             journal_item_idx, journal = _try_next_items(ref_items_list, title_item_idx, doi)
             journal_item_idx_list = [journal_item_idx]
             journal_item_parts_list = [journal]
-            journal = journal
-    cleaning_params = [journal_item_idx, journal, title_item_idx, title, doi,
-                       journal_in_title, journal_item_parts_list, ref_items_list]
+    cleaning_params = [journal, title_item_idx, title, doi, journal_item_parts_list, ref_items_list]
     clean_journal, clean_title = _clean_journal_and_title(cleaning_params)
     return journal_item_idx, clean_journal, clean_title
 
 
-def _merge_ref_item(item_idx, ref_item, ref_items_list, new_item_idx, ref_new_item):
+def _merge_ref_item(ref_item, ref_items_list, new_item_idx, ref_new_item):
     items_idx_max = len(ref_items_list) - 1
     item_end_part = ref_item.split(": ")[1]
     if not re.findall(bp_rg.RE_SCOPUS_REF_AND, item_end_part):
@@ -493,7 +497,7 @@ def _check_merge_ref_items_colon(item_idx, ref_item, ref_items_list, raw_ref):
         ref_end_part = (", ").join(raw_ref.split(", ")[next_item_idx:])
         if re.findall(bp_rg.RE_SCOPUS_REF_AND, ref_end_part):
             # and in ref after ref_item
-            new_item_idx, ref_new_item = _merge_ref_item(item_idx, ref_item, ref_items_list,
+            new_item_idx, ref_new_item = _merge_ref_item(ref_item, ref_items_list,
                                                          new_item_idx, ref_new_item)
     return new_item_idx, ref_new_item
 
@@ -514,7 +518,7 @@ def _cases_check(txt):
     firstchar = txt[0]
     firstchar_is_lower = firstchar.islower()
     firstchar_is_upper = firstchar.isupper()
-    nextchars_are_upper = all([firstchar.isupper(), upper_len>1,
+    nextchars_are_upper = all([firstchar_is_upper, upper_len>1,
                                not re.findall(bp_rg.RE_JOURNAL_ACRONYMS, txt)])
     return firstchar_is_lower, nextchars_are_upper
 
@@ -537,7 +541,7 @@ def _check_merge_ref_items_lowercase(item_idx, ref_item, ref_items_list):
 
 def _drop_ref_items(value_regex, ref_items_list):
     new_ref_items_list = []
-    for item_idx, ref_item in enumerate(ref_items_list):
+    for ref_item in ref_items_list:
         values_list = re.findall(value_regex, ref_item)
         if values_list:
             ref_item = ''
@@ -618,9 +622,9 @@ def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
             year_item_idx, year = _find_ref_year(ref_items_list, doi_item_idx, doi, ref)
             authors, authors_case = _find_ref_authors(ref_items_list)
             search_title_params = [authors_case, year, year_item_idx, doi, doi_item_idx]
-            title_item_idx, title_item, journal_in_title = _found_ref_title(ref_items_list, search_title_params)
-            search_journal_params = [authors_case, title_item_idx, title_item, doi, journal_in_title]
-            journal_item_idx, journal, title = _find_ref_journal(ref_items_list, search_journal_params)
+            title_item_idx, title_item = _found_ref_title(ref_items_list, search_title_params)
+            search_journal_params = [authors_case, title_item_idx, title_item, doi]
+            _, journal, title = _find_ref_journal(ref_items_list, search_journal_params)
 
             if verbose:
                 print("    year          :", year)
@@ -629,11 +633,11 @@ def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
                 print("    doi           :", doi)
                 print("    title         :", title)
 
-            if authors==bp_sg.UNKNOWN:
-                authors = bp_sg.PARTIAL
-                if journal!=bp_sg.UNKNOWN and title!=bp_sg.UNKNOWN:
+            if authors==bp_pg.UNKNOWN:
+                authors = bp_pg.PARTIAL
+                if bp_pg.UNKNOWN not in (journal, title):
                     title = f'{title}, {journal}'
-                    journal = bp_sg.UNKNOWN
+                    journal = bp_pg.UNKNOWN
 
             pub_refs_list.append(article_ref(pub_id, authors, year, journal, doi, title, raw_ref))
     return pub_refs_list
@@ -644,9 +648,9 @@ def build_scopus_references(corpus_df, cols_tup, verbose=False):
 
     The structure of the built data is composed of 6 columns and one row per reference and per publication.
         Ex:
-           Pub_id  Author            Year         Journal             DOI                Title              Full_reference
-            0    Bellouard Q et al.  2017   Int. J. Hydrog. Energy    10.23919/...  Thermal management...   Bellouard Q,...
-            0    Bellouard Q.         2020   Energy Fuels              unknown       Design and add...      Bellouard Q.,...
+        Pub_id  Author            Year         Journal           DOI                Title             Full_reference
+         0    Bellouard Q et al.  2017   Int. J. Hydrog. Energy 10.23919/...  Thermal management...  Bellouard Q,...
+         0    Bellouard Q.        2020   Energy Fuels           unknown       Design and add...      Bellouard Q.,...
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
