@@ -474,9 +474,9 @@ def check_and_drop_columns(database, init_df):
 
     # Check for missing mandatory columns
     if database==bp_pg.WOS:
-        cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val) + (wos_col_eissn_alias)
+        cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val} | {wos_col_eissn_alias}
     elif database==bp_pg.SCOPUS:
-        cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_SCOPUS.values() if val)
+        cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_SCOPUS.values() if val}
     else:
         cols_mandatory = ()
         print(f"Sorry, unrecognized database {database} : should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
