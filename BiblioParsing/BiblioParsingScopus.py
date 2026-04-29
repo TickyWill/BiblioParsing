@@ -1297,7 +1297,7 @@ def read_database_scopus(rawdata_path, correct_data=False, scopus_ids=False):
     # Setting columns for scopus parsing process
     cols_tup = _set_scopus_parsing_cols()
     _, cols_dic, scopus_cols_dic = cols_tup
-    scopus_id_col = cols_dic['scopus_id_col']
+    scopus_id_col, pub_id_col = cols_dic['scopus_id_col'], cols_dic['pub_id_col']
     scopus_cols_keys = ['init_scopus_id_col', 'scopus_aff_col']
     (init_scopus_id_col, scopus_aff_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
     scopus_ids_cols_list = [scopus_id_col, init_scopus_id_col]
@@ -1306,7 +1306,7 @@ def read_database_scopus(rawdata_path, correct_data=False, scopus_ids=False):
     scopus_rawdata_df = pd.DataFrame()
     corrected_authors_df = pd.DataFrame()
     corrected_addresses_df = pd.DataFrame()
-    scopus_ids_df = pd.DataFrame()
+    scopus_ids_df = pd.DataFrame(columns=[scopus_id_col, pub_id_col])
 
     # Check if rawdata file is available and get its full path if it is
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.SCOPUS_RAWDATA_EXTENT)

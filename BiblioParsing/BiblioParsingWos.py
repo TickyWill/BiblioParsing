@@ -803,19 +803,19 @@ def read_database_wos(rawdata_path, wos_ids=False):
         wos_ids (bool): Optional, true for building the data of WoS IDs of \
         publications (dafault=False).
     Returns:
-        (tup): (The cleaned corpus data (dataframe), The WoS-IDs data (dataframe)). 
+        (tup): (The cleaned corpus data (dataframe), The WoS-IDs data (dataframe)).
     """
     # Setting columns for wos parsing process
     cols_tup = _set_wos_parsing_cols()
     _, cols_dic, wos_cols_dic = cols_tup
-    wos_id_col = cols_dic['wos_id_col']
+    wos_id_col, pub_id_col = cols_dic['wos_id_col'], cols_dic['pub_id_col']
     init_wos_id_col = wos_cols_dic['init_wos_id_col']
     wos_ids_cols_list = [wos_id_col, init_wos_id_col]
 
     # Initializing returned data to empty dataframes
     full_wos_rawdata_df = pd.DataFrame()
     wos_rawdata_df = pd.DataFrame()
-    wos_ids_df = pd.DataFrame()
+    wos_ids_df = pd.DataFrame(columns=[wos_id_col, pub_id_col])
 
     # Check if rawdata file is available and get its full path if it is
     rawdata_file_path = check_and_get_rawdata_file_path(rawdata_path, bp_sg.WOS_RAWDATA_EXTENT)
@@ -916,63 +916,68 @@ def biblio_parser_wos(rawdata_path, inst_filter_list=None, country_affiliations_
 
         # Keeping the number of articles in wos_fails_dic dict
         wos_fails_dic['number of article'] = len(corpus_df)
+        if len(corpus_df):
+            # Building the dataframe of articles
+            print(f"  - {articles_item} parsing...", end="\r")
+            articles_df = _build_articles_wos(corpus_df, cols_tup)
+            _keeping_item_parsing_results(articles_item, articles_df)
+            print(f"  - {articles_item} parsed    ")
 
-        # Building the dataframe of articles
-        print(f"  - {articles_item} parsing...", end="\r")
-        articles_df = _build_articles_wos(corpus_df, cols_tup)
-        _keeping_item_parsing_results(articles_item, articles_df)
-        print(f"  - {articles_item} parsed    ")
+            # Building the dataframe of authors
+            print(f"  - {authors_item} parsing...", end="\r")
+            authors_df = _build_authors_wos(corpus_df, wos_fails_dic, cols_tup)
+            _keeping_item_parsing_results(authors_item, authors_df)
+            print(f"  - {authors_item} parsed    ")
 
-        # Building the dataframe of authors
-        print(f"  - {authors_item} parsing...", end="\r")
-        authors_df = _build_authors_wos(corpus_df, wos_fails_dic, cols_tup)
-        _keeping_item_parsing_results(authors_item, authors_df)
-        print(f"  - {authors_item} parsed    ")
+            # Building the dataframe of addresses, countries and institutions
+            print(f"  - {addresses_item}, {countries_item} and {institutions_item} parsing...", end="\r")
+            addresses_tup = _build_addresses_countries_institutions_wos(corpus_df, wos_fails_dic, cols_tup)
+            addresses_df, countries_df, institutions_df = addresses_tup
+            _keeping_item_parsing_results(addresses_item, addresses_df)
+            _keeping_item_parsing_results(countries_item, countries_df)
+            _keeping_item_parsing_results(institutions_item, institutions_df)
+            print(f"  - {addresses_item}, {countries_item} and {institutions_item} parsed    ")
 
-        # Building the dataframe of addresses, countries and institutions
-        print(f"  - {addresses_item}, {countries_item} and {institutions_item} parsing...", end="\r")
-        addresses_tup = _build_addresses_countries_institutions_wos(corpus_df, wos_fails_dic, cols_tup)
-        addresses_df, countries_df, institutions_df = addresses_tup
-        _keeping_item_parsing_results(addresses_item, addresses_df)
-        _keeping_item_parsing_results(countries_item, countries_df)
-        _keeping_item_parsing_results(institutions_item, institutions_df)
-        print(f"  - {addresses_item}, {countries_item} and {institutions_item} parsed    ")
+            # Building the dataframe of authors and their institutions
+            print(f"  - {auth_inst_item} parsing...")
+            auth_inst_df = _build_authors_countries_institutions_wos(corpus_df, wos_fails_dic, cols_tup, 
+                                                                     inst_filter_list = inst_filter_list ,
+                                                                     country_affiliations_file_path = country_affiliations_file_path,
+                                                                     inst_types_file_path = inst_types_file_path,
+                                                                     country_towns_file = country_towns_file,
+                                                                     country_towns_folder_path = country_towns_folder_path)
+            _keeping_item_parsing_results(auth_inst_item, auth_inst_df)
+            print(f"  - {auth_inst_item} parsed                     ")
 
-        # Building the dataframe of authors and their institutions
-        print(f"  - {auth_inst_item} parsing...")
-        auth_inst_df = _build_authors_countries_institutions_wos(corpus_df, wos_fails_dic, cols_tup, 
-                                                                 inst_filter_list = inst_filter_list ,
-                                                                 country_affiliations_file_path = country_affiliations_file_path,
-                                                                 inst_types_file_path = inst_types_file_path,
-                                                                 country_towns_file = country_towns_file,
-                                                                 country_towns_folder_path = country_towns_folder_path)
-        _keeping_item_parsing_results(auth_inst_item, auth_inst_df)
-        print(f"  - {auth_inst_item} parsed                     ")
+            # Building the dataframes of keywords
+            print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsing...", end="\r")
+            AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(corpus_df, wos_fails_dic, cols_tup)
+            _keeping_item_parsing_results(authors_kw_item, AK_keywords_df)
+            _keeping_item_parsing_results(index_kw_item, IK_keywords_df)
+            _keeping_item_parsing_results(title_kw_item, TK_keywords_df)
+            print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsed    ")
 
-        # Building the dataframes of keywords
-        print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsing...", end="\r")
-        AK_keywords_df, IK_keywords_df, TK_keywords_df = _build_keywords_wos(corpus_df, wos_fails_dic, cols_tup)
-        _keeping_item_parsing_results(authors_kw_item, AK_keywords_df)
-        _keeping_item_parsing_results(index_kw_item, IK_keywords_df)
-        _keeping_item_parsing_results(title_kw_item, TK_keywords_df)
-        print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsed    ")
+            # Building the dataframe of subjects
+            print(f"  - {subjects_item} parsing...", end="\r")
+            subjects_df = _build_subjects_wos(corpus_df, wos_fails_dic, cols_tup)
+            _keeping_item_parsing_results(subjects_item, subjects_df)
+            print(f"  - {subjects_item} parsed    ")
 
-        # Building the dataframe of subjects
-        print(f"  - {subjects_item} parsing...", end="\r")
-        subjects_df = _build_subjects_wos(corpus_df, wos_fails_dic, cols_tup)
-        _keeping_item_parsing_results(subjects_item, subjects_df)
-        print(f"  - {subjects_item} parsed    ")
+            # Building the dataframe of sub-subjects
+            print(f"  - {sub_subjects_item} parsing...", end="\r")
+            sub_subjects_df = _build_sub_subjects_wos(corpus_df, wos_fails_dic, cols_tup)
+            _keeping_item_parsing_results(sub_subjects_item, sub_subjects_df)
+            print(f"  - {sub_subjects_item} parsed    ")
 
-        # Building the dataframe of sub-subjects
-        print(f"  - {sub_subjects_item} parsing...", end="\r")
-        sub_subjects_df = _build_sub_subjects_wos(corpus_df, wos_fails_dic, cols_tup)
-        _keeping_item_parsing_results(sub_subjects_item, sub_subjects_df)
-        print(f"  - {sub_subjects_item} parsed    ")
+            # Building the dataframe of references
+            print(f"  - {references_item} parsing...", end="\r")
+            references_df = _build_references_wos(corpus_df, cols_tup)
+            _keeping_item_parsing_results(references_item, references_df)
+            print(f"  - {references_item} parsed    ")
 
-        # Building the dataframe of references
-        print(f"  - {references_item} parsing...", end="\r")
-        references_df = _build_references_wos(corpus_df, cols_tup)
-        _keeping_item_parsing_results(references_item, references_df)
-        print(f"  - {references_item} parsed    ")
-
-    return wos_parsing_dict, wos_fails_dic, wos_ids_df
+        else:
+            empty_df = pd.DataFrame()
+            for item in items_list:
+                _keeping_item_parsing_results(item, empty_df)
+    return_tup = (wos_parsing_dict, wos_fails_dic, wos_ids_df)
+    return return_tup
