@@ -103,6 +103,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
     # Concatenating the dicts of wos and scopus corpuses, item by item of the common_items_list
     concat_parsing_dict = {}
     for item in common_items_list:
+        item_columns = list(first_parsing_dict[item].columns)
         if len(first_parsing_dict[item]) and len(second_parsing_dict[item]):
             concat_parsing_dict[item] = _concatenate_item_dfs(first_parsing_dict[item],
                                                               second_parsing_dict[item], pub_id_alias)
@@ -111,7 +112,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
         elif len(first_parsing_dict[item]):
             concat_parsing_dict[item] = first_parsing_dict[item]
         else:
-            concat_parsing_dict[item] = None
+            concat_parsing_dict[item] = pd.DataFrame(columns=item_columns)
 
     # Extending the author with institutions parsing df
     if affil_filter_list and concat_parsing_dict[auth_inst_item_alias] is not None:
@@ -183,7 +184,7 @@ def _set_same_article_title(df, title_col, lc_title_col):
     for t1 in title_df[lc_title_col]:
         t1_idx += 1
         for t2 in title_df[lc_title_col]:
-            if not "part " in t1 or not "part " in t2:
+            if "part " not in t1 or "part " not in t2:
                 if t2!=t1 and (len(t1)>bp_pg.LENGTH_THRESHOLD and len(t2)>bp_pg.LENGTH_THRESHOLD):
                     t1_set, t2_set = set(t1.split()), set(t2.split())
                     common_words = t2_set.intersection(t1_set)
@@ -328,8 +329,6 @@ def _norm_doctype(doctype):
     for key, values in bp_pg.LC_DOCTYPE_DIC.items():
         if lc_doctype in values:
             norm_doctype = key
-        else:
-            pass
     return norm_doctype
 
 
@@ -514,7 +513,7 @@ def deduplicate_parsing(concat_parsing_dict, norm_affil_status=False, affil_para
     for item in items_list_wo_articles:
         item_df = concat_parsing_dict[item]
         second_col = ""
-        if item in sorting_second_col_dict.keys():
+        if item in second_col_items_list:
             second_col = sorting_second_col_dict[item]
         dedup_parsing_dict[item] = _deduplicate_item_df(pub_ids_to_drop, item_df, pub_id_col, second_col)
 

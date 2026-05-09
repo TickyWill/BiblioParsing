@@ -152,7 +152,7 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
         norm_raw_aff_dict[country] = {}
         for num, norm_aff in enumerate(norm_raw_aff_df[norm_affil_col]):
             norm_aff = norm_aff.strip()
-            raw_aff_list = [item for item in list(norm_raw_aff_df.loc[num])[1:] if not(pd.isnull(item)) is True]
+            raw_aff_list = [item for item in list(norm_raw_aff_df.loc[num])[1:] if pd.isnull(item) is False]
 
             if verbose:
                 print(f"\n\n{str(num)}- Normalized affiliation: {norm_aff}")

@@ -525,14 +525,13 @@ def _clean_affils(affils_drop_params, towns_dict, verbose=False):
     keeping_words_flags = [found_item_flags.gen_keeping_words, found_item_flags.basic_keeping_words,
                            found_item_flags.user_keeping_words]
 
-    add_affiliation_flag = False
     break_status = False
     if not any(dropping_word_flags):
         affils_list.append(affiliation)
-        add_affiliation_flag = True
         if verbose:
             print('No dropping item found in:', affiliation, '\n')
     else:
+        add_affiliation_flag = False
         if found_item_flags.dropping_bp:
             affils_drop.append(('dropping_bp', sub_check_affils_list))
             if verbose:
@@ -956,8 +955,8 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
     cols_lists_dic, cols_dic = _set_norm_affils_cols()
     cols_lists_keys = ['country_cols_list', 'affil_cols_list']
     country_cols_list, affil_cols_list = [cols_lists_dic[key] for key in cols_lists_keys]
-    cols_keys = ['pub_id_col', 'address_id_col', 'address_col', 'country_col', 'institution_col']
-    pub_id_col, address_id_col, address_col, country_col, institution_col = [cols_dic[key] for key in cols_keys]
+    cols_keys = ['pub_id_col', 'address_id_col', 'address_col', 'country_col', 'affil_col']
+    pub_id_col, address_id_col, address_col, country_col, affil_col = [cols_dic[key] for key in cols_keys]
 
     # Setting useful cols lists
     norm_affil_cols_list = affil_cols_list
@@ -965,8 +964,8 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
 
     # Setting named tuples
     country = namedtuple('country', country_cols_list)
-    norm_institution = namedtuple('norm_institution', norm_affil_cols_list)
-    raw_institution = namedtuple('raw_institution', raw_affil_cols_list)
+    norm_affiliation = namedtuple('norm_affiliation', norm_affil_cols_list)
+    raw_affiliation = namedtuple('raw_affiliation', raw_affil_cols_list)
 
     # Getting useful data for affiliations normalization
     affil_dicts = build_affils_useful_dicts(affil_params_dic)
@@ -982,8 +981,8 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
             progress_callback(progress_status)
 
         countries_list = []
-        norm_institutions_list = []
-        raw_institutions_list = []
+        norm_affiliations_list = []
+        raw_affiliations_list = []
         for pub_id, pub_id_addresses_dg in addresses_df.groupby(pub_id_col):
             if verbose:
                 print("\n\nPub_id:", pub_id, "\npub_id_addresses_dg:\n", pub_id_addresses_dg)
@@ -1009,8 +1008,8 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
                     addr_raw_affils = "; ".join(addr_raw_affils_list)
                 if address_country:
                     countries_list.append(country(pub_id, address_idx, address_country))
-                norm_institutions_list.append(norm_institution(pub_id, address_idx, addr_norm_affils))
-                raw_institutions_list.append(raw_institution(pub_id, address_idx, addr_raw_affils, std_address))
+                norm_affiliations_list.append(norm_affiliation(pub_id, address_idx, addr_norm_affils))
+                raw_affiliations_list.append(raw_affiliation(pub_id, address_idx, addr_raw_affils, std_address))
                 step += 1
 
                 if verbose:
@@ -1026,22 +1025,22 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
                     progress_status += progress_step
                     progress_callback(progress_status)
 
-        # Building a clean countries dataframe and accordingly updating the parsing success rate dict
+        # Building clean data of countries
         country_df, _ = build_item_df_from_tup(countries_list, country_cols_list, country_col, pub_id_col)
 
-        # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-        norm_institution_df, _ = build_item_df_from_tup(norm_institutions_list, norm_affil_cols_list,
-                                                        institution_col, pub_id_col)
+        # Building clean data of noramized affiliations
+        norm_affiliation_df, _ = build_item_df_from_tup(norm_affiliations_list, norm_affil_cols_list,
+                                                        affil_col, pub_id_col)
 
-        # Building a clean institutions dataframe and accordingly updating the parsing success rate dict
-        raw_institution_df, _ = build_item_df_from_tup(raw_institutions_list, raw_affil_cols_list,
-                                                       institution_col, pub_id_col)
+        # Building clean data of raw affiliations
+        raw_affiliation_df, _ = build_item_df_from_tup(raw_affiliations_list, raw_affil_cols_list,
+                                                       affil_col, pub_id_col)
     else:
         # Returning empty dataframes
-        country_df, norm_institution_df, raw_institution_df = [pd.DataFrame()] * 3
+        country_df, norm_affiliation_df, raw_affiliation_df = [pd.DataFrame()] * 3
 
     if progress_param:
         progress_callback, _, final_progress = progress_param
         progress_callback(final_progress)
 
-    return country_df, norm_institution_df, raw_institution_df, wrong_affil_types_dict
+    return country_df, norm_affiliation_df, raw_affiliation_df, wrong_affil_types_dict

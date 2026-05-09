@@ -54,7 +54,7 @@ import BiblioParsing.regex_globals as bp_rg
 
 def str_int_convertor(x):
     try:
-        return(int(float(x)))
+        return int(float(x))
     except ValueError:
         return 0
 
@@ -90,9 +90,9 @@ def treat_author(authors_list):
     raw_first_author = authors_list.split(authors_sep)[0]
     first_author = normalize_name(raw_first_author)
     # Setting firstname_initials to upper case
-    lastname = (" ").join(first_author.split(" ")[:-1])
+    lastname = " ".join(first_author.split(" ")[:-1])
     firstname_initials = first_author.split(" ")[-1]
-    first_author = (" ").join([lastname, firstname_initials.upper()])
+    first_author = " ".join([lastname, firstname_initials.upper()])
     return first_author
 
 
@@ -284,10 +284,10 @@ def build_title_keywords(df):
     bag_of_words_occurrences = list(Counter(bag_of_words).items())
     bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
 
-    title_keywords = set(x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES)
+    title_keywords = {x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES}
     df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(title_keywords.intersection(set(x))))
 
-    return (df, bag_of_words_occurrences)
+    return df, bag_of_words_occurrences
 
 
 def normalize_country(country):
@@ -324,22 +324,26 @@ def normalize_country(country):
 
 
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
-    """Normalizes the author name spelling according the three debatable rules:
+    """Normalizes the author name spelling according to the three debatable rules:
             - replacing none ascii letters by ascii ones,
-            - capitalizing first name,
-            - capitalizing surnames,
+            - capitalizing firstname,
+            - capitalizing lastname,
             - removing comma and dot.
-       It uses the internal funtion `remove_special_symbol`of the same module.
+    It uses the internal funtion `remove_special_symbol`of the same module.
        ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
-        >>> "Grol-Bica-Velu D'Aillon E-KJ".
+           >>> "Grol-Bica-Velu D'Aillon E-KJ".
 
     Args:
         text (str): The name to normalize.
+        drop_ponct (bool): Optional (default: True), if True, ponctuation is changed \
+        using PONCT_CHANGE global.
+        lastname_only (bool): Optional (default: False), if True, only lastname is normalized.
+        firstname_only (bool): Optional (default: False), if True, only firstname is normalized.
     Returns
-        (str) : The normalized text.
+        (str): The normalized text.
     Notes:
-        The globals 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE'
-        from `BiblioGeneralGlobals` module are used.
+        The 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' globals are imported \
+        from `general_global` module.
     """
     if "." not in text:
         text_split = text.split(" ")
@@ -485,16 +489,15 @@ def check_and_drop_columns(database, init_df):
         cols_available = set(df.columns)
         missing_columns = cols_mandatory.difference(cols_available)
         if missing_columns:
-            error_text  = (f'The mandatory columns: {",".join(missing_columns)} are missing '
-                           f'in rawdata extracted from {database}.\nPlease correct before proceeding.')
-            print(error_text)
+            print(f'The mandatory columns: {",".join(missing_columns)} are missing '
+                  f'in rawdata extracted from {database}.\nPlease correct before proceeding.')
 
         # Setting issn to e_issn if issn not available for wos
         if database==bp_pg.WOS:
             df = df.replace('', np.nan, regex=True) # To allow the use of combine_first
             df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
             df = df.dropna(axis = 0, how = 'all')
-            cols_mandatory = set(val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val)
+            cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val}
 
 
         # Dropping unused columns
@@ -547,11 +550,18 @@ def upgrade_col_names(corpus_folder):
 
 def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     """Replaces in the string 'text' symbols and words defined by the keys 
-    of the dictionaries 'DIC_TOWN_SYMBOLS' and 'DIC_TOWN_WORDS' by their 
+    of the dictionaries dic_town_symbols and dic_town_words by their 
     corresponding values in these dictionaries.
+
+    By default, these dictionnaries are set by the 'DIC_TOWN_SYMBOLS' and the 
+    'DIC_TOWN_WORDS' globals imported from the `affilioations_globals` module.
 
     Args:
         text (str): The string where changes will be done.
+        dic_town_symbols (dict): Optional, keyed by symbols (str) to change \
+        and valued by the replacing ones (str).
+        dic_town_words (dict): Optional, keyed by words (str) to change \
+        and valued by the replacing ones (str).
     Returns:
         (str): The modified string.
     """
@@ -625,9 +635,10 @@ def standardize_str(raw_str):
 
 
 def set_address_uniform_words(address):
+    uniform_address = address
     for word_to_substitute, pattern in bp_rg.AFFIL_WORD_SUBSTITUTE_PATTERN_DIC.items():
         re_pattern = re.compile(pattern)
-        uniform_address = re.sub(re_pattern, word_to_substitute + ' ', address)
+        uniform_address = re.sub(re_pattern, word_to_substitute + ' ', uniform_address)
     uniform_address = re.sub(r'\s+', ' ', uniform_address)
     uniform_address = re.sub(r'\s,', ',', uniform_address)
     return uniform_address

@@ -76,7 +76,6 @@ def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
 
 
 def _clean_wos_ref(raw_ref):
-    ref = raw_ref
     raw_ref_items_list = raw_ref.split(", ")
     ref_items_list = []
     for x in raw_ref_items_list:
@@ -102,7 +101,7 @@ def _find_wos_ref_doi(ref_items_list):
         if re.findall(bp_rg.RE_WOS_REF_DOI, ref_item):
             dois_idx_list.append(item_idx)
             init_dois_items_list.append(ref_item)
-    dois_list = list(set(x.replace("DOI","").strip().lower() for x in init_dois_items_list))
+    dois_list = list({x.replace("DOI","").strip().lower() for x in init_dois_items_list})
     dois_list_str = ", ".join(dois_list)
     return dois_list_str
 
@@ -127,7 +126,7 @@ def _set_wos_dotted_initials(first_item):
         check_parts_list.remove(part.strip())
     name_check_nb = len(check_parts_list)
     if name_check_nb==2:
-        lastname = (' ').join(name_parts_list[:-1])
+        lastname = ' '.join(name_parts_list[:-1])
         initials = name_parts_list[-1]
         if len(initials)<=4 and initials.isupper():
             dotted_initials = "".join([x + "." for x in initials.replace(".", "")])
@@ -136,7 +135,7 @@ def _set_wos_dotted_initials(first_item):
         authors_case = "Dotted"
         mod_first_item = f'{lastname} {dotted_initials}'
     elif name_check_nb>2:
-        lastname = (' ').join(name_parts_list[:-2])
+        lastname = ' '.join(name_parts_list[:-2])
         initials = name_parts_list[-2:]
         dotted_initials = "".join([x.replace(".", "") + initial_dot for x in initials])
         authors_case = "Dotted"

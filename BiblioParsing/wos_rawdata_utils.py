@@ -45,18 +45,16 @@ def read_wos_rawdata(rawdata_path, wos_ids=False):
     - Allows to circumvent the error ParserError ('	' expected after '"') generated \
     by the method `pd.read_csv` when reading the raw wos-database file
     - Checks columns and drops unused columns by the parsing process using the \
-    `check_and_drop_columns` function imported from `BiblioParsingUtils` module.
+    `check_and_drop_columns` function imported from `parsing_utils` module.
     - Replaces the unavailable items values by a string set in the global UNKNOWN.
     - Adds an index column.
     - Normalizes the journal names using the `normalize_journal_names` function \
-    imported from the `BiblioParsingUtils` module.
+    imported from the `parsing_utils` module.
     Finally, the function can built data of WoS identifiers of the publications.
     The returned data are initialized to empty dataframes.
 
     Args:
         rawdata_path (path): The full path to the WoS-rawdata file.
-        correct_data (bool): Optional, true for correcting authors' names \
-        and addresses (dafault=False).
         wos_ids (bool): Optional, true for building the data of WoS IDs of \
         publications (dafault=False).
     Returns:
@@ -70,7 +68,6 @@ def read_wos_rawdata(rawdata_path, wos_ids=False):
     wos_ids_cols_list = [wos_id_col, init_wos_id_col]
 
     # Initializing returned data to empty dataframes
-    full_wos_rawdata_df = pd.DataFrame()
     wos_rawdata_df = pd.DataFrame()
     wos_ids_df = pd.DataFrame()
 

@@ -111,10 +111,10 @@ def _check_authors_list(authors_str, affiliations_str):
     # Building the list of authors full names in authors-with-affiliation
     affil_authors_list = [[x.strip() for x in authors.split(';')]
                     for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
-    flat_authors_list  = list(set(sum(affil_authors_list, [])))
+    flat_authors_set  = set(sum(affil_authors_list, []))
 
     # Building the list of authors out of authors-with-affiliation
-    out_authors_list = list(set(authors_ordered_list) - set(flat_authors_list))
+    out_authors_list = list(set(authors_ordered_list) - flat_authors_set)
     return authors_ordered_list, affil_authors_list, out_authors_list
 
 
@@ -322,7 +322,6 @@ def _build_wos_addresses_countries_affiliations(corpus_df, fails_dic, cols_tup):
 
     addresses_list, countries_list, affiliations_list = [], [], []
     for pub_id, authors_str, affiliations_str in corpus_series_zip:
-        pub_addresses_list = []
         if '[' in affiliations_str:
             # Format case: '[Author1] address1; [Author1, Author2] address2...'
             # authors = bp_rg.RE_AUTHOR.findall(affiliations_str) # for future use

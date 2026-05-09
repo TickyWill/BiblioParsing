@@ -137,7 +137,7 @@ def _check_authors_with_affiliations(corpus_df, check_cols):
     return corrected_corpus_df, corrected_addresses_df
 
 
-def _correct_firstname_initials(author, fullname_init):
+def _correct_firstname_initials(fullname_init):
     fullname = fullname_init
     # Remove author digital identifier
     if "(" in fullname_init:
@@ -148,8 +148,7 @@ def _correct_firstname_initials(author, fullname_init):
         # Assuming a team as author
         lastname, firstname = fullname, "Unknown First Name"
 
-    # Normalizing author's name and last-name with punctuation drop (specifically ";")
-    author = normalize_name(author, drop_ponct=True)
+    # Normalizing author's last-name with punctuation drop (specifically ";")
     lastname = normalize_name(lastname, drop_ponct=True, lastname_only=True)
 
     # Normalizing author's first name keeping punctuation (specifically ".")
@@ -166,11 +165,11 @@ def _correct_firstname_initials(author, fullname_init):
     return new_author
 
 
-def _correct_auth_data(author, auth_tup):
+def _correct_auth_data(auth_tup):
     fullname, auth_affil = auth_tup
 
     # Correcting author name
-    new_author = _correct_firstname_initials(author, fullname)
+    new_author = _correct_firstname_initials(fullname)
 
     # Updating author-with-affiliations with the corrected author name
     auth_affil_split = auth_affil.split(", ")
@@ -215,7 +214,7 @@ def _check_authors(corpus_df, check_cols):
         new_authors_list = []
         new_auth_affils_list = []
         for author, auth_tup in auth_data_dict.items():
-            new_author, new_auth_affil = _correct_auth_data(author, auth_tup)
+            new_author, new_auth_affil = _correct_auth_data(auth_tup)
             if author!=new_author:
                 corrected_authors_data.append([pub_id, author, new_author])
             new_authors_list.append(new_author)

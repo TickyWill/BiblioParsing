@@ -35,21 +35,24 @@ def _get_demo_config():
 
 
 def _build_effective_config(parsing_folder_dict, db_list):
+    rawdata_folder_name = parsing_folder_dict['corpus']['database']['rawdata']
+    parsing_folder_name = parsing_folder_dict['corpus']['database']['parsing']
     parsing_folder_dict_init = parsing_folder_dict
-    parsing_folder_dict = {}
-    parsing_folder_dict['folder_root'] = parsing_folder_dict_init['folder_root']
-    parsing_folder_dict['corpus'] = {}
-    parsing_folder_dict['corpus']['corpus_root'] = parsing_folder_dict_init['corpus']['corpus_root']
-    parsing_folder_dict['corpus']['concat'] = parsing_folder_dict_init['corpus']['concat']
-    parsing_folder_dict['corpus']['dedup'] = parsing_folder_dict_init['corpus']['dedup']
-    parsing_folder_dict['corpus']['databases'] = {}
+
+    parsing_folder_dict = {'folder_root': parsing_folder_dict_init['folder_root'],
+                           'corpus': {},
+                          }
+    parsing_folder_dict['corpus'] = {'corpus_root': parsing_folder_dict_init['corpus']['corpus_root'],
+                                     'concat'     : parsing_folder_dict_init['corpus']['concat'],
+                                     'dedup'      : parsing_folder_dict_init['corpus']['dedup'],
+                                     'databases'  : {},
+                                     }
+
     for db_num, db_label in enumerate(db_list):
-        parsing_folder_dict['corpus']['databases'][str(db_num)]= {}
-        parsing_folder_dict['corpus']['databases'][str(db_num)]['root'] = db_label
-        rawdata_folder_name = parsing_folder_dict_init['corpus']['database']['rawdata']
-        parsing_folder_dict['corpus']['databases'][str(db_num)]['rawdata'] = rawdata_folder_name
-        parsing_folder_name = parsing_folder_dict_init['corpus']['database']['parsing']
-        parsing_folder_dict['corpus']['databases'][str(db_num)]['parsing'] = parsing_folder_name
+        parsing_folder_dict['corpus']['databases'][str(db_num)]= {'root': db_label,
+                                                                  'rawdata': rawdata_folder_name,
+                                                                  'parsing' : parsing_folder_name
+                                                                 }
     return parsing_folder_dict
 
 
@@ -84,7 +87,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     rawdata_path_dict = {}
     parsing_path_dict = {}
     # Creating the databases folders if not available
-    for db_num in list(parsing_folder_dict['corpus']['databases'].keys()):
+    for db_num in parsing_folder_dict['corpus']['databases'].keys():
 
         keys_list = ['corpus', 'databases', db_num, 'root']
         db_root_path, db_root_name = _create_folder(parsing_folder_dict, keys_list, corpus_folder_path)
@@ -113,7 +116,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     dedup_parsing_path, _ = _create_folder(parsing_folder_dict, keys_list, dedup_root_path)
     parsing_path_dict['dedup'] = dedup_parsing_path
 
-    return (rawdata_path_dict, parsing_path_dict)
+    return rawdata_path_dict, parsing_path_dict
 
 
 def set_user_config(year=None, db_list=None):
@@ -142,7 +145,7 @@ def set_user_config(year=None, db_list=None):
     # Getting the filenames for each parsing item
     item_filename_dict = config_dict['PARSING_FILE_NAMES']
 
-    return (wf_path, rawdata_path_dict, parsing_path_dict, item_filename_dict)
+    return wf_path, rawdata_path_dict, parsing_path_dict, item_filename_dict
 
 
 def save_parsing_dict(parsing_dict, parsing_path,
@@ -163,8 +166,6 @@ def save_parsing_dict(parsing_dict, parsing_path,
                 item_tsv_file = item_filename_dict[item] + ".csv"
                 item_tsv_path = parsing_path / Path(item_tsv_file)
                 item_df.to_csv(item_tsv_path, index=False, sep=',')
-        else:
-            pass
     message = f"All parsing results saved as {save_extent} files"
     return message
 
@@ -192,6 +193,7 @@ def save_db_ids_data(db_ids_df, parsing_path, database):
         db_ids_df (dataframe): The database IDs data.
         parsing_path (path): The full path of the parsing results folder \
         for saving the xlsx file.
+        database (str): The database name.
     """
     file_name = database.capitalize() + "_IDs.xlsx"
     file_path = parsing_path / Path(file_name)
