@@ -6,6 +6,7 @@ __all__ = ['AFFIL_DROPPING_PATTERNS_DIC',
            'AFFIL_WORDS_SET_TEMPLATE',
            'AFFIL_WORD_SUBSTITUTE_PATTERN_DIC',
            'AFFIL_WORD_TO_DROP_TEMPLATE',
+           'COUNTRY_ALIAS_TEMPLATE',
            'RE_ADDRESS',
            'RE_ADDS_JOURNAL',
            'RE_AFFIL_AMB_WORDS_LIST',
@@ -54,6 +55,9 @@ __all__ = ['AFFIL_DROPPING_PATTERNS_DIC',
 import re
 from string import Template
 
+# For uniformization of country names
+COUNTRY_ALIAS_TEMPLATE = Template(r'$word\s' + "|" + r'$word$$')
+
 RE_ADDRESS = re.compile(r'''(?<=\]\s)           # Captures: "xxxxx" in string between "]" and "["
                         [^;]*                          # or  between "]" and end of string or ";"
                         (?=; | $ )''', re.X)
@@ -91,8 +95,8 @@ RE_AWA = re.compile(r'\w+;,\s\w+|\w+;\w+')               # Captures ';, ' or ';'
 AUTHORS_SMALL_WORDS_LIST = ['de', 'von']
 
 _JOURNAL_NAMES_LIST = ['Arxiv']
-_JOURNAL_SHORTS_LIST = ['Adv', 'Bull', 'Chem', 'Commun', 'Conf', 'J', 'Lett', 'Nat', 'Proc', 'Rep', 'Rev', 'Ser', 'Symp',
-                        'Trans', 'Transact']
+_JOURNAL_SHORTS_LIST = ['Adv', 'Bull', 'Chem', 'Commun', 'Conf', 'J', 'Lett', 'Nat', 'Proc', 'Rep', 'Rev',
+                        'Ser', 'Symp', 'Trans', 'Transact']
 _JOURNAL_WORDS_LIST = ['Acta', 'Conference', 'Journal', 'Letters', 'Magazine', 'Procedia', 'Proceedings',
                        'Series', 'Symposium', 'Transactions', 'Workshop']
 

@@ -655,7 +655,8 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
         print('affils_list stripped:', affils_list, "\n")
 
     # Removing country and country alias from the kept affiliations
-    affils_list = [x for x in affils_list if x != country and x not in bp_gg.ALIAS_UK]
+    uk_aliases = bp_gg.COUNTRY_ALIASES["United Kingdom"]
+    affils_list = [x for x in affils_list if x!=country and x not in uk_aliases]
     if verbose:
         print('affils_list without country aliases:', affils_list, "\n")
 

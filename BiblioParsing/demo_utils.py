@@ -120,6 +120,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
 
 
 def set_user_config(year=None, db_list=None):
+    """Sets the configuration for a demo"""
     # default values :
     rawdata_path_dict, parsing_path_dict, item_filename_dict = None, None, None
 
@@ -150,6 +151,7 @@ def set_user_config(year=None, db_list=None):
 
 def save_parsing_dict(parsing_dict, parsing_path,
                       item_filename_dict, save_extent):
+    """Saves the parsing results of a single step of the parsing step."""
     # Cycling on parsing items
     for item in bp_pg.PARSING_ITEMS_LIST:
         if item in parsing_dict.keys():
@@ -206,6 +208,7 @@ def save_db_ids_data(db_ids_df, parsing_path, database):
 
 def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict,
                        save_extent, fails_dicts, ids_dfs_dict):
+    """Saves the parsing results of all the steps of the parsing process."""
     fails_save_status = False
     db_ids_save_status = False
 

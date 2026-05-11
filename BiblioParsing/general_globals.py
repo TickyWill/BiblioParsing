@@ -3,13 +3,9 @@ such as countries with their specific structure of zip codes.
 """
 
 __all__ = ['ACCENT_CHANGE',
-           'ALIAS_BLR',
-           'ALIAS_FR',
-           'ALIAS_TUR',
-           'ALIAS_UK',
-           'ALIAS_USA',
            'APOSTROPHE_CHANGE',
            'COUNTRIES',
+           'COUNTRY_ALIASES',
            'COUNTRIES_CODES',
            'COUNTRIES_CONTINENT',
            'COUNTRIES_GPS',
@@ -71,24 +67,21 @@ def build_countries_globals():
         (list, dict, dict, dict): tuple of the built data.
     """
     # Setting columns name aliases
-    countries_alias = COUNTRIES_COL_NAMES['country']
-    gps_alias = COUNTRIES_COL_NAMES['gps']
-    short_alias = COUNTRIES_COL_NAMES['short_name']
-    zip_letters_alias = COUNTRIES_COL_NAMES['zip_letters']
-    zip_digits_alias = COUNTRIES_COL_NAMES['zip_digits']
-    continent_alias = COUNTRIES_COL_NAMES['continent']
+    col_keys = ['country', 'gps', 'short_name', 'zip_letters', 'zip_digits', 'continent']
+    (countries_col, gps_col, short_col, zip_letters_col,
+     zip_digits_col, continent_col) = [COUNTRIES_COL_NAMES[key] for key in col_keys]
 
     # Setting the specific file paths for countries information
     path_countries_info = Path(__file__).parent / Path(REP_UTILS) / Path(COUNTRIES_INFO)
     df = pd.read_excel(path_countries_info)
 
-    countries = df[countries_alias].to_list()
+    countries = df[countries_col].to_list()
     countries_gps = {x[0]:ast.literal_eval(x[1])
-                     for x in zip(df[countries_alias], df[gps_alias])}
-    countries_codes = {x[0]:x[1] for x in zip(df[countries_alias], df[short_alias])}
+                     for x in zip(df[countries_col], df[gps_col])}
+    countries_codes = {x[0]:x[1] for x in zip(df[countries_col], df[short_col])}
     zip_codes = {x[0]:{'letters':ast.literal_eval(x[1]), 'digits':ast.literal_eval(x[2])}
-                 for x in zip(df[countries_alias], df[zip_letters_alias], df[zip_digits_alias])}
-    countries_continent = {x[0]:x[1] for x in zip(df[countries_alias], df[continent_alias])}
+                 for x in zip(df[countries_col], df[zip_letters_col], df[zip_digits_col])}
+    countries_continent = {x[0]:x[1] for x in zip(df[countries_col], df[continent_col])}
 
     return countries, countries_gps, countries_codes, zip_codes, countries_continent
 
@@ -99,25 +92,23 @@ for country in ZIP_CODES.keys():
     ZIP_CODES[country]['letters'] = [x.replace(".", r"\.").lower()
                                      for x in ZIP_CODES[country]['letters']]
 
+USA_STATES = ("AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,"
+              "LA,ME,MD,MA,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,"
+              "OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY")
+USA_ALIASES = "UNITED STATES, United States of America, USA," + USA_STATES
 
-USA_STATES = '''AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,
-NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY'''
-USA_STATES = [x.strip() for x in USA_STATES.split(',')]
-
-ALIAS_USA = '''UNITED STATES,United States of America,USA'''
-ALIAS_USA = [x.strip() for x in ALIAS_USA.split(',')]
-
-ALIAS_UK = '''England,Wales,North Ireland,Scotland'''
-ALIAS_UK = [x.strip() for x in ALIAS_UK.split(',')]
-
-ALIAS_FR = '''FRANCE,FR,Fr'''
-ALIAS_FR = [x.strip() for x in ALIAS_FR.split(',')]
-
-ALIAS_BLR = '''BELARUS,BLR'''
-ALIAS_BLR = [x.strip() for x in ALIAS_BLR.split(',')]
-
-ALIAS_TUR = '''Turkiye'''
-ALIAS_TUR = [x.strip() for x in ALIAS_TUR.split(',')]
+COUNTRY_ALIASES = {"Belarus"              : ["BELARUS", "BLR"],
+                   "China"                : ["China", "china"],
+                   "France"               : ["FRANCE", "france", "FR", "Fr"],
+                   "Netherlands"          : ["Netherlands"],
+                   "Palestinian Territory": ["Palestine"],
+                   "Russian Federation"   : ["Russia"],
+                   "Turkey"               : ["Turkiye"],
+                   "United Arab Emirates" : ["U Arab Emirates", "Arab Emirates"],
+                   "United Kingdom"       : ["England", "Wales", "North Ireland", "Scotland"],
+                   "United States"        : [x.strip() for x in USA_ALIASES.split(',')],
+                   "Viet Nam"             : ["Vietnam"],
+                  }
 
 
 # Character replacements

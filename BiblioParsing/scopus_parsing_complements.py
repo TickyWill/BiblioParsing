@@ -496,13 +496,12 @@ def _check_merge_ref_items_colon(item_idx, ref_item, ref_items_list, raw_ref):
     if ": " in ref_item and item_idx<items_idx_max:
         next_item_idx = item_idx + 1
         next_item = ref_items_list[next_item_idx]
-        if not(re.findall(bp_rg.RE_SCOPUS_REF_YEAR, next_item)):
+        if not re.findall(bp_rg.RE_SCOPUS_REF_YEAR, next_item):
             ref_end_part = ", ".join(raw_ref.split(", ")[next_item_idx:])
             if re.findall(bp_rg.RE_SCOPUS_REF_AND, ref_end_part):
                 # 'and' in ref after ref_item
                 new_item_idx, ref_new_item = _merge_ref_item(ref_item, ref_items_list,
                                                              new_item_idx, ref_new_item)
-                print(new_item_idx, ref_new_item)
     return new_item_idx, ref_new_item
 
 
@@ -614,7 +613,6 @@ def _clean_ref(raw_ref):
 
     # Keeping only items up to DOI
     new_ref_items_list = _drop_all_items_after(bp_rg.RE_SCOPUS_REF_DOI, new_ref_items_list)
-    print("\nitems_list up to DOI", new_ref_items_list)
 
     clean_ref_items_list = [x for x in new_ref_items_list if x]
     new_ref = ', '.join(clean_ref_items_list)

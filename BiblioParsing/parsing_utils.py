@@ -53,41 +53,96 @@ import BiblioParsing.regex_globals as bp_rg
 
 
 def str_int_convertor(x):
+    """Converts string to integer.
+
+    Args:
+        x (str): String to convert.
+    Return:
+        (int): The conversion result, \
+        'O' if faild to do the conversion.
+    """
     try:
         return int(float(x))
     except ValueError:
         return 0
 
 
-def convert_issn(text):
-    new_text = bp_pg.UNKNOWN
-    y = ''.join(re.findall(bp_rg.RE_ISSN, text))
+def convert_issn(raw_txt):
+    """Converts a text to the ISSN standard format.
+
+    It search for potential occurence of raw ISSN values in the text 
+    using the 'RE_ISSN' global imported from the `bmfuncts.regex_globals` module. 
+    It returns the keyword of unknown ISSN given by the 'UNKNOWN' global 
+    imported from the `bmfuncts.pub_global` module.
+
+    Args:
+        raw_txt (str): String to convert.
+    Return:
+        (str): The formatted ISSN.
+    """
+    issn = bp_pg.UNKNOWN
+    y = ''.join(re.findall(bp_rg.RE_ISSN, raw_txt))
     if y.strip():
-        new_text = y[0:4] + "-" + y[4:]
-    return new_text
+        issn = y[0:4] + "-" + y[4:]
+    return issn
 
 
-def treat_doctype(doctype):
+def treat_doctype(raw_doctype):
+    """Sets the unique value for the document type through the 'DIC_DOCTYPE' 
+    global imported from the `bmfuncts.pub_global` module.
+
+    If the initial document type is not in the 'DIC_DOCTYPE' global, 
+    it returns the unchanged document type.
+
+    Args:
+        raw_doctype (str): The initial document type to convert.
+    Return:
+        (str): The unique value corresponding to the initial document type.
+    """
+    doctype = raw_doctype
     for doctype_key, doctype_list in bp_pg.DIC_DOCTYPE.items():
-        if doctype in doctype_list:
+        if raw_doctype in doctype_list:
             doctype = doctype_key
     return doctype
 
 
 def treat_title(title):
+    """Changes characters in the title text through the 'DASHES_CHANGE', 
+    'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' globals.
+
+    These globals are imported from the `bmfuncts.general_global` module.
+
+    Args:
+        title (str): The title text to convert.
+    Return:
+        (str): The changed title text.
+    """
     title = title.translate(bp_gg.DASHES_CHANGE)
     title = title.translate(bp_gg.LANG_CHAR_CHANGE)
     title = title.translate(bp_gg.PONCT_CHANGE)
     return title
 
 
-def treat_author(authors_list):
+def treat_author(authors_str):
+    """Identifies the first author among the authors' list and returns it 
+    as lastname followed by firstname initials.
+
+    The authors' names may be separated by ',' or ";" depending on the data 
+    extraction period of time. 
+    The firstname initials are set after standardization of the full name 
+    through the `normalize_name` function of the same module.
+
+    Args:
+        authors_str (str): The list of authors.
+    Return:
+        (str): The built full name of the first author.
+    """
     authors_sep = ','
-    if ';' in authors_list:
+    if ';' in authors_str:
         # Change in scopus on 07/2023
         authors_sep = ';'
     # Picking the first author
-    raw_first_author = authors_list.split(authors_sep)[0]
+    raw_first_author = authors_str.split(authors_sep)[0]
     first_author = normalize_name(raw_first_author)
     # Setting firstname_initials to upper case
     lastname = " ".join(first_author.split(" ")[:-1])
@@ -97,19 +152,29 @@ def treat_author(authors_list):
 
 
 def dict_print(dic):
+    """Prints dict items line by line.
+
+    Args:
+        (dict): The data to print.
+    """
     for k,v in dic.items():
         print("            ", k, ":", v)
 
 
 def set_unknown_address(author_idx, add_unknown_country=False):
-    """Builds unknown address for an author wich address is unknown.
+    """Adds author ID to the 'UNKNOWN' global to set the address to correct 
+    for an author wich address is unknown in the extracted rawdata.
+
+    It also may add to the built address the unknown-country key given 
+    by 'UNKNOWN_COUNTRY' global. The  globals are imported from 
+    the `bmfuncts.pub_global` module.
 
     Args:
         author_idx (int): Index of the author in the publication's authors list.
         add_unknown_country (bool): If True (default: False), unknown-country key \
         is added to the unknown address.
     Returns:
-        (str): The built unknown address.
+        (str): The built author's address.
     """
     if add_unknown_country:
         author_address = f'{author_idx}_{bp_pg.UNKNOWN}, {bp_pg.UNKNOWN_COUNTRY}'
@@ -119,7 +184,17 @@ def set_unknown_address(author_idx, add_unknown_country=False):
 
 
 def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
-    """
+    """Sets the full path to the rawdata to be used.
+
+    It choose the most recent file ending with the specified extension 
+    among those available in the specified folder. 
+    If no file is available, it returns None value.
+
+    Args:
+        rawdata_path (path): The full path to the folder to walk.
+        raw_extent (str): The file extension tu use for the file search.
+    Returns:
+        (path): The full path to the selected rawdata file.
     Notes:
         ToDo: Management of multiple files to merge with 'merge_database' function.
     """
@@ -130,18 +205,34 @@ def check_and_get_rawdata_file_path(rawdata_path, raw_extent):
                               if file.endswith(raw_extent))
     if rawdata_list:
         # Selecting the most recent file with raw_extent extension
-        rawdata_list.sort(key = lambda x: os.path.getmtime(x), reverse=True)
+        rawdata_list.sort(key=os.path.getmtime, reverse=True)
         rawdata_file_path = rawdata_list[0]
     else:
         rawdata_file_path = None
     return rawdata_file_path
 
 
-def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_type):
-    """Trying to drop data by database identifier given in an XLSX file"""
+def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database):
+    """Tries to drop data by database identifiers given in an XLSX file.
+
+    If the file is not yet available, an empty one with the useful column names 
+    is created to be filled by the user for a next run.
+
+    Args:
+        rawdata_path (path): The full path to the folder of rawdata file 
+        where the XLSX file of identifiers to drop is located.
+        init_full_rawdata_df (dataframe): The full extracted rawdata.
+        ids_cols_list (list): Composed of the column name (str) of the identifiers \
+        in the database identifiers file and of the column name (str) \
+        of the identifiers in the full extracted rawdata.
+        database (str): The name of the database from which the rawdata \
+        are extracted used to set the file name of database identifiers to drop.
+    Returns:
+        (dataframe): The modified full rawdata.
+    """
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
-    ids_todrop_file = database_type.capitalize() + bp_pg.IDS_TO_DROP_FILE_BASE
+    ids_todrop_file = database.capitalize() + bp_pg.IDS_TO_DROP_FILE_BASE
     ids_todrop_path = rawdata_path / Path(ids_todrop_file)
     if ids_todrop_path.is_file():
         rawdata_todrop = pd.read_excel(ids_todrop_path)
@@ -159,6 +250,16 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database_typ
 
 
 def set_rawdata_error(database, rawdata_path, raw_extent):
+    """Builds the formatted text to use as warning when no rawdata file is available.
+
+    Args:
+        database (str): The name of the database from which the rawdata \
+        would have been extracted.
+        rawdata_path (path): The full path where the raxdata file should be located.
+        raw_extent (str): The file extension of the missing file.
+    Returns:
+        (str): The formatted text.
+    """
     error_text  = (f"\n   !!! No {database} raw-data file available !!! \n"
                    "\nBefore new launch of the parsing, "
                    f"please make available a {database} raw-data file "
@@ -167,10 +268,21 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
 
 
 def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fails_dict=None):
-    """Building a clean item dataframe from a tuple 
-    and accordingly updating the parsing success rate dict."""
+    """Builds a clean item data from values listed in a namedtuple and may accordingly update 
+    the parsing success rate data.
+
+    Args:
+        item_list (list): Composed of namedtuples giving values to be set in the data columns.
+        item_col_names (list): The data column names (str).
+        item_col (str): The column name of the item values in the built data.
+        pub_id_col (str): The column name of the publications' identifers.
+        fails_dict (dict): Parsing success rate data, optional (default: None).
+    Returns:
+        (tuple): Composed of the built data (dataframe) and of the potentially \
+        updated parsing success rate data (dict).
+    """
     item_df = pd.DataFrame.from_dict({label:[s[idx] for s in item_list]
-                                      for idx,label in enumerate(item_col_names)})
+                                      for idx, label in enumerate(item_col_names)})
     pub_ids_list = item_df[item_df[item_col]==''][pub_id_col].values
     pub_ids_list = list(set(pub_ids_list))
     if fails_dict:
@@ -181,16 +293,22 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fail
     return item_df, fails_dict
 
 
-def clean_authors_countries_affils(auth_addr_country_inst_df):
+def clean_authors_countries_affils(auth_addr_country_affil_df):
     """Gathers author's attributes in a single line for each publication.
+
+    Args:
+        auth_addr_country_affil_df (dataframe): The data of author \
+        per country and affiliations per publication.
+    Returns:
+        (dataframe): The cleaned data.
     """
     # Setting useful column names
-    columns_list = auth_addr_country_inst_df.columns
+    columns_list = auth_addr_country_affil_df.columns
     (pub_id_col, author_col, address_col, country_col,
      norm_aff_col, raw_aff_col) = columns_list[0:6]
 
-    new_auth_addr_country_inst_df = pd.DataFrame(columns=columns_list)
-    for _, pub_id_dg in auth_addr_country_inst_df.groupby(pub_id_col):
+    new_auth_addr_country_affil_df = pd.DataFrame(columns=columns_list)
+    for _, pub_id_dg in auth_addr_country_affil_df.groupby(pub_id_col):
         new_pub_id_dg = pd.DataFrame(columns=columns_list)
         for _, author_dg in pub_id_dg.groupby(author_col):
             new_author_dg = author_dg.copy()
@@ -211,14 +329,35 @@ def clean_authors_countries_affils(auth_addr_country_inst_df):
                 new_pub_id_dg = pd.concat([new_pub_id_dg, new_author_dg])
             else:
                 new_pub_id_dg = pd.concat([new_pub_id_dg, author_dg])
-        new_auth_addr_country_inst_df = pd.concat([new_auth_addr_country_inst_df, new_pub_id_dg])
-    new_auth_addr_country_inst_df.fillna(bp_ag.EMPTY, inplace=True)
-    new_auth_addr_country_inst_df.replace("", bp_ag.EMPTY, inplace=True)
-    return new_auth_addr_country_inst_df
+        new_auth_addr_country_affil_df = pd.concat([new_auth_addr_country_affil_df, new_pub_id_dg])
+    new_auth_addr_country_affil_df.fillna(bp_ag.EMPTY, inplace=True)
+    new_auth_addr_country_affil_df.replace("", bp_ag.EMPTY, inplace=True)
+    return new_auth_addr_country_affil_df
+
+
+def _tokenizer(text):
+    """Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
+    NLTK_VALID_TAG_LIST are kept.
+
+    ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
+    gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
+
+    Args:
+        text (string): String to tokenize
+    Returns
+        (list) : The tokenized and lemmatized words.
+    """
+    tokenized = nltk.word_tokenize(text.lower())
+    valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
+                   if pos in bp_pg.NLTK_VALID_TAG_LIST]
+
+    stemmer = nltk.stem.WordNetLemmatizer()
+    valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
+    return valid_words_lemmatized
 
 
 def build_title_keywords(df):
-    """Given the dataframe 'df' with one column 'title':
+    """Given the dataframe 'df' with one column named 'title':
 
                     Title
             0  Experimental and CFD investigation of inert be...
@@ -231,50 +370,26 @@ def build_title_keywords(df):
     belonging to the global list 'NLTK_VALID_TAG_LIST'.
        2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
     the set of the tokenized and lemmelized (using the nltk WordNetLemmatizer) title. The column
-    'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'
-       3- Builds the list of tuples 'list_of_words_occurrences.sort'
+    'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'.
+       3- Builds the list of tuples 'list_of_words_occurrences.sort' 
     [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
     of # occurrences token_i.
        4- Suppress words pertening to BLACKLISTED_WORDS to the list from the bag of words
 
     Args:
        df (dataframe): Data of publication title per publication identifier.
-
     Returns:
-       (tup): tuple (df, bag_of_words_occurrences) with df a dataframe \
-       which columns are [pub_id, title_tokens_alias, kept_tokens_alias] \
-       where title_tokens_alias contains the list of tokens of the title \
-       and kept_tokens_alias the list of tokens with an occurrence frequency \
-       >= NOUN_MINIMUM_OCCURRENCES, and bag_of_words_occurrences a list of tuples \
-       where tuple i is (word_i,# occurrence_i).
+       (tup): Composed of the data (dataframe) which columns are \
+       ['pub_id', 'title_tokens_alias', 'kept_tokens_alias'] \
+       where 'title_tokens_alias' contains the list of tokens of the title \
+       and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
+       and of the list of tuples where tuple i is (word_i, # occurrence_i).
     """
-    # To Do: update docstring
-
-    def tokenizer(text):
-        """Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
-        NLTK_VALID_TAG_LIST are kept.
-
-        ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
-        gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
-
-        Args:
-            text (string): String to tokenize
-        Returns
-            (list) : The tokenized and lemmatized words.
-        """
-        tokenized = nltk.word_tokenize(text.lower())
-        valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
-                       if pos in bp_pg.NLTK_VALID_TAG_LIST]
-
-        stemmer = nltk.stem.WordNetLemmatizer()
-        valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
-        return valid_words_lemmatized
-
     title_alias = bp_pcg.COL_NAMES['temp_col'][2]
     title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
     kept_tokens_alias = bp_pcg.COL_NAMES['temp_col'][4]
 
-    df[title_tokens_alias] = df[title_alias].apply(tokenizer)
+    df[title_tokens_alias] = df[title_alias].apply(_tokenizer)
 
     # Removing the blacklisted words from the bag of words
     bag_of_words = np.array(df[title_tokens_alias].sum())
@@ -285,42 +400,44 @@ def build_title_keywords(df):
     bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
 
     title_keywords = {x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES}
-    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x :list(title_keywords.intersection(set(x))))
+    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x:list(title_keywords.intersection(set(x))))
 
     return df, bag_of_words_occurrences
 
 
-def normalize_country(country):
+def normalize_country(raw_country):
     """Normalizes the country name for coherence seeking between 
-    wos and scopus corpuses.
+    WoS and Scopus corpuses.
+
+    If the raw country name is not in the list given by the 'COUNTRIES' 
+    global, the returned country name is set as follows. 
+    It is set to the key of the 'COUNTRY_ALIASES' (dict) global:
+        - either, if the raw country name itself is an alias.
+        - or, if an alias of the country among the values of this global is found 
+        in the raw country name;
+    Otherwise, it is set to the key word given by the 'UNKNOWN_COUNTRY' 
+    global imported from the 'parsing_globals' module, 
+    The 'COUNTRIES' and 'COUNTRY_ALIASES' globals are imported 
+    from the `general_globals` module.
+
+    Args:
+        raw_country (str): The country name to normalize.
+    Returns:
+        (str): The normalized country name
     """
-    country_clean = country
-    if country not in bp_gg.COUNTRIES:
-        if country in  bp_gg.ALIAS_UK:
-            country_clean = 'United Kingdom'
-        elif 'Netherlands' in country:
-            country_clean = 'Netherlands'
-        elif country in bp_gg.ALIAS_USA or "USA" in country:
-            country_clean = 'United States'
-        elif ('china' in country) or ('China' in country):
-            country_clean = 'China'
-        elif country=='Russia':
-            country_clean = 'Russian Federation'
-        elif country=='U Arab Emirates':
-            country_clean = 'United Arab Emirates'
-        elif country=='Vietnam':
-            country_clean = 'Viet Nam'
-        elif country=='Palestine':
-            country_clean = 'Palestinian Territory'
-        elif country in bp_gg.ALIAS_FR:
-            country_clean = 'France'
-        elif country in bp_gg.ALIAS_BLR:
-            country_clean = 'Belarus'
-        elif country in bp_gg.ALIAS_TUR:
-            country_clean = 'Turkey'
-        else:
-            country_clean = bp_pg.UNKNOWN_COUNTRY
-    return country_clean
+    clean_country = raw_country
+    if raw_country not in bp_gg.COUNTRIES:
+        clean_country = bp_pg.UNKNOWN_COUNTRY
+        for country, country_aliases in bp_gg.COUNTRY_ALIASES.items():
+            if raw_country in country_aliases:
+                clean_country = country
+                break
+            for alias in country_aliases:
+                alias_re = re.compile(bp_rg.COUNTRY_ALIAS_TEMPLATE.substitute({"word":alias}))
+                if re.findall(alias_re, raw_country):
+                    clean_country = country
+                    break
+    return clean_country
 
 
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
@@ -417,7 +534,6 @@ def normalize_journal_names(database, corpus_df):
         by SCOPUS and WOS globals.
         corpus_df (dataframe): corpus dataframe to be normalized \
         in terms of journal names.
-
     Returns:
         (dataframe): The data with an additional column containing \
         the normalized journal names.
@@ -452,41 +568,62 @@ def normalize_journal_names(database, corpus_df):
 
 
 def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
+    """Builds the data of database indentifier for each publication.
 
-    # Setting useful aliases
-    pub_id_col_alias = bp_pcg.COL_NAMES['pub_id']
+    Args:
+        rawdata_df (dataframe): The rawdata from which database \
+        identifiers are extracted.
+        init_db_id_col (str): The name of the column of the database \
+        identifiers values in the rawdata.
+        db_id_col (str): The name of the column of the database \
+        identifiers values in the built data.
+    Returns:
+        (dataframe): The built data.
+   """
+    # Setting col name from globals
+    pub_id_col = bp_pcg.COL_NAMES['pub_id']
 
     # Setting the pub_id in rawdata_df index
     rawdata_df.index = range(len(rawdata_df))
 
     # Setting the pub-id as a column
-    rawdata_df = rawdata_df.rename_axis(pub_id_col_alias).reset_index()
+    rawdata_df = rawdata_df.rename_axis(pub_id_col).reset_index()
 
     # Building the final data
-    init_db_ids_df = rawdata_df[[init_db_id_col, pub_id_col_alias]]
+    init_db_ids_df = rawdata_df[[init_db_id_col, pub_id_col]]
     db_ids_df = init_db_ids_df.rename(columns={init_db_id_col: db_id_col})
     return db_ids_df
 
 
-def check_and_drop_columns(database, init_df):
-    df = init_df.copy()
+def check_and_drop_columns(database, init_rawdata_df):
+    """Checks the availability of the mandatory columns in the rawdata 
+    and drop the unused ones.
+
+    Args:
+        database (str): The name of the database from which rawdata \
+        have been extracted.
+        init_rawdata_df (dataframe): The rawdata to be checked and cleaned.
+    Returns:
+        (dataframe): The checked and cleaned data.
+   """
+    rawdata_df = init_rawdata_df.copy()
 
     # Setting useful aliases
-    pub_id_col_alias    = bp_pcg.COL_NAMES["pub_id"]
-    wos_col_issn_alias  = bp_pcg.COLUMN_LABEL_WOS["issn"]
-    wos_col_eissn_alias = bp_pcg.COLUMN_LABEL_WOS_PLUS["e_issn"]
+    pub_id_col = bp_pcg.COL_NAMES["pub_id"]
+    wos_col_issn = bp_pcg.COLUMN_LABEL_WOS["issn"]
+    wos_col_eissn = bp_pcg.COLUMN_LABEL_WOS_PLUS["e_issn"]
 
     # Check for missing mandatory columns
     if database==bp_pg.WOS:
-        cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val} | {wos_col_eissn_alias}
+        cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val} | {wos_col_eissn}
     elif database==bp_pg.SCOPUS:
         cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_SCOPUS.values() if val}
     else:
         cols_mandatory = ()
-        print(f"Sorry, unrecognized database {database} : should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
+        print(f"Sorry, unrecognized database {database}: should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
 
     if cols_mandatory:
-        cols_available = set(df.columns)
+        cols_available = set(rawdata_df.columns)
         missing_columns = cols_mandatory.difference(cols_available)
         if missing_columns:
             print(f'The mandatory columns: {",".join(missing_columns)} are missing '
@@ -494,20 +631,20 @@ def check_and_drop_columns(database, init_df):
 
         # Setting issn to e_issn if issn not available for wos
         if database==bp_pg.WOS:
-            df = df.replace('', np.nan, regex=True) # To allow the use of combine_first
-            df[wos_col_issn_alias] = df[wos_col_issn_alias].combine_first(df[wos_col_eissn_alias])
-            df = df.dropna(axis = 0, how = 'all')
+            rawdata_df = rawdata_df.replace('', np.nan, regex=True) # To allow the use of combine_first
+            rawdata_df[wos_col_issn] = rawdata_df[wos_col_issn].combine_first(rawdata_df[wos_col_eissn])
+            rawdata_df = rawdata_df.dropna(axis=0, how='all')
             cols_mandatory = {val for val in bp_pcg.COLUMN_LABEL_WOS.values() if val}
 
 
         # Dropping unused columns
         cols_to_drop = list(cols_available.difference(cols_mandatory))
-        df.drop(cols_to_drop, axis=1, inplace=True)
+        rawdata_df.drop(cols_to_drop, axis=1, inplace=True)
 
         # Setting publication identifier in a column of the data
-        df.index = range(len(df))
-        df = df.rename_axis(pub_id_col_alias).reset_index()
-    return df
+        rawdata_df.index = range(len(rawdata_df))
+        rawdata_df = rawdata_df.rename_axis(pub_id_col).reset_index()
+    return rawdata_df
 
 
 def upgrade_col_names(corpus_folder):
@@ -635,6 +772,15 @@ def standardize_str(raw_str):
 
 
 def set_address_uniform_words(address):
+    """Replaces words in the address using the regex patterns given by 
+    the 'AFFIL_WORD_SUBSTITUTE_PATTERN_DIC' global  imported from 
+    the `regex_globals` module.
+
+    Args:
+        address (str): The address before replacement of words.
+    Returns:
+        (str): The address where words have been replaced.
+   """
     uniform_address = address
     for word_to_substitute, pattern in bp_rg.AFFIL_WORD_SUBSTITUTE_PATTERN_DIC.items():
         re_pattern = re.compile(pattern)

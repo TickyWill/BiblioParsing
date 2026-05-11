@@ -613,9 +613,6 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
 
     # Setting items list and values
     items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(12)]
-    (articles_item, authors_item, addresses_item, countries_item, affiliations_item,
-     auth_affil_item, authors_kw_item, index_kw_item, title_kw_item, subjects_item,
-     sub_subjects_item, references_item) = items_list
 
     # Setting the specific file paths for subjects and sub-subjects assignment for Scopus corpuses
     scopus_cat_codes_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_CAT_CODES)
@@ -634,44 +631,44 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
     if not corpus_df.empty:
 
         # Building the dataframe of articles
-        print(f"  - {articles_item} parsing...", end="\r")
+        print("  - Publications main data parsing...", end="\r")
         articles_df = _build_scopus_articles(corpus_df, scopus_fails_dic, cols_tup)
-        print(f"  - {articles_item} parsed    ")
+        print("  - Publications main data parsed    ")
 
         # Building the dataframe of authors
-        print(f"  - {authors_item} parsing...", end="\r")
+        print("  - Authors parsing...", end="\r")
         authors_df = _build_scopus_authors(corpus_df, scopus_fails_dic, cols_tup)
-        print(f"  - {authors_item} parsed    ")
+        print("  - Authors parsed    ")
 
         # Building the dataframe of addresses, countries and affiliations
-        print(f"  - {addresses_item}, {countries_item} and {affiliations_item} parsing...", end="\r")
+        print("  - Addresses, countries and affiliations parsing...", end="\r")
         addresses_tup = _build_scopus_addresses_countries_affiliations(corpus_df, scopus_fails_dic, cols_tup)
         addresses_df, countries_df, affiliations_df = addresses_tup
-        print(f"  - {addresses_item}, {countries_item} and {affiliations_item} parsed    ")
+        print("  - Addresses, countries and affiliations parsed    ")
 
         # Building the dataframe of authors and their affiliations
-        print(f"  - {auth_affil_item} parsing...")
+        print("  - Authors with affiliations parsing...")
         auth_affils_df = _build_scopus_authors_countries_affiliations(corpus_df, scopus_fails_dic, cols_tup,
                                                                       affil_filter_list=affil_filter_list,
                                                                       affil_params_dic=affil_params_dic)
-        print(f"  - {auth_affil_item} parsed                     ")
+        print("  - Authors with affiliations parsed                     ")
 
         # Building the dataframes of keywords
-        print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsing...", end="\r")
+        print("  - Authors' keywords, indexed keywords and title keywords parsing...", end="\r")
         authors_kw_df, index_kw_df, title_kw_df = _build_scopus_keywords(corpus_df, scopus_fails_dic, cols_tup)
-        print(f"  - {authors_kw_item}, {index_kw_item} and {title_kw_item} parsed    ")
+        print("  - Authors' keywords, indexed keywords and title keywords parsed    ")
 
         # Building the dataframe of subjects and sub-subjects
-        print(f"  - {subjects_item} and {sub_subjects_item} parsing...", end="\r")
+        print("  - Subjects and secondary subjects parsing...", end="\r")
         subjects_df, sub_subjects_df = build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
                                                                               scopus_journals_issn_cat_path,
                                                                               scopus_fails_dic, cols_tup)
-        print(f"  - {subjects_item} and {sub_subjects_item} parsed    ")
+        print("  - Subjects and secondary subjects parsed    ")
 
         # Building the dataframe of references
-        print(f"  - {references_item} parsing...", end="\r")
+        print("  - References parsing...", end="\r")
         references_df = build_scopus_references(corpus_df, cols_tup)
-        print(f"  - {references_item} parsed    ")
+        print("  - References parsed    ")
 
         # Building the scopus data dict
         scopus_parsing_list = [articles_df, authors_df, addresses_df, countries_df, affiliations_df, auth_affils_df,

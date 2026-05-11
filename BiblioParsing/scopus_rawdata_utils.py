@@ -35,8 +35,8 @@ def _set_scopus_rawdata_cols():
         'COL_NAMES' global, A dict valued by column names of rawdata defined \
         by the 'COLUMN_LABEL_SCOPUS' and 'COLUMN_LABEL_SCOPUS_PLUS' globals).
     """
-    cols_dic = {'scopus_id_col'           : bp_pcg.COL_NAMES['scopus_id'][0],
-                'pub_id_col'              : bp_pcg.COL_NAMES['pub_id'],
+    cols_dic = {'scopus_id_col': bp_pcg.COL_NAMES['scopus_id'][0],
+                'pub_id_col'   : bp_pcg.COL_NAMES['pub_id'],
                }
 
     scopus_cols_dic = {'scopus_auth_col'         : bp_pcg.COLUMN_LABEL_SCOPUS['authors'],
