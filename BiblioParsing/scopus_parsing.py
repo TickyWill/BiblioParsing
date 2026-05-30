@@ -576,7 +576,7 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
     return articles_df
 
 
-def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
+def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, scopus_cat_paths=None):
     """Builds parsing data from the corpus rawdata.
 
     The list of the parsed items (keys of the returned dict which values are the dataframes \
@@ -603,6 +603,8 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
         the full path to the data per country of raw affiliations per normalized one, the full path to the data of \
         affiliations-types used to normalize the affiliations, the name of the file of the data of towns per country \
         and the full path to the folder where these data are available.
+        scopus_cat_paths (list): Optional (default: none), Composed of the full path to the Scopus categories codes \
+        and of the catagories per journal.
     Returns:
         (tup): (The parsed data (dataframes) as values of a dict keyed by parsing items, \
         The parsing success rate data (dict), The data (dataframe) of the corrected author names, \
@@ -615,8 +617,11 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
     items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(12)]
 
     # Setting the specific file paths for subjects and sub-subjects assignment for Scopus corpuses
-    scopus_cat_codes_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_CAT_CODES)
-    scopus_journals_issn_cat_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_JOURNALS_ISSN_CAT)
+    if not scopus_cat_paths:
+        scopus_cat_codes_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_CAT_CODES)
+        scopus_journals_issn_cat_path = Path(__file__).parent / Path(bp_gg.REP_UTILS) / Path(bp_pg.SCOPUS_JOURNALS_ISSN_CAT)
+    else:
+        scopus_cat_codes_path, scopus_journals_issn_cat_path = scopus_cat_paths
 
     # Reading and checking the corpus file
     raw_data_return_tup = read_scopus_rawdata(rawdata_path, correct_data=True, scopus_ids=True)

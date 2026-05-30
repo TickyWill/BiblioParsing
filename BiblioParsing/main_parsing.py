@@ -52,7 +52,7 @@ def merge_database(database, filename, in_dir, out_dir):
     result.to_csv(out_dir / Path(filename), sep='\t')
 
 
-def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_dic=None):
+def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_dic=None, scopus_cat_paths=None):
     """Parses corpus rawdata using the appropriate parser.
 
     Two parsers are available:
@@ -70,6 +70,9 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
         of raw affiliations per normalized one, the full path to the data of affiliations-types \
         used to normalize the affiliations, the name of the file of the data of towns per country \
         and the full path to the folder where these data are available.
+        scopus_cat_paths (list): Optional (default: none), Composed of the full path to the Scopus \
+        categories codes and of the catagories per journal.
+    Returns:
     Returns:
         (tup): The tuple of parsing results returned by the used appropriate parser.
     """
@@ -79,7 +82,7 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
                                  affil_params_dic=affil_params_dic)
     elif database==bp_pg.SCOPUS:
         parsing_tup = scopus_parser(rawdata_path, affil_filter_list=affil_filter_list,
-                                    affil_params_dic=affil_params_dic)
+                                    affil_params_dic=affil_params_dic, scopus_cat_paths=scopus_cat_paths)
     else:
         print(f"WARNING: Sorry, unrecognized database {database}: it should be {bp_pg.WOS} or {bp_pg.SCOPUS}")
 
