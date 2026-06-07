@@ -17,7 +17,7 @@ with open(path.join(this_directory, 'requirements.txt'), encoding='utf-8') as f:
 
 # This setup is suitable for "python setup.py develop".
 
-setup(name='biblioparsing',
+setup(name='BiblioParsing',
       version='3.0.0',
       description='A toolbox for parsing a bibliography',
       long_description=long_description,
@@ -37,5 +37,5 @@ setup(name='biblioparsing',
       author= 'BiblioAnalysis team',
       author_email= 'francois.bertin7@wanadoo.fr, amal.chabli@orange.fr',
       url= 'https://github.com/TickyWill/BiblioParsing',
-      packages=find_packages(),
+      packages=find_packages(include=['biblioparsing']),
       )
