@@ -179,7 +179,9 @@ RE_SCOPUS_REF_AUTHOR = re.compile(r'^[a-zA-Z]*\s[a-zA-Z][\.]?$'
                                   + '|' +
                                   r'[a-zA-Z]{1}-[a-zA-Z]{1}[\.]?$'
                                   + '|' +
-                                  r'[a-zA-Z]{1}[\.]?-[a-zA-Z]{1}[\.]?$')
+                                  r'[a-zA-Z]{1}[\.]?-[a-zA-Z]{1}[\.]?$'
+                                  + '|' +
+                                  r'\s[a-zA-Z]{1}\.[a-zA-Z]{0,1}[\.]?[a-zA-Z]{0,1}[\.]?[a-zA-Z]{0,1}[\.]?$')
 
 
 RE_SCOPUS_AUTHOR_INITIALS = re.compile(r'^[a-zA-Z]{1,2},\s$'

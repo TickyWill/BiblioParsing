@@ -167,6 +167,7 @@ def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
     return subjects_df, sub_subjects_df
 
 
+# Functions for parsing cleaned reference
 def _try_list_idx(item_idx, value_idx, values_list):
     try:
         value_item_idx, value = item_idx, values_list[value_idx].strip()
@@ -175,17 +176,19 @@ def _try_list_idx(item_idx, value_idx, values_list):
     return value_item_idx, value
 
 
-def _find_ref_doi(ref_items_list):
+def _find_ref_doi(ref_items_list, verbose):
     item_idx, dois_list = 0, []
     for item_idx, ref_item in enumerate(ref_items_list):
         dois_list = re.findall(bp_rg.RE_SCOPUS_REF_DOI, ref_item)
         if dois_list:
             break
+    if verbose:
+        print("\n    DOI search:", item_idx, dois_list)
     doi_item_idx, doi = _try_list_idx(item_idx, 0, dois_list)
     return doi_item_idx, doi
 
 
-def _find_ref_year(ref_items_list, doi_item_idx, doi, ref):
+def _find_ref_year(ref_items_list, doi_item_idx, doi, ref, verbose):
     item_idx, years_list = 0, []
     for item_idx, ref_item in enumerate(ref_items_list):
         years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEAR, ref_item)
@@ -209,41 +212,96 @@ def _find_ref_year(ref_items_list, doi_item_idx, doi, ref):
                     years_list = re.findall(bp_rg.RE_SCOPUS_REF_DIGITS, ref_item)
                     if not all_years_list:
                         break
+    if verbose:
+        print("\n    Year search:", item_idx, years_list)
     year_item_idx, year = _try_list_idx(item_idx, 0, years_list)
     return year_item_idx, year
 
 
-def _search_authors_in_items(ref_items_list):
+def _check_author_in_next_items(init_auth_idx_max, author_step, idx_max, ref_items_list, verbose):
+    auth_idx_max = init_auth_idx_max + author_step
+    if idx_max>init_auth_idx_max:
+        idx = init_auth_idx_max + author_step
+        while re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, ref_items_list[idx]):
+            auth_idx_max = idx
+            idx += author_step
+            if verbose:
+                print("\n        idx:", idx)
+                print("        auth_idx_max 1:", auth_idx_max)
+            if idx>idx_max:
+                break
+    return auth_idx_max
+
+
+def _check_authors_case_w_dot(authors_case_base, item, verbose):
+    authors_case = authors_case_base + '_w_dot'
+    if '.' not in item:
+        authors_case = authors_case_base + '_wo_dot'
+    if verbose:
+        print("        authors_case:", authors_case)
+    return authors_case
+
+
+def _search_authors_in_items(ref_items_list, verbose):
     # Searching for possible author names and specifying the author names structure
+    # only in the case of idx_max > 0
     first_author, et_al, authors_case = bp_pg.UNKNOWN, "", 'no_authors'
+    idx_max = len(ref_items_list) - 1
+    auth_idx_max = 0
     first_item = ref_items_list[0]
+    if verbose:
+        print("\n    RE_REF_AUTHOR_DROP in first item:",
+              re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item))
     if not re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item):
         second_item = ref_items_list[1]
+        if verbose:
+            print("\n    RE_SCOPUS_REF_AUTHOR in first item:",
+                  re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, first_item))
+
         if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, first_item):
             authors_case = 'single_one_item'
+            author_step = 1
             first_author = first_item
+            # Checking if multiple authors and computing max index of authors' items
+            if verbose:
+                print("\n    RE_SCOPUS_REF_AUTHOR in second item 1:",
+                      re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item))
             if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
-                authors_case = 'multiple_one_item_w_dot'
-                if '.' not in second_item:
-                    authors_case = 'multiple_one_item_wo_dot'
+                authors_case = _check_authors_case_w_dot('multiple_one_item', second_item, verbose)
                 et_al = "et al."
+                auth_idx_max = _check_author_in_next_items(auth_idx_max, author_step, idx_max,
+                                                           ref_items_list, verbose)
         else:
+            if verbose:
+                print("\n    RE_SCOPUS_REF_AUTHOR in second item 2:",
+                      re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item))
             if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
                 authors_case = 'single_two_items'
+                author_step = 2
                 first_author = f'{first_item} {second_item}'
-                if len(ref_items_list)>3:
-                    fourth_item = ref_items_list[3]
+                auth_idx_max = 1
+                # Checking if multiple authors and computing max index of authors' items
+                next_auth_idx_max = auth_idx_max + author_step
+                if idx_max>next_auth_idx_max:
+                    fourth_item = ref_items_list[next_auth_idx_max]
+                    if verbose:
+                        print(f"\n    RE_SCOPUS_REF_AUTHOR in {fourth_item}:",
+                              re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, fourth_item))
                     if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, fourth_item):
-                        authors_case = 'multiple_two_items_w_dot'
-                        if '.' not in second_item:
-                            authors_case = 'multiple_two_items_wo_dot'
+                        authors_case = _check_authors_case_w_dot('multiple_two_items', fourth_item, verbose)
                         et_al = "et al."
-    return first_author, et_al, authors_case
+                        auth_idx_max = _check_author_in_next_items(auth_idx_max, author_step, idx_max,
+                                                                   ref_items_list, verbose)
+    if verbose:
+        print("\n    Authors search in item:", first_author, et_al, authors_case, auth_idx_max)
+    return first_author, et_al, authors_case, auth_idx_max
 
 
-def _build_authors_attr(ref_items_list):
+def _build_authors_attr(ref_items_list, verbose):
     first_author, et_al, authors_case = bp_pg.UNKNOWN, "", 'no_authors'
+    idx_max = len(ref_items_list) - 1
     author_max_len = 30
+    auth_idx_max = 0
     first_item = ref_items_list[0]
     if re.findall(bp_rg.RE_SCOPUS_REF_EL_AL, first_item):
         authors_case = 'with_et_al'
@@ -251,7 +309,7 @@ def _build_authors_attr(ref_items_list):
     else:
         if ":" in first_item or len(first_item)>author_max_len:
             authors_case = 'first_item_too_long'
-        if len(ref_items_list)>1:
+        if idx_max>0:
             if authors_case=='first_item_too_long':
                 # Searching for possible author name in second item
                 second_item = ref_items_list[1]
@@ -261,11 +319,14 @@ def _build_authors_attr(ref_items_list):
                     et_al = "etc."
             else:
                 # Searching for possible author names beginning from first item
-                first_author, et_al, authors_case = _search_authors_in_items(ref_items_list)
-    return first_author, et_al, authors_case
+                first_author, et_al, authors_case, auth_idx_max = _search_authors_in_items(ref_items_list,
+                                                                                           verbose)
+    if verbose:
+        print("\n    Authors search in item:", first_author, et_al, authors_case, auth_idx_max)
+    return first_author, et_al, authors_case, auth_idx_max
 
 
-def _set_dotted_initials(first_author):
+def _set_dotted_initials(first_author, verbose):
     dotted_first_author = first_author
     initial_dot = '.'
     if first_author!=bp_pg.UNKNOWN and initial_dot not in first_author:
@@ -274,57 +335,65 @@ def _set_dotted_initials(first_author):
         initials_list = [f'{x}{initial_dot}' for x in initials.split("-") if x]
         new_initials = '-'.join(initials_list)
         dotted_first_author = f'{lastname} {new_initials}'
+    if verbose:
+        print("\n    Dotted first author:", dotted_first_author)
     return dotted_first_author
 
 
-def _find_ref_authors(ref_items_list):
-    first_author, et_al, authors_case = _build_authors_attr(ref_items_list)
-    dotted_first_author = _set_dotted_initials(first_author)
+def _find_ref_authors(ref_items_list, verbose):
+    first_author, et_al, authors_case, auth_idx_max = _build_authors_attr(ref_items_list,
+                                                                          verbose)
+    dotted_first_author = _set_dotted_initials(first_author, verbose)
     authors = dotted_first_author
     if dotted_first_author!=bp_pg.UNKNOWN and "et al." not in dotted_first_author:
         authors = f'{dotted_first_author} {et_al}'
-    return authors, authors_case
+    if verbose:
+        print("\n    Authors search:", authors, authors_case, auth_idx_max)
+    return authors, authors_case, auth_idx_max
 
 
-def _found_ref_title(ref_items_list, search_title_params):
-    authors_case, year, year_item_idx, doi, doi_item_idx = search_title_params
+def _found_ref_title(ref_items_list, search_title_params, verbose):
+    authors_case, year, year_item_idx, doi, doi_item_idx, auth_idx_max = search_title_params
     mod_ref_items_list = [x.strip() + ", " for x in ref_items_list]
-    idx = 0
-    if authors_case not in ['no_authors', 'first_item_too_long', 'partial_one_item']:
-        if authors_case in ['with_et_al', 'single_one_item']:
-            idx = 1
-        elif authors_case=='multiple_one_item_w_dot':
-            while "., " in mod_ref_items_list[idx]:
-                idx += 1
-        elif authors_case=='multiple_one_item_wo_dot':
-            while re.findall(bp_rg.RE_SCOPUS_AUTHOR_NAME, mod_ref_items_list[idx]):
-                idx += 1
-        elif authors_case=='single_two_items':
-            idx += 2
-        elif authors_case=='multiple_two_items_w_dot':
-            while "., " in mod_ref_items_list[idx + 1]:
-                idx += 2
+    idx_max = len(ref_items_list)-1
+    title_item_idx, title =  0, bp_pg.UNKNOWN
+    authors_exclude_cases = ['no_authors', 'first_item_too_long', 'partial_one_item']
+    authors_test = all([authors_case not in authors_exclude_cases, auth_idx_max<idx_max])
+    if verbose:
+        print("        idx_max     :", idx_max)
+        print("        auth_idx_max:", auth_idx_max)
+        print("        authors_test:", authors_test)
+    if authors_test:
+        idx = auth_idx_max + 1
+        if authors_case=='multiple_two_items_w_dot':
             while re.findall(bp_rg.RE_SCOPUS_REF_DOT, mod_ref_items_list[idx]):
                 # Incrementing idx for presence of dot after 1 or 2 characters")
                 idx += 1
-        elif authors_case=='multiple_two_items_wo_dot':
-            while re.findall(bp_rg.RE_SCOPUS_AUTHOR_INITIALS, mod_ref_items_list[idx + 1]):
-                idx += 2
-            while re.findall(bp_rg.RE_SCOPUS_REF_DOT, mod_ref_items_list[idx]):
-                # Incrementing idx for presence of dot after 1 or 2 characters")
-                idx += 1
+                if idx>idx_max:
+                    break
+        if verbose:
+            print("\n        Title idx    :", idx)
+            print("        doi_item_idx :", doi_item_idx)
+            print("        year_item_idx:", year_item_idx)
         if ((idx==doi_item_idx and doi!=bp_pg.UNKNOWN)
             or (year_item_idx==0 and year!=bp_pg.UNKNOWN)):
             # Incrementing idx for conflicts with doi or year indices")
             idx += 1
-    title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
+        if verbose:
+            print("        Title idx    :", idx)
+            print("        Title        :", title)
+        title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
+    if authors_case=='no_authors':
+        title = ref_items_list[0]
     if title==f'({year})' and year!=bp_pg.UNKNOWN:
         # Incrementing idx for title equality with (dddd) as year-item
-        idx += 1
+        idx = title_item_idx + 1
         title_item_idx, title = _try_list_idx(idx, idx, ref_items_list)
     if title==ref_items_list[doi_item_idx] and doi!=bp_pg.UNKNOWN:
         # Not keeping DOI as title
         title = bp_pg.UNKNOWN
+    if verbose:
+        print("\n    Ref title search:", title_item_idx, title)
     return title_item_idx, title
 
 
@@ -335,7 +404,7 @@ def _split_long_item_by_dot(item_txt):
     return item_txt_start, item_txt_end
 
 
-def _select_journal_part(item_txt, colon, journal):
+def _select_journal_part(item_txt, colon, journal, verbose):
     journal_item_part = item_txt
     if colon:
         item_parts_list = item_txt.split(":")
@@ -345,24 +414,48 @@ def _select_journal_part(item_txt, colon, journal):
                 break
     else:
         if " in " in item_txt:
+            if verbose:
+                print("    item_txt:", item_txt)
             txt = item_txt
             while txt:
                 txt_parts = txt.split(" in ")
                 txt_start, txt_end = txt_parts[0], txt_parts[-1]
                 txt_start_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_start)
                 txt_end_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_end)
-                if len(txt_parts)==2:
+
+
+                if verbose:
+                    print("        txt:", txt)
+                    print("        txt_parts:", txt_parts)
+                    print("        txt_start:", txt_start)
+                    print("        txt_start_search:", txt_start_search)
+                    print("        txt_end:",txt_end)
+                    print("        txt_end_search:", txt_end_search)
+                txt_search = any([txt_start_search, txt_end_search])
+                if verbose:
+                    print("        txt_search:", txt_search)
+
+                if len(txt_parts)==2 and txt_search:
+                    if verbose:
+                        print("        len=2 and txt_search true")
                     if txt_start_search:
                         journal, journal_item_part = txt, txt
                         txt = ''
                     elif txt_end_search:
                         journal, journal_item_part = f'in {txt_end}', txt_end
                         txt = ''
-                else:
+                elif len(txt_parts)>2:
+                    if verbose:
+                        print("        len >2")
                     txt = " in ".join(txt_parts[0:-1])
                     if txt_end_search:
                         journal, journal_item_part = f'in {txt_end}', txt_end
                         txt = ''
+                else:
+                    if verbose:
+                        print("        else")
+                    journal, journal_item_part = '', ''
+                    txt = ''
         years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEAR, item_txt)
         if years_list:
             journal_item_part = item_txt.split(years_list[0])[-1]
@@ -417,9 +510,10 @@ def _clean_journal_and_title(cleaning_params):
     return clean_journal, clean_title
 
 
-def _find_ref_journal(ref_items_list, search_journal_params):
-    authors_case, title_item_idx, title_item, doi = search_journal_params
+def _find_ref_journal(ref_items_list, search_journal_params, verbose):
+    authors_case, title_item_idx, title_item, doi, auth_idx_max = search_journal_params
     title = title_item
+    idx_max = len(ref_items_list) - 1
     journal_item_idx, journal, journal_item_part = 0, bp_pg.UNKNOWN, ''
     journal_item_parts_list = []
     if authors_case in ['first_item_too_long', 'partial_one_item']:
@@ -431,7 +525,7 @@ def _find_ref_journal(ref_items_list, search_journal_params):
             item_txt, colon = title_item, False
             if ":" in title_item_end:
                 item_txt, colon = title_item_end, True
-            journal, _ = _select_journal_part(item_txt, colon, journal)
+            journal, _ = _select_journal_part(item_txt, colon, journal, verbose)
         else:
             if len(ref_items_list)>1:
                 second_item = ref_items_list[1]
@@ -440,40 +534,62 @@ def _find_ref_journal(ref_items_list, search_journal_params):
     else:
         journal_item_idx_list, journals_list = [], []
         # First item not too long as author names
-        idx_init = 0
+        idx_init = auth_idx_max
         if len(ref_items_list)>1:
-            idx_init = 1
-
-        for item_idx, ref_item in enumerate(ref_items_list):
-            check_journal = all([re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, ref_item),
-                                 ref_item!=doi, item_idx>=idx_init])
+            idx_init += 1
+        search_items_list = ref_items_list[idx_init:]
+        if verbose:
+            print()
+            print("    Journal search_items_list:", search_items_list)
+        for search_idx, search_item in enumerate(search_items_list):
+            item_idx = search_idx + idx_init
+            _journal_item_idx, _journal, journal_item_part = item_idx, '', ''
+            check_journal = all([re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item),
+                                 search_item!=doi, item_idx>=idx_init])
+            if verbose:
+                print()
+                print("    search_item:", search_item)
+                print("        re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item):",
+                      re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item))
+                print("        check_journal:", check_journal)
             if check_journal:
-                colon, _journal_item_idx, _journal = False, item_idx, ref_item.strip()
-                _journal, journal_item_part = _select_journal_part(ref_item, colon, _journal)
-                journal_item_idx_list.append(_journal_item_idx)
-                journals_list.append(_journal)
-                journal_item_parts_list.append(journal_item_part)
+                colon, _journal_item_idx, _journal = False, item_idx, search_item.strip()
+                _journal, journal_item_part = _select_journal_part(search_item, colon, _journal, verbose)
 
-            check_dots = all([len(part)>2 and '.' in part for part in ref_item.split(" ")]
-                             + [ref_item!=doi, item_idx>=idx_init])
+            check_dots = all([len(part)>2 and '.' in part for part in search_item.split(" ")]
+                             + [search_item!=doi, item_idx>=idx_init])
+            if verbose:
+                print("        check_dots:", check_dots)
             if check_dots:
-                _journal_item_idx, _journal, journal_item_part = item_idx, ref_item.strip(), ref_item
+                _journal_item_idx, _journal, journal_item_part = item_idx, search_item.strip(), search_item
+
+            if journal_item_part:
                 journal_item_idx_list.append(_journal_item_idx)
                 journals_list.append(_journal)
                 journal_item_parts_list.append(journal_item_part)
 
         if journals_list:
+            if verbose:
+                print("\n    journals_list:", journals_list)
             journal_item_idx, journal = journal_item_idx_list[0], journals_list[0]
         else:
             # No results of journal search in all items
-            journal_item_idx, journal = _try_next_items(ref_items_list, title_item_idx, doi)
-            journal_item_parts_list = [journal]
-
+            init_item_idx = max(title_item_idx, auth_idx_max)
+            if verbose:
+                print("\n\n    init_item_idx:", init_item_idx)
+            if init_item_idx<idx_max:
+                journal_item_idx, journal = _try_next_items(ref_items_list, init_item_idx, doi)
+                journal_item_parts_list = [journal]
+    if verbose:
+        print("\n    Journal search:", journal, title, journal_item_parts_list)
     cleaning_params = [journal, title_item_idx, title, doi, journal_item_parts_list, ref_items_list]
     clean_journal, clean_title = _clean_journal_and_title(cleaning_params)
+    if verbose:
+        print("\n    Journal and title clean:", journal_item_idx, clean_journal, clean_title)
     return journal_item_idx, clean_journal, clean_title
 
 
+# Functions for cleaning raw reference
 def _merge_ref_item(ref_item, ref_items_list, new_item_idx, ref_new_item):
     items_idx_max = len(ref_items_list) - 1
     item_end_part = ref_item.split(": ")[1]
@@ -619,32 +735,46 @@ def _clean_ref(raw_ref):
     return new_ref
 
 
-def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
-    # Setting named tuple
-    article_ref = namedtuple('article_ref', ref_cols_list)
+def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, verbose_ref_id):
+    # Setting named tuple for the keeping the reference parsing results
+    pub_ref_tup = namedtuple('pub_ref', ref_cols_list)
 
     pub_refs_list =[]
     if isinstance(ref_field, str):
         # If the reference field is not empty and not an URL
         raw_refs_list = [x for x in ref_field.split("; ") if x]
-        for raw_ref in raw_refs_list:
-            if verbose:
-                print("\n\nraw_ref       :", raw_ref)
-            ref = _clean_ref(raw_ref)
-            ref_items_list = ref.split(", ")
-            if verbose:
-                print("ref           :", ref)
-                print("ref_items_list:", ref_items_list)
+        for ref_idx, raw_ref in enumerate(raw_refs_list):
+            ref_verbose = False
+            try:
+                if pub_verbose:
+                    print("\n\n\n\nREF INDEX     :", ref_idx)
+                    print("raw_ref       :", raw_ref)
+                    if ref_idx==verbose_ref_id:
+                       ref_verbose = True
+                ref = _clean_ref(raw_ref)
+                ref_items_list = ref.split(", ")
+                if ref_verbose:
+                    print("ref           :", ref)
+                    print("ref_items_list:", ref_items_list)
 
-            doi_item_idx, doi = _find_ref_doi(ref_items_list)
-            year_item_idx, year = _find_ref_year(ref_items_list, doi_item_idx, doi, ref)
-            authors, authors_case = _find_ref_authors(ref_items_list)
-            search_title_params = [authors_case, year, year_item_idx, doi, doi_item_idx]
-            title_item_idx, title_item = _found_ref_title(ref_items_list, search_title_params)
-            search_journal_params = [authors_case, title_item_idx, title_item, doi]
-            _, journal, title = _find_ref_journal(ref_items_list, search_journal_params)
+                doi_item_idx, doi = _find_ref_doi(ref_items_list, ref_verbose)
+                year_item_idx, year = _find_ref_year(ref_items_list, doi_item_idx, doi, ref, ref_verbose)
+                authors, authors_case, auth_idx_max = _find_ref_authors(ref_items_list, ref_verbose)
+                search_title_params = [authors_case, year, year_item_idx, doi, doi_item_idx, auth_idx_max]
+                title_item_idx, title_item = _found_ref_title(ref_items_list, search_title_params, ref_verbose)
+                search_journal_params = [authors_case, title_item_idx, title_item, doi, auth_idx_max]
+                _, journal, title = _find_ref_journal(ref_items_list, search_journal_params, ref_verbose)
 
-            if verbose:
+            except Exception as e:
+                error_message = (f"\n\nWARNING: {e}:"
+                                 f"\n    Pub_id       : {pub_id}"
+                                 f"\n    Reference index: {ref_idx}"
+                                 f"\n    Raw reference: {raw_ref}")
+                print(error_message)
+                year, authors, journal, doi, title = [bp_pg.UNKNOWN] * 5
+
+            if ref_verbose:
+                print("\n\n    raw_ref       :", raw_ref)
                 print("    year          :", year)
                 print("    authors       :", authors)
                 print("    journal       :", journal)
@@ -657,11 +787,11 @@ def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
                     title = f'{title}, {journal}'
                     journal = bp_pg.UNKNOWN
 
-            pub_refs_list.append(article_ref(pub_id, authors, year, journal, doi, title, raw_ref))
+            pub_refs_list.append(pub_ref_tup(pub_id, authors, year, journal, doi, title, raw_ref))
     return pub_refs_list
 
 
-def build_scopus_references(corpus_df, cols_tup, verbose=False):
+def build_scopus_references(corpus_df, cols_tup, verbose_pub_id=None, verbose_ref_id=None):
     """Builds the data of cited references per publication of the corpus.
 
     The structure of the built data is composed of 6 columns and one row per reference and per publication.
@@ -673,6 +803,9 @@ def build_scopus_references(corpus_df, cols_tup, verbose=False):
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
         cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+        verbose_pub_id (int): Optional publication identifier selected for printing parsing information (default: None).
+        verbose_ref_id (int): Optional identifier of the reference of the above publication selected for printing detailed \
+        information of parsing steps (default: None).
     Returns:
         (dataframe): The built data.
     """
@@ -684,9 +817,11 @@ def build_scopus_references(corpus_df, cols_tup, verbose=False):
 
     refs_list =[]
     for pub_id, ref_field in zip(list(corpus_df[pub_id_col]), corpus_df[scopus_ref_col]):
-        if verbose:
+        pub_verbose = False
+        if pub_id==verbose_pub_id:
+            pub_verbose = True
             print("\n\npub_id:", pub_id)
-        pub_refs_list = _build_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose)
+        pub_refs_list = _build_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, verbose_ref_id)
         refs_list += pub_refs_list
     references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
                                             for idx, label in enumerate(ref_cols_list)})
