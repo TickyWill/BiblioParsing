@@ -11,7 +11,7 @@ pip install git+https://github.com/TickyWill/BiblioParsing.git@main
 ## Usage example
 ```python
 from pathlib import Path
-import BiblioParsing as bp
+import biblioparsing as bp
 
 # Getting the filenames for each parsing item
 config_tup = bp.set_user_config()

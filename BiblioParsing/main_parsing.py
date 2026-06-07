@@ -13,11 +13,11 @@ from pathlib import Path
 import pandas as pd
 
 # Local library imports
-import BiblioParsing.parsing_globals as bp_pg
-from BiblioParsing.scopus_parsing import scopus_parser
-from BiblioParsing.scopus_rawdata_utils import read_scopus_rawdata
-from BiblioParsing.wos_parsing import wos_parser
-from BiblioParsing.wos_rawdata_utils import read_wos_rawdata
+import biblioparsing.parsing_globals as bp_pg
+from biblioparsing.scopus_parsing import scopus_parser
+from biblioparsing.scopus_rawdata_utils import read_scopus_rawdata
+from biblioparsing.wos_parsing import wos_parser
+from biblioparsing.wos_rawdata_utils import read_wos_rawdata
 
 
 def merge_database(database, filename, in_dir, out_dir):
@@ -56,8 +56,8 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
     """Parses corpus rawdata using the appropriate parser.
 
     Two parsers are available:
-    - `wos_parser` function imported from `wos_parsing` module;
-    - `scopus_parser` function imported from `scopus_parsing` module.
+    - `wos_parser` function imported from the `wos_parsing` module;
+    - `scopus_parser` function imported from the `scopus_parsing` module.
 
     Args:
         rawdata_path (path): The full path to the corpus rawdata.

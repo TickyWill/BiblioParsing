@@ -21,8 +21,8 @@ __all__ = ['AFFIL_COL_NAMES',
 
 
 # Local imports
-import BiblioParsing.regex_globals as bp_rg
-from BiblioParsing.parsing_utils import remove_special_symbol
+import biblioparsing.regex_globals as bp_rg
+from biblioparsing.general_utils import remove_special_symbol
 
 
 # *********************************************

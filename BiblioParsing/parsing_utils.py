@@ -15,9 +15,9 @@ __all__ = ['build_item_df_from_tup',
            'normalize_journal_names',
            'normalize_name',
            'rationalize_town_names',
-           'remove_special_symbol',
            'set_address_uniform_words',
            'set_rawdata_error',
+           'set_shared_parsing_cols',
            'set_unknown_address',
            'standardize_address',
            'standardize_str',
@@ -30,11 +30,9 @@ __all__ = ['build_item_df_from_tup',
 
 
 # Standard library imports
-import functools
 import operator
 import os
 import re
-import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -45,11 +43,12 @@ import pandas as pd
 import nltk
 
 # Local library imports
-import BiblioParsing.affiliations_globals as bp_ag
-import BiblioParsing.general_globals as bp_gg
-import BiblioParsing.parsing_cols_globals as bp_pcg
-import BiblioParsing.parsing_globals as bp_pg
-import BiblioParsing.regex_globals as bp_rg
+import biblioparsing.affiliations_globals as bp_ag
+import biblioparsing.general_globals as bp_gg
+import biblioparsing.parsing_cols_globals as bp_pcg
+import biblioparsing.parsing_globals as bp_pg
+import biblioparsing.regex_globals as bp_rg
+from biblioparsing.general_utils import remove_special_symbol
 
 
 def str_int_convertor(x):
@@ -446,7 +445,8 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
             - capitalizing firstname,
             - capitalizing lastname,
             - removing comma and dot.
-    It uses the internal funtion `remove_special_symbol`of the same module.
+    It uses the internal funtion `remove_special_symbol` funcion imported 
+    from the `general_utils` module..
        ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
            >>> "Grol-Bica-Velu D'Aillon E-KJ".
 
@@ -685,6 +685,53 @@ def upgrade_col_names(corpus_folder):
                     print(f'*** The EMPTY file {os.path.join(dirpath,file)} has been upgraded ***')
 
 
+def set_shared_parsing_cols():
+    """Builds 2 dict setting columns lists and selected columns names 
+    shared for the processe of parsing rawdata of any data type.
+
+    Globals are imported from the `parsing_cols_globals` module (imported as bp_pcg).
+
+    Returns:
+        (tup): (A dict valued by column-names lists for each parsing item \
+        and temporary column names defined by the 'COL_NAMES' global, \
+        A dict valued by column names of parsing results defined by the \
+        'COL_NAMES' and 'NORM_JOURNAL_COLUMN_LABEL' globals).
+    """
+    cols_lists_dic = {'articles_cols_list'   : bp_pcg.COL_NAMES['articles'],
+                      'address_cols_list'    : bp_pcg.COL_NAMES['address'],
+                      'auth_cols_list'       : bp_pcg.COL_NAMES['authors'],
+                      'auth_affil_cols_list' : bp_pcg.COL_NAMES['auth_inst'],
+                      'country_cols_list'    : bp_pcg.COL_NAMES['country'],
+                      'affil_cols_list'      : bp_pcg.COL_NAMES['institution'],
+                      'kw_cols_list'         : bp_pcg.COL_NAMES['keywords'],
+                      'ref_cols_list'        : bp_pcg.COL_NAMES['references'],
+                      'tmp_cols_list'        : bp_pcg.COL_NAMES['temp_col'],
+                     }
+
+    cols_dic = {'pub_id_col'          : bp_pcg.COL_NAMES['pub_id'],
+                'subject_col'         : bp_pcg.COL_NAMES['subject'][1],
+                'sub_subject_col'     : bp_pcg.COL_NAMES['sub_subject'][1],
+                'affil_author_idx_col': bp_pcg.COL_NAMES['auth_inst'][1],
+                'norm_affils_col'     : bp_pcg.COL_NAMES['auth_inst'][4],
+                'address_col'         : bp_pcg.COL_NAMES['address'][2],
+                'country_col'         : bp_pcg.COL_NAMES['country'][2],
+                'affil_col'           : bp_pcg.COL_NAMES['institution'][2],
+                'author_idx_col'      : bp_pcg.COL_NAMES['authors'][1],
+                'co_authors_col'      : bp_pcg.COL_NAMES['authors'][2],
+                'keyword_col'         : bp_pcg.COL_NAMES['keywords'][1],
+                'title_temp_col'      : bp_pcg.COL_NAMES['temp_col'][2],
+                'kept_tokens_col'     : bp_pcg.COL_NAMES['temp_col'][4],
+                'author_col'          : bp_pcg.COL_NAMES['articles'][1],
+                'year_col'            : bp_pcg.COL_NAMES['articles'][2],
+                'doc_type_col'        : bp_pcg.COL_NAMES['articles'][7],
+                'title_col'           : bp_pcg.COL_NAMES['articles'][9],
+                'issn_col'            : bp_pcg.COL_NAMES['articles'][10],
+                'norm_journal_col'    : bp_pcg.NORM_JOURNAL_COLUMN_LABEL,
+               }
+
+    return cols_lists_dic, cols_dic
+
+
 def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     """Replaces in the string 'text' symbols and words defined by the keys 
     of the dictionaries dic_town_symbols and dic_town_words by their 
@@ -717,40 +764,14 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     return text
 
 
-def remove_special_symbol(text, only_ascii=True, strip=True):
-    """The function `remove_special_symbol` removes accentuated characters in the string 'text'
-    and ignore non-ascii characters if 'only_ascii' is true.
-
-    Finally, spaces at the ends of 'text' are removed if strip is true.
-
-    Args:
-        text (str): The text where to remove special symbols.
-        only_ascii (boolean): If True, non-ascii characters are removed from 'text' (default: True).
-        strip (boolean): If True, spaces at the ends of 'text' are removed (default: True).
-    Returns:
-        (str): The modified string 'text'.
-    """
-    if only_ascii:
-        nfc = functools.partial(unicodedata.normalize,'NFD')
-        text = nfc(text). \
-                   encode('ascii', 'ignore'). \
-                   decode('utf-8')
-    else:
-        nfkd_form = unicodedata.normalize('NFKD',text)
-        text = ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
-
-    if strip:
-        text = text.strip()
-    return text
-
-
 def standardize_str(raw_str):
     """Standardize a general string without implicite origin of the string.
 
     First, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global, apostrophes are replaced 
     by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are droped 
-    using 'SYMB_DROP' global. These globals are imported from the `BiblioParsing` package imported as "bp". 
-    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion of the same module.
+    using 'SYMB_DROP' global. These globals are imported from the `general.globals` module (imported as bp_gg). 
+    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion imported 
+    from the `general_utils` module.
 
     Args:
         raw_str (str): the raw string to be standardized.
@@ -797,7 +818,7 @@ def standardize_address(raw_address, add_unknown_country=True):
 
     First, the address string is standardized through the `standardize_str` function of the same module. 
     Then, the aliases of a given word are captured using a specific regex which is case sensitive defined 
-    by the global 'RE_AFFIL_WORD_PATTERN_DIC' imported from the `BiblioParsing.regex_globals` module. 
+    by the global 'RE_AFFIL_WORD_PATTERN_DIC' imported from the `regex_globals` module (imported as bp_rg). 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
     The length of the aliases is limited to a maximum according to the longest alias known.
         ex: The longest alias known for the word 'University' is 'Universidade'. 

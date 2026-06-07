@@ -12,23 +12,25 @@ import numpy as np
 import pandas as pd
 
 # Local libray imports
-import BiblioParsing.parsing_cols_globals as bp_pcg
-import BiblioParsing.parsing_globals as bp_pg
-import BiblioParsing.regex_globals as bp_rg
-from BiblioParsing.parsing_utils import build_pub_db_ids
-from BiblioParsing.parsing_utils import check_and_drop_columns
-from BiblioParsing.parsing_utils import check_and_get_rawdata_file_path
-from BiblioParsing.parsing_utils import drop_rawdata
-from BiblioParsing.parsing_utils import normalize_country
-from BiblioParsing.parsing_utils import normalize_journal_names
-from BiblioParsing.parsing_utils import normalize_name
-from BiblioParsing.parsing_utils import remove_special_symbol
-from BiblioParsing.parsing_utils import standardize_str
+import biblioparsing.parsing_cols_globals as bp_pcg
+import biblioparsing.parsing_globals as bp_pg
+import biblioparsing.regex_globals as bp_rg
+from biblioparsing.general_utils import remove_special_symbol
+from biblioparsing.parsing_utils import build_pub_db_ids
+from biblioparsing.parsing_utils import check_and_drop_columns
+from biblioparsing.parsing_utils import check_and_get_rawdata_file_path
+from biblioparsing.parsing_utils import drop_rawdata
+from biblioparsing.parsing_utils import normalize_country
+from biblioparsing.parsing_utils import normalize_journal_names
+from biblioparsing.parsing_utils import normalize_name
+from biblioparsing.parsing_utils import standardize_str
 
 
 def _set_scopus_rawdata_cols():
     """Builds 2 dict setting selected columns names for the process of getting 
     and cleaning Scopus rawdata.
+
+    Globals are imported from the `parsing_cols_globals` module (imported as bp_pcg).
 
     Returns:
         (tup): (A dict valued by column names of parsing results defined by the \

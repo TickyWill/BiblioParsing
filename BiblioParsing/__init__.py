@@ -1,3 +1,5 @@
+""" `biblioparsing` package __init__.
+"""
 __version__ = '3.0.0'
 __author__ = 'BiblioAnalysis team'
 __license__ = 'MIT'
@@ -9,23 +11,24 @@ import os
 import nltk
 
 # Local imports
-from BiblioParsing.general_globals import *
-from BiblioParsing.parsing_cols_globals import *
-from BiblioParsing.parsing_globals import *
-from BiblioParsing.regex_globals import *
-from BiblioParsing.affiliations_globals import *
-from BiblioParsing.parsing_utils import *
-from BiblioParsing.affil_norm_utils import *
-from BiblioParsing.scopus_rawdata_utils import *
-from BiblioParsing.scopus_parsing import *
-from BiblioParsing.scopus_parsing_complements import *
-from BiblioParsing.wos_rawdata_utils import *
-from BiblioParsing.wos_parsing import *
-from BiblioParsing.wos_parsing_complements import *
-from BiblioParsing.affiliations_parsing import *
-from BiblioParsing.concat_parsing import *
-from BiblioParsing.main_parsing import *
-from BiblioParsing.demo_utils import *
+from biblioparsing.general_utils import *
+from biblioparsing.general_globals import *
+from biblioparsing.parsing_cols_globals import *
+from biblioparsing.parsing_globals import *
+from biblioparsing.regex_globals import *
+from biblioparsing.affiliations_globals import *
+from biblioparsing.parsing_utils import *
+from biblioparsing.affil_norm_utils import *
+from biblioparsing.scopus_rawdata_utils import *
+from biblioparsing.scopus_parsing import *
+from biblioparsing.scopus_parsing_complements import *
+from biblioparsing.wos_rawdata_utils import *
+from biblioparsing.wos_parsing import *
+from biblioparsing.wos_parsing_complements import *
+from biblioparsing.affiliations_parsing import *
+from biblioparsing.concat_parsing import *
+from biblioparsing.main_parsing import *
+from biblioparsing.demo_utils import *
 
 def download_nltk_data():
     """The function `download_nltk_data` downloads complementary libraries for nltk

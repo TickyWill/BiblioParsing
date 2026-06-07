@@ -14,11 +14,11 @@ import numpy as np
 import pandas as pd
 
 # Local library imports
-import BiblioParsing.general_globals as bp_gg
-import BiblioParsing.parsing_cols_globals as bp_pcg
-import BiblioParsing.parsing_globals as bp_pg
-from BiblioParsing.affiliations_parsing import build_norm_and_raw_affils
-from BiblioParsing.affiliations_parsing import extend_author_affils
+import biblioparsing.general_globals as bp_gg
+import biblioparsing.parsing_cols_globals as bp_pcg
+import biblioparsing.parsing_globals as bp_pg
+from biblioparsing.affiliations_parsing import build_norm_and_raw_affils
+from biblioparsing.affiliations_parsing import extend_author_affils
 
 
 def _set_dedup_cols():
@@ -79,7 +79,7 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
 
     Then it proceeds with extending the "author with institutions" parsing data 
     using the `extend_author_affils` function imported from the 
-    `BiblioParsing.BiblioParsingInstitutions` module.
+    `biblioparsing.affilations_parsing` module.
 
     Args:
         first_parsing_dict (dict): The dict keyed by parsing items (str) and valued by data \
@@ -311,7 +311,7 @@ def _drop_duplicate_article2(df, cols_list):
                                   f'are found in the group of publication data with IDs {pub_ids_list} '
                                   f'in "_deduplicate_articles" function '
                                   f'called by "parsing_concatenate_deduplicate" function '
-                                  f'of "BiblioParsingConcat.py" module.\n'
+                                  f'of "concat_parsing.py" module.\n'
                                   f'Publications data with DOIs "{bp_pg.UNKNOWN}" has been droped')
             print(warning)
         dfs_list.append(dg)

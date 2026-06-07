@@ -21,7 +21,7 @@ import os
 from pathlib import Path
 
 # Local library imports
-import BiblioParsing.parsing_globals as bp_pg
+import biblioparsing.parsing_globals as bp_pg
 
 
 def _get_demo_config():

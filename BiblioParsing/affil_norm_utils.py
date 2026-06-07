@@ -17,14 +17,13 @@ import openpyxl
 import pandas as pd
 
 # Local library imports
-import BiblioParsing as bp
-import BiblioParsing.affiliations_globals as bp_ag
-import BiblioParsing.general_globals as bp_gg
-import BiblioParsing.regex_globals as bp_rg
-from BiblioParsing.parsing_utils import dict_print
-from BiblioParsing.parsing_utils import remove_special_symbol
-from BiblioParsing.parsing_utils import rationalize_town_names
-from BiblioParsing.parsing_utils import set_address_uniform_words
+import biblioparsing.affiliations_globals as bp_ag
+import biblioparsing.general_globals as bp_gg
+import biblioparsing.regex_globals as bp_rg
+from biblioparsing.general_utils import remove_special_symbol
+from biblioparsing.parsing_utils import dict_print
+from biblioparsing.parsing_utils import rationalize_town_names
+from biblioparsing.parsing_utils import set_address_uniform_words
 
 
 def _build_words_set(raw_aff, verbose=False):
@@ -130,7 +129,7 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
 
     # Setting the path for the 'Country_affiliations.xlsx' file
     if not country_affiliations_file_path:
-        rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
+        rep_utils_path = Path(__file__).parent / Path(bp_gg.REP_UTILS)
         country_affils_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['country_affils_file']
         country_affiliations_file_path = rep_utils_path / Path(country_affils_file)
 
@@ -181,7 +180,7 @@ def read_affil_types(affil_types_file_path=None):
 
     # Setting the full path for the file of ordered institutions types
     if not affil_types_file_path:
-        rep_utils_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
+        rep_utils_path = Path(__file__).parent / Path(bp_gg.REP_UTILS)
         affil_types_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['affil_types_file']
         affil_types_file_path = rep_utils_path / Path(affil_types_file)
 
@@ -198,8 +197,9 @@ def read_affil_types(affil_types_file_path=None):
 def read_towns_per_country(country_towns_file=None, country_towns_folder_path=None):
     """Builds dict keyed by countries and valued by a list of towns of the country.
 
-    It uses the functions `rationalize_town_names`and `remove_special_symbol`
-    imported from the `BiblioParsing.BiblioParsingUtils` module.
+    It uses the `rationalize_town_names` function imported from 
+    the `parsing_utils` module and the `remove_special_symbol`
+    function imported from the `general_utils` module.
 
     Args:
         country_towns_file (str): File name of the list of towns per country.
@@ -210,7 +210,7 @@ def read_towns_per_country(country_towns_file=None, country_towns_folder_path=No
     """
     # Setting the path of the file of towns par country
     if not country_towns_folder_path:
-        country_towns_folder_path = Path(bp.__file__).parent / Path(bp_gg.REP_UTILS)
+        country_towns_folder_path = Path(__file__).parent / Path(bp_gg.REP_UTILS)
     if not country_towns_file:
         country_towns_file = bp_ag.AFFIL_DEFAULT_FILES_DIC['country_towns_file']
     file_path = country_towns_folder_path / Path(country_towns_file)

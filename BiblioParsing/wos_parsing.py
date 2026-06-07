@@ -11,31 +11,37 @@ from collections import namedtuple
 import pandas as pd
 
 # Local library imports
-import BiblioParsing.affiliations_globals as bp_ag
-import BiblioParsing.parsing_cols_globals as bp_pcg
-import BiblioParsing.parsing_globals as bp_pg
-import BiblioParsing.regex_globals as bp_rg
-from BiblioParsing.affiliations_parsing import build_addr_affils_tup
-from BiblioParsing.affiliations_parsing import extend_author_affils
-from BiblioParsing.parsing_utils import build_item_df_from_tup
-from BiblioParsing.parsing_utils import build_title_keywords
-from BiblioParsing.parsing_utils import clean_authors_countries_affils
-from BiblioParsing.parsing_utils import normalize_country
-from BiblioParsing.parsing_utils import normalize_name
-from BiblioParsing.parsing_utils import set_unknown_address
-from BiblioParsing.parsing_utils import standardize_address
-from BiblioParsing.parsing_utils import str_int_convertor
-from BiblioParsing.parsing_utils import treat_author
-from BiblioParsing.parsing_utils import treat_doctype
-from BiblioParsing.parsing_utils import treat_title
-from BiblioParsing.wos_rawdata_utils import read_wos_rawdata
-from BiblioParsing.wos_parsing_complements import build_wos_subjects_and_sub_subjects
-from BiblioParsing.wos_parsing_complements import build_wos_references
+import biblioparsing.affiliations_globals as bp_ag
+import biblioparsing.parsing_cols_globals as bp_pcg
+import biblioparsing.parsing_globals as bp_pg
+import biblioparsing.regex_globals as bp_rg
+from biblioparsing.affiliations_parsing import build_addr_affils_tup
+from biblioparsing.affiliations_parsing import extend_author_affils
+from biblioparsing.parsing_utils import build_item_df_from_tup
+from biblioparsing.parsing_utils import build_title_keywords
+from biblioparsing.parsing_utils import clean_authors_countries_affils
+from biblioparsing.parsing_utils import normalize_country
+from biblioparsing.parsing_utils import normalize_name
+from biblioparsing.parsing_utils import set_shared_parsing_cols
+from biblioparsing.parsing_utils import set_unknown_address
+from biblioparsing.parsing_utils import standardize_address
+from biblioparsing.parsing_utils import str_int_convertor
+from biblioparsing.parsing_utils import treat_author
+from biblioparsing.parsing_utils import treat_doctype
+from biblioparsing.parsing_utils import treat_title
+from biblioparsing.wos_rawdata_utils import read_wos_rawdata
+from biblioparsing.wos_parsing_complements import build_wos_subjects_and_sub_subjects
+from biblioparsing.wos_parsing_complements import build_wos_references
 
 
 def _set_wos_parsing_cols():
     """Builds 3 dict setting columns list and selected columns names 
     for the process of parsing WoS rawdata.
+
+    The shared columns info with other rawdata types are set through 
+    the `set_shared_parsing_cols`function imported from the 
+    `parsing_utils` module. 
+    Globals are imported from the `parsing_cols_globals` module (imported as bp_pcg).
 
     Returns:
         (tup): (A dict valued by column-names lists for each parsing item \
@@ -44,40 +50,12 @@ def _set_wos_parsing_cols():
         'COL_NAMES' global, A dict valued by column names of rawdata defined \
         by the 'COLUMN_LABEL_WOS' and 'COLUMN_LABEL_WOS_PLUS' globals).
     """
-    cols_lists_dic = {'articles_cols_list'   : bp_pcg.COL_NAMES['articles'],
-                      'address_cols_list'    : bp_pcg.COL_NAMES['address'],
-                      'auth_cols_list'       : bp_pcg.COL_NAMES['authors'],
-                      'auth_affil_cols_list' : bp_pcg.COL_NAMES['auth_inst'],
-                      'country_cols_list'    : bp_pcg.COL_NAMES['country'],
-                      'affil_cols_list'      : bp_pcg.COL_NAMES['institution'],
-                      'kw_cols_list'         : bp_pcg.COL_NAMES['keywords'],
-                      'ref_cols_list'        : bp_pcg.COL_NAMES['references'],
-                      'subject_cols_list'    : bp_pcg.COL_NAMES['subject'],
-                      'sub_subject_cols_list': bp_pcg.COL_NAMES['sub_subject'],
-                      'tmp_cols_list'        : bp_pcg.COL_NAMES['temp_col'],
-                     }
+    cols_lists_dic, cols_dic = set_shared_parsing_cols()
 
-    cols_dic = {'wos_id_col'          : bp_pcg.COL_NAMES['wos_id'][0],
-                'pub_id_col'          : bp_pcg.COL_NAMES['pub_id'],
-                'subject_col'         : bp_pcg.COL_NAMES['subject'][1],
-                'sub_subject_col'     : bp_pcg.COL_NAMES['sub_subject'][1],
-                'affil_author_idx_col': bp_pcg.COL_NAMES['auth_inst'][1],
-                'norm_affils_col'     : bp_pcg.COL_NAMES['auth_inst'][4],
-                'address_col'         : bp_pcg.COL_NAMES['address'][2],
-                'country_col'         : bp_pcg.COL_NAMES['country'][2],
-                'affil_col'           : bp_pcg.COL_NAMES['institution'][2],
-                'author_idx_col'      : bp_pcg.COL_NAMES['authors'][1],
-                'co_authors_col'      : bp_pcg.COL_NAMES['authors'][2],
-                'keyword_col'         : bp_pcg.COL_NAMES['keywords'][1],
-                'title_temp_col'      : bp_pcg.COL_NAMES['temp_col'][2],
-                'kept_tokens_col'     : bp_pcg.COL_NAMES['temp_col'][4],
-                'author_col'          : bp_pcg.COL_NAMES['articles'][1],
-                'year_col'            : bp_pcg.COL_NAMES['articles'][2],
-                'doc_type_col'        : bp_pcg.COL_NAMES['articles'][7],
-                'title_col'           : bp_pcg.COL_NAMES['articles'][9],
-                'issn_col'            : bp_pcg.COL_NAMES['articles'][10],
-                'norm_journal_col'    : bp_pcg.NORM_JOURNAL_COLUMN_LABEL,
-               }
+    cols_lists_dic['subject_cols_list'] = bp_pcg.COL_NAMES['subject']
+    cols_lists_dic['sub_subject_cols_list'] = bp_pcg.COL_NAMES['sub_subject']
+
+    cols_dic['wos_id_col'] = bp_pcg.COL_NAMES['wos_id'][0]
 
     wos_cols_dic = {'wos_auth_col'         : bp_pcg.COLUMN_LABEL_WOS['authors'],
                     'wos_title_kw_col'     : bp_pcg.COLUMN_LABEL_WOS['title'],

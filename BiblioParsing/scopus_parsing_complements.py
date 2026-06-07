@@ -15,8 +15,8 @@ from collections import namedtuple
 import pandas as pd
 
 # Local libray imports
-import BiblioParsing.parsing_globals as bp_pg
-import BiblioParsing.regex_globals as bp_rg
+import biblioparsing.parsing_globals as bp_pg
+import biblioparsing.regex_globals as bp_rg
 
 
 def _set_pub_subjects_list(pub_id, codes_df, code_cat_dict, sub_subject):
@@ -745,12 +745,13 @@ def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, verbose_
         raw_refs_list = [x for x in ref_field.split("; ") if x]
         for ref_idx, raw_ref in enumerate(raw_refs_list):
             ref_verbose = False
+            year, authors, journal, doi, title = [bp_pg.UNKNOWN] * 5
             try:
                 if pub_verbose:
                     print("\n\n\n\nREF INDEX     :", ref_idx)
                     print("raw_ref       :", raw_ref)
                     if ref_idx==verbose_ref_id:
-                       ref_verbose = True
+                        ref_verbose = True
                 ref = _clean_ref(raw_ref)
                 ref_items_list = ref.split(", ")
                 if ref_verbose:
@@ -765,29 +766,37 @@ def _build_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, verbose_
                 search_journal_params = [authors_case, title_item_idx, title_item, doi, auth_idx_max]
                 _, journal, title = _find_ref_journal(ref_items_list, search_journal_params, ref_verbose)
 
-            except Exception as e:
-                error_message = (f"\n\nWARNING: {e}:"
+            except IndexError:
+                error_message = (f"\n\nWARNING: Index out of range for"
                                  f"\n    Pub_id       : {pub_id}"
                                  f"\n    Reference index: {ref_idx}"
                                  f"\n    Raw reference: {raw_ref}")
                 print(error_message)
-                year, authors, journal, doi, title = [bp_pg.UNKNOWN] * 5
 
-            if ref_verbose:
-                print("\n\n    raw_ref       :", raw_ref)
-                print("    year          :", year)
-                print("    authors       :", authors)
-                print("    journal       :", journal)
-                print("    doi           :", doi)
-                print("    title         :", title)
+            except Exception as err:
+                error_message = (f"\n\nWARNING: {err} for"
+                                 f"\n    Pub_id       : {pub_id}"
+                                 f"\n    Reference index: {ref_idx}"
+                                 f"\n    Raw reference: {raw_ref}")
+                print(error_message)
+                raise
 
-            if authors==bp_pg.UNKNOWN:
-                authors = bp_pg.PARTIAL
-                if bp_pg.UNKNOWN not in (journal, title):
-                    title = f'{title}, {journal}'
-                    journal = bp_pg.UNKNOWN
+            finally:
+                if authors==bp_pg.UNKNOWN:
+                    authors = bp_pg.PARTIAL
+                    if bp_pg.UNKNOWN not in (journal, title):
+                        title = f'{title}, {journal}'
+                        journal = bp_pg.UNKNOWN
 
-            pub_refs_list.append(pub_ref_tup(pub_id, authors, year, journal, doi, title, raw_ref))
+                if ref_verbose:
+                    print("\n\n    raw_ref       :", raw_ref)
+                    print("    year          :", year)
+                    print("    authors       :", authors)
+                    print("    journal       :", journal)
+                    print("    doi           :", doi)
+                    print("    title         :", title)
+
+                pub_refs_list.append(pub_ref_tup(pub_id, authors, year, journal, doi, title, raw_ref))
     return pub_refs_list
 
 
@@ -804,8 +813,8 @@ def build_scopus_references(corpus_df, cols_tup, verbose_pub_id=None, verbose_re
         corpus_df (dataframe): The selected rawdata of the corpus.
         cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
         verbose_pub_id (int): Optional publication identifier selected for printing parsing information (default: None).
-        verbose_ref_id (int): Optional identifier of the reference of the above publication selected for printing detailed \
-        information of parsing steps (default: None).
+        verbose_ref_id (int): Optional identifier of the reference of the above publication selected for printing \
+        detailed information of parsing steps (default: None).
     Returns:
         (dataframe): The built data.
     """

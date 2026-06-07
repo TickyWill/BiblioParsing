@@ -1,3 +1,3 @@
-include BiblioParsing/DemoConfig/*.*
-include BiblioParsing/RefFiles/*.*
+include biblioparsing/DemoConfig/*.*
+include biblioparsing/RefFiles/*.*
 include LICENSE
