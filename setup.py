@@ -37,5 +37,5 @@ setup(name='BiblioParsing',
       author= 'BiblioAnalysis team',
       author_email= 'francois.bertin7@wanadoo.fr, amal.chabli@orange.fr',
       url= 'https://github.com/TickyWill/BiblioParsing',
-      packages=find_packages(include=['biblioparsing']),
+      packages=find_packages(include=['bpfuncts']),
       )

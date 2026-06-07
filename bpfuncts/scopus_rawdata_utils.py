@@ -12,18 +12,18 @@ import numpy as np
 import pandas as pd
 
 # Local libray imports
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.general_utils import remove_special_symbol
-from biblioparsing.parsing_utils import build_pub_db_ids
-from biblioparsing.parsing_utils import check_and_drop_columns
-from biblioparsing.parsing_utils import check_and_get_rawdata_file_path
-from biblioparsing.parsing_utils import drop_rawdata
-from biblioparsing.parsing_utils import normalize_country
-from biblioparsing.parsing_utils import normalize_journal_names
-from biblioparsing.parsing_utils import normalize_name
-from biblioparsing.parsing_utils import standardize_str
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import remove_special_symbol
+from bpfuncts.parsing_utils import build_pub_db_ids
+from bpfuncts.parsing_utils import check_and_drop_columns
+from bpfuncts.parsing_utils import check_and_get_rawdata_file_path
+from bpfuncts.parsing_utils import drop_rawdata
+from bpfuncts.parsing_utils import normalize_country
+from bpfuncts.parsing_utils import normalize_journal_names
+from bpfuncts.parsing_utils import normalize_name
+from bpfuncts.parsing_utils import standardize_str
 
 
 def _set_scopus_rawdata_cols():
@@ -315,12 +315,12 @@ def read_scopus_rawdata(rawdata_path, correct_data=False, scopus_ids=False):
     internal function. 
     Then, the function:
     - Checks columns and drops unuseful columns using the \
-    `check_and_drop_columns` function imported from `BiblioParsingUtils` module.
+    `check_and_drop_columns` function imported from `parsing_utils` module.
     - Checks the affiliation column content using the `_check_scopus_affiliation_column` \
     internal function.
     - Replaces the unavailable items values by a string set in the global UNKNOWN.
     - Normalizes the journal names using the `normalize_journal_names` function \
-    imported from the `BiblioParsingUtils` module.
+    imported from the `parsing_utils` module.
     Finally, the function can built data of Scopus identifiers of the publications.
     The returned data are initialized to empty dataframes.
 

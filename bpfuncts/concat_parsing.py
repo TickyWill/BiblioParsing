@@ -14,11 +14,11 @@ import numpy as np
 import pandas as pd
 
 # Local library imports
-import biblioparsing.general_globals as bp_gg
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-from biblioparsing.affiliations_parsing import build_norm_and_raw_affils
-from biblioparsing.affiliations_parsing import extend_author_affils
+import bpfuncts.general_globals as bp_gg
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+from bpfuncts.affiliations_parsing import build_norm_and_raw_affils
+from bpfuncts.affiliations_parsing import extend_author_affils
 
 
 def _set_dedup_cols():

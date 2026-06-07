@@ -15,9 +15,9 @@ from collections import namedtuple
 import pandas as pd
 
 # Local libray imports
-import biblioparsing.parsing_globals as bp_pg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.parsing_utils import build_item_df_from_tup
+import bpfuncts.parsing_globals as bp_pg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.parsing_utils import build_item_df_from_tup
 
 
 def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):

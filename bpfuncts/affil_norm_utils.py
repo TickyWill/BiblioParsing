@@ -17,13 +17,13 @@ import openpyxl
 import pandas as pd
 
 # Local library imports
-import biblioparsing.affiliations_globals as bp_ag
-import biblioparsing.general_globals as bp_gg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.general_utils import remove_special_symbol
-from biblioparsing.parsing_utils import dict_print
-from biblioparsing.parsing_utils import rationalize_town_names
-from biblioparsing.parsing_utils import set_address_uniform_words
+import bpfuncts.affiliations_globals as bp_ag
+import bpfuncts.general_globals as bp_gg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import remove_special_symbol
+from bpfuncts.parsing_utils import dict_print
+from bpfuncts.parsing_utils import rationalize_town_names
+from bpfuncts.parsing_utils import set_address_uniform_words
 
 
 def _build_words_set(raw_aff, verbose=False):

@@ -11,27 +11,27 @@ from collections import namedtuple
 import pandas as pd
 
 # Local library imports
-import biblioparsing.affiliations_globals as bp_ag
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.affiliations_parsing import build_addr_affils_tup
-from biblioparsing.affiliations_parsing import extend_author_affils
-from biblioparsing.parsing_utils import build_item_df_from_tup
-from biblioparsing.parsing_utils import build_title_keywords
-from biblioparsing.parsing_utils import clean_authors_countries_affils
-from biblioparsing.parsing_utils import normalize_country
-from biblioparsing.parsing_utils import normalize_name
-from biblioparsing.parsing_utils import set_shared_parsing_cols
-from biblioparsing.parsing_utils import set_unknown_address
-from biblioparsing.parsing_utils import standardize_address
-from biblioparsing.parsing_utils import str_int_convertor
-from biblioparsing.parsing_utils import treat_author
-from biblioparsing.parsing_utils import treat_doctype
-from biblioparsing.parsing_utils import treat_title
-from biblioparsing.wos_rawdata_utils import read_wos_rawdata
-from biblioparsing.wos_parsing_complements import build_wos_subjects_and_sub_subjects
-from biblioparsing.wos_parsing_complements import build_wos_references
+import bpfuncts.affiliations_globals as bp_ag
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.affiliations_parsing import build_addr_affils_tup
+from bpfuncts.affiliations_parsing import extend_author_affils
+from bpfuncts.parsing_utils import build_item_df_from_tup
+from bpfuncts.parsing_utils import build_title_keywords
+from bpfuncts.parsing_utils import clean_authors_countries_affils
+from bpfuncts.parsing_utils import normalize_country
+from bpfuncts.parsing_utils import normalize_name
+from bpfuncts.parsing_utils import set_shared_parsing_cols
+from bpfuncts.parsing_utils import set_unknown_address
+from bpfuncts.parsing_utils import standardize_address
+from bpfuncts.parsing_utils import str_int_convertor
+from bpfuncts.parsing_utils import treat_author
+from bpfuncts.parsing_utils import treat_doctype
+from bpfuncts.parsing_utils import treat_title
+from bpfuncts.wos_rawdata_utils import read_wos_rawdata
+from bpfuncts.wos_parsing_complements import build_wos_subjects_and_sub_subjects
+from bpfuncts.wos_parsing_complements import build_wos_references
 
 
 def _set_wos_parsing_cols():

@@ -43,12 +43,12 @@ import pandas as pd
 import nltk
 
 # Local library imports
-import biblioparsing.affiliations_globals as bp_ag
-import biblioparsing.general_globals as bp_gg
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.general_utils import remove_special_symbol
+import bpfuncts.affiliations_globals as bp_ag
+import bpfuncts.general_globals as bp_gg
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import remove_special_symbol
 
 
 def str_int_convertor(x):
@@ -649,7 +649,7 @@ def check_and_drop_columns(database, init_rawdata_df):
 
 def upgrade_col_names(corpus_folder):
     """Add names to the column of the parsing and filter_<i> files to take into account the
-    upgrade of BiblioParsing package.
+    upgrade of the `BiblioParsing` package.
 
     Args:
         corpus_folder (str): folder of the corpus to be adapted.

@@ -21,7 +21,7 @@ import os
 from pathlib import Path
 
 # Local library imports
-import biblioparsing.parsing_globals as bp_pg
+import bpfuncts.parsing_globals as bp_pg
 
 
 def _get_demo_config():
@@ -71,7 +71,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     # Updating 'parsing_folder_dict' using the list of databases 'db_list'
     parsing_folder_dict = _build_effective_config(parsing_folder_dict, db_list)
 
-    # Creating the 'Biblioparsing_files' if not available
+    # Creating the working folder if not available
     keys_list = ['folder_root']
     wf_path, _ = _create_folder(parsing_folder_dict, keys_list, root_path)
 

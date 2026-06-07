@@ -11,13 +11,13 @@ import numpy as np
 import pandas as pd
 
 # Local libray imports
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-from biblioparsing.parsing_utils import build_pub_db_ids
-from biblioparsing.parsing_utils import check_and_drop_columns
-from biblioparsing.parsing_utils import check_and_get_rawdata_file_path
-from biblioparsing.parsing_utils import drop_rawdata
-from biblioparsing.parsing_utils import normalize_journal_names
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+from bpfuncts.parsing_utils import build_pub_db_ids
+from bpfuncts.parsing_utils import check_and_drop_columns
+from bpfuncts.parsing_utils import check_and_get_rawdata_file_path
+from bpfuncts.parsing_utils import drop_rawdata
+from bpfuncts.parsing_utils import normalize_journal_names
 
 
 def _set_wos_rawdata_cols():

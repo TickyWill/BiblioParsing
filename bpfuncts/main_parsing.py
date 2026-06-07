@@ -13,11 +13,11 @@ from pathlib import Path
 import pandas as pd
 
 # Local library imports
-import biblioparsing.parsing_globals as bp_pg
-from biblioparsing.scopus_parsing import scopus_parser
-from biblioparsing.scopus_rawdata_utils import read_scopus_rawdata
-from biblioparsing.wos_parsing import wos_parser
-from biblioparsing.wos_rawdata_utils import read_wos_rawdata
+import bpfuncts.parsing_globals as bp_pg
+from bpfuncts.scopus_parsing import scopus_parser
+from bpfuncts.scopus_rawdata_utils import read_scopus_rawdata
+from bpfuncts.wos_parsing import wos_parser
+from bpfuncts.wos_rawdata_utils import read_wos_rawdata
 
 
 def merge_database(database, filename, in_dir, out_dir):

@@ -15,8 +15,8 @@ from collections import namedtuple
 import pandas as pd
 
 # Local libray imports
-import biblioparsing.parsing_globals as bp_pg
-import biblioparsing.regex_globals as bp_rg
+import bpfuncts.parsing_globals as bp_pg
+import bpfuncts.regex_globals as bp_rg
 
 
 def _set_pub_subjects_list(pub_id, codes_df, code_cat_dict, sub_subject):

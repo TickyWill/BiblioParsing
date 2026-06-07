@@ -15,15 +15,15 @@ from collections import namedtuple
 import pandas as pd
 
 # Local library imports
-import biblioparsing.affiliations_globals as bp_ag
-import biblioparsing.general_globals as bp_gg
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.regex_globals as bp_rg
-from biblioparsing.affil_norm_utils import build_affils_useful_dicts
-from biblioparsing.general_utils import remove_special_symbol
-from biblioparsing.parsing_utils import rationalize_town_names
-from biblioparsing.parsing_utils import build_item_df_from_tup
-from biblioparsing.parsing_utils import standardize_address
+import bpfuncts.affiliations_globals as bp_ag
+import bpfuncts.general_globals as bp_gg
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.regex_globals as bp_rg
+from bpfuncts.affil_norm_utils import build_affils_useful_dicts
+from bpfuncts.general_utils import remove_special_symbol
+from bpfuncts.parsing_utils import rationalize_town_names
+from bpfuncts.parsing_utils import build_item_df_from_tup
+from bpfuncts.parsing_utils import standardize_address
 
 
 def _set_norm_affils_cols():

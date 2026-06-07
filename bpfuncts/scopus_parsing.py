@@ -12,26 +12,26 @@ from pathlib import Path
 import pandas as pd
 
 # Local libray imports
-import biblioparsing.general_globals as bp_gg
-import biblioparsing.parsing_cols_globals as bp_pcg
-import biblioparsing.parsing_globals as bp_pg
-from biblioparsing.affiliations_parsing import build_addr_affils_tup
-from biblioparsing.affiliations_parsing import extend_author_affils
-from biblioparsing.parsing_utils import build_item_df_from_tup
-from biblioparsing.parsing_utils import build_title_keywords
-from biblioparsing.parsing_utils import clean_authors_countries_affils
-from biblioparsing.parsing_utils import convert_issn
-from biblioparsing.parsing_utils import normalize_country
-from biblioparsing.parsing_utils import set_shared_parsing_cols
-from biblioparsing.parsing_utils import set_unknown_address
-from biblioparsing.parsing_utils import standardize_address
-from biblioparsing.parsing_utils import str_int_convertor
-from biblioparsing.parsing_utils import treat_author
-from biblioparsing.parsing_utils import treat_doctype
-from biblioparsing.parsing_utils import treat_title
-from biblioparsing.scopus_parsing_complements import build_scopus_references
-from biblioparsing.scopus_parsing_complements import build_scopus_subjects_and_sub_subjects
-from biblioparsing.scopus_rawdata_utils import read_scopus_rawdata
+import bpfuncts.general_globals as bp_gg
+import bpfuncts.parsing_cols_globals as bp_pcg
+import bpfuncts.parsing_globals as bp_pg
+from bpfuncts.affiliations_parsing import build_addr_affils_tup
+from bpfuncts.affiliations_parsing import extend_author_affils
+from bpfuncts.parsing_utils import build_item_df_from_tup
+from bpfuncts.parsing_utils import build_title_keywords
+from bpfuncts.parsing_utils import clean_authors_countries_affils
+from bpfuncts.parsing_utils import convert_issn
+from bpfuncts.parsing_utils import normalize_country
+from bpfuncts.parsing_utils import set_shared_parsing_cols
+from bpfuncts.parsing_utils import set_unknown_address
+from bpfuncts.parsing_utils import standardize_address
+from bpfuncts.parsing_utils import str_int_convertor
+from bpfuncts.parsing_utils import treat_author
+from bpfuncts.parsing_utils import treat_doctype
+from bpfuncts.parsing_utils import treat_title
+from bpfuncts.scopus_parsing_complements import build_scopus_references
+from bpfuncts.scopus_parsing_complements import build_scopus_subjects_and_sub_subjects
+from bpfuncts.scopus_rawdata_utils import read_scopus_rawdata
 
 
 def _set_scopus_parsing_cols():
