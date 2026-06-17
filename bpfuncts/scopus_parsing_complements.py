@@ -53,11 +53,13 @@ def _build_scopus_selected_subjects(corpus_df, scopus_journals_issn_cat_df, code
     for pub_id, pub_journal, pub_issn in corpus_series_zip:
         # Searching journal by name or by ISSN
         journal_keywords_df = scopus_journals_issn_cat_df.query('journal==@pub_journal')['keyword_id']
+        journal_keywords_df = journal_keywords_df[journal_keywords_df!='Undefined']
         if not journal_keywords_df.empty:
             journal_pub_res = _set_pub_subjects_list(pub_id, journal_keywords_df, code_cat_dict, sub_subject)
             res.extend(journal_pub_res)
         else:
             issn_keywords_df = scopus_journals_issn_cat_df.query('issn==@pub_issn')['keyword_id']
+            issn_keywords_df = issn_keywords_df[issn_keywords_df!='Undefined']
             if not issn_keywords_df.empty:
                 issn_pub_res = _set_pub_subjects_list(pub_id, issn_keywords_df, code_cat_dict, sub_subject)
                 res.extend(issn_pub_res)
@@ -151,6 +153,8 @@ def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
                                               header=None).fillna(0)
     scopus_journals_issn_cat_df[2] = scopus_journals_issn_cat_df[2].str.split(';')
     scopus_journals_issn_cat_df.columns = ['journal','issn','keyword_id']
+    scopus_journals_issn_cat_df['keyword_id'] = scopus_journals_issn_cat_df['keyword_id'].fillna(0)
+    scopus_journals_issn_cat_df = scopus_journals_issn_cat_df.replace(0, 'Undefined')
 
     # Building subjects data
     sub_subject = False
