@@ -56,7 +56,7 @@ import re
 from string import Template
 
 # For uniformization of country names
-COUNTRY_ALIAS_TEMPLATE = Template(r'$word\s' + "|" + r'$word$$')
+COUNTRY_ALIAS_TEMPLATE = Template(r'^$word\s' + "|" + r'$word$$' + "|" + r'\s$word\s')
 
 RE_ADDRESS = re.compile(r'''(?<=\]\s)           # Captures: "xxxxx" in string between "]" and "["
                         [^;]*                          # or  between "]" and end of string or ";"

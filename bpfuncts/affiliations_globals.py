@@ -102,7 +102,7 @@ _DROPPING_WORDS = ["alle", "alleen", "area", "avda", "avda.",
                    "district", "edificio", "east", "esplanade", "estrada", "floor", "jardim", "jardins",
                    "km", "ku", "lane", "largo", "linder", "mall", "marg",
                    "p.", "p.le", "p.o.box", "parcella", "passeig", "pk", "playa", "plaza", "parc", "park",
-                   "parque", "piazza", "piazzale", "po", "pob", "pola", "pza", "pzza",
+                   "parque", "plads", "piazza", "piazzale", "po", "pob", "pola", "pza", "pzza",
                    "rambla", "rd", "rua", "road", "sec.", "sc", "s-n", "s/n", "sp", "st", "st.", "strada",
                    "street", "str", "str.", "tietotie", "vei", "veien", "vej", "via", "viale", "vialle",
                    "voc.", "w", "way", "west", "zona"]
@@ -116,12 +116,12 @@ DROPPING_WORDS = [x.replace("/", r"\/") for x in _DROPPING_WORDS]
 
         # Setting a list of dropping words for France
 _FR_DROPPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue",
-                     "ba", "bat", "bat.", "batiment", "blv.", "blvd", "boulevard",
-                     "campus", "cedex", "ch.", "chemin", "complexe", "cours", "cs",
-                     "domaine", "esplanade", "foret", "immeuble",
-                     "montee", "no.", "p", "p°", "parcelle", "parvis", "pl", "pl.", "place", "parc",
-                     "plan", "pole", "quai", "r", "r.", "rambla", "region", "route", "rue",
-                     "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
+                      "ba", "bat", "bat.", "batiment", "blv.", "blvd", "boulevard",
+                      "campus", "cedex", "ch.", "chemin", "complexe", "cours", "cs",
+                      "domaine", "esplanade", "foret", "immeuble",
+                      "montee", "no.", "p", "p°", "parcelle", "parvis", "pl", "pl.", "place", "parc",
+                      "plan", "pole", "quai", "r", "r.", "rambla", "region", "route", "rue",
+                      "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
 
         # Removing accents keeping non adcii characters and converting to lower case the dropping words, by default
 _FR_DROPPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _FR_DROPPING_WORDS]
