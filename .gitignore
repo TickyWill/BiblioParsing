@@ -77,9 +77,9 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-Demo_BiblioParsing_amal.ipynb
-CheckInstitutionsParsing.ipynb
-Demo_BiblioParsing-test.ipynb
+Demo_BiblioParsing_*.ipynb
+*RefParsing.ipynb
+Affils*.ipynb
 
 # IPython
 profile_default/
