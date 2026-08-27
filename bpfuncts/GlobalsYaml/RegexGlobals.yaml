@@ -1,0 +1,442 @@
+# Use single cotes with single \ for escaping characters
+# Use double cotes with double \ for escaping characters only in case of single cote is part of regex
+#
+# ****************************************************
+# * Regex for standardization and correction of data *
+# ****************************************************
+#
+# Template for capturing potentialy ambiguous words to standardize addresses
+affil_amb_words_list:
+    - des
+    - "@"
+#
+amb_words_template: '\s$word\s'
+#
+# Template for capturing small words in authors' names
+authors_small_words_list:
+    - de
+    - von
+#
+auth_small_words_template: '^$word\s'
+#
+# Templates for uniformization of country names in addresses
+country_alias_template_list:
+    - '^$word\s'
+    - '$word$$'
+    - '\s$word\s'
+#
+# Regex for capturing "xxxxx" in string between "]" and "[" or  between "]" and end of string or ";"
+re_address: '(?<=\]\s)[^;]*(?=;|$)'
+#
+# Regex for capturing "xxxx, xxx" or "xxxx xxx" in string between "[" and "]"
+re_author: "(?<=\\[)[a-zA-Z,;\\s\\.\\-']*(?=,|\\s)[a-zA-Z,;\\s\\.\\-']*(?=\\])"
+#
+# Regex for capturing " d...dth " or " d...dnd " in string
+re_num_conf_list:
+    - '\s\d+th\s'
+    - '\s\d+nd\s'
+#
+# Regex for capturing alias of University surrounded by texts
+re_sub_list:
+    - '[a-z]?Univ[\.a-zé]{0,6}\s'
+    - '[a-z]?Univ[\.a-zé]{0,6}$'
+#
+# Regex for capturing "Univ" before a coma possibly preceeded by text
+re_sub_first: '[a-z]?Univ[,]\s'
+#
+# Regex for capturing "dddd" as the string giving the year
+re_year: '\d{4}'
+#
+# Regex for capturing " dddd " as the year in journal name
+re_year_journal: '\s\d{4}\s'
+#
+# Regex for capturing text begining with ', '
+# and that possibly contains letters and hyphen-minus
+re_zip_code: ',\s[a-zA-Z]?[\-]?\d+.*'
+#
+# Regex for capturing ';, ' or ';' surrounded by letters
+re_awa_list:
+    - '\w+;,\s\w+'
+    - '\w+;\w+'
+#
+# Regex for normalization of ISSN to the form dddd-dddd or dddd-dddX
+re_issn_list:
+    - '^[0-9]{8}'
+    - '[0-9]{4}'
+    - '[0-9]{3}X'
+#
+# *******************************
+# * Affiliations' parsing regex *
+# *******************************
+#
+# ------------Addresses uniformization-----------
+# Patterns for capturing aliases of 'center' for uniformization
+affil_ctr_pattern_list:
+    - '\b[CZ]ent[erum]{1,3}\b\.?'
+#
+# Patterns for capturing aliases of 'Department' for uniformization
+affil_dept_pattern_list:
+    - '\bD[eéi]{1}p[arteimnot]{0,9}\b\.?'
+#
+# Patterns for capturing aliases of 'Faculty' for uniformization
+affil_fac_pattern_list:
+    - '\bFac[lutey]{0,4}\b\.?'
+#
+# Patterns for capturing aliases of 'Institute' for uniformization
+affil_inst_pattern_list:
+    - '\bInst[ituteosky]{0,7}\b\.?'
+    - '\bIstituto\b'
+#
+# Patterns for capturing aliases of 'Laboratory' for uniformization
+affil_lab_pattern_list:
+    - "'?\\bLab\\b\\.?"
+    - "'?\\bLabor[aeimorstuy]{0,7}\\b\\.?"
+#
+# Patterns for capturing aliases of 'School' for uniformization
+affil_sch_pattern_list:
+    - '\bSch[ol]{0,3}\b\.?'
+#
+# Patterns for capturing aliases of 'University' for uniformization
+affil_univ_pattern_list:
+    - '\b[a-z]?Univ[aàäcdeéirstyz]{0,8}\b\.?'
+#
+#
+# ------------Address chunck dropping-------------
+#
+# Regex for capturing postal box to drop addresses chuncks,
+# for instance "bp12" in "azert BP12 yui_OP"
+# " bp 156X" in " bp 156X azert" or "08bp" in "azert 08BP yui_OP"
+affil_dropping_bp_pattern_list:
+    - '\bbp\s?\d+[a-z]?\b'
+    - '\b\d+bp\b'
+#
+# Pattern for capturing embedding digits to drop addresses' chuncks
+# In first part, for capturing, for instance, " 1234" in "azert 1234-yui_OP"
+# or " 1" in "azert 1-yui_OP" or " 1-23" in "azert 1-23-yui"
+# Or, in second part, capturing, for instance, "azert12" in "azert12 UI_OPq"
+# or "azerty1234567" in "azerty1234567 ui_OPq"
+affil_dropping_digits_pattern_list:
+    - '\s?\d+(-\d+)?\b'
+    - '\b[a-z]+(-)?\d{2,}\b'
+#
+# Template for capturing suffix
+# For instance, capturing "platz" in "Azertyplatz uiops12"
+# Or, for instance, capturing "-gu" in "Yeongtong-gu"
+# Suffix list specified in 'AffiliationsGlobals.yaml' file
+affil_dropping_suffix_template_list:
+    - '\B$word\b'
+    - '\b$word\b'
+#
+# Templates for capturing word to drop the address chunck
+# Words list specified in 'AffiliationsGlobals.yaml' file
+affil_dropping_word_template_list:
+    - '[\s(]$word[\s)]'
+    - '[\s]$word$$'
+    - '^$word\b'
+#
+#
+# ------------Address chunck keeping-------------
+# Template for capturing prefix followed by 4 digits and potentially separated by "-",
+# for instance, capturing "umr1234" in "azert UMR1234 YUI_OP"
+# or "fr1234" in "azert-fr1234 Yui_OP"
+# Prefix list specified in 'AffiliationsGlobals.yaml' file
+affil_digits_keeping_prefix_template: '\b$prefix[-]?\d{4}\b'
+#
+# Template for capturing prefix attached to 3 or 4 digits to keep the address chunck
+# Prefix list specified in 'AffiliationsGlobals.yaml' file
+affil_keeping_prefix_template: '\b$prefix\d{3,4}\b'
+#
+# Template for capturing words to keep the address chunck
+# Words list specified in 'AffiliationsGlobals.yaml' file
+affil_keeping_word_template: '\b$word\b'
+#
+#
+# ------------Search of words in words set in addresses------------
+# Templates for capturing for instance "word" in "word of set"
+# or " word" in "set with word", or "word" in "Azert Word Azerty"
+affil_words_set_template_list:
+    - '[\s]$word[\s)]'
+    - '[\s]$word$$'
+    - '^$word\b'
+#
+# Templates for capturing small words or accronyms given by the small_words_drop
+# and the missing_space_acronyms globals in 'AffiliationsGlobals.yaml' file
+# For instance capturing 'of' in 'technical university of denmark'
+# capturing 'd' in 'institut d ingenierie'
+# capturing 'the' in 'the denmark university'
+# or capturing 'umr' in 'umr dddd' or 'umr dd'
+affil_word_to_drop_template_list:
+    - '[\s(]$word[\s)]'
+    - '[\s]$word$$|^$word\b'
+#
+#
+# ------------Zip code search in addresses------------
+# Template for capturing zip code in addresses for other countries
+# Capturing letters and zip-digits as given for each country in the file
+# which name is specified in 'AffiliationsGlobals.yaml' file by value at 'countries_info'
+affil_zip_template: '\b($zip_letters)[\s-]?(\d{$zip_digits})\b'
+#
+# Pattern for capturing state code in addresses for UK
+# Capturing: for instance, " BT7 1NN" or " WC1E 6BT" or " G128QQ"
+# " a# #a", " a# #az", " a# ##a", " a# ##az", " a##a", " a##az", " a###a", " a###az",
+# " a#a #a", " a#a #az", " a#a ##a", " a#a ##az", " a#a#a", " a#a#az", " a#a##a", " a#a##az",
+# " a## #a", " a## #az", " a## ##a", " a## ##az", " a###a", " a###az", " a####a", " a####az",
+# " a##a #a", " a##a #az", " a##a ##a", " a##a ##az", " a##a#a", " a##a#az", " a##a##a", " a##a##az",
+# " az# #a", " az# #az", " az# ##a", " az# ##az", " az##a", " az##az", " az###a", " az###az",
+# " az#a #a", " az#a #az", " az#a ##a", " az#a ##az", " az#a#a", " az#a#az", " az#a##a", " az#a##az",
+# " az## #a", " az## #az", " az## ##a", " az## ##az", " az###a", " az###az", " az###a", " az####az",
+# " az##a #a", " az##a #az", " az##a ##a", " az##a ##az", " az##a#a", " az##a#az", " az##a#a", " az##a##az",
+affil_uk_zip_pattern: '^\s?[a-z]{1,2}\d{1,2}[a-z]{0,1}\s?\d{1,2}[a-z]{1,2}$'
+#
+# Patterns for capturing state code in addresses for North America
+# Capturing: for instance, " NY" or ' NI BT48 0SG' or " ON K1N 6N5"
+# " az" or " az " + 6 or 7 characters in 2 parts separated by spaces
+affil_nam_zip_pattern_list:
+    - '^\s?[a-z]{2}$'
+    - '^\s?[a-z]{2}\s[a-z0-9]{3,4}\s[a-z0-9]{2,3}$'
+#
+#
+# ****************************
+# * References' parsing regex *
+# ****************************
+#
+# ------Search of journals' names for Scopus and WoS data------
+#
+# List of journals' accronyms
+journal_acronyms_list:
+    - ACS
+    - ECS
+    - IEEE
+    - RRL
+#
+# List of journals' short names
+journal_shorts_list:
+    - Adv
+    - Bull
+    - Chem
+    - Commun
+    - Conf
+    - J
+    - Lett
+    - Nat
+    - Proc
+    - Rep
+    - Rev
+    - Ser
+    - Symp
+    - Trans
+    - Transact
+#
+# List of journals' part names
+journal_words_list:
+    - Acta
+    - Conference
+    - Journal
+    - Letters
+    - Magazine
+    - Procedia
+    - Proceedings
+    - Series
+    - Symposium
+    - Transactions
+    - Workshop
+#
+# Template for capturing accronyms of journals
+acronyms_template: '^$word\s'
+#
+# Templates for capturing full names of journals
+fulls_templates_list:
+    - '^$word\s'
+    - '\s$word[,\s]?'
+#
+# Templates for capturing dotted short names of journals
+shorts_templates_list:
+    - '^$word\.\s'
+    - '\s$word\.[,\s]?'
+#
+# Templates for capturing undotted short names of journals
+undotted_shorts_templates_list:
+    - '^$word\s'
+    - '\s$word\s'
+    - '\s$word$$'
+#
+#
+# ************************************************************************
+# * Regex specific to parsing of publications' references in Scopus data *
+# ************************************************************************
+#
+# ------Search of months' aliases ------
+#
+# List of short names of months to drop references' chunck
+ref_dropping_short_months_list:
+    - Jan
+    - Feb
+    - Apr
+    - Jun
+    - Jul
+    - Aug
+    - Sept
+    - Oct
+    - Nov
+    - Dec
+    - janv
+    - févr
+    - avr
+    - juill
+    - sept
+    - oct
+    - nov
+    - déc
+#
+# List of full names of months to drop references' chunck
+ref_dropping_full_months_list:
+    - March
+    - May
+    - June
+    - October
+    - mars
+    - mai
+    - juin
+    - août
+#
+# Templates for capturing short names of months to drop references' chunck
+drop_short_month_template_list:
+    - '^$word\.\s'
+    - '\s$word\.\s'
+    - '\s$word\.$$'
+    - '^$word\.$$'
+#
+# Templates for capturing short and full names of months to drop references' chunck
+drop_all_month_template_list:
+    - '^$word\s'
+    - '\s$word\s'
+    - '\s$word$$'
+    - '^$word$$'
+#
+#
+# ------Search of other part of references------
+#
+# Regex for capturing "and" in references
+re_scopus_ref_and_list:
+    - '\sand\s'
+    - '^and\s'
+#
+# Regex for capturing authors' names chunks in reférences
+re_scopus_ref_author_list:
+    - '^[a-zA-Z]*\s[a-zA-Z][\.]?$'
+    - '^[a-zA-Z]*\s[a-zA-Z][\.]?-?[a-zA-Z][\.]?$'
+    - '\set\sal\.$'
+    - '^[a-zA-Z]{1,2}[\.]?$'
+    - '[a-zA-Z]{1}-[a-zA-Z]{1}[\.]?$'
+    - '[a-zA-Z]{1}[\.]?-[a-zA-Z]{1}[\.]?$'
+    - '\s[a-zA-Z]{1}\.[a-zA-Z]{0,1}[\.]?[a-zA-Z]{0,1}[\.]?[a-zA-Z]{0,1}[\.]?$'
+#
+# Regex for capturing authors' names in references
+re_scopus_ref_author_drop_list:
+    - '^[A-Z]{3,}\s'
+    - '\s[A-Z]{3,}\s'
+    - '\s[A-Z]{4,}$'
+#
+# Regex for capturing digits followed by text in references
+re_scopus_ref_digits_drop_list:
+    - '^\d{4}[a-zA-Z]{2,}\.[\.]?'
+    - '^\d{1}\:[A-Z]{3}\:'
+#
+# Regex for capturing "et al." in references
+re_scopus_ref_et_al_list:
+    - '[eE]t\-al\.$'
+    - '[eE]t\sal\.$'
+#
+# Regex for capturing isolated digits in references
+re_scopus_ref_only_digits: '^[\d]+$'
+#
+# Regex for capturing "pp. " followed by digits in references
+re_scopus_ref_pages: '^pp\.\s\d'
+#
+# Regex for capturing dotted text in references
+re_scopus_ref_dot_list:
+    - '^[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s'
+    - '\s[a-zA-Z]\.[\s]?[\-]?[a-zA-Z]\.\s'
+#
+# Regex for capturing DOI in references
+re_scopus_ref_doi: '[\s]?10\.[\d]{4,}\/.*$'
+#
+# Regex for capturing 'Conference' in references
+re_scopus_ref_conf: '[a-zA-Z0-9]?\sConference\s[a-zA-Z0-9]?'
+#
+# Regex for capturing isolated 4 consecutive digits in references
+re_scopus_ref_digits: '\s\d{4}\s'
+#
+# Regex for capturing 4-digits year inside DOI in references
+re_scopus_ref_doi_year: '\.\d{4}\.'
+#
+# Regex for capturing non-alphanumeric characters in references
+re_scopus_ref_symb: '^[^a-zA-Z0-9]+$'
+#
+# Regex for capturing "dddd" within parenthesis in string or at end of string in references
+re_scopus_ref_year: '(?<=\()\d{4}(?=\))'
+#
+# Regex for capturing "dddd" after, before or within parenthesis in string
+# or at end of string in references
+re_scopus_ref_years_list:
+    - '(?<=\()\d{4}'
+    - '\d{4}(?=\))'
+    - '\s\d{4}$'
+    - '(?<=/)\d{4}'
+    - '\d{4}(?=/)'
+    - '\s\d{4}(?=,)'
+    - '\s\d{4}\s'
+#
+#
+# *********************************************************************
+# * Regex specific to parsing of publications' references in WoS data *
+# *********************************************************************
+#
+# List of journals' full names for references of WoS data)
+journal_names_list:
+    - Arxiv
+#
+# Template for capturing journal's names in references of WoS data
+names_template: '^$word$$'
+#
+# Regex for capturing DOI in references of WoS data
+re_wos_ref_doi_list:
+    - '[\s]?10\.[\d]{4,}\/.*$'
+    - '^DOI\s'
+#
+# Regex for capturing year in references of WoS data
+re_wos_ref_year: '^\d{4}$'
+#
+# Template for capturing special words to drop references' chunck in WoS data
+ref_dropping_words_list:
+    - Appendix
+    - available
+    - Available
+    - https
+    - '\[?Online\]?'
+    - presented
+    - Presented
+#
+drop_word_template: '^$word[,\s]?'
+#
+#
+# **********************
+# * No more used regex *
+# **********************
+#
+# Regex for capturing string between "()" in journal name
+re_adds_journal: '\([^\)]+\)'
+#
+# Regex for search of journals' name begenning with one digit in Scopus data
+re_scopus_journal_digits: '^[\d]+[^a-zA-Z]*'
+#
+# Regex for search of authors' initials in Scopus data
+re_scopus_author_initials_list:
+    - '^[a-zA-Z]{1,2},\s$'
+    - '^[a-zA-Z]-?[a-zA-Z],\s$'
+#
+# Regex for search of authors' full name in Scopus data
+re_scopus_author_name_list:
+    - '^[a-zA-Z]*\s[a-zA-Z]{1,2},\s$'
+    - '^[a-zA-Z]*\s[a-zA-Z]-[a-zA-Z],\s$'
+#

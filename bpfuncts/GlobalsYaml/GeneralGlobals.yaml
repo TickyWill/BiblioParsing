@@ -1,0 +1,115 @@
+# Conversion factor for inch to millimeter
+in_to_mm: 25.4
+#
+# File name of countries attributes
+countries_info: Countries.xlsx
+#
+# Columns name of the file of countries attributes
+countries_col_names:
+  country    : Country
+  short_name : Short name
+  gps        : GPS Coordinates
+  zip_letters: Zip code letters
+  zip_digits : Zip code digits
+  continent  : Continent
+#
+# Folder name where useful files are located
+rep_utils: RefFiles
+#
+# USA-states accronyms
+usa_states: AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY
+#
+# USA-country aliases
+usa_aliases_list:
+    - UNITED STATES
+    - United States of America
+    - USA
+#
+# Other countries aliases
+country_aliases:
+    Belarus:
+        - BELARUS
+        - BLR
+    China:
+        - China
+        - china
+    France:
+        - FRANCE
+        - france
+        - FR
+        - Fr
+    Netherlands:
+        - Netherlands
+    Palestinian Territory:
+        - Palestine
+    Russian Federation:
+        - Russia
+    Turkey:
+        - Turkiye
+    United Arab Emirates:
+        - U Arab Emirates
+        - Arab Emirates
+    United Kingdom:
+        - England
+        - Wales
+        - North Ireland
+        - Scotland
+    Viet Nam:
+        - Vietnam
+#
+# For changing particularly encoded symbols (particular cote to standard cote)
+apostrophe_change_dic:
+    "”": "'"
+    "’": "'"
+    '"': "'"
+    "“": "'"
+    "'": "'"
+#
+# For replacing dashes by hyphen-minus
+# Non-Breaking Hyphen, En-dash and Em-dash
+dashes_change_dic:
+    "‐": "-"
+    "—": "-"
+    "–": "-"
+#
+# For changing langages specific characters to standard characters in personal names
+lang_char_change_dic:
+    "Ł": "L"
+    "ł": "l"
+    "ı": "i"
+    "Đ": "D"
+    "&": ""
+#
+# For droping ponctuation symbols
+ponct_change_dic:
+    .  : ''
+    ',': ''
+    ;  : ''
+#
+# For changing particularly encoded symbols
+symb_change_dic:
+    "&": "and"
+    "’": "'"
+    .  : ""
+    "-": " "
+    "§": " "
+    (  : " "
+    )  : " "
+    /  : " "
+    "'": " "
+#
+# For droping particular symbols
+drop_symb_dic:
+    "'": " "
+    '*': ' '
+    '#': ' '
+    '|': ' '
+#
+# For changing particular symbols in document-title
+title_symb_change_dic:
+    ' - ': '-'
+    (    : ''
+    )    : ''
+    ' :' : ': '
+    '-'  : ' '
+    '  ' : ' '

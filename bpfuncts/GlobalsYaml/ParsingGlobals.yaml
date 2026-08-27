@@ -1,0 +1,163 @@
+# *******************************************
+# * Globals specific to parsing Scopus data *
+# *******************************************
+#
+# Database name
+scopus: scopus
+#
+# File names of Scopus data for identification of publications subjects
+# These files are available in 'RefFiles' folder of the 'BiblioParsing' package
+scopus_cat_codes: scopus_cat_codes.txt
+scopus_journals_issn_cat: scopus_journals_issn_cat.txt
+#
+# Scopus-rawdata file-name extension
+scopus_rawdata_extent: csv
+#
+# Value for authors when references field of Scopus rawdata is partially parsed
+partial: Partial
+#
+#
+# ****************************************
+# * Globals specific to parsing WoS data *
+# ****************************************
+#
+# Database name
+wos: wos
+#
+# Encoding type for reading WoS rawdata
+encoding: utf-8
+#
+# Extension of maximum field-size for reading WoS rawdata
+field_size_limit: 262144
+#
+# WoS-rawdata file-name extension
+wos_rawdata_extent: txt
+#
+# Collection for uniformization of first-author's names in references field of WoS rawdata
+authors_smal_words:
+    - de
+    - von
+#
+#
+# ***************************************
+# * Globals specific to parsing rawdata *
+# ***************************************
+#
+# Value for indicating undefined fields in rawdata
+unknown: unknown
+#
+# Value for indicating undefined country in affiliations' rawdata
+unknown_country: Unknown
+#
+# Base for setting the file name of publications' identifiers to remove from rawdata before parsing
+ids_to_drop_file_base: "_IDs à supprimer.xlsx"
+#
+# List of items separatly built from the rawdata parsing
+#parsing_items_list:
+#    - articles
+#    - authors
+#    - addresses
+#    - countries
+#    - institutions
+#    - authors_institutions
+#    - authors_keywords
+#    - indexed_keywords
+#    - title_keywords
+#    - subjects
+#    - sub_subjects
+#    - references
+#    - norm_institutions
+#    - raw_institutions
+#
+# Collection for uniformization of document types between rawdata
+dic_doctype:
+    Article:
+        - Article
+    Article; early access:
+        - Article; Early Access
+    Book:
+        - Book
+    Book chapter:
+        - Book Chapter
+        - Article; Book Chapter
+    Conference paper:
+        - Conference Paper
+        - Proceedings Paper
+        - Article; Proceedings Paper
+    Data paper:
+        - Data Paper
+        - Article; Data Paper
+    Correction:
+        - Correction
+    Editorial material:
+        - Editorial Material
+        - Editorial Material; Book Chapter
+    Erratum:
+        - Erratum
+    Letter:
+        - Letter
+    Meeting Abstract:
+        - Meeting Abstract
+    Note:
+        - Note
+    Review:
+        - Review
+    Review; early access:
+        - Review; Early Access
+    Short survey:
+        - Short survey
+#
+# Collection for uniformization of journal names through substitution of low words
+dic_low_words:
+    proceedings of        : ''
+    conference record of  : ''
+    proceedings           : ''
+    communications        : ''
+    conference proceedings: ''
+    ieee                  : ''
+    international         : int
+    conference            : conf
+    journal of            : j
+    transactions on       : trans
+    science               : sci
+    technology            : tech
+    engineering           : eng
+    '&'                   : and
+    ':'                   : ' '
+    '-'                   : ' '
+    ','                   : ' '
+    (                     : ' '
+    )                     : ' '
+    /                     : ' '
+    ;                     : ' '
+#
+#
+# *************************************************
+# * Globals specific to deduplication of parsings *
+# *************************************************
+#
+# Threshold of strings length for checking similarity
+length_threshold: 30
+#
+# Threshold of true similarity between strings
+similarity_threshold: 80
+#
+#
+# ***********************************************
+# * Globals specific to building title keywords *
+# ***********************************************
+#
+# Find help on the nltk tags set using nltk.help.upenn_tagset() 
+nltk_valid_tag_list:
+    - NN
+    - NNS
+    - VBG
+    - JJ
+#
+# Minimum occurrences of a noun for retaining it
+# when building the set of title keywords of a corpus
+noun_minimum_occurrences: 3
+#
+# For instance to be set to ['null','nan'] for parsing title keywords
+blacklisted_words: []
+#

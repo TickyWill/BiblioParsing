@@ -20,9 +20,6 @@ import json
 import os
 from pathlib import Path
 
-# Local library imports
-import bpfuncts.parsing_globals as bp_pg
-
 
 def _get_demo_config():
     config_json_file_name = 'BiblioParsing_config.json'
@@ -153,21 +150,20 @@ def save_parsing_dict(parsing_dict, parsing_path,
                       item_filename_dict, save_extent):
     """Saves the parsing results of a single step of the parsing step."""
     # Cycling on parsing items
-    for item in bp_pg.PARSING_ITEMS_LIST:
-        if item in parsing_dict.keys():
-            item_df = parsing_dict[item]
-            if save_extent == "xlsx":
-                item_xlsx_file = item_filename_dict[item] + ".xlsx"
-                item_xlsx_path = parsing_path / Path(item_xlsx_file)
-                item_df.to_excel(item_xlsx_path, index = False)
-            elif save_extent == "dat":
-                item_tsv_file = item_filename_dict[item] + ".dat"
-                item_tsv_path = parsing_path / Path(item_tsv_file)
-                item_df.to_csv(item_tsv_path, index=False, sep='\t')
-            else:
-                item_tsv_file = item_filename_dict[item] + ".csv"
-                item_tsv_path = parsing_path / Path(item_tsv_file)
-                item_df.to_csv(item_tsv_path, index=False, sep=',')
+    for item in parsing_dict.keys():
+        item_df = parsing_dict[item]
+        if save_extent == "xlsx":
+            item_xlsx_file = item_filename_dict[item] + ".xlsx"
+            item_xlsx_path = parsing_path / Path(item_xlsx_file)
+            item_df.to_excel(item_xlsx_path, index = False)
+        elif save_extent == "dat":
+            item_tsv_file = item_filename_dict[item] + ".dat"
+            item_tsv_path = parsing_path / Path(item_tsv_file)
+            item_df.to_csv(item_tsv_path, index=False, sep='\t')
+        else:
+            item_tsv_file = item_filename_dict[item] + ".csv"
+            item_tsv_path = parsing_path / Path(item_tsv_file)
+            item_df.to_csv(item_tsv_path, index=False, sep=',')
     message = f"All parsing results saved as {save_extent} files"
     return message
 

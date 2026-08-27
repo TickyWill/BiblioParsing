@@ -553,11 +553,9 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
     return articles_df
 
 
-def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, scopus_cat_paths=None):
+def scopus_parser(rawdata_path, parsing_items_list, affil_filter_list=None, affil_params_dic=None, scopus_cat_paths=None):
     """Builds parsing data from the corpus rawdata.
 
-    The list of the parsed items (keys of the returned dict which values are the dataframes \
-    of the parsing results) is given by the PARSING_ITEMS_LIST global. 
     The rawdata are parsed using the following internal functions:
     - `_build_scopus_articles` which parses the articles' core data from the corpus rawdata
     - `_build_scopus_authors` which parses the authors' field of rawdata;
@@ -573,6 +571,8 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
 
     Args:
         rawdata_path (path): The full path to the corpus rawdata.
+        parsing_items_list (list): The parsed items (keys of the returned dict which values are the dataframes \
+        of the parsing results)
         affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
         optional (default=None).
         affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
@@ -591,7 +591,7 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
     cols_tup = _set_scopus_parsing_cols()
 
     # Setting items list and values
-    items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(12)]
+    items_list = [parsing_items_list[x] for x in range(12)]
 
     # Setting the specific file paths for subjects and sub-subjects assignment for Scopus corpuses
     if not scopus_cat_paths:

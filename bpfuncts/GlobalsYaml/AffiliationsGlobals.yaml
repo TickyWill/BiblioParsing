@@ -1,0 +1,278 @@
+# Word to indicate that raw affiliations are all normalized for a given address
+empty: empty
+#
+# Column names of affiliations
+affil_col_names:
+  norm_affil_col: Norm affiliations
+  raw_affil_col_base: Raw affiliations
+#
+# File names of data for affiliations normalization
+affil_default_files_dic:
+  country_towns_file: Country_towns.xlsx
+  country_affils_file: Country_affiliations.xlsx
+  institute_affils_file: Institute_affiliations.xlsx
+  affil_types_file: Affiliations_types.xlsx
+#
+# Column names of useful data setting affiliations types
+affil_types_usecols:
+- Level
+- Abbreviation
+#
+# Dict for replacing symbols in town names
+dic_town_symbols:
+  '-': ' '
+  '''': ' '
+#
+# Dict for replacing specific words in town names
+dic_town_words:
+  ' lez ': ' les '
+  'saint ': 'st '
+#
+# Basic words list for keeping chunck in addresses
+basic_keeping_words:
+- Beamline
+- CRG
+- EA
+- ED
+- Equipe
+- ULR
+- UMR
+- UMS
+- UPR
+#
+# User's words list for keeping chunck in addresses
+user_keeping_words:
+    - CEA
+    - CEMHTI
+    - CNRS
+    - ESRF
+    - FEMTO ST
+    - IMEC
+    - INES
+    - INSA
+    - INSERM
+    - IRCELYON
+    - KU Leuven
+    - LaMCoS
+    - LEPMI
+    - LETI
+    - LITEN
+    - LOCIE
+    - spLine
+    - STMicroelectronics
+    - TNO
+    - UMI
+    - VTT
+#
+# Prefix list  for keeping chuncks in addresses
+keeping_prefix:
+    - EA
+    - FR
+    - U
+    - ULR
+    - UMR
+    - UMS
+    - UPR
+#
+# Suffix list for keeping chuncks in addresses
+dropping_suffix:
+    - campus
+    - laan
+    - park
+    - platz
+    - staal
+    - strae
+    - strasse
+    - "straße"
+    - vej
+    - waldring
+    - weg
+    - schule
+    - -ku
+    - -cho
+    - -ken
+    - -shi
+    - -gun
+    - alleen
+    - vagen
+    - vei
+    - -gu
+    - -do
+    - -si
+    - shire
+#
+# Words list for droping chuncks in addresses
+dropping_words:
+    - alle
+    - alleen
+    - area
+    - avda
+    - avda.
+    - bd
+    - bldg
+    - box
+    - bp
+    - building
+    - c
+    - calla
+    - calle
+    - camino
+    - carrera
+    - carretera
+    - cesta
+    - cho
+    - circuito
+    - city
+    - ciudad
+    - complejo
+    - corso
+    - country
+    - ctra
+    - cubillos
+    - district
+    - drive
+    - edificio
+    - east
+    - esplanade
+    - estrada
+    - floor
+    - jardim
+    - jardins
+    - km
+    - ku
+    - lane
+    - largo
+    - linder
+    - mall
+    - marg
+    - p.
+    - p.le
+    - p.o.box
+    - parcella
+    - passeig
+    - pk
+    - playa
+    - plaza
+    - parc
+    - park
+    - parque
+    - plads
+    - piazza
+    - piazzale
+    - po
+    - pob
+    - pola
+    - pza
+    - pzza
+    - rambla
+    - rd
+    - rua
+    - road
+    - sec.
+    - sc
+    - s-n
+    - s/n
+    - sp
+    - st
+    - st.
+    - strada
+    - street
+    - str
+    - str.
+    - tietotie
+    - vei
+    - veien
+    - vej
+    - via
+    - viale
+    - vialle
+    - voc.
+    - w
+    - way
+    - west
+    - zona
+#
+# French words list for droping chuncks in addresses
+fr_droping_words:
+    - allee
+    - antenne
+    - av
+    - av.
+    - ave
+    - avenue
+    - ba
+    - bat
+    - bat.
+    - batiment
+    - blv.
+    - blvd
+    - boulevard
+    - campus
+    - cedex
+    - ch.
+    - chemin
+    - complexe
+    - cours
+    - cs
+    - domaine
+    - esplanade
+    - foret
+    - immeuble
+    - montee
+    - no.
+    - p
+    - "p°"
+    - parcelle
+    - parvis
+    - pl
+    - pl.
+    - place
+    - parc
+    - plan
+    - pole
+    - quai
+    - r
+    - r.
+    - rambla
+    - region
+    - route
+    - rue
+    - site
+    - v.
+    - via
+    - villa
+    - voie
+    - zac
+    - zi
+    - z.i.
+    - zone
+#
+# Small-words list to drop in addresses' chuncks
+small_words_drop:
+    - the
+    - and
+    - of
+    - for
+    - de
+    - et
+    - la
+    - aux
+    - a
+    - sur
+    - pour
+    - en
+    - l
+    - d
+    - le
+#
+# Acronyms list with possibly missing space correspoding to specific affiliations
+missing_space_acronyms:
+    - FR
+    - FRE
+    - ULR
+    - UMR
+    - UMS
+    - U
+    - UPR
+    - UR
+#

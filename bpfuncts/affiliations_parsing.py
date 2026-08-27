@@ -900,7 +900,7 @@ def extend_author_affils(item_df, affil_filter_list):
     """
     # Setting useful column names
     cols_lists_dic, cols_dic = _set_norm_affils_cols()
-    read_usecols = cols_lists_dic['auth_affil_cols_list'][0:5]
+    read_usecols = cols_lists_dic['auth_affil_cols_list']
     norm_affils_col = cols_dic['norm_affils_col']
     temp_col = "complements_col"
 

@@ -1,5 +1,8 @@
 """Module of global parameters for setting column-names used 
 for rawdata parsings and concatenation/deduplication of parsings.
+
+The parameters values are set from the 'parsing_cols_globals.yaml' file 
+available by default in the 'DemoConfig' folder of the package.
 """
 
 __all__ = ['COL_NAMES',
@@ -8,182 +11,159 @@ __all__ = ['COL_NAMES',
            'COLUMN_LABEL_WOS',
            'COLUMN_LABEL_WOS_PLUS',
            'COLUMN_TYPE_SCOPUS',
-           'NORM_JOURNAL_COLUMN_LABEL',
-           'USECOLS_SCOPUS',
-           'USECOLS_WOS',
+           'NORM_JOURNAL_COL_NAME',
           ]
 
 
-# *****************************
-# * Parsing data column names *
-# *****************************
+# Local imports
+from bpfuncts.globals_utils import read_yaml_parsing_cols_globals
 
-# Particular column names
-NORM_JOURNAL_COLUMN_LABEL = 'Norm_journal'
 
-# Column names common to column names dicts
-PUB_ID      = 'Pub_id'
-AUTHOR_IDX  = 'Idx_author'
-ADDRESS_IDX = 'Idx_address'
-ADDRESS     = 'Address'
-COUNTRY     = 'Country'
-JOURNAL     = 'Journal'
-YEAR        = 'Year'
-DOI         = 'DOI'
-TITLE       = 'Title'
+# Getting the globals values from the YAML file of parsing globals
+parsing_cols_globals_dic = read_yaml_parsing_cols_globals()
 
-# Column names dicts
-COL_NAMES = {'pub_id'      : PUB_ID,
-             'wos_id'      : ['WoS_id',
-                              PUB_ID],
-             'scopus_id'   : ['Scopus_id',
-                              PUB_ID,],
-             'address'     : [PUB_ID,
-                              ADDRESS_IDX,
-                              ADDRESS,],
-             'address_inst': [PUB_ID,
-                              ADDRESS_IDX,
-                              ADDRESS,
-                              COUNTRY,
-                              'Norm_institutions',
-                              'Unknown_institutions',],
-             'articles'    : [PUB_ID,
-                              'Authors',
-                              YEAR,
-                              JOURNAL,
-                              'Volume',
-                              'Page',
-                              DOI,
-                              'Document_type',
-                              'Language',
-                              TITLE,
-                              'ISSN',],
-             'authors'     : [PUB_ID,
-                              AUTHOR_IDX,
-                              'Co_author',],
-             'auth_inst'   : [PUB_ID,
-                              AUTHOR_IDX,
-                              ADDRESS,
-                              COUNTRY,
-                              'Norm_institutions',
-                              'Raw_institutions',
-                              'Secondary_institutions',],
-             'country'     : [PUB_ID,
-                              ADDRESS_IDX,
-                              COUNTRY,],
-             'institution' : [PUB_ID,
-                              ADDRESS_IDX,
-                              'Institution',],
-             'keywords'    : [PUB_ID,
-                              'Keyword',],
-             'references'  : [PUB_ID,
-                              'Authors',
-                              YEAR,
-                              JOURNAL,
-                              DOI,
-                              TITLE,
-                              'Full_reference',],
-             'subject'     : [PUB_ID,
-                              'Subject',],
-             'sub_subject' : [PUB_ID,
-                              'Sub_subject',],
-             'temp_col'    : ['Title_LC',
-                              'Dedup_Same_Journal',
-                              TITLE,
-                              'title_tokens',
-                              'kept_tokens',
-                              'doc_type_lc',
-                              'doi_lc',],
+
+# ************************
+# * Parsing column names *
+# ************************
+
+PARSING_COLS_DIC = parsing_cols_globals_dic['parsing_cols_dic']
+
+COL_NAMES = {'pub_id'      : PARSING_COLS_DIC['pub_id'],
+             'wos_id'      : [PARSING_COLS_DIC['wos_id'],
+                              PARSING_COLS_DIC['pub_id'],
+                             ],
+             'scopus_id'   : [PARSING_COLS_DIC['scopus_id'],
+                              PARSING_COLS_DIC['pub_id'],
+                             ],
+             'address'     : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['address_id'],
+                              PARSING_COLS_DIC['address'],
+                             ],
+             'articles'    : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['authors'],
+                              PARSING_COLS_DIC['year'],
+                              PARSING_COLS_DIC['journal'],
+                              PARSING_COLS_DIC['volume'],
+                              PARSING_COLS_DIC['page'],
+                              PARSING_COLS_DIC['doi'],
+                              PARSING_COLS_DIC['doctype'],
+                              PARSING_COLS_DIC['language'],
+                              PARSING_COLS_DIC['title'],
+                              PARSING_COLS_DIC['issn'],
+                             ],
+             'authors'     : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['author_id'],
+                              PARSING_COLS_DIC['co_author'],
+                             ],
+             'auth_inst'   : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['author_id'],
+                              PARSING_COLS_DIC['address'],
+                              PARSING_COLS_DIC['country'],
+                              PARSING_COLS_DIC['norm_affils'],
+                              PARSING_COLS_DIC['raw_affils'],
+                             ],
+             'country'     : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['address_id'],
+                              PARSING_COLS_DIC['country'],
+                             ],
+             'institution' : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['address_id'],
+                             PARSING_COLS_DIC['affiliation]',
+                             ],
+             'keywords'    : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['keyword'],
+                             ],
+             'references'  : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['authors'],
+                              PARSING_COLS_DIC['year'],
+                              PARSING_COLS_DIC['journal'],
+                              PARSING_COLS_DIC['doi'],
+                              PARSING_COLS_DIC['title'],
+                              PARSING_COLS_DIC['full_ref'],
+                             ],
+             'subject'     : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['subject'],
+                             ],
+             'sub_subject' : [PARSING_COLS_DIC['pub_id'],
+                              PARSING_COLS_DIC['sub_subject'],
+                             ],
+             'temp_col'    : [PARSING_COLS_DIC['title_lowercase'],
+                              PARSING_COLS_DIC['dedup_same_journal'],
+                              PARSING_COLS_DIC['title'],
+                              PARSING_COLS_DIC['title_tokens'],
+                              PARSING_COLS_DIC['kept_tokens'],
+                              PARSING_COLS_DIC['doctype_lowercase'],
+                              PARSING_COLS_DIC['doi_lowercase'],
+                             ],
             }
 
+# Particular column names
+NORM_JOURNAL_COL_NAME = PARSING_COLS_DIC['norm_journal']
 
 # ***********************
 # * Scopus column names *
 # ***********************
 
-COLUMN_LABEL_SCOPUS = {'affiliations'             : 'Affiliations',
-                       'author_keywords'          : 'Author Keywords',
-                       'authors'                  : 'Authors',
-                       'authors_with_affiliations': 'Authors with affiliations',
-                       'document_type'            : 'Document Type',
-                       'doi'                      : 'DOI',
-                       'index_keywords'           : 'Index Keywords' ,
-                       'issn'                     : 'ISSN',
-                       'journal'                  : 'Source title',
-                       'language'                 : 'Language of Original Document',
-                       'page_start'               : 'Page start' ,
-                       'references'               : 'References' ,
-                       'sub_subjects'             : '',
-                       'subjects'                 : '',
-                       'title'                    : 'Title' ,
-                       'volume'                   : 'Volume',
-                       'year'                     : 'Year',
-                       }
+SCOPUS_COLS_LABELS_DIC = parsing_cols_globals_dic['scopus_cols_labels_dic']
 
+SCOPUS_COL_LABEL_LIST = ['affiliations',
+                         'author_keywords',
+                         'authors',
+                         'authors_with_affiliations',
+                         'document_type',
+                         'doi',
+                         'index_keywords',
+                         'issn',
+                         'journal',
+                         'language',
+                         'page_start',
+                         'references',
+                         'title',
+                         'volume',
+                         'year',
+                        ]
 
-COLUMN_LABEL_SCOPUS_PLUS = {'scopus_id'     : 'EID',
-                            'auth_fullnames': 'Author full names',
-                           }
+SCOPUS_COL_LABEL_PLUS_LIST = ['scopus_id',
+                              'auth_fullnames',
+                             ]
 
+COLUMN_LABEL_SCOPUS = [SCOPUS_COLS_LABELS_DIC[key][0] for key in SCOPUS_COL_LABEL_LIST]
 
-COLUMN_TYPE_SCOPUS = {COLUMN_LABEL_SCOPUS['affiliations']             : str,
-                      COLUMN_LABEL_SCOPUS['author_keywords']          : str,
-                      COLUMN_LABEL_SCOPUS['authors']                  : str,
-                      COLUMN_LABEL_SCOPUS['authors_with_affiliations']: str,
-                      COLUMN_LABEL_SCOPUS['document_type']            : str,
-                      COLUMN_LABEL_SCOPUS['doi']                      : str,
-                      COLUMN_LABEL_SCOPUS['index_keywords']           : str,
-                      COLUMN_LABEL_SCOPUS['issn']                     : str,
-                      COLUMN_LABEL_SCOPUS['journal']                  : str,
-                      COLUMN_LABEL_SCOPUS['language']                 : str,
-                      COLUMN_LABEL_SCOPUS['page_start']               : str,
-                      COLUMN_LABEL_SCOPUS['references']               : str,
-                      COLUMN_LABEL_SCOPUS['sub_subjects']             : str,
-                      COLUMN_LABEL_SCOPUS['subjects']                 : str,
-                      COLUMN_LABEL_SCOPUS['title']                    : str,
-                      COLUMN_LABEL_SCOPUS['volume']                   : str,
-                      COLUMN_LABEL_SCOPUS['year']                     : int,
-                     }
+COLUMN_TYPE_SCOPUS =  [SCOPUS_COLS_LABELS_DIC[key][1] for key in SCOPUS_COL_LABEL_LIST]
 
-
-# This global is only useful for the merge of Scopus rawdata
-_USECOLS_SCOPUS = '''Abstract,Affiliations,Authors,Author Keywords,Authors with affiliations,
-                     CODEN,Document Type,DOI,EID,Index Keywords,ISBN,ISSN,Issue,Language of Original Document,
-                     Page start,References,Source title,Title,Volume,Year'''
-USECOLS_SCOPUS  = [x.strip() for x in _USECOLS_SCOPUS.split(',')]
+COLUMN_LABEL_SCOPUS_PLUS = [SCOPUS_COLS_LABELS_DIC[key][0] for key in SCOPUS_COL_LABEL_PLUS_LIST]
 
 
 # ********************
 # * WoS column names *
 # ********************
 
-COLUMN_LABEL_WOS = {'affiliations'             : '',
-                    'author_keywords'          : 'DE',
-                    'authors'                  : 'AU',
-                    'authors_fullnames'        : 'AF',
-                    'authors_with_affiliations': 'C1',
-                    'document_type'            : 'DT',
-                    'doi'                      : 'DI',
-                    'index_keywords'           : 'ID',
-                    'issn'                     : 'SN',
-                    'journal'                  : 'SO',
-                    'language'                 : 'LA',
-                    'page_start'               : 'BP',
-                    'references'               : 'CR',
-                    'subjects'                 : 'WC',
-                    'sub_subjects'             : 'SC',
-                    'title'                    : 'TI',
-                    'volume'                   : 'VL',
-                    'year'                     : 'PY' ,
-                    }
+WOS_COLS_LABELS_DIC = parsing_cols_globals_dic['wos_cols_labels_dic']
 
+WOS_COL_LABEL_LIST = ['affiliations',
+                      'author_keywords',
+                      'authors',
+                      'authors_with_affiliations',
+                      'document_type',
+                      'doi',
+                      'index_keywords',
+                      'issn',
+                      'journal',
+                      'language',
+                      'page_start',
+                      'references',
+                      'subjects',
+                      'sub_subjects',
+                      'title',
+                      'volume',
+                      'year',
+                     ]
 
-COLUMN_LABEL_WOS_PLUS = {'e_issn'              : 'EI',
-                         'wos_id'              : 'UT',
-                        }
+WOS_COL_LABEL_PLUS_LIST = ['e_issn',
+                           'wos_id',
+                          ]
 
+COLUMN_LABEL_WOS = [WOS_COLS_LABELS_DIC[key] for key in WOS_COL_LABEL_LIST]
 
-# This global is only useful for the merge of WoS rawdata
-_USECOLS_WOS ='''AB,AU,BP,BS,C1,CR,DE,DI,DT,ID,IS,LA,PY,RP,
-                SC,SN,SO,TI,UT,VL,WC'''
-USECOLS_WOS  = [x.strip() for x in _USECOLS_WOS.split(',')]
+COLUMN_LABEL_WOS_PLUS = [WOS_COLS_LABELS_DIC[key] for key in WOS_COL_LABEL_PLUS_LIST]

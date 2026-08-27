@@ -561,7 +561,7 @@ def normalize_journal_names(database, corpus_df):
               f"should be {bp_pg.WOS} or {bp_pg.SCOPUS} ")
 
     if journal_alias:
-        norm_journal_alias = bp_pcg.NORM_JOURNAL_COLUMN_LABEL
+        norm_journal_alias = bp_pcg.NORM_JOURNAL_COL_NAME
         corpus_df[norm_journal_alias] = corpus_df[journal_alias].apply(_journal_normalizer)
 
     return corpus_df
@@ -695,7 +695,7 @@ def set_shared_parsing_cols():
         (tup): (A dict valued by column-names lists for each parsing item \
         and temporary column names defined by the 'COL_NAMES' global, \
         A dict valued by column names of parsing results defined by the \
-        'COL_NAMES' and 'NORM_JOURNAL_COLUMN_LABEL' globals).
+        'COL_NAMES' and 'NORM_JOURNAL_COL_NAME' globals).
     """
     cols_lists_dic = {'articles_cols_list'   : bp_pcg.COL_NAMES['articles'],
                       'address_cols_list'    : bp_pcg.COL_NAMES['address'],
@@ -726,7 +726,7 @@ def set_shared_parsing_cols():
                 'doc_type_col'        : bp_pcg.COL_NAMES['articles'][7],
                 'title_col'           : bp_pcg.COL_NAMES['articles'][9],
                 'issn_col'            : bp_pcg.COL_NAMES['articles'][10],
-                'norm_journal_col'    : bp_pcg.NORM_JOURNAL_COLUMN_LABEL,
+                'norm_journal_col'    : bp_pcg.NORM_JOURNAL_COL_NAME,
                }
 
     return cols_lists_dic, cols_dic

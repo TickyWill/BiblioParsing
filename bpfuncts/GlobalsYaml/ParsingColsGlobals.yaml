@@ -1,0 +1,123 @@
+# *************************************************************************************
+# * Dict setting the names of columns for the data resulting from the parsing process *
+# *************************************************************************************
+#
+# Values are the name for each column
+parsing_cols_dic:
+  pub_id: Pub_id
+  wos_id: WoS_id
+  scopus_id: Scopus_id
+  address_id: Idx_address
+  author_id: Idx_author
+  address: Address
+  journal: Journal
+  year: Year
+  doi: DOI
+  title: Title
+  norm_affils: Norm_institutions
+  raw_affils: Raw_institutions
+  affiliation: Institution
+  authors: Authors
+  volume: Volume
+  page: Page
+  doctype: Document_type
+  language: Language
+  issn: ISSN
+  co_author: Co_author
+  keyword: Keyword
+  full_ref: Full_reference
+  subject: Subject
+  sub_subject: Sub_subject
+  title_lowercase: Title_LC
+  dedup_same_journal: Dedup_Same_Journal
+  title_tokens: title_tokens
+  kept_tokens: kept_tokens
+  doctype_lowercase: doc_type_lc
+  doi_lowercase: doi_lc
+  norm_journal: Norm_journal
+#
+#
+# ***************************************************************
+# * Dict giving the Scopus names of columns in Scopus raw data *
+# ***************************************************************
+#
+# Values are lists composed of name and type of data for each column
+scopus_cols_labels_dic:
+  affiliations:
+  - Affiliations
+  - string
+  author_keywords:
+  - Author Keywords
+  - string
+  authors:
+  - Authors
+  - string
+  authors_with_affiliations:
+  - Authors with affiliations
+  - string
+  document_type:
+  - Document Type
+  - string
+  doi:
+  - DOI
+  - string
+  index_keywords:
+  - Index Keywords
+  - string
+  issn:
+  - ISSN
+  - string
+  journal:
+  - Source title
+  - string
+  language:
+  - Language of Original Document
+  - string
+  page_start:
+  - Page start
+  - string
+  references:
+  - References
+  - string
+  title:
+  - Title
+  - string
+  volume:
+  - Volume
+  - string
+  year:
+  - Year
+  - integer
+  scopus_id:
+  - EID
+  - string
+  auth_fullnames:
+  - Author full names
+  - string
+#
+#
+# ***********************************************************
+# * Globals giving the WoS names of columns in WoS raw data *
+# ***********************************************************
+#
+wos_cols_labels_dic:
+  author_keywords: DE
+  authors: AU
+  authors_fullnames: AF
+  authors_with_affiliations: C1
+  document_type: DT
+  doi: DI
+  index_keywords: ID
+  issn: SN
+  journal: SO
+  language: LA
+  page_start: BP
+  references: CR
+  subjects: WC
+  sub_subjects: SC
+  title: TI
+  volume: VL
+  year: PY
+  e_issn: EI
+  wos_id: UT
+#

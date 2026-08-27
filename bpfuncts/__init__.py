@@ -11,6 +11,7 @@ import os
 import nltk
 
 # Local imports
+from bpfuncts.globals_utils import *
 from bpfuncts.general_utils import *
 from bpfuncts.general_globals import *
 from bpfuncts.parsing_cols_globals import *

@@ -546,11 +546,9 @@ def _build_wos_articles(corpus_df, fails_dic, cols_tup):
     return articles_df
 
 
-def wos_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
+def wos_parser(rawdata_path, parsing_items_list, affil_filter_list=None, affil_params_dic=None):
     """Builds parsing data from the corpus rawdata.
 
-    The list of the parsed items (keys of the returned dict which values are the dataframes \
-    of the parsing results) is given by the PARSING_ITEMS_LIST global. 
     The rawdata are parsed using the following internal functions:
     - `_build_wos_articles` which parses the articles' core data from the corpus rawdata
     - `_build_wos_authors` which parses the authors' field of rawdata;
@@ -566,6 +564,8 @@ def wos_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
 
     Args:
         rawdata_path (path): The full path to the corpus rawdata.
+        parsing_items_list (list): The parsed items (keys of the returned dict which values are the dataframes \
+        of the parsing results)
         affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
         optional (default=None).
         affil_params_dic (dict); Optional dict (default=None) keyed by ['affil_types_file_path', \
@@ -581,7 +581,7 @@ def wos_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
     cols_tup = _set_wos_parsing_cols()
 
     # Setting items list and values
-    items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(12)]
+    items_list = [parsing_items_list[x] for x in range(12)]
 
     # Reading and checking the raw corpus file
     corpus_df, wos_ids_df = read_wos_rawdata(rawdata_path, wos_ids=True)

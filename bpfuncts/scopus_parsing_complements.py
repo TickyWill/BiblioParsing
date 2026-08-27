@@ -307,7 +307,7 @@ def _build_authors_attr(ref_items_list, verbose):
     author_max_len = 30
     auth_idx_max = 0
     first_item = ref_items_list[0]
-    if re.findall(bp_rg.RE_SCOPUS_REF_EL_AL, first_item):
+    if re.findall(bp_rg.RE_SCOPUS_REF_ET_AL, first_item):
         authors_case = 'with_et_al'
         first_author = first_item
     else:

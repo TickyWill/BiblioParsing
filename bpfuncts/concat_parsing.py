@@ -44,7 +44,7 @@ def _set_dedup_cols():
                 'lc_doc_type_col'        : bp_pcg.COL_NAMES['temp_col'][5],
                 'lc_doi_col'             : bp_pcg.COL_NAMES['temp_col'][6],
                 'same_journal_col'       : bp_pcg.COL_NAMES['temp_col'][1],
-                'norm_journal_col'       : bp_pcg.NORM_JOURNAL_COLUMN_LABEL,
+                'norm_journal_col'       : bp_pcg.NORM_JOURNAL_COL_NAME,
                }
     return cols_dic
 
@@ -73,7 +73,8 @@ def _concatenate_item_dfs(item_first_corpus_df, item_second_corpus_df, pub_id_co
     return concat_df
 
 
-def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_list=None):
+#def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_list=None):
+def concatenate_parsing(first_parsing_dict, second_parsing_dict, parsing_items_list, affil_filter_list=None):
     """Concatenates parsing data of two corpuses using the `_concatenate_item_dfs` 
     internal function to the module.
 
@@ -86,6 +87,8 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
         resulting from the parsing of the first corpus (dataframe).
         second_parsing_dict (dict): The dict keyed by parsing items (str) and valued by data \
         resulting from the parsing of the second corpus (dataframe).
+        parsing_items_list (list): The parsed items (keys of the returned dict which values \
+        are the dataframes of the parsing results)
         affil_filter_list (list): Optional (default=None), the affiliations-filter composed of a list \
         of normalized affiliations (str).
     Returns:
@@ -93,7 +96,8 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
     """
     # Setting useful aliases
     pub_id_alias = bp_pcg.COL_NAMES['pub_id']
-    auth_inst_item_alias = bp_pg.PARSING_ITEMS_LIST[5]
+#    auth_inst_item_alias = bp_pg.PARSING_ITEMS_LIST[5]
+    authaffil_item = parsing_items_list[5]
 
     # Getting a list of the common items of the parsing dicts
     first_items_set = set(first_parsing_dict.keys())
@@ -114,11 +118,11 @@ def concatenate_parsing(first_parsing_dict, second_parsing_dict, affil_filter_li
         else:
             concat_parsing_dict[item] = pd.DataFrame(columns=item_columns)
 
-    # Extending the author with institutions parsing df
-    if affil_filter_list and concat_parsing_dict[auth_inst_item_alias] is not None:
-        return_df = extend_author_affils(concat_parsing_dict[auth_inst_item_alias],
+    # Extending the author with institutions parsing data
+    if affil_filter_list and concat_parsing_dict[authaffil_item] is not None:
+        return_df = extend_author_affils(concat_parsing_dict[authaffil_item],
                                          affil_filter_list)
-        concat_parsing_dict[auth_inst_item_alias] = return_df
+        concat_parsing_dict[authaffil_item] = return_df
     return concat_parsing_dict
 
 
@@ -463,7 +467,8 @@ def _deduplicate_item_df(pub_ids_to_drop, item_df, pub_id_col, second_col):
     return item_dg
 
 
-def deduplicate_parsing(concat_parsing_dict, norm_affil_status=False, affil_params_dic=None, verbose=False):
+def deduplicate_parsing(concat_parsing_dict, parsing_items_list, norm_affil_status=False,
+                        affil_params_dic=None, verbose=False):
     """Deduplicates parsing data from the concatenated parsing data.
 
     It proceeds with deduplication of publications data using the `_deduplicate_articles` internal 
@@ -475,6 +480,8 @@ def deduplicate_parsing(concat_parsing_dict, norm_affil_status=False, affil_para
     Args:
         concat_parsing_dict (dict): Dict with keys as items parsing (str) and values (dataframe) as \
         the data resulting from the concatenation of corpuses parsings.
+        parsing_items_list (list): The parsed items (keys of the returned dict which values \
+        are the dataframes of the parsing results)
         norm_affil_status (bool): If true (dafault= False), normalized institutions and of not-yet \
         normalized institutions are built.
         affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
@@ -495,12 +502,12 @@ def deduplicate_parsing(concat_parsing_dict, norm_affil_status=False, affil_para
     pub_id_col = cols_list[0]
 
     # Setting second cols for sorting item's data after deduplication for selected items
-    second_col_items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in range(1, 6)]
+    second_col_items_list = [parsing_items_list[x] for x in range(1, 6)]
     sorting_second_col_dict = dict(zip(second_col_items_list, cols_list[1:]))
 
     # Setting useful items' lists and items' values for deduplication process
     full_items_list = list(concat_parsing_dict.keys())
-    sub_items_list = [bp_pg.PARSING_ITEMS_LIST[x] for x in [0, 2, 12, 13]]
+    sub_items_list = [parsing_items_list[x] for x in [0, 2, 12, 13]]
     articles_item, addresses_item, norm_inst_item, raw_inst_item = sub_items_list
     items_list_wo_articles = full_items_list.copy()
     items_list_wo_articles.remove(articles_item)
