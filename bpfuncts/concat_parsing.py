@@ -295,26 +295,21 @@ def _drop_duplicate_article2(df, cols_list):
     lc_title_col, lc_doc_type_col, same_journal_col, lc_doi_col, pub_id_col = cols_list
     dedup_df = df.copy()
     dfs_list = []
-    for _, dg in df.groupby([lc_title_col, lc_doc_type_col, same_journal_col]):
-        if len(dg)<3:
-            # Deduplicating article lines with same title, document type, first author and journal
-            # and also with same DOI if not bp_pg.UNKNOWN
-            dg[lc_doi_col] = _find_value_to_keep(dg, lc_doi_col)
-            dg.drop_duplicates(subset = [lc_doi_col], keep='first', inplace=True)
-        else:
-            # Dropping Publications data with DOI bp_pg.UNKNOWN from group of publications with same title,
-            # document type, first author and journal but different DOIs
-            unkown_indices = dg[dg[lc_doi_col]==bp_pg.UNKNOWN].index
-            dg.drop(unkown_indices,inplace = True)
-            pub_ids_list = list(dg[pub_id_col])
-            warning = (f'WARNING: Multiple DOI values for same title, document type, first author and journal '
-                                  f'are found in the group of publication data with IDs {pub_ids_list} '
-                                  f'in "_deduplicate_articles" function '
-                                  f'called by "parsing_concatenate_deduplicate" function '
-                                  f'of "concat_parsing.py" module.\n'
-                                  f'Publications data with DOIs "{bp_pg.UNKNOWN}" has been droped')
-            print(warning)
-        dfs_list.append(dg)
+    for same_list, dg in df.groupby([lc_title_col, lc_doc_type_col, same_journal_col]):
+        new_dg = dg.copy()
+        if len(new_dg)>1:
+            # Dropping publications data with DOI bp_pg.UNKNOWN from group of publications with same title,
+            # document type, first author and journal
+            unknown_doi_idx = dg[dg[lc_doi_col]==bp_pg.UNKNOWN].index
+            dg_wo_unknown_doi = dg.drop(unknown_doi_idx)
+            new_dg = dg_wo_unknown_doi.drop_duplicates(subset=[lc_doi_col], keep='first')
+            if len(new_dg)>1:
+                # Warning that publications with same title, document type, first author and journal have different DOIs
+                pub_ids_list = list(new_dg[pub_id_col])
+                warning = ('           - WARNING: Multiple DOI values for same title, document type, first author and journal '
+                           f"for the publications' with IDs: {pub_ids_list}")
+                print(warning)
+        dfs_list.append(new_dg)
     if dfs_list:
         dedup_df = pd.concat(dfs_list)
     dedup_df = dedup_df.drop([lc_title_col, lc_doc_type_col, lc_doi_col], axis=1)
