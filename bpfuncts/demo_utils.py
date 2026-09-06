@@ -2,16 +2,18 @@
 
 This covers:
     - Configuration setting such as working folder architecture;
+    - Reading parsings results;
     - Saving parsings results;
     - Setting paths to user's files to use for authors' affiliations parsing.
 """
 
-__all__ = ['save_db_ids_data',
-           'save_fails_dict',
-           'save_parsing_dict',
-           'save_parsing_dicts',
-           'set_step_affil_parsing_paths',
-           'set_user_config',
+__all__ = ['read_demo_parsing_dict',
+           'save_demo_db_ids_data',
+           'save_demo_fails_dict',
+           'save_demo_parsing_dict',
+           'save_demo_parsing_dicts',
+           'set_demo_step_affil_parsing_paths',
+           'set_demo_user_config',
           ]
 
 
@@ -19,6 +21,9 @@ __all__ = ['save_db_ids_data',
 import json
 import os
 from pathlib import Path
+
+# 3rd party imports
+import pandas as pd
 
 # Local library imports
 import bpfuncts.parsing_globals as bp_pg
@@ -34,7 +39,7 @@ def _get_demo_config():
     return config_dict
 
 
-def _build_effective_config(parsing_folder_dict, db_list):
+def _build_demo_effective_config(parsing_folder_dict, db_list):
     rawdata_folder_name = parsing_folder_dict['corpus']['database']['rawdata']
     parsing_folder_name = parsing_folder_dict['corpus']['database']['parsing']
     parsing_folder_dict_init = parsing_folder_dict
@@ -56,7 +61,7 @@ def _build_effective_config(parsing_folder_dict, db_list):
     return parsing_folder_dict
 
 
-def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
+def _build_demo_files_paths(year, parsing_folder_dict, root_path, db_list):
     # Internal functions
     def _create_folder(parsing_folder_dict, keys_list, folder_root):
         key_dict = parsing_folder_dict
@@ -69,7 +74,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
         return (folder_path, folder_name)
 
     # Updating 'parsing_folder_dict' using the list of databases 'db_list'
-    parsing_folder_dict = _build_effective_config(parsing_folder_dict, db_list)
+    parsing_folder_dict = _build_demo_effective_config(parsing_folder_dict, db_list)
 
     # Creating the working folder if not available
     keys_list = ['folder_root']
@@ -119,7 +124,7 @@ def _build_files_paths(year, parsing_folder_dict, root_path, db_list):
     return rawdata_path_dict, parsing_path_dict
 
 
-def set_user_config(year=None, db_list=None):
+def set_demo_user_config(year=None, db_list=None):
     """Sets the configuration for a demo"""
     # default values :
     rawdata_path_dict, parsing_path_dict, item_filename_dict = None, None, None
@@ -141,7 +146,7 @@ def set_user_config(year=None, db_list=None):
 
     if year and db_list:
         # Building the working folder architecture for a corpus single year "year" and getting useful paths
-        rawdata_path_dict, parsing_path_dict = _build_files_paths(year, parsing_folder_dict, root_path, db_list)
+        rawdata_path_dict, parsing_path_dict = _build_demo_files_paths(year, parsing_folder_dict, root_path, db_list)
 
     # Getting the filenames for each parsing item
     item_filename_dict = config_dict['PARSING_FILE_NAMES']
@@ -149,8 +154,8 @@ def set_user_config(year=None, db_list=None):
     return wf_path, rawdata_path_dict, parsing_path_dict, item_filename_dict
 
 
-def save_parsing_dict(parsing_dict, parsing_path,
-                      item_filename_dict, save_extent):
+def save_demo_parsing_dict(parsing_dict, parsing_path,
+                           item_filename_dict, save_extent):
     """Saves the parsing results of a single step of the parsing step."""
     # Cycling on parsing items
     for item in bp_pg.PARSING_ITEMS_LIST:
@@ -172,7 +177,7 @@ def save_parsing_dict(parsing_dict, parsing_path,
     return message
 
 
-def save_fails_dict(fails_dict, parsing_path):
+def save_demo_fails_dict(fails_dict, parsing_path):
     """Saves parsing performance indicators in a json file.
 
     Args:
@@ -188,8 +193,8 @@ def save_fails_dict(fails_dict, parsing_path):
     return message
 
 
-def save_db_ids_data(db_ids_df, parsing_path, database):
-    """The function `save_db_ids_data` saves database-IDs data in an xlsx file.
+def save_demo_db_ids_data(db_ids_df, parsing_path, database):
+    """The function `save_demo_db_ids_data` saves database-IDs data in an xlsx file.
 
     Args:
         db_ids_df (dataframe): The database IDs data.
@@ -206,7 +211,7 @@ def save_db_ids_data(db_ids_df, parsing_path, database):
     return message
 
 
-def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict,
+def save_demo_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict,
                        save_extent, fails_dicts, ids_dfs_dict):
     """Saves the parsing results of all the steps of the parsing process."""
     fails_save_status = False
@@ -214,16 +219,16 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict
 
     for parsing_name, parsing_dict in parsing_dicts_dict.items():
         parsing_path = parsing_path_dict[parsing_name]
-        _ = save_parsing_dict(parsing_dict, parsing_path, item_filename_dict, save_extent)
+        _ = save_demo_parsing_dict(parsing_dict, parsing_path, item_filename_dict, save_extent)
 
         if parsing_name in fails_dicts.keys():
             parsing_fails_dict = fails_dicts[parsing_name]
-            _ = save_fails_dict(parsing_fails_dict, parsing_path)
+            _ = save_demo_fails_dict(parsing_fails_dict, parsing_path)
             fails_save_status = True
 
         if parsing_name in ids_dfs_dict.keys():
             db_ids_df = ids_dfs_dict[parsing_name]
-            _ = save_db_ids_data(db_ids_df, parsing_path, parsing_name)
+            _ = save_demo_db_ids_data(db_ids_df, parsing_path, parsing_name)
             db_ids_save_status = True
 
     message = f"All parsing-to-deduplication results saved as files with .{save_extent} extension."
@@ -235,7 +240,8 @@ def save_parsing_dicts(parsing_dicts_dict, parsing_path_dict, item_filename_dict
     return message
 
 
-def set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic, rawdata_parsing_step=False, verbose=False):
+def set_demo_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
+                                      rawdata_parsing_step=False, verbose=False):
     """Sets paths to user's files to use for authors' affiliations parsing."""
     # Setting the filename for the affiliations-per-country data for parsings deduplication step
     parsing_step_norm_affil_file = user_affil_files_dic['country_affils_file']
@@ -259,3 +265,45 @@ def set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic, rawdata_p
               f"\n  - country_towns_file  : {user_affil_files_dic['country_towns_file']}\n"
               f"\navailable at: {user_rep_utils}\n")
     return user_affil_params_dic
+
+
+def read_demo_parsing_dict(parsing_path, item_filename_dict, read_extent):
+    """Reads the dataframes of the parsing results from files of a specified type.
+
+    Args:
+        parsing_path (path): Full path to the folder where the parsing \
+        results are located.
+        item_filename_dict (dict): Dict keyed by the parsing items and valued \
+        by the file names of the parsing results.
+        read_extent (str): File type given by file extension without the dot separator \
+        (ex: "xlsx" for Excel file type).
+    Returns:
+        (dict): Parsing results keyed by parsing items \
+        given by 'PARSING_ITEMS_LIST' global imported from \
+        the package imported as bp and valued by the dataframes \
+        of parsing results.
+    """
+    parsing_dict = {}
+    # Cycling on parsing items
+    for item in bp_pg.PARSING_ITEMS_LIST:
+        item_df = None
+        if read_extent=="xlsx":
+            item_xlsx_file = item_filename_dict[item] + ".xlsx"
+            item_xlsx_path = parsing_path / Path(item_xlsx_file)
+            if item_xlsx_path.is_file():
+                try:
+                    item_df = pd.read_excel(item_xlsx_path)
+                except pd.errors.EmptyDataError:
+                    item_df = pd.DataFrame()
+        elif read_extent=="dat":
+            item_tsv_file = item_filename_dict[item] + ".dat"
+            item_tsv_path = parsing_path / Path(item_tsv_file)
+            if item_tsv_path.is_file():
+                try:
+                    item_df = pd.read_csv(item_tsv_path, sep = "\t")
+                except pd.errors.EmptyDataError:
+                    item_df = pd.DataFrame()
+
+        if item_df is not None:
+            parsing_dict[item] = item_df
+    return parsing_dict

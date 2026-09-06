@@ -1,6 +1,6 @@
 """ `BiblioParsing` package __init__.
 """
-__version__ = '3.0.0'
+__version__ = '3.1.0'
 __author__ = 'BiblioAnalysis team'
 __license__ = 'MIT'
 
@@ -36,14 +36,17 @@ def download_nltk_data():
 
     To do that, it first checks if any of the potential full path of their dedicated folder exists.
     If not, it downloads the required libraries.
+    Complementary libraries for nltk are downloaded into 'C:/Users/<user home>/AppData/Roaming/nltk_data'.
+
+    For more information see: https://www.nltk.org/data.html
     """
     for nltk_path in nltk.data.path:
         if os.path.exists(nltk_path):
             return
 
     # Downloading useful complementary libraries since no nltk data have been already downloaded
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger_eng')
+    nltk.download('punkt_tab')
     nltk.download('wordnet')
 
 download_nltk_data()

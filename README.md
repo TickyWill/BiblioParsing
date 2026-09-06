@@ -3,9 +3,9 @@
 Python modules for parsing the rawdata extracted from Scopus and WoS databases.
 
 ## Installation
-Run the following to install:
+Run the following to install from a branch of the git repository:
 ```python
-pip install git+https://github.com/TickyWill/BiblioParsing.git@main
+pip install git+https://github.com/TickyWill/BiblioParsing.git@<branch_name>
 ```
 
 ## Usage example
@@ -14,7 +14,7 @@ from pathlib import Path
 import bpfuncts as bp
 
 # Getting the filenames for each parsing item
-config_tup = bp.set_user_config()
+config_tup = bp.set_demo_user_config()
 item_filename_dict = config_tup[3]
 
 # Setting the files type for saving results
@@ -34,10 +34,10 @@ user_affil_files_dic = {'country_towns_file'   : <your_country_towns_file_name>,
                        }
 
 user_rep_utils = <full_path_to_your_affil_root_folder_name>
-rawdata_affil_params_dic = bp.set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
-                                                           rawdata_parsing_step=True)
-dedup_affil_params_dic = bp.set_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
-                                                         rawdata_parsing_step=False)
+rawdata_affil_params_dic = bp.set_demo_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
+                                                                rawdata_parsing_step=True)
+dedup_affil_params_dic = bp.set_demo_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
+                                                              rawdata_parsing_step=False)
 
 # Setting the user's status of building normalized institutions file and raw institutions file after deduplicating parsing
 user_norm_affil_status = True
@@ -46,33 +46,33 @@ user_norm_affil_status = True
 scopus_raw_path = Path(<your_fullpath_to_scopus_rawdata>)
 scopus_parsing_path = Path(<your_fullpath_for_scopus_parsing_results>)
 return_tup = bp.scopus_parser(scopus_raw_path, affil_filter_list=None,
-                               affil_params_dic=rawdata_affil_params_dic)
+                              affil_params_dic=rawdata_affil_params_dic)
 scopus_parsing_dict, scopus_fails_dict, scopus_ids_df = return_tup[0:3]
-bp.save_parsing_dict(scopus_parsing_dict, scopus_parsing_path, item_filename_dict, save_extent)
-bp.save_fails_dict(scopus_fails_dict, scopus_parsing_path)
-bp.save_db_ids_data(scopus_ids_df, scopus_parsing_path, bp.SCOPUS)
+bp.save_demo_parsing_dict(scopus_parsing_dict, scopus_parsing_path, item_filename_dict, save_extent)
+bp.save_demo_fails_dict(scopus_fails_dict, scopus_parsing_path)
+bp.save_demo_db_ids_data(scopus_ids_df, scopus_parsing_path, bp.SCOPUS)
 
 # Parsing WoS rawdata and saving results
 wos_raw_path = Path(<your_fullpath_to_wos_rawdata>)
 wos_parsing_path = Path(<your_fullpath_for_wos_parsing_results>)
 return_tup = bp.wos_parser(wos_raw_path, affil_filter_list=None,
-                                  affil_params_dic=rawdata_affil_params_dic)
+                           affil_params_dic=rawdata_affil_params_dic)
 wos_parsing_dict, wos_fails_dict, wos_ids_df = return_tup
-bp.save_parsing_dict(wos_parsing_dict, wos_parsing_path, item_filename_dict, save_extent)
-bp.save_fails_dict(wos_fails_dict, wos_parsing_path)
-bp.save_db_ids_data(wos_ids_df, wos_parsing_path, bp.WOS)
+bp.save_demo_parsing_dict(wos_parsing_dict, wos_parsing_path, item_filename_dict, save_extent)
+bp.save_demo_fails_dict(wos_fails_dict, wos_parsing_path)
+bp.save_demo_db_ids_data(wos_ids_df, wos_parsing_path, bp.WOS)
 
 # Parsings concatenation and saving results
 concat_parsing_path = Path(<your_fullpath_for_parsings_concat_results>)
 concat_parsing_dict = bp.concatenate_parsing(scopus_parsing_dict, wos_parsing_dict,
                                              affil_filter_list=user_affil_filter_list)
-bp.save_parsing_dict(concat_parsing_dict, concat_parsing_path, item_filename_dict, save_extent)
+bp.save_demo_parsing_dict(concat_parsing_dict, concat_parsing_path, item_filename_dict, save_extent)
 
 # Parsings deduplication and saving results
 dedup_parsing_path = Path(<your_fullpath_for_parsings_dedup_results>)
 dedup_parsing_dict = bp.deduplicate_parsing(concat_parsing_dict, norm_affil_status=user_norm_affil_status,
                                             affil_params_dic=rawdata_affil_params_dic)
-bp.save_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict, save_extent)
+bp.save_demo_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict, save_extent)
 ```
 **for more exemples refer to** [BiblioParsing-exemples](https://github.com/TickyWill/BiblioParsing/Demo_BiblioParsing.ipynb).
 
@@ -83,8 +83,9 @@ bp.save_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_dict,
 1.2.0 Added parsing of database-IDs
 2.0.0 Deep refactoring based on rationalization of imports
 3.0.0 Deep refactoring based on rationalization of functions, modules and regex
+3.1.0 Upgrade of python version to 3.14
 
 # Meta
-	- authors : BiblioAbnalysis team
+	- authors: BiblioAbnalysis team
 
 Distributed under the [MIT license](https://mit-license.org/)
