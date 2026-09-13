@@ -152,13 +152,13 @@ DASHES_CHANGE = str.maketrans(DASHES_CHANGE_DIC)
 LANG_CHAR_CHANGE_DIC = {"Ł": "L",   # polish capital to L
                         "ł": "l",   # polish l
                         "ı": "i",
-                        "Đ": "D",   # D with stroke (Vietamese,South Slavic) to D
+                        "Đ": "D",   # D with stroke (Vietnamese,South Slavic) to D
                         "&": "",
                         }
 LANG_CHAR_CHANGE = str.maketrans(LANG_CHAR_CHANGE_DIC)
 
 
-# For droping ponctuation symbols
+# For dropping punctuation symbols
 PONCT_CHANGE_DIC = {".": "",
                     ",": "",
                     ";": "",
@@ -180,7 +180,7 @@ SYMB_CHANGE_DIC = {"&": "and",
 SYMB_CHANGE = str.maketrans(SYMB_CHANGE_DIC)
 
 
-# For droping particular symbols
+# For dropping particular symbols
 DROP_SYMB_DIC = {"'": " ",
                  "*": " ",
                  "#": " ",

@@ -71,8 +71,7 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
         used to normalize the affiliations, the name of the file of the data of towns per country \
         and the full path to the folder where these data are available.
         scopus_cat_paths (list): Optional (default: none), Composed of the full path to the Scopus \
-        categories codes and of the catagories per journal.
-    Returns:
+        categories codes and of the categories per journal.
     Returns:
         (tup): The tuple of parsing results returned by the used appropriate parser.
     """

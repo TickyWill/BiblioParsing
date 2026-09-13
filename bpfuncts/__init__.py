@@ -20,11 +20,13 @@ from bpfuncts.affiliations_globals import *
 from bpfuncts.parsing_utils import *
 from bpfuncts.affil_norm_utils import *
 from bpfuncts.scopus_rawdata_utils import *
+from bpfuncts.scopus_references_parsing import *
+from bpfuncts.scopus_subjects_parsing import *
 from bpfuncts.scopus_parsing import *
-from bpfuncts.scopus_parsing_complements import *
 from bpfuncts.wos_rawdata_utils import *
+from bpfuncts.wos_references_parsing import *
+from bpfuncts.wos_subjects_parsing import *
 from bpfuncts.wos_parsing import *
-from bpfuncts.wos_parsing_complements import *
 from bpfuncts.affiliations_parsing import *
 from bpfuncts.concat_parsing import *
 from bpfuncts.main_parsing import *

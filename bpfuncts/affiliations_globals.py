@@ -61,19 +61,19 @@ GEN_KEEPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).low
 
         # Setting a list of basic keeping words only for country = 'France'
 _BASIC_KEEPING_WORDS = ['Beamline', 'CRG', 'EA', 'ED', 'Equipe', 'ULR', 'UMR', 'UMS', 'UPR']
-        # Removing accents keeping non adcii characters and converting to lower case the words, by default
+        # Removing accents keeping non ASCII characters and converting to lower case the words, by default
 BASIC_KEEPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _BASIC_KEEPING_WORDS]
 
         # Setting a user list of keeping words
 _USER_KEEPING_WORDS = ['CEA', 'CEMHTI', 'CNRS', 'ESRF', 'FEMTO ST', 'IMEC', 'INES', 'INSA',
                        'INSERM', 'IRCELYON', 'KU Leuven', 'LaMCoS', 'LEPMI', 'LETI', 'LITEN',
                        'LOCIE', 'spLine', 'STMicroelectronics', 'TNO', 'UMI', 'VTT']
-        # Removing accents keeping non adcii characters and converting to lower case the words, by default
+        # Removing accents keeping non ASCII characters and converting to lower case the words, by default
 USER_KEEPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _USER_KEEPING_WORDS]
 
         # Setting a total list of keeping words
 _KEEPING_WORDS = _GEN_KEEPING_WORDS + _BASIC_KEEPING_WORDS + _USER_KEEPING_WORDS
-        # Removing accents keeping non adcii characters and converting to lower case the words, by default
+        # Removing accents keeping non ASCII characters and converting to lower case the words, by default
 KEEPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _KEEPING_WORDS]
 
 
@@ -90,7 +90,7 @@ _DROPPING_SUFFIX = ["campus", "laan", "park", "platz", "staal", "strae", "strass
                     "alleen", "vagen", "vei", "-gu", "-do", "-si", "shire"]
 
     # added "ring" but drops chunks containing "Engineering"
-    # Removing accents keeping non adcii characters and converting to lower case the dropping suffixes, by default
+    # Removing accents keeping non ASCII characters and converting to lower case the dropping suffixes, by default
 DROPPING_SUFFIX = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _DROPPING_SUFFIX]
 
 
@@ -107,7 +107,7 @@ _DROPPING_WORDS = ["alle", "alleen", "area", "avda", "avda.",
                    "street", "str", "str.", "tietotie", "vei", "veien", "vej", "via", "viale", "vialle",
                    "voc.", "w", "way", "west", "zona"]
 
-        # Removing accents keeping non adcii characters and converting to lower case the dropping words, by default
+        # Removing accents keeping non ASCII characters and converting to lower case the dropping words, by default
 _DROPPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _DROPPING_WORDS]
         # Escaping the regex meta-character "." from the dropping words, by default
 _DROPPING_WORDS = [x.replace(".", r"\.") for x in _DROPPING_WORDS]
@@ -123,7 +123,7 @@ _FR_DROPPING_WORDS = ["allee", "antenne", "av", "av.", "ave", "avenue",
                       "plan", "pole", "quai", "r", "r.", "rambla", "region", "route", "rue",
                       "site", "v.", "via", "villa", "voie", "zac", "zi", "z.i.", "zone"]
 
-        # Removing accents keeping non adcii characters and converting to lower case the dropping words, by default
+        # Removing accents keeping non ASCII characters and converting to lower case the dropping words, by default
 _FR_DROPPING_WORDS = [remove_special_symbol(x, only_ascii=False, strip=False).lower() for x in _FR_DROPPING_WORDS]
         # Escaping the regex meta-character "." from the dropping words, by default
 _FR_DROPPING_WORDS = [x.replace(".", r"\.") for x in _FR_DROPPING_WORDS]

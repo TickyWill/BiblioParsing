@@ -55,8 +55,8 @@ def read_wos_rawdata(rawdata_path, wos_ids=False):
 
     Args:
         rawdata_path (path): The full path to the WoS-rawdata file.
-        wos_ids (bool): Optional, true for building the data of WoS IDs of \
-        publications (dafault=False).
+        wos_ids (bool): Optional, true for building the data of WoS IDs \
+        of publications (default=False).
     Returns:
         (tup): (The cleaned corpus data (dataframe), The WoS-IDs data (dataframe)).
     """

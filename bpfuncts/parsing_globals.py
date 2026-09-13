@@ -68,7 +68,7 @@ UNKNOWN = 'unknown'
 # Value for undefined country in affiliations rawdata
 UNKNOWN_COUNTRY = 'Unknown'
 
-# Filae name of identifiers of publications to remove from rawdata before parsing
+# File name of identifiers of publications to remove from rawdata before parsing
 IDS_TO_DROP_FILE_BASE = "_IDs à supprimer.xlsx"
 
 # List of items separatly built from the rawdata parsing

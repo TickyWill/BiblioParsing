@@ -2,9 +2,12 @@
 """
 
 __all__ = ['build_affils_useful_dicts',
+           'build_norm_affiliation_list',
            'build_norm_raw_affils_dict',
+           'extend_author_affils',
            'read_affil_types',
            'read_towns_per_country',
+           'set_norm_affils_cols',
            ]
 
 
@@ -19,6 +22,7 @@ import pandas as pd
 # Local library imports
 import bpfuncts.affiliations_globals as bp_ag
 import bpfuncts.general_globals as bp_gg
+import bpfuncts.parsing_cols_globals as bp_pcg
 import bpfuncts.regex_globals as bp_rg
 from bpfuncts.general_utils import remove_special_symbol
 from bpfuncts.parsing_utils import dict_print
@@ -26,9 +30,33 @@ from bpfuncts.parsing_utils import rationalize_town_names
 from bpfuncts.parsing_utils import set_address_uniform_words
 
 
+def set_norm_affils_cols():
+    """Builds 2 dict setting columns lists and selected columns names 
+    for the process of parsing author affiliations and getting their 
+    normalized affiliations.
+
+    Returns:
+        (tup): (A dict valued by column-names lists defined by the 'COL_NAMES' global, \
+        A dict valued by column names of parsing results defined by the 'COL_NAMES' global).
+    """
+    cols_lists_dic = {'country_cols_list'   : bp_pcg.COL_NAMES['country'],
+                      'affil_cols_list'     : bp_pcg.COL_NAMES['institution'],
+                      'auth_affil_cols_list': bp_pcg.COL_NAMES['auth_inst'],
+                     }
+
+    cols_dic = {'pub_id_col'     : bp_pcg.COL_NAMES['pub_id'],
+                'address_id_col' : bp_pcg.COL_NAMES['address'][1],
+                'address_col'    : bp_pcg.COL_NAMES['address'][2],
+                'country_col'    : bp_pcg.COL_NAMES['country'][2],
+                'affil_col'      : bp_pcg.COL_NAMES['institution'][2],
+                'norm_affils_col': bp_pcg.COL_NAMES['auth_inst'][4],
+               }
+    return cols_lists_dic, cols_dic
+
+
 def _build_words_set(raw_aff, verbose=False):
     """Builds sets of words from a raw affiliation after standardization of words and symbols, 
-    removing special symbols, adding missing spaces and droping small words.
+    removing special symbols, adding missing spaces and dropping small words.
 
     Args:
         raw_aff (str): The raw affiliation used to build the sets of words.
@@ -36,7 +64,7 @@ def _build_words_set(raw_aff, verbose=False):
     Returns:
         (tuple): Tuple of to sets of words; The first set is the canonical set of words \
         issuing from the string 'raw_aff'; The second set is an added set if some specific \
-        accronyms are present in the first set of words.
+        acronyms are present in the first set of words.
     """
     # Setting substitution templates for searching small words or acronyms
     word_to_drop_template = bp_rg.AFFIL_WORD_TO_DROP_TEMPLATE
@@ -57,7 +85,7 @@ def _build_words_set(raw_aff, verbose=False):
     # Uniformizing symbols
     std_raw_aff = std_raw_aff.translate(bp_gg.SYMB_CHANGE)
 
-    # Droping particular symbols
+    # Dropping particular symbols
     std_raw_aff = std_raw_aff.translate(bp_gg.SYMB_DROP)
     if verbose:
         print('       std_raw_aff:', std_raw_aff)
@@ -66,14 +94,14 @@ def _build_words_set(raw_aff, verbose=False):
     raw_aff_words_set = set(std_raw_aff.strip().split(' '))
 
     # Managing missing space in raw affiliations related
-    # to particuliar institutions cases such as UMR or U followed by digits
+    # to particular institutions cases such as UMR or U followed by digits
     std_raw_aff_add = ""
     for accron in bp_ag.MISSING_SPACE_ACRONYMS:
         re_accron = re.compile(word_to_drop_template.substitute({"word":accron}))
         if re.search(re_accron, std_raw_aff.lower()) and len(raw_aff_words_set)==2:
             std_raw_aff_add = "".join(std_raw_aff.split(" "))
 
-    # Droping small words
+    # Dropping small words
     for word_to_drop in bp_ag.SMALL_WORDS_DROP:
         re_drop_words = re.compile(word_to_drop_template.substitute({"word":word_to_drop}))
         if re.search(re_drop_words, std_raw_aff.lower()):
@@ -118,7 +146,7 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
 
     Args:
         country_affiliations_file_path (path): Full path to the file of normalized affiliations \
-        with they possible corresponding raw affiliation built by the user"; if None, it is set \
+        with their possible corresponding raw affiliation built by the user"; if None, it is set \
         using the 'COUNTRY_AFFILIATIONS_FILE' and 'REP_UTILS' globals.
         verbose (bool): If true, variables are printed for code control (default: False).
     Returns:
@@ -234,6 +262,17 @@ def read_towns_per_country(country_towns_file=None, country_towns_folder_path=No
 
 
 def _check_norm_raw_affils_dict(affil_types_dict, norm_raw_affils_dict):
+    """Checks that all affiliations types used by the user to set the normalized names of affiliations 
+    per country are chosen among the keys of the 'affil_types_dict'.
+
+    Args:
+        affil_types_dict (dict): The data returned by the `read_affil_types` function of the same module.
+        norm_raw_affils_dict (dict): The data returned by the `build_norm_raw_affils_dict` function \
+        of the same module.
+    Returns:
+        (dict): Data giving the wrong affiliations types keyed by countries and valued by the wrong \
+        affiliations types found (list).
+    """
     wrong_affil_types_dict = {}
     affil_types_set = set(affil_types_dict.keys())
     for country, country_dict in norm_raw_affils_dict.items():
@@ -282,7 +321,7 @@ def build_affils_useful_dicts(affil_params_dic):
     # Checking affiliations-types in 'norm_raw_affils_dict' dict
     wrong_affil_types_dict = _check_norm_raw_affils_dict(affil_types_dict, norm_raw_affils_dict)
     if wrong_affil_types_dict:
-        print("\nWARNING: Uncorrect normalized-affiliation types found in the file: "
+        print("\nWARNING: Incorrect normalized-affiliation types found in the file: "
               f"\n         {country_affils_file_path}"
               "\n\n         Please, correct the following affiliation types:")
         dict_print(wrong_affil_types_dict)
@@ -294,3 +333,118 @@ def build_affils_useful_dicts(affil_params_dic):
                    'wrong_affil_types_dict': wrong_affil_types_dict,
                   }
     return affil_dicts
+
+
+def build_norm_affiliation_list(affiliation, country, norm_raw_aff_dict, verbose=False):
+    """Builds the list of normalized affiliations for a chunk of an address.
+
+    Args:
+        affiliation (str) : The chunk of the analyzed address.
+        country (str): The country of the analyzed address.
+        norm_raw_aff_dict (dict): The data keyed by country and valued by data (dataframe) \
+        giving raw_affiliations per each normalized affiliations.
+        verbose (bool): True for allowing control prints (default: False).
+    Returns:
+        (list): The built normalized affiliations.
+    """
+    norm_affiliation_list = []
+
+    # Removing accents and converting to lower case
+    aff_mod = remove_special_symbol(affiliation, only_ascii=False, strip=True)
+    aff_mod = aff_mod.lower()
+    if verbose:
+        print('\naff_mod:', aff_mod, "\n")
+
+    # Searching for words set in affiliation
+    for num, norm_aff in enumerate(norm_raw_aff_dict[country].keys()):
+        if verbose:
+            print("\n", str(num) + ' norm_aff:', norm_aff, "\n")
+        for words_set in norm_raw_aff_dict[country][norm_aff]:
+            if verbose:
+                print('\twords_set:', words_set)
+            words_set_tags = []
+            for word in words_set:
+                re_search_words = re.compile(bp_rg.AFFIL_WORDS_SET_TEMPLATE.substitute({"word":word}))
+                if re.search(re_search_words, aff_mod):
+                    words_set_tags.append('true')
+                else:
+                    words_set_tags.append('false')
+                if verbose:
+                    print('\t\tword:', word, '\n\t\twords_set_tags:', words_set_tags)
+            if 'false' not in words_set_tags:
+                norm_affiliation_list.append(norm_aff)
+            if verbose:
+                print(f"\tfinal words_set_tags: {words_set_tags}\n\tnorm_affiliation_list: {norm_affiliation_list}\n")
+    if verbose:
+        print('\tnorm_affiliation_list:', norm_affiliation_list)
+    return norm_affiliation_list
+
+
+def _build_complements_list(affil_names_list, affiliations):
+    """Builds a list of single digit corresponding to the names list of affiliations.
+
+    The digit is set to 1 if the affiliation name iof the list is present 
+    in the list of the normalized affiliations of an address. Otherwise, it is set to 0.
+
+    Args:
+        affil_names_list (list): The names list of affiliations to search for.
+        affiliations (list): The list of the normalized affiliations of an address.
+    Returns:
+        (list): The built list.
+    """
+    complements_list = []
+    for affil in affil_names_list:
+        if affil in affiliations:
+            complements_list.append(1)
+        else:
+            complements_list.append(0)
+    return complements_list
+
+
+def extend_author_affils(item_df, affil_filter_list):
+    """Extends the data of authors affiliations initially obtained by the parsing
+    of the corpus, with complementary information about an affiliation selected by the user.
+
+    The selection is given by the user through a list of 2-items tuples composed 
+    of a normalized affiliation and the corresponding column name. For each normalized
+    affiliation, the corresponding column is filled with 1 for each of the author 
+    affiliated to this affiliation. Otherwise, it is filled with 0. The values 1 or 0 to be set 
+    are defined through the `_build_complements_list` internal function.
+    The useful column names are set through the `set_norm_affils_cols` function of the same module.
+
+    Args:
+        item_df (dataframe): The data of authors with affiliation.
+        affil_filter_list (list): The list of tuples selected by the user.
+    Returns:
+        (dataframe): The extended data with the columns given by the user.
+    """
+    # Setting useful column names
+    cols_lists_dic, cols_dic = set_norm_affils_cols()
+    read_usecols = cols_lists_dic['auth_affil_cols_list'][0:5]
+    norm_affils_col = cols_dic['norm_affils_col']
+    temp_col = "complements_col"
+
+    # Getting the useful columns of the item df
+    item_df = item_df[read_usecols]
+
+    # Setting an affiliation name for each of the affiliations indicated in the affiliations filter
+    affil_names_list = [f'{x[0]}' for x in affil_filter_list]
+    affil_col_list = [f'{x[1]}' for x in affil_filter_list]
+
+    # Building a list of 0 or 1 in 'temp_col' column added to the initial data using "affil_filter_list"
+    item_dg = item_df.copy()
+    item_dg[temp_col] = item_dg.apply(lambda row: _build_complements_list(affil_names_list,
+                                                                          row[norm_affils_col]),
+                                      axis=1)
+    item_dg.reset_index(inplace=True, drop=True)
+
+    # Distributing the value lists of 'temp_col' column in a dataframe
+    # into columns which names are given by 'affil_col_list' list
+    complements_split_df = pd.DataFrame(item_dg[temp_col].sort_index().to_list(), columns=affil_col_list)
+
+    # Extending the initial data with the previously built data from 'temp_col' column
+    new_item_df = pd.concat([item_dg, complements_split_df], axis=1)
+
+    # Dropping the temp_col column which is no more useful
+    new_item_df.drop([temp_col], axis=1, inplace=True)
+    return new_item_df
