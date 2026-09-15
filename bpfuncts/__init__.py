@@ -6,6 +6,8 @@ __license__ = 'MIT'
 
 # Standard library imports
 import os
+import sys
+from pathlib import Path
 
 # 3rd party imports
 import nltk
@@ -32,23 +34,42 @@ from bpfuncts.concat_parsing import *
 from bpfuncts.main_parsing import *
 from bpfuncts.demo_utils import *
 
-def download_nltk_data():
-    """The function `download_nltk_data` downloads complementary libraries for nltk
-    if they have not been already downloaded.
 
+def download_nltk_data():
+    """Downloads complementary libraries for nltk if they have not been already downloaded.
+
+    The libraries to dowload depend on the python version.
     To do that, it first checks if any of the potential full path of their dedicated folder exists.
     If not, it downloads the required libraries.
     Complementary libraries for nltk are downloaded into 'C:/Users/<user home>/AppData/Roaming/nltk_data'.
 
     For more information see: https://www.nltk.org/data.html
     """
-    for nltk_path in nltk.data.path:
-        if os.path.exists(nltk_path):
-            return
+    # Setting the complementary libraries to download
+    nltk_data_folders = ['taggers', 'tokenizers', 'corpora']
+    if sys.version_info>=(3, 9):
+        nltk_data_sub_folders = ['averaged_perceptron_tagger_eng', 'punkt_tab'] + ['wordnet']
+    else:
+        nltk_data_sub_folders = ['averaged_perceptron_tagger', 'punkt'] + ['wordnet']
+    nltk_data_dict = dict(zip(nltk_data_folders, nltk_data_sub_folders))
 
-    # Downloading useful complementary libraries since no nltk data have been already downloaded
-    nltk.download('averaged_perceptron_tagger_eng')
-    nltk.download('punkt_tab')
-    nltk.download('wordnet')
+    # Checking if the complementary libraries are already available
+    status_list = []
+    for nltk_path in nltk.data.path:
+        status = False
+        if os.path.exists(nltk_path):
+            status = True
+            for folder, sub_folder in nltk_data_dict.items():
+                folder_path = Path(nltk_path) / Path(folder)
+                sub_folder_path = folder_path / Path(sub_folder)
+                if not folder_path.is_dir() or not sub_folder_path.is_dir():
+                    status = False
+        status_list.append(status)
+
+    # Downloading the missing libraries in 'C:/Users/<user home>/AppData/Roaming/nltk_data'
+    if not any(status_list):
+        for nltk_data_to_load in nltk_data_sub_folders:
+            nltk.download(nltk_data_to_load)
+    return
 
 download_nltk_data()
