@@ -543,8 +543,6 @@ def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags, verbose):
         to this chunk in the chunks list of the analyzed address, of the previously kept affiliations (list), \
         of the previous chunks to drop (list), and of the previous status of the chunk addition (bool).
         found_item_flags (namedtuple):The tuple built through the `_search_items` internal function.
-        keeping_words_flags (list): Selected flags from 'found_item_flags' that abort \
-        the drop of the chunck.
         verbose (bool): True for allowing control prints (default: False).
     Returns:
         (tup): Composed of the updated kept affiliations (list), of the updated chunks to drop (list), \
