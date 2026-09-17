@@ -446,5 +446,5 @@ def extend_author_affils(item_df, affil_filter_list):
     new_item_df = pd.concat([item_dg, complements_split_df], axis=1)
 
     # Dropping the temp_col column which is no more useful
-    new_item_df.drop([temp_col], axis=1, inplace=True)
+    new_item_df = new_item_df.drop([temp_col], axis=1)
     return new_item_df
