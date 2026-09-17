@@ -4,7 +4,7 @@ BiblioParsing description
 Purpose
 =======
 
-- Collection de fonctions d’aide l'analyse d'un corpus de publications
+- Collection de fonctions d’aide à l'analyse d'un corpus de publications
 - Bibliothèque à l'usage de développeurs en python
 - Les corpus bruts sont issus des bases de données bibliographiques courantes (WoS, Scopus, HAL, PubMed...)
 
