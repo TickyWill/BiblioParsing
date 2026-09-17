@@ -249,6 +249,8 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database):
         are extracted used to set the file name of database identifiers to drop.
     Returns:
         (dataframe): The modified full rawdata.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
@@ -399,6 +401,8 @@ def build_title_keywords(df):
        where 'title_tokens_alias' contains the list of tokens of the title \
        and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
        and of the list of tuples where tuple i is (word_i, # occurrence_i).
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     title_alias = bp_pcg.COL_NAMES['temp_col'][2]
     title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
@@ -766,9 +770,9 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     Returns:
         (str): The modified string.
     """
-    if dic_town_symbols is None:
+    if not dic_town_symbols:
         dic_town_symbols = bp_ag.DIC_TOWN_SYMBOLS
-    if dic_town_words is None:
+    if not dic_town_words:
         dic_town_words = bp_ag.DIC_TOWN_WORDS
 
     # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
@@ -850,6 +854,8 @@ def standardize_address(raw_address, add_unknown_country=True):
         to the standardized address.
     Returns:
         (str): The full standardized address.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Removing particular characters
     standard_address = standardize_str(raw_address)

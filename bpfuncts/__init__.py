@@ -71,4 +71,5 @@ def download_nltk_data():
         for nltk_data_to_load in nltk_data_sub_folders:
             nltk.download(nltk_data_to_load)
 
+
 download_nltk_data()

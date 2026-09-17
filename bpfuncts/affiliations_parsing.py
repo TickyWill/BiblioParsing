@@ -385,6 +385,8 @@ def _search_items(affiliation, country, towns_dict, verbose=False):
     Returns:
         (namedtuple): A namedtuple which values are booleans returned by the internal functions \
         that returns a list of booleans that are True if the corresponding searched item is found.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     funct_list = [_search_dropping_bp, _search_dropping_digits, _search_dropping_suffix, _search_dropping_town,
                   _search_dropping_words, _search_keeping_prefix, _search_keeping_words]
@@ -692,6 +694,8 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
         verbose (bool): True for allowing control prints (default: False).
     Returns:
         (tuple): A tuple composed of 3 items (list of kept chunks, country and list of dropped chunks).
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Splitting by coma the standard address in chunks listed in an initial-affiliations list
     init_raw_affils_list = std_address.split(',')
@@ -979,6 +983,7 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
         (tuple): (countries data per address (dataframe), normalized affiliations per address (dataframe), \
         raw affiliations per address (dataframe), A dict of wrong type of normalized affiliations \
         for correction by the user).
+    ToDo: Reduce complexity of the function.
     """
     # Setting useful column names
     cols_lists_dic, cols_dic = set_norm_affils_cols()

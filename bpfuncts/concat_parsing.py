@@ -68,7 +68,7 @@ def _concatenate_item_dfs(item_first_corpus_df, item_second_corpus_df, pub_id_co
     # Concatenating the two dataframes
     dfs_list = [item_first_corpus_df, new_item_second_corpus_df]
     concat_df = pd.concat(dfs_list)
-    concat_df.sort_values(by=[pub_id_col], inplace=True)
+    concat_df = concat_df.sort_values(by=[pub_id_col])
 
     return concat_df
 
@@ -209,7 +209,7 @@ def _set_same_journal_name(df, norm_journal_col, same_journal_col):
                     or (j1_specific_words==set() or j2_specific_words==set())):
                     journal_df.loc[journal_df[same_journal_col]==j2] = j1
         print(f"\t\t\tNumber of journals checked: {j1_idx} / {lines_nb}", end="\r")
-    df.reset_index(inplace=True, drop=True)
+    df = df.reset_index(drop=True)
     same_journal_name_df = pd.concat([df, journal_df], axis=1)
     return same_journal_name_df
 
@@ -248,7 +248,7 @@ def _set_same_article_title(df, title_col, lc_title_col):
             print(f"\t\t\tNumber of titles checked: {t1_idx}  / {lines_nb}", end="\r")
     title_df[lc_title_col] = title_df[lc_title_col].str.lower()
     title_df[lc_title_col] = title_df[lc_title_col].apply(_norm_title)
-    df.reset_index(inplace=True, drop=True)
+    df = df.reset_index(drop=True)
     same_title_df = pd.concat([df, title_df], axis=1)
     return same_title_df
 
@@ -383,7 +383,7 @@ def _set_same_first_author_name(df, cols_list):
         dfs_list.append(sub_df)
     if dfs_list:
         same_author_df = pd.concat(dfs_list)
-    same_author_df.sort_values(by=[pub_id_col], inplace=True)
+    same_author_df = same_author_df.sort_values(by=[pub_id_col])
     return same_author_df
 
 
@@ -409,10 +409,10 @@ def _drop_duplicate_article1(df, cols_list):
             # Deduplicating article lines by DOI
             dg[title_col]= _find_value_to_keep(dg, title_col)
             dg[doctype_col] = _find_value_to_keep(dg, doctype_col)
-            dg.drop_duplicates(subset=[lc_doi_col], keep='first', inplace=True)
+            dg = dg.drop_duplicates(subset=[lc_doi_col], keep='first')
         else:
             # Deduplicating article lines without DOI by title and document type
-            dg.drop_duplicates(subset=[lc_title_col, lc_doctype_col], keep='first', inplace=True)
+            dg = dg.drop_duplicates(subset=[lc_title_col, lc_doctype_col], keep='first')
         dfs_list.append(dg)
     doi_dedup_df = pd.concat(dfs_list)
     return doi_dedup_df
@@ -452,7 +452,7 @@ def _drop_duplicate_article2(df, cols_list):
     if dfs_list:
         dedup_df = pd.concat(dfs_list)
     dedup_df = dedup_df.drop([lc_title_col, lc_doctype_col, lc_doi_col], axis=1)
-    dedup_df.sort_values(by=[pub_id_col], inplace=True)
+    dedup_df = dedup_df.sort_values(by=[pub_id_col])
     return dedup_df
 
 
@@ -598,10 +598,10 @@ def _deduplicate_item_df(pub_ids_to_drop, item_df, pub_id_col, second_col):
     # Selecting item's data to keep
     filt = item_df[pub_id_col].isin(pub_ids_to_drop)
     item_dg = item_df[~filt].copy()
-    item_dg.sort_values(by=[pub_id_col], inplace=True)
+    item_dg = item_dg.sort_values(by=[pub_id_col])
 
     if second_col:
-        item_dg.sort_values(by=[pub_id_col, second_col], inplace=True)
+        item_dg = item_dg.sort_values(by=[pub_id_col, second_col])
     return item_dg
 
 

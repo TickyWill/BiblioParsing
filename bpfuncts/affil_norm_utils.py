@@ -436,7 +436,7 @@ def extend_author_affils(item_df, affil_filter_list):
     item_dg[temp_col] = item_dg.apply(lambda row: _build_complements_list(affil_names_list,
                                                                           row[norm_affils_col]),
                                       axis=1)
-    item_dg.reset_index(inplace=True, drop=True)
+    item_dg = item_dg.reset_index(drop=True)
 
     # Distributing the value lists of 'temp_col' column in a dataframe
     # into columns which names are given by 'affil_col_list' list

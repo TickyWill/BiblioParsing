@@ -523,7 +523,7 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
         auth_affils_df = extend_author_affils(auth_affils_df, affil_filter_list)
 
     # Sorting the values in the dataframe returned by two columns
-    auth_affils_df.sort_values(by = [pub_id_col, author_idx_col], inplace=True)
+    auth_affils_df = auth_affils_df.sort_values(by=[pub_id_col, author_idx_col])
     return auth_affils_df
 
 
@@ -567,8 +567,7 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
 
     articles_scopus_cols = scopus_cols_list + [norm_journal_col]
     articles_df = corpus_df[articles_scopus_cols].astype(str)
-    articles_df.rename(columns=dict(zip(articles_scopus_cols, articles_cols_list[1:])),
-                       inplace=True)
+    articles_df = articles_df.rename(columns=dict(zip(articles_scopus_cols, articles_cols_list[1:])))
 
     articles_df[author_col] = articles_df[author_col].apply(treat_author)
     articles_df[year_col] = articles_df[year_col].apply(str_int_convertor)

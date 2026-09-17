@@ -66,18 +66,17 @@ def _build_demo_effective_config(parsing_folder_dict, db_list):
     parsing_folder_dict_init = parsing_folder_dict
 
     parsing_folder_dict = {'folder_root': parsing_folder_dict_init['folder_root'],
-                           'corpus': {},
-                          }
-    parsing_folder_dict['corpus'] = {'corpus_root': parsing_folder_dict_init['corpus']['corpus_root'],
+                           'corpus': {'corpus_root': parsing_folder_dict_init['corpus']['corpus_root'],
                                      'concat'     : parsing_folder_dict_init['corpus']['concat'],
                                      'dedup'      : parsing_folder_dict_init['corpus']['dedup'],
                                      'databases'  : {},
-                                     }
+                                     },
+                          }
 
     for db_num, db_label in enumerate(db_list):
         parsing_folder_dict['corpus']['databases'][str(db_num)]= {'root': db_label,
                                                                   'rawdata': rawdata_folder_name,
-                                                                  'parsing' : parsing_folder_name
+                                                                  'parsing': parsing_folder_name
                                                                  }
     return parsing_folder_dict
 
