@@ -18,14 +18,14 @@ def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
 
     The structure of the built data is composed of 2 columns and one row 
     per publication and subject.
-        Ex:
-            Pub-index       Subject
-               0       Neurosciences & Neurology
-               1       Psychology
-               1       Environmental Sciences & Ecology
-               2       Engineering
-               2       Physics
-               3       Philosophy
+    Ex:
+    Pub-index       Subject.
+    0           Neurosciences & Neurology.
+    1           Psychology.
+    1           Environmental Sciences & Ecology.
+    2           Engineering.
+    2           Physics.
+    3           Philosophy.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.

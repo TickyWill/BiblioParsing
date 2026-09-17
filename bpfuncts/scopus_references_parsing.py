@@ -1020,10 +1020,10 @@ def build_scopus_references(corpus_df, cols_tup, verbose_pub_id=None, verbose_re
     """Builds the data of cited references per publication of the corpus.
 
     The structure of the built data is composed of 6 columns and one row per reference and per publication.
-        Ex:
-        Pub_id  Author            Year         Journal           DOI                Title             Full_reference
-         0    Bellouard Q et al.  2017   Int. J. Hydrog. Energy 10.23919/...  Thermal management...  Bellouard Q,...
-         0    Bellouard Q.        2020   Energy Fuels           unknown       Design and add...      Bellouard Q.,...
+    Ex:
+    Pub_id  Author           Year         Journal           DOI                Title             Full_reference.
+    0    Bellouard Q et al.  2017   Int. J. Hydrog. Energy 10.23919/etc Thermal management etc  Bellouard Q, etc.
+    0    Bellouard Q.        2020   Energy Fuels           unknown          Design and add etc  Bellouard Q., etc.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.

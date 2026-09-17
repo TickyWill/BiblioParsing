@@ -377,24 +377,19 @@ def _tokenizer(text):
 
 
 def build_title_keywords(df):
-    """Given the dataframe 'df' with one column named 'title':
+    """Builds keywords from the analysis of the publication's title.
 
-                    Title
-            0  Experimental and CFD investigation of inert be...
-            1  Impact of Silicon/Graphite Composite Electrode...
-
-    the function 'build_title_keywords':
-
-       1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
+    The step of the building process are the following:
+    1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
     in all the article titles of the corpus. The tokens are the words of the title with nltk tags 
     belonging to the global list 'NLTK_VALID_TAG_LIST'.
-       2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
+    2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
     the set of the tokenized and lemmatized (using the nltk WordNetLemmatizer) title. The column
     'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'.
-       3- Builds the list of tuples 'list_of_words_occurrences.sort' 
+    3- Builds the list of tuples 'list_of_words_occurrences.sort' 
     [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
     of # occurrences token_i.
-       4- Suppress words pertaining to BLACKLISTED_WORDS to the list from the bag of words
+    4- Suppress words pertaining to BLACKLISTED_WORDS to the list from the bag of words
 
     Args:
        df (dataframe): Data of publication title per publication identifier.
@@ -432,9 +427,9 @@ def normalize_country(raw_country):
     If the raw country name is not in the list given by the 'COUNTRIES' 
     global, the returned country name is set as follows. 
     It is set to the key of the 'COUNTRY_ALIASES' (dict) global:
-        - either, if the raw country name itself is an alias.
-        - or, if an alias of the country among the values of this global is found 
-        in the raw country name;
+    - either, if the raw country name itself is an alias.
+    - or, if an alias of the country among the values of this global is found 
+    in the raw country name.
     Otherwise, it is set to the key word given by the 'UNKNOWN_COUNTRY' 
     global imported from the 'parsing_globals' module, 
     The 'COUNTRIES' and 'COUNTRY_ALIASES' globals are imported 
@@ -461,15 +456,16 @@ def normalize_country(raw_country):
 
 
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
-    """Normalizes the author name spelling according to the three debatable rules:
-            - replacing none ascii letters by ascii ones,
-            - capitalizing firstname,
-            - capitalizing lastname,
-            - removing comma and dot.
+    """Normalizes the author name spelling.
+
+    The normalization is based on the following rules:
+    - replacing none ascii letters by ascii ones,
+    - capitalizing firstname,
+    - capitalizing lastname,
+    - removing comma and dot.
     It uses the internal funtion `remove_special_symbol` funcion imported 
     from the `general_utils` module.
-       ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
-           >>> "Grol-Bica-Velu D'Aillon E-KJ".
+    ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ") >>> "Grol-Bica-Velu D'Aillon E-KJ".
 
     Args:
         text (str): The name to normalize.
@@ -477,7 +473,7 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
         using PONCT_CHANGE global.
         lastname_only (bool): Optional (default: False), if True, only lastname is normalized.
         firstname_only (bool): Optional (default: False), if True, only firstname is normalized.
-    Returns
+    Returns:
         (str): The normalized text.
     Notes:
         The 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' globals are imported \
@@ -541,14 +537,14 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
 
 
 def normalize_journal_names(database, corpus_df):
-    """Adds the column `normalize_journal_names` to the corpus. 
+    """Adds the column 'normalize_journal_names' to the corpus.
 
-    The journal normalized names are expurgated from unnecessary
-	pieces of information such as: small words defined in a global 
-    dict (`DIC_LOW_WORDS`), year, conference edition... 
+    The journal normalized names are expurgated from unnecessary 
+    pieces of information such as small words defined in the global 
+    dict 'DIC_LOW_WORDS', year and conference edition. 
     These normalized and simplified journal names are mainly used 
-    when concatenating two corpus (wos, scopus, ...) using slightly
-    different name for the same journal.
+    when concatenating two corpuses using slightly different names 
+    for the same journal.
 
     Args:
         database (string): Type of data among the ones defined \
@@ -842,10 +838,10 @@ def standardize_address(raw_address, add_unknown_country=True):
     by the global 'RE_AFFIL_WORD_PATTERN_DIC' imported from the `regex_globals` module (imported as bp_rg). 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
     The length of the aliases is limited to a maximum according to the longest alias known.
-        ex: The longest alias known for the word 'University' is 'Universidade'. 
-            Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
-            with possibly before one symbol among a to z and after up to 8 symbols from the list 
-            '[aàäcdeéirstyz]' and possibly finishing with a dot. 
+    ex: The longest alias known for the word 'University' is 'Universidade'. 
+    Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
+    with possibly before one symbol among a to z and after up to 8 symbols from the list 
+    '[aàäcdeéirstyz]' and possibly finishing with a dot. 
     Finally, the country is normalized through the `normalize_country` function of the same module.
 
     Args:

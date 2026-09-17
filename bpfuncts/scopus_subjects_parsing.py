@@ -106,40 +106,38 @@ def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
     and updates the parsing success rate data.
 
     The built data are composed of 2 columns and one row per publication and subject or sub-subjects.
-        Ex:
-            Pub_id   Subject
-              0      Mathematics
-              0      Engineering
-              1	     Physics and Astronomy
-              1	     Biochemistry, Genetics and Molecular Biology
+    Ex:
+    Pub_id   Subject.
+    0       Mathematics.
+    0       Engineering.
+    1	    Physics and Astronomy.
+    1	    Biochemistry, Genetics and Molecular Biology.
 
     The subjects are attributed using 2 files provided by Elsevier.
     The "scopus_cat_codes.txt" file gives a code per category:
-
-                         Category            Code
-            General Medicine                 2700    => Subject
-            Medicine (miscellaneous)         2701    => Sub-subject
-            Anatomy                          2702
-            Anesthesiology and Pain Medicine 2703
-            Biochemistry, medical            2704
-            ...
+    Category                         Code.
+    General Medicine                 2700    => Subject.
+    Medicine (miscellaneous)         2701    => Sub-subject.
+    Anatomy                          2702.
+    Anesthesiology and Pain Medicine 2703.
+    Biochemistry, medical            2704.
+    etc.
 
     The "scopus_journals_issn_cat.txt" file give the categories codes attached to a journal:
-
-                Journal            ISSN           Codes
-            21st Century Music   15343219     1210;
-            2D Materials                      2210; 2211; 3104; 2500; 1600;
-            3 Biotech            2190572X     1101; 2301; 1305;
-            ...
+    Journal               ISSN           Codes.
+    21st Century Music   15343219     1210;.
+    2D Materials                      2210; 2211; 3104; 2500; 1600;.
+    3 Biotech            2190572X     1101; 2301; 1305;.
+    etc.
 
     For "2D Materials journal":
-        - The subjects are given by the codes multiple of 100: 2500; 1600
-        - The sub-subjects are given by the other codes: 2210; 2211; 3104
+    - The subjects are given by the codes multiple of 100: 2500; 1600.
+    - The sub-subjects are given by the other codes: 2210; 2211; 3104.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
-        scopus_cat_codes_path (path): The full path to the file "scopus_cat_codes.txt".
-        scopus_journals_issn_cat_path (path): The full path to the file "scopus_journals_issn_cat.txt".
+        scopus_cat_codes_path (path): The full path to the txt file "scopus_cat_codes".
+        scopus_journals_issn_cat_path (path): The full path to the txt file "scopus_journals_issn_cat".
         fails_dic (dict): Parsing success rate data.
         cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
     Returns:

@@ -235,12 +235,11 @@ def build_wos_references(corpus_df, cols_tup, verbose=False):
 
     The structure of the built data is composed of 6 columns and one row 
     per reference and per publication.
-        Ex:
-
-           Pub_id  Author     Year         Journal           Volume  Page
-            0    Bellouard Q  2017   Int. J. Hydrog. Energy    42    13486
-            0    Nishinaka H  2020   Energy Fuels              31    10933
-            0    Bellouard Q  2018   Int. J. Hydrog. Energy    44    19193
+    Ex:
+    Pub_id  Author    Year        Journal            Volume  Page.
+    0    Bellouard Q  2017   Int. J. Hydrog. Energy    42    13486.
+    0    Nishinaka H  2020   Energy Fuels              31    10933.
+    0    Bellouard Q  2018   Int. J. Hydrog. Energy    44    19193.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
