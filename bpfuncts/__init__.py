@@ -70,6 +70,5 @@ def download_nltk_data():
     if not any(status_list):
         for nltk_data_to_load in nltk_data_sub_folders:
             nltk.download(nltk_data_to_load)
-    return
 
 download_nltk_data()
