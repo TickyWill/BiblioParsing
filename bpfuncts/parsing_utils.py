@@ -25,6 +25,7 @@ __all__ = ['build_item_df_from_tup',
            'treat_author',
            'treat_doctype',
            'treat_title',
+           'try_list_idx',
            'upgrade_col_names',
            ]
 
@@ -51,6 +52,26 @@ import bpfuncts.regex_globals as bp_rg
 from bpfuncts.general_utils import remove_special_symbol
 
 
+def try_list_idx(item_idx, value_idx, values_list):
+    """Tries to get de value at a given index in a values list.
+
+    If the given index is not an index of the values_list, the kept value 
+    is set to the 'UNKNOWN' global and its index set to 0.
+
+    Args:
+        item_idx (int): The item index to return for the kept value.
+        value_idx (int): The index to try in the values list.
+        values_list (list): The list of values in which the index to try is used.
+    Returns:
+        (tup): Composed of the index set for the kept value and of the kept value.
+    """
+    try:
+        value_item_idx, value = item_idx, values_list[value_idx].strip()
+    except IndexError:
+        value_item_idx, value = 0, bp_pg.UNKNOWN
+    return value_item_idx, value
+
+
 def str_int_convertor(x):
     """Converts string to integer.
 
@@ -58,7 +79,7 @@ def str_int_convertor(x):
         x (str): String to convert.
     Return:
         (int): The conversion result, \
-        'O' if faild to do the conversion.
+        'O' if failed to do the conversion.
     """
     try:
         return int(float(x))
@@ -69,7 +90,7 @@ def str_int_convertor(x):
 def convert_issn(raw_txt):
     """Converts a text to the ISSN standard format.
 
-    It search for potential occurence of raw ISSN values in the text 
+    It searches for potential occurrence of raw ISSN values in the text
     using the 'RE_ISSN' global imported from the `bmfuncts.regex_globals` module. 
     It returns the keyword of unknown ISSN given by the 'UNKNOWN' global 
     imported from the `bmfuncts.pub_global` module.
@@ -157,12 +178,12 @@ def dict_print(dic):
         (dict): The data to print.
     """
     for k,v in dic.items():
-        print("            ", k, ":", v)
+        print("\t\t\t", k, ":", v)
 
 
 def set_unknown_address(author_idx, add_unknown_country=False):
     """Adds author ID to the 'UNKNOWN' global to set the address to correct 
-    for an author wich address is unknown in the extracted rawdata.
+    for an author which address is unknown in the extracted rawdata.
 
     It also may add to the built address the unknown-country key given 
     by 'UNKNOWN_COUNTRY' global. The  globals are imported from 
@@ -228,6 +249,8 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database):
         are extracted used to set the file name of database identifiers to drop.
     Returns:
         (dataframe): The modified full rawdata.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
@@ -254,7 +277,7 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     Args:
         database (str): The name of the database from which the rawdata \
         would have been extracted.
-        rawdata_path (path): The full path where the raxdata file should be located.
+        rawdata_path (path): The full path where the rawdata file should be located.
         raw_extent (str): The file extension of the missing file.
     Returns:
         (str): The formatted text.
@@ -271,10 +294,10 @@ def build_item_df_from_tup(item_list, item_col_names, item_col, pub_id_col, fail
     the parsing success rate data.
 
     Args:
-        item_list (list): Composed of namedtuples giving values to be set in the data columns.
+        item_list (list): Composed of namedtuple giving values to be set in the data columns.
         item_col_names (list): The data column names (str).
         item_col (str): The column name of the item values in the built data.
-        pub_id_col (str): The column name of the publications' identifers.
+        pub_id_col (str): The column name of the publications' identifiers.
         fails_dict (dict): Parsing success rate data, optional (default: None).
     Returns:
         (tuple): Composed of the built data (dataframe) and of the potentially \
@@ -335,7 +358,7 @@ def clean_authors_countries_affils(auth_addr_country_affil_df):
 
 
 def _tokenizer(text):
-    """Tokenizes, lemmelizes the string 'text'. Only the words with nltk tags in the global
+    """Tokenizes, lemmatizes the string 'text'. Only the words with nltk tags in the global
     NLTK_VALID_TAG_LIST are kept.
 
     ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
@@ -356,24 +379,19 @@ def _tokenizer(text):
 
 
 def build_title_keywords(df):
-    """Given the dataframe 'df' with one column named 'title':
+    """Builds keywords from the analysis of the publication's title.
 
-                    Title
-            0  Experimental and CFD investigation of inert be...
-            1  Impact of Silicon/Graphite Composite Electrode...
-
-    the function 'build_title_keywords':
-
-       1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
+    The step of the building process are the following:
+    1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
     in all the article titles of the corpus. The tokens are the words of the title with nltk tags 
     belonging to the global list 'NLTK_VALID_TAG_LIST'.
-       2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
-    the set of the tokenized and lemmelized (using the nltk WordNetLemmatizer) title. The column
+    2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
+    the set of the tokenized and lemmatized (using the nltk WordNetLemmatizer) title. The column
     'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'.
-       3- Builds the list of tuples 'list_of_words_occurrences.sort' 
+    3- Builds the list of tuples 'list_of_words_occurrences.sort' 
     [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
     of # occurrences token_i.
-       4- Suppress words pertening to BLACKLISTED_WORDS to the list from the bag of words
+    4- Suppress words pertaining to BLACKLISTED_WORDS to the list from the bag of words
 
     Args:
        df (dataframe): Data of publication title per publication identifier.
@@ -383,6 +401,8 @@ def build_title_keywords(df):
        where 'title_tokens_alias' contains the list of tokens of the title \
        and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
        and of the list of tuples where tuple i is (word_i, # occurrence_i).
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     title_alias = bp_pcg.COL_NAMES['temp_col'][2]
     title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
@@ -411,9 +431,9 @@ def normalize_country(raw_country):
     If the raw country name is not in the list given by the 'COUNTRIES' 
     global, the returned country name is set as follows. 
     It is set to the key of the 'COUNTRY_ALIASES' (dict) global:
-        - either, if the raw country name itself is an alias.
-        - or, if an alias of the country among the values of this global is found 
-        in the raw country name;
+    - either, if the raw country name itself is an alias.
+    - or, if an alias of the country among the values of this global is found 
+    in the raw country name.
     Otherwise, it is set to the key word given by the 'UNKNOWN_COUNTRY' 
     global imported from the 'parsing_globals' module, 
     The 'COUNTRIES' and 'COUNTRY_ALIASES' globals are imported 
@@ -440,15 +460,16 @@ def normalize_country(raw_country):
 
 
 def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=False):
-    """Normalizes the author name spelling according to the three debatable rules:
-            - replacing none ascii letters by ascii ones,
-            - capitalizing firstname,
-            - capitalizing lastname,
-            - removing comma and dot.
+    """Normalizes the author name spelling.
+
+    The normalization is based on the following rules:
+    - replacing none ascii letters by ascii ones,
+    - capitalizing firstname,
+    - capitalizing lastname,
+    - removing comma and dot.
     It uses the internal funtion `remove_special_symbol` funcion imported 
-    from the `general_utils` module..
-       ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ")
-           >>> "Grol-Bica-Velu D'Aillon E-KJ".
+    from the `general_utils` module.
+    ex: normalize_name(" GrÔŁ-biçà-vèLU D'aillön, E-kj. ") >>> "Grol-Bica-Velu D'Aillon E-KJ".
 
     Args:
         text (str): The name to normalize.
@@ -456,7 +477,7 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
         using PONCT_CHANGE global.
         lastname_only (bool): Optional (default: False), if True, only lastname is normalized.
         firstname_only (bool): Optional (default: False), if True, only firstname is normalized.
-    Returns
+    Returns:
         (str): The normalized text.
     Notes:
         The 'DASHES_CHANGE', 'LANG_CHAR_CHANGE' and 'PONCT_CHANGE' globals are imported \
@@ -520,14 +541,14 @@ def normalize_name(text, drop_ponct=True, lastname_only=False, firstname_only=Fa
 
 
 def normalize_journal_names(database, corpus_df):
-    """Adds the column `normalize_journal_names` to the corpus. 
+    """Adds the column 'normalize_journal_names' to the corpus.
 
-    The journal normalized names are expurgated from unnecessary
-	pieces of information such as: small words defined in a global 
-    dict (`DIC_LOW_WORDS`), year, conference edition... 
+    The journal normalized names are expurgated from unnecessary 
+    pieces of information such as small words defined in the global 
+    dict 'DIC_LOW_WORDS', year and conference edition. 
     These normalized and simplified journal names are mainly used 
-    when concatenating two corpus (wos, scopus, ...) using slightly
-    different name for the same journal.
+    when concatenating two corpuses using slightly different names 
+    for the same journal.
 
     Args:
         database (string): Type of data among the ones defined \
@@ -568,7 +589,7 @@ def normalize_journal_names(database, corpus_df):
 
 
 def build_pub_db_ids(rawdata_df, init_db_id_col, db_id_col):
-    """Builds the data of database indentifier for each publication.
+    """Builds the data of database identifier for each publication.
 
     Args:
         rawdata_df (dataframe): The rawdata from which database \
@@ -687,7 +708,7 @@ def upgrade_col_names(corpus_folder):
 
 def set_shared_parsing_cols():
     """Builds 2 dict setting columns lists and selected columns names 
-    shared for the processe of parsing rawdata of any data type.
+    shared for the process of parsing rawdata of any data type.
 
     Globals are imported from the `parsing_cols_globals` module (imported as bp_pcg).
 
@@ -737,8 +758,8 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     of the dictionaries dic_town_symbols and dic_town_words by their 
     corresponding values in these dictionaries.
 
-    By default, these dictionnaries are set by the 'DIC_TOWN_SYMBOLS' and the 
-    'DIC_TOWN_WORDS' globals imported from the `affilioations_globals` module.
+    By default, these dictionaries are set by the 'DIC_TOWN_SYMBOLS' and the
+    'DIC_TOWN_WORDS' globals imported from the `affiliations_globals` module.
 
     Args:
         text (str): The string where changes will be done.
@@ -749,9 +770,9 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
     Returns:
         (str): The modified string.
     """
-    if dic_town_symbols is None:
+    if not dic_town_symbols:
         dic_town_symbols = bp_ag.DIC_TOWN_SYMBOLS
-    if dic_town_words is None:
+    if not dic_town_words:
         dic_town_words = bp_ag.DIC_TOWN_WORDS
 
     # Uniformizing symbols in town names using the dict 'DIC_TOWN_SYMBOLS'
@@ -765,12 +786,12 @@ def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
 
 
 def standardize_str(raw_str):
-    """Standardize a general string without implicite origin of the string.
+    """Standardize a general string without implicit origin of the string.
 
     First, dashes are replaced by a hyphen-minus using 'DASHES_CHANGE' global, apostrophes are replaced 
-    by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are droped 
+    by the standard cote using 'APOSTROPHE_CHANGE' global and some particular characters are dropped
     using 'SYMB_DROP' global. These globals are imported from the `general.globals` module (imported as bp_gg). 
-    Then, all characters are converted to ASCII ones through the `remove_special_symbol` funcion imported 
+    Then, all characters are converted to ASCII ones through the `remove_special_symbol` function imported
     from the `general_utils` module.
 
     Args:
@@ -821,10 +842,10 @@ def standardize_address(raw_address, add_unknown_country=True):
     by the global 'RE_AFFIL_WORD_PATTERN_DIC' imported from the `regex_globals` module (imported as bp_rg). 
     The aliases may contain symbols from a given list of any language including accentuated ones. 
     The length of the aliases is limited to a maximum according to the longest alias known.
-        ex: The longest alias known for the word 'University' is 'Universidade'. 
-            Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
-            with possibly before one symbol among a to z and after up to 8 symbols from the list 
-            '[aàäcdeéirstyz]' and possibly finishing with a dot. 
+    ex: The longest alias known for the word 'University' is 'Universidade'. 
+    Thus, 'University' aliases are limited to 12 symbols beginning with the base 'Univ' 
+    with possibly before one symbol among a to z and after up to 8 symbols from the list 
+    '[aàäcdeéirstyz]' and possibly finishing with a dot. 
     Finally, the country is normalized through the `normalize_country` function of the same module.
 
     Args:
@@ -833,6 +854,8 @@ def standardize_address(raw_address, add_unknown_country=True):
         to the standardized address.
     Returns:
         (str): The full standardized address.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Removing particular characters
     standard_address = standardize_str(raw_address)

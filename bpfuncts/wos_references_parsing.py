@@ -3,7 +3,6 @@ of WoS rawdata.
 """
 
 __all__ = ['build_wos_references',
-           'build_wos_subjects_and_sub_subjects',
           ]
 
 
@@ -17,64 +16,17 @@ import pandas as pd
 # Local libray imports
 import bpfuncts.parsing_globals as bp_pg
 import bpfuncts.regex_globals as bp_rg
-from bpfuncts.parsing_utils import build_item_df_from_tup
-
-
-def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
-    """Builds the data of subject per publication of the corpus 
-    and updates the parsing success rate data.
-
-    The structure of the built data is composed of 2 columns and one row 
-    per publication and subject.
-        Ex:
-            Pub-index       Subject
-               0       Neurosciences & Neurology
-               1       Psychology
-               1       Environmental Sciences & Ecology
-               2       Engineering
-               2       Physics
-               3       Philosophy
-
-    Args:
-        corpus_df (dataframe): The selected rawdata of the corpus.
-        fails_dic (dict): Parsing success rate data.
-        cols_tup (tup): Columns information as built through \
-        the `_set_wos_parsing_cols` internal function.
-    Returns:
-        (dataframe): The built data.
-    """
-    # Setting useful column names
-    cols_lists_dic, cols_dic, wos_cols_dic = cols_tup
-    subject_cols_list = cols_lists_dic['subject_cols_list']
-    sub_subject_cols_list = cols_lists_dic['sub_subject_cols_list']
-    cols_keys = ['pub_id_col', 'subject_col', 'sub_subject_col']
-    (pub_id_col, subject_col, sub_subject_col) = [cols_dic[key] for key in cols_keys]
-    wos_subjects_col = wos_cols_dic['wos_subjects_col']
-    wos_sub_subjects_col = wos_cols_dic['wos_sub_subjects_col']
-
-    # Setting named tuples
-    subject = namedtuple('subject', subject_cols_list)
-    sub_subject = namedtuple('sub_subject', sub_subject_cols_list )
-
-    corpus_series_zip = zip(corpus_df[pub_id_col], corpus_df[wos_subjects_col],
-                            corpus_df[wos_sub_subjects_col])
-    subjects_list, sub_subjects_list = [], []
-    for pub_id, pub_subjects_str, pub_sub_subjects_str in corpus_series_zip:
-        for pub_subject in pub_subjects_str.split(';'):
-            subjects_list.append(subject(pub_id, pub_subject.strip()))
-        if isinstance(pub_sub_subjects_str, str):
-            for pub_sub_subject in pub_sub_subjects_str.split(';'):
-                sub_subjects_list.append(sub_subject(pub_id, pub_sub_subject.strip()))
-
-    # Building clean subjects and sub_subjects data and accordingly updating the parsing success rate dict
-    subjects_df, fails_dic = build_item_df_from_tup(subjects_list, subject_cols_list,
-                                                    subject_col, pub_id_col, fails_dic)
-    sub_subjects_df, fails_dic = build_item_df_from_tup(sub_subjects_list, sub_subject_cols_list,
-                                                        sub_subject_col, pub_id_col, fails_dic)
-    return subjects_df, sub_subjects_df
+from bpfuncts.parsing_utils import try_list_idx
 
 
 def _clean_wos_ref(raw_ref):
+    """Cleans the reference when it contains '[' or ']'.
+
+    Args:
+        raw_ref (str): The reference to clean.
+    Returns:
+        (str): The cleaned reference.
+    """
     raw_ref_items_list = raw_ref.split(", ")
     ref_items_list = []
     for x in raw_ref_items_list:
@@ -86,19 +38,18 @@ def _clean_wos_ref(raw_ref):
     return ref
 
 
-def _try_list_idx(item_idx, value_idx, values_list):
-    try:
-        value_item_idx, value = item_idx, values_list[value_idx].strip()
-    except IndexError:
-        value_item_idx, value = 0, bp_pg.UNKNOWN
-    return value_item_idx, value
-
-
 def _find_wos_ref_doi(ref_items_list):
-    dois_idx_list, init_dois_items_list = [], []
-    for item_idx, ref_item in enumerate(ref_items_list):
+    """Searches for the DOI in the items resulting from the split by ', ' of a reference 
+    using the regex 'RE_WOS_REF_DOI', a global imported from the `bpfuncts.regex_globals` module.
+
+    Args:
+        ref_items_list (list): The items (str) of the reference.
+    Returns:
+        (str): A txt gathering items with DOI info.
+    """
+    init_dois_items_list = []
+    for ref_item in ref_items_list:
         if re.findall(bp_rg.RE_WOS_REF_DOI, ref_item):
-            dois_idx_list.append(item_idx)
             init_dois_items_list.append(ref_item)
     dois_list = list({x.replace("DOI","").strip().lower() for x in init_dois_items_list})
     dois_list_str = ", ".join(dois_list)
@@ -106,16 +57,34 @@ def _find_wos_ref_doi(ref_items_list):
 
 
 def _find_wos_ref_year(ref_items_list):
+    """Searches for the year in the items resulting from the split 
+    by ', ' of a reference using the regex 'RE_WOS_REF_YEAR', 
+    a global imported from the `bpfuncts.regex_globals` module.
+
+    Args:
+        ref_items_list (list): The items (str) of the reference.
+    Returns:
+        (str): The first occurrence of found years.
+    """
     item_idx, years_list = 0, []
     for item_idx, ref_item in enumerate(ref_items_list):
         years_list = re.findall(bp_rg.RE_WOS_REF_YEAR, ref_item)
         if years_list:
             break
-    _, year = _try_list_idx(item_idx, 0, years_list)
+    _, year = try_list_idx(item_idx, 0, years_list)
     return year
 
 
 def _set_wos_dotted_initials(first_item):
+    """Modifies the first item of the items resulting from the split 
+    by ', ' of a reference in order to set dotted initials for the authors.
+
+    Args:
+        first_item (str): The first item of the reference.
+    Returns:
+        (tup): Composed of the case of the authors initials (str) \
+        and of the modified item (str).
+    """
     authors_case = "Undotted"
     mod_first_item = first_item
     initial_dot = '.'
@@ -143,6 +112,15 @@ def _set_wos_dotted_initials(first_item):
 
 
 def _find_wos_ref_authors(ref_items_list):
+    """Sets the authors from the first item of the items resulting 
+    from the split by ', ' of a reference.
+
+    Args:
+        ref_items_list (list): The items (str) of the reference.
+    Returns:
+        (tup): Composed of the case of the authors initials (str) \
+        and of the authors (str).
+    """
     first_item = ref_items_list[0]
     if "Anonymous" in first_item:
         authors = "Anonymous"
@@ -154,6 +132,22 @@ def _find_wos_ref_authors(ref_items_list):
 
 
 def _search_journal_words(item, title, journal):
+    """Set if an item is a journal information by searching for specific words 
+    using the regex 'RE_WOS_REF_JOURNAL', a global imported 
+    from the `bpfuncts.regex_globals` module.
+
+    The item is also kept as journal information if it is in upper case.
+    Otherwise, the item is kept as title of the reference.
+
+    Args:
+        item (str): The item among the items resulting from the split \
+        by ', ' of a reference.
+        title (str): The previously kept item as title.
+        journal (str): The previously kept item as journal information.
+    Returns:
+        (tup): Composed of the kept item as title (str) and the kept item \
+        as journal information.
+    """
     if re.findall(bp_rg.RE_WOS_REF_JOURNAL, item) or item.isupper():
         journal = item
     else:
@@ -162,6 +156,18 @@ def _search_journal_words(item, title, journal):
 
 
 def _find_wos_ref_title_journal(ref_items_list, authors_case, year):
+    """Searches for the title and the journal information in the items resulting 
+    from the split by ', ' of a reference through the `_search_journal_words` 
+    internal function.
+
+    Args:
+        ref_items_list (list): The items (str) of the reference.
+        authors_case (str): The case of the authors initials.
+        year (str): The year kept for the reference.
+    Returns:
+        (tup): Composed of the kept item as title (str) and the kept item \
+        as journal information.
+    """
     journal = bp_pg.UNKNOWN
     title = bp_pg.UNKNOWN
     ref_items_nb = len(ref_items_list)
@@ -182,7 +188,17 @@ def _find_wos_ref_title_journal(ref_items_list, authors_case, year):
 
 
 def _build_wos_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
-    # Setting named tuple
+    """Builds the list of key items of the references of a publication as named-tuples.
+
+    Args:
+        pub_id (int): The publication ID.
+        ref_field (str): The reference field giving the references of the publication.
+        ref_cols_list (list): The column names to be used for the named-tuples.
+        verbose (bool): True for allowing control prints (default: False).
+    Returns:
+        (list): The built named-tuples.
+    """
+    # Setting named-tuple for keeping the reference parsing results
     article_ref = namedtuple('article_ref', ref_cols_list)
 
     pub_refs_list =[]
@@ -219,17 +235,17 @@ def build_wos_references(corpus_df, cols_tup, verbose=False):
 
     The structure of the built data is composed of 6 columns and one row 
     per reference and per publication.
-        Ex:
-
-           Pub_id  Author     Year         Journal           Volume  Page
-            0    Bellouard Q  2017   Int. J. Hydrog. Energy    42    13486
-            0    Nishinaka H  2020   Energy Fuels              31    10933
-            0    Bellouard Q  2018   Int. J. Hydrog. Energy    44    19193
+    Ex:
+    Pub_id  Author    Year        Journal            Volume  Page.
+    0    Bellouard Q  2017   Int. J. Hydrog. Energy    42    13486.
+    0    Nishinaka H  2020   Energy Fuels              31    10933.
+    0    Bellouard Q  2018   Int. J. Hydrog. Energy    44    19193.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
         cols_tup (tup): Columns information as built through \
         the `_set_wos_parsing_cols` internal function.
+        verbose (bool): True allows control prints (default: False).
     Returns:
         (dataframe): The built data.
     """

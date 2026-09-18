@@ -64,7 +64,7 @@ RE_ADDRESS = re.compile(r'''(?<=\]\s)           # Captures: "xxxxx" in string be
 
 RE_ADDS_JOURNAL = re.compile(r'\([^\)]+\)')        # Captures string between "()" in journal name   (unused)
 
-# Potentialy ambiguous words in affiliations names
+# Potentially ambiguous words in affiliations names
 AFFIL_AMB_WORDS_LIST = ['des', '@']
 SET_AMB_WORDS_TEMPLATE = Template(r'\s$word\s')
 RE_AFFIL_AMB_WORDS_LIST = [SET_AMB_WORDS_TEMPLATE.substitute({"word":word}) for word in AFFIL_AMB_WORDS_LIST]
@@ -87,7 +87,7 @@ RE_YEAR = re.compile(r'\d{4}')                           # Captures "dddd" as th
 
 RE_YEAR_JOURNAL = re.compile(r'\s\d{4}\s')               # Captures " dddd " as the year in journal name
 
-RE_ZIP_CODE = re.compile(r',\s[a-zA-Z]?[\-]?\d+.*',)     # Captures text begining with ', '
+RE_ZIP_CODE = re.compile(r',\s[a-zA-Z]?[\-]?\d+.*',)     # Captures text beginning with ', '
                                                          # and that possibly contains letters and hyphen-minus
 RE_AWA = re.compile(r'\w+;,\s\w+|\w+;\w+')               # Captures ';, ' or ';' surrounded by letters
 
@@ -373,7 +373,7 @@ AFFIL_KEEPING_PATTERNS_DIC = {'digits_prefix'     : AFFIL_DIGITS_KEEPING_PREFIX_
                              }
 
 
-# Template for capturing small words or accronyms given by the SMALL_WORDS_DROP
+# Template for capturing small words or acronyms given by the SMALL_WORDS_DROP
 # and the MISSING_SPACE_ACRONYMS globals in BiblioParsing.specific_globals module
 # For instance capturing 'of' in 'technical university of denmark'
 # capturing 'd' in 'institut d ingenierie'

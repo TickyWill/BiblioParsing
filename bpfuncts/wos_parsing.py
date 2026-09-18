@@ -15,8 +15,8 @@ import bpfuncts.affiliations_globals as bp_ag
 import bpfuncts.parsing_cols_globals as bp_pcg
 import bpfuncts.parsing_globals as bp_pg
 import bpfuncts.regex_globals as bp_rg
+from bpfuncts.affil_norm_utils import extend_author_affils
 from bpfuncts.affiliations_parsing import build_addr_affils_tup
-from bpfuncts.affiliations_parsing import extend_author_affils
 from bpfuncts.parsing_utils import build_item_df_from_tup
 from bpfuncts.parsing_utils import build_title_keywords
 from bpfuncts.parsing_utils import clean_authors_countries_affils
@@ -30,8 +30,8 @@ from bpfuncts.parsing_utils import treat_author
 from bpfuncts.parsing_utils import treat_doctype
 from bpfuncts.parsing_utils import treat_title
 from bpfuncts.wos_rawdata_utils import read_wos_rawdata
-from bpfuncts.wos_parsing_complements import build_wos_subjects_and_sub_subjects
-from bpfuncts.wos_parsing_complements import build_wos_references
+from bpfuncts.wos_references_parsing import build_wos_references
+from bpfuncts.wos_subjects_parsing import build_wos_subjects_and_sub_subjects
 
 
 def _set_wos_parsing_cols():
@@ -82,13 +82,26 @@ def _set_wos_parsing_cols():
 
 
 def _check_authors_list(authors_str, affiliations_str):
+    """Compares the lists of authors as retrieved from the authors' field 
+    and from the authors-with-affiliations' field of the corpus rawdata.
+
+    Args:
+        authors_str (str): The authors' field.
+        affiliations_str (str): The authors-with-affiliations' field.
+    Returns:
+        (tup): Composed of the authors (list) retrieved from the authors' field, \
+        of the authors (list) retrieved from the authors-with-affiliations' field \
+        and of authors (list) not found in the authors-with-affiliations' field.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
+    """
     # Building the full list of ordered authors full names
     authors_ordered_list = authors_str.split("; ")
     authors_ordered_list = [author.strip() for author in authors_ordered_list]
 
     # Building the list of authors full names in authors-with-affiliation
     affil_authors_list = [[x.strip() for x in authors.split(';')]
-                    for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
+                          for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
     flat_authors_set  = set(sum(affil_authors_list, []))
 
     # Building the list of authors out of authors-with-affiliation
@@ -97,6 +110,13 @@ def _check_authors_list(authors_str, affiliations_str):
 
 
 def _set_upper_initials(author):
+    """Sets author's initials in upper case in the author's full name.
+
+    Args:
+        author (str): The author's full name.
+    Returns:
+        (str): The modified author's full name.
+    """
     names_list = author.split(" ")
     names_list[-1] = names_list[-1].upper()
     new_author = " ".join(names_list)
@@ -489,7 +509,7 @@ def _build_wos_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
         auth_affils_df = extend_author_affils(auth_affils_df, affil_filter_list)
 
     # Sorting the values in the built data by two columns
-    auth_affils_df.sort_values(by=[pub_id_col, author_idx_col], inplace=True)
+    auth_affils_df = auth_affils_df.sort_values(by=[pub_id_col, author_idx_col])
 
     return auth_affils_df
 
@@ -534,8 +554,7 @@ def _build_wos_articles(corpus_df, fails_dic, cols_tup):
 
     articles_wos_cols = wos_cols_list + [norm_journal_col]
     articles_df = corpus_df[articles_wos_cols].astype(str)
-    articles_df.rename(columns=dict(zip(articles_wos_cols, articles_cols_list[1:])),
-                       inplace=True)
+    articles_df = articles_df.rename(columns=dict(zip(articles_wos_cols, articles_cols_list[1:])))
 
     articles_df[author_col] = articles_df[author_col].apply(treat_author)
     articles_df[year_col] = articles_df[year_col].apply(str_int_convertor)
@@ -554,9 +573,9 @@ def wos_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None):
     The rawdata are parsed using the following internal functions:
     - `_build_wos_articles` which parses the articles' core data from the corpus rawdata
     - `_build_wos_authors` which parses the authors' field of rawdata;
-    - `_build_wos_addresses_countries_affiliations` which parses the author-with-affilations \
+    - `_build_wos_addresses_countries_affiliations` which parses the author-with-affiliations \
     field of rawdata by publication;
-    - `_build_wos_authors_countries_affiliations` which parses the author-with-affilations \
+    - `_build_wos_authors_countries_affiliations` which parses the author-with-affiliations \
     field of rawdata by authors;
     - `_build_wos_keywords` which parses the authors' keywords and the indexed keywords fields \
     of rawdata and builds the title keywords from the publication title field of rawdata;

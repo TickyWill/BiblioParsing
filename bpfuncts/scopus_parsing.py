@@ -15,8 +15,8 @@ import pandas as pd
 import bpfuncts.general_globals as bp_gg
 import bpfuncts.parsing_cols_globals as bp_pcg
 import bpfuncts.parsing_globals as bp_pg
+from bpfuncts.affil_norm_utils import extend_author_affils
 from bpfuncts.affiliations_parsing import build_addr_affils_tup
-from bpfuncts.affiliations_parsing import extend_author_affils
 from bpfuncts.parsing_utils import build_item_df_from_tup
 from bpfuncts.parsing_utils import build_title_keywords
 from bpfuncts.parsing_utils import clean_authors_countries_affils
@@ -29,9 +29,9 @@ from bpfuncts.parsing_utils import str_int_convertor
 from bpfuncts.parsing_utils import treat_author
 from bpfuncts.parsing_utils import treat_doctype
 from bpfuncts.parsing_utils import treat_title
-from bpfuncts.scopus_parsing_complements import build_scopus_references
-from bpfuncts.scopus_parsing_complements import build_scopus_subjects_and_sub_subjects
 from bpfuncts.scopus_rawdata_utils import read_scopus_rawdata
+from bpfuncts.scopus_references_parsing import build_scopus_references
+from bpfuncts.scopus_subjects_parsing import build_scopus_subjects_and_sub_subjects
 
 
 def _set_scopus_parsing_cols():
@@ -77,7 +77,17 @@ def _set_scopus_parsing_cols():
 
 
 def _set_author_idx(author, author_counter_params):
-    # Updating author's counter and last-author name
+    """Updates authors' count and last-author name.
+
+    Args:
+        author (str): The actual author's name.
+        author_counter_params (tup): Composed of the previous \
+        count of authors (int) and of the previous full-name (str) \
+        of the last author.
+    Returns:
+        (tup): Composed of the updated count of authors (int) \
+        and of the updated full-name (str) of the last author.
+    """
     author_idx, last_author = author_counter_params
     if author!=last_author:
         author_idx += 1
@@ -88,6 +98,23 @@ def _set_author_idx(author, author_counter_params):
 
 def _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
                                   author_counter_params):
+    """Builds the standardized affiliations list of an author.
+
+    The count of authors and the ful-name of the last author 
+    are updated through the `_set_author_idx` internal function.
+
+    Args:
+        raw_author_affiliations_str (str): The author's affiliations as retrieved \
+        from the author-with-affiliations's field of the corpus rawdata.
+        affiliations_list (list): The authors' affiliations as retrieved \
+        from the affiliations' field of the corpus rawdata.
+        author_counter_params (tup): Composed of the previous count of authors (int) \
+        and of the previous full-name (str) of the last author.
+    Returns:
+        (tup): Composed of standardized affiliations (list) of the author, \
+        of the updated count of authors (int) and of the updated full-name (str) \
+        of the last author.
+    """
     std_author_affiliations_str = standardize_address(raw_author_affiliations_str,
                                                       add_unknown_country=False)
     author_affiliations_list = std_author_affiliations_str.split(',')
@@ -496,7 +523,7 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
         auth_affils_df = extend_author_affils(auth_affils_df, affil_filter_list)
 
     # Sorting the values in the dataframe returned by two columns
-    auth_affils_df.sort_values(by = [pub_id_col, author_idx_col], inplace=True)
+    auth_affils_df = auth_affils_df.sort_values(by=[pub_id_col, author_idx_col])
     return auth_affils_df
 
 
@@ -540,8 +567,7 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
 
     articles_scopus_cols = scopus_cols_list + [norm_journal_col]
     articles_df = corpus_df[articles_scopus_cols].astype(str)
-    articles_df.rename(columns=dict(zip(articles_scopus_cols, articles_cols_list[1:])),
-                       inplace=True)
+    articles_df = articles_df.rename(columns=dict(zip(articles_scopus_cols, articles_cols_list[1:])))
 
     articles_df[author_col] = articles_df[author_col].apply(treat_author)
     articles_df[year_col] = articles_df[year_col].apply(str_int_convertor)
@@ -561,9 +587,9 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
     The rawdata are parsed using the following internal functions:
     - `_build_scopus_articles` which parses the articles' core data from the corpus rawdata
     - `_build_scopus_authors` which parses the authors' field of rawdata;
-    - `_build_scopus_addresses_countries_affiliations` which parses the author-with-affilations \
+    - `_build_scopus_addresses_countries_affiliations` which parses the author-with-affiliations \
     field of rawdata by publication;
-    - `_build_scopus_authors_countries_affiliations` which parses the author-with-affilations \
+    - `_build_scopus_authors_countries_affiliations` which parses the author-with-affiliations \
     field of rawdata by authors;
     - `_build_scopus_keywords` which parses the authors' keywords and the indexed keywords fields \
     of rawdata and builds the title keywords from the publication title field of rawdata;
@@ -573,15 +599,15 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
 
     Args:
         rawdata_path (path): The full path to the corpus rawdata.
-        affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
-        optional (default=None).
+        affil_filter_list (list): The filter of affiliations composed of a list of \
+        normalized affiliations (str), optional (default=None).
         affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
         'country_affils_file_path', 'country_towns_folder_path', 'country_towns_file'] and valued by the user as \
         the full path to the data per country of raw affiliations per normalized one, the full path to the data of \
         affiliations-types used to normalize the affiliations, the name of the file of the data of towns per country \
         and the full path to the folder where these data are available.
         scopus_cat_paths (list): Optional (default: none), Composed of the full path to the Scopus categories codes \
-        and of the catagories per journal.
+        and of the categories per journal.
     Returns:
         (tup): (The parsed data (dataframes) as values of a dict keyed by parsing items, \
         The parsing success rate data (dict), The data (dataframe) of the corrected author names, \

@@ -140,6 +140,15 @@ def _check_authors_with_affiliations(corpus_df, check_cols):
 
 
 def _correct_firstname_initials(fullname_init):
+    """Normalizes the firstname initials in the author's name.
+
+    Args:
+        fullname_init (str): The author's fullname as given by the publication's rawdata.
+    Returns:
+        (str): The normalized author's name.
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
+    """
     fullname = fullname_init
     # Remove author digital identifier
     if "(" in fullname_init:
@@ -168,6 +177,18 @@ def _correct_firstname_initials(fullname_init):
 
 
 def _correct_auth_data(auth_tup):
+    """Corrects the author's name including in the author-with-affiliations item.
+
+    The correction is based on the firstname initials normalization 
+    through the `correct_firstname_initials` internal function.
+
+    Args:
+        auth_tup (tup): Composed of the author's fullname and of the \
+        author-with-affiliations item as given by the publication's rawdata.
+    Returns:
+        (tup): Composed of the corrected author's name and of \
+        the corrected author-with-affiliations item.
+    """
     fullname, auth_affil = auth_tup
 
     # Correcting author name
@@ -266,7 +287,7 @@ def _correct_scopus_full_rawdata(corpus_df, cols_tup):
     new_corpus_df, corrected_authors_df = _check_authors(new_corpus_df, auth_check_cols)
 
     # Dropping pub_id_col column
-    new_corpus_df.drop(columns=[pub_id_col], inplace=True)
+    new_corpus_df = new_corpus_df.drop(columns=[pub_id_col])
     return new_corpus_df, corrected_authors_df, corrected_addresses_df
 
 
