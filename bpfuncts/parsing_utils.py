@@ -3,13 +3,12 @@ and concatenation/deduplication of parsings.
 """
 
 __all__ = ['build_item_df_from_tup',
+           'build_kw_lists',
            'build_pub_db_ids',
-           'build_title_keywords',
            'check_and_drop_columns',
            'check_and_get_rawdata_file_path',
            'clean_authors_countries_affils',
            'convert_issn',
-           'dict_print',
            'drop_rawdata',
            'normalize_country',
            'normalize_journal_names',
@@ -18,6 +17,7 @@ __all__ = ['build_item_df_from_tup',
            'set_address_uniform_words',
            'set_rawdata_error',
            'set_shared_parsing_cols',
+           'set_shared_parsing_namedtups',
            'set_unknown_address',
            'standardize_address',
            'standardize_str',
@@ -35,8 +35,8 @@ import operator
 import os
 import re
 from collections import Counter
+from collections import namedtuple
 from pathlib import Path
-
 
 # 3rd party imports
 import numpy as np
@@ -171,16 +171,6 @@ def treat_author(authors_str):
     return first_author
 
 
-def dict_print(dic):
-    """Prints dict items line by line.
-
-    Args:
-        (dict): The data to print.
-    """
-    for k,v in dic.items():
-        print("\t\t\t", k, ":", v)
-
-
 def set_unknown_address(author_idx, add_unknown_country=False):
     """Adds author ID to the 'UNKNOWN' global to set the address to correct 
     for an author which address is unknown in the extracted rawdata.
@@ -282,10 +272,9 @@ def set_rawdata_error(database, rawdata_path, raw_extent):
     Returns:
         (str): The formatted text.
     """
-    error_text  = (f"\n   !!! No {database} raw-data file available !!! \n"
-                   "\nBefore new launch of the parsing, "
-                   f"please make available a {database} raw-data file "
-                   f"with {raw_extent} extension in:\n   {rawdata_path}.")
+    error_text  = (f"{bp_gg.TAB*4}!!! No {database.upper()} rawdata file available !!!\n"
+               f"{bp_gg.TAB}Please make available a {database.upper()} rawdata file "
+               f"with '.{raw_extent}' extension in:\n{bp_gg.TAB}{rawdata_path}")
     return error_text
 
 
@@ -355,73 +344,6 @@ def clean_authors_countries_affils(auth_addr_country_affil_df):
     new_auth_addr_country_affil_df.fillna(bp_ag.EMPTY, inplace=True)
     new_auth_addr_country_affil_df.replace("", bp_ag.EMPTY, inplace=True)
     return new_auth_addr_country_affil_df
-
-
-def _tokenizer(text):
-    """Tokenizes, lemmatizes the string 'text'. Only the words with nltk tags in the global
-    NLTK_VALID_TAG_LIST are kept.
-
-    ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
-    gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
-
-    Args:
-        text (string): String to tokenize
-    Returns
-        (list) : The tokenized and lemmatized words.
-    """
-    tokenized = nltk.word_tokenize(text.lower())
-    valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
-                   if pos in bp_pg.NLTK_VALID_TAG_LIST]
-
-    stemmer = nltk.stem.WordNetLemmatizer()
-    valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
-    return valid_words_lemmatized
-
-
-def build_title_keywords(df):
-    """Builds keywords from the analysis of the publication's title.
-
-    The step of the building process are the following:
-    1- Builds the set "keywords_TK" of the tokens appearing at least NOUN_MINIMUM_OCCURRENCE times 
-    in all the article titles of the corpus. The tokens are the words of the title with nltk tags 
-    belonging to the global list 'NLTK_VALID_TAG_LIST'.
-    2- Adds two columns 'token' and 'pub_token' to the dataframe 'df'. The column 'token' contains
-    the set of the tokenized and lemmatized (using the nltk WordNetLemmatizer) title. The column
-    'pub_token' contains the list of words common to the set "keywords_TK" and to the column 'kept_tokens'.
-    3- Builds the list of tuples 'list_of_words_occurrences.sort' 
-    [(token_1,# occurrences token_1), (token_2,# occurrences token_2),...] ordered by decreasing values
-    of # occurrences token_i.
-    4- Suppress words pertaining to BLACKLISTED_WORDS to the list from the bag of words
-
-    Args:
-       df (dataframe): Data of publication title per publication identifier.
-    Returns:
-       (tup): Composed of the data (dataframe) which columns are \
-       ['pub_id', 'title_tokens_alias', 'kept_tokens_alias'] \
-       where 'title_tokens_alias' contains the list of tokens of the title \
-       and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
-       and of the list of tuples where tuple i is (word_i, # occurrence_i).
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
-    """
-    title_alias = bp_pcg.COL_NAMES['temp_col'][2]
-    title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
-    kept_tokens_alias = bp_pcg.COL_NAMES['temp_col'][4]
-
-    df[title_tokens_alias] = df[title_alias].apply(_tokenizer)
-
-    # Removing the blacklisted words from the bag of words
-    bag_of_words = np.array(df[title_tokens_alias].sum())
-    for remove in bp_pg.BLACKLISTED_WORDS:
-        bag_of_words = bag_of_words[bag_of_words!=remove]
-
-    bag_of_words_occurrences = list(Counter(bag_of_words).items())
-    bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
-
-    title_keywords = {x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES}
-    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x:list(title_keywords.intersection(set(x))))
-
-    return df, bag_of_words_occurrences
 
 
 def normalize_country(raw_country):
@@ -721,7 +643,7 @@ def set_shared_parsing_cols():
     cols_lists_dic = {'articles_cols_list'   : bp_pcg.COL_NAMES['articles'],
                       'address_cols_list'    : bp_pcg.COL_NAMES['address'],
                       'auth_cols_list'       : bp_pcg.COL_NAMES['authors'],
-                      'auth_affil_cols_list' : bp_pcg.COL_NAMES['auth_inst'],
+                      'auth_affil_cols_list' : bp_pcg.COL_NAMES['auth_inst'][:-1],
                       'country_cols_list'    : bp_pcg.COL_NAMES['country'],
                       'affil_cols_list'      : bp_pcg.COL_NAMES['institution'],
                       'kw_cols_list'         : bp_pcg.COL_NAMES['keywords'],
@@ -751,6 +673,32 @@ def set_shared_parsing_cols():
                }
 
     return cols_lists_dic, cols_dic
+
+
+def set_shared_parsing_namedtups():
+    """Builds a dict setting named-tuples information for the process of parsing rawdata.
+
+    The column's lists are set through the `set_shared_parsing_cols` function of the same module.
+
+    Returns:
+        (dict): Data valued by the list composed of the named-tuple and of its columns' list.
+    """
+    # Setting useful column names
+    cols_lists_dic, _ = set_shared_parsing_cols()
+    cols_lists_keys = ['auth_cols_list', 'kw_cols_list', 'address_cols_list',
+                       'country_cols_list', 'affil_cols_list', 'auth_affil_cols_list', 'ref_cols_list']
+    (auth_cols_list, kw_cols_list, address_cols_list, country_cols_list,
+     affil_cols_list, auth_affil_cols_list, ref_cols_list) = [cols_lists_dic[key] for key in cols_lists_keys]
+
+    namedtups_dic = {'co_author'  : [namedtuple('co_author', auth_cols_list), auth_cols_list],
+                     'key_word'   : [namedtuple('key_word', kw_cols_list), kw_cols_list],
+                     'address'    : [namedtuple('address', address_cols_list), address_cols_list],
+                     'country'    : [namedtuple('country', country_cols_list), country_cols_list],
+                     'affiliation': [namedtuple('affiliation', affil_cols_list), affil_cols_list],
+                     'auth_affil' : [namedtuple('auth_affil', auth_affil_cols_list), auth_affil_cols_list],# modifié
+                     'pub_ref'    : [namedtuple('pub_ref', ref_cols_list), ref_cols_list]
+                     }
+    return namedtups_dic
 
 
 def rationalize_town_names(text, dic_town_symbols=None, dic_town_words=None):
@@ -883,3 +831,112 @@ def standardize_address(raw_address, add_unknown_country=True):
         standard_address = ','.join(first_raw_affiliations_list[:-1] + [country_chunck])
 
     return standard_address
+
+
+def _tokenizer(text):
+    """Tokenizes, lemmatizes the string 'text'. Only the words with nltk tags in the global
+    NLTK_VALID_TAG_LIST are kept.
+
+    ex 'Thermal stability of Mg2Si0.55Sn0.45 for thermoelectric applications' 
+    gives the list : ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
+
+    Args:
+        text (string): String to tokenize
+    Returns
+        (list) : The tokenized and lemmatized words.
+    """
+    tokenized = nltk.word_tokenize(text.lower())
+    valid_words = [word for (word, pos) in nltk.pos_tag(tokenized)
+                   if pos in bp_pg.NLTK_VALID_TAG_LIST]
+
+    stemmer = nltk.stem.WordNetLemmatizer()
+    valid_words_lemmatized = [stemmer.lemmatize(valid_word) for valid_word in valid_words]
+    return valid_words_lemmatized
+
+
+def _build_title_keywords(df):
+    """Builds keywords from the analysis of the publication's title.
+
+    The step of the building process are the following:
+    1- Adds a column with the title's tokens per publication through the `_tokenizer` internal function.
+    2- Suppress words pertaining to BLACKLISTED_WORDS to the list from the bag of words \
+    of all the tokens of the corpus.
+    3- Adds a column with kept title's tokens per publication.
+    The kept tokens are those which occurence in the bag of words is higher than the minimum 
+    given by the NOUN_MINIMUM_OCCURENCE global imported from the `bpfuncts.parsing_globals` module.
+
+    Args:
+       df (dataframe): Data of publication title per publication identifier.
+    Returns:
+       (tup): Composed of the data (dataframe) which columns are \
+       ['pub_id', 'title_tokens_alias', 'kept_tokens_alias'] \
+       where 'title_tokens_alias' contains the list of tokens of the title \
+       and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
+       and of the list of tuples where tuple i is (word_i, # occurrence_i).
+    Note:
+        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
+    """
+    title_alias = bp_pcg.COL_NAMES['temp_col'][2]
+    title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]
+    kept_tokens_alias = bp_pcg.COL_NAMES['temp_col'][4]
+
+    df[title_tokens_alias] = df[title_alias].apply(_tokenizer)
+
+    # Removing the blacklisted words from the bag of words
+    bag_of_words = np.array(df[title_tokens_alias].sum())
+    for remove in bp_pg.BLACKLISTED_WORDS:
+        bag_of_words = bag_of_words[bag_of_words!=remove]
+
+    bag_of_words_occurrences = list(Counter(bag_of_words).items())
+    bag_of_words_occurrences.sort(key=operator.itemgetter(1), reverse=True)
+
+    title_keywords = {x for x, y in bag_of_words_occurrences if y>=bp_pg.NOUN_MINIMUM_OCCURRENCES}
+    df[kept_tokens_alias] = df[title_tokens_alias].apply(lambda x:list(title_keywords.intersection(set(x))))
+
+    return df, bag_of_words_occurrences
+
+
+def build_kw_lists(corpus_df, db_usecols, key_word_ntup):
+    """Builds the lists of keywords per publication of a corpus using the author's keywords, 
+    the indexed keywords or the title keywords.
+
+    The author's keywords and the indexed keywords are directly extracted from the corpus data. 
+    The title keywords are builds through the `_build_title_keywords` internal function.
+    The lists of keywords are composed of (publication ID, keyword) tuples.
+
+    Args:
+        corpus_df (dataframe): The selected rawdata of the corpus.
+        db_usecols (list): The useful column names according to the corpus rawdata.
+        key_word_ntup (namedtuple): Value at key 'key_word' of the build dict through \
+        the `set_shared_parsing_namedtups` of the same module.
+    Returns:
+        (tup): Composed of the 3 built lists of keywords.
+    """
+    pub_id_col, auth_kw_col, idx_kw_col, title_kw_col, title_temp_col, kept_tokens_col = db_usecols
+
+    aks_list = []
+    aks_df = corpus_df[auth_kw_col].fillna('')
+    for pub_id, pub_aks_str in zip(corpus_df[pub_id_col], aks_df):
+        pub_aks_list = pub_aks_str.split(';')
+        for pub_ak in pub_aks_list:
+            pub_ak = pub_ak.lower().strip()
+            aks_list.append(key_word_ntup(pub_id, pub_ak if pub_ak!='null' else bp_pg.UNKNOWN))
+
+    iks_list = []
+    iks_df = corpus_df[idx_kw_col].fillna('')
+    for pub_id, pub_iks_str in zip(corpus_df[pub_id_col], iks_df):
+        pub_iks_list = pub_iks_str.split(';')
+        for pub_ik in pub_iks_list:
+            pub_ik = pub_ik.lower().strip()
+            iks_list.append(key_word_ntup(pub_id, pub_ik if pub_ik!='null' else bp_pg.UNKNOWN))
+
+    tks_list = []
+    title_df = pd.DataFrame(corpus_df[title_kw_col].fillna(''))
+    title_df.columns = [title_temp_col]
+    tks_df, _ = _build_title_keywords(title_df)
+    for pub_id in corpus_df[pub_id_col]:
+        for token in tks_df.loc[pub_id, kept_tokens_col]:
+            token = token.lower().strip()
+            tks_list.append(key_word_ntup(pub_id, token if token!='null' else bp_pg.UNKNOWN))
+
+    return aks_list, iks_list, tks_list

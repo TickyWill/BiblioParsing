@@ -8,6 +8,11 @@ __all__ = ['build_scopus_subjects_and_sub_subjects',
 # 3rd party library imports
 import pandas as pd
 
+# Local libray imports
+import bpfuncts.general_globals as bp_gg
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
+
 
 def _set_pub_subjects_list(pub_id, codes_df, code_cat_dict, sub_subject):
     """Builds the list of subjects or sub-subjects for a publication ID.
@@ -139,10 +144,13 @@ def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
         scopus_cat_codes_path (path): The full path to the txt file "scopus_cat_codes".
         scopus_journals_issn_cat_path (path): The full path to the txt file "scopus_journals_issn_cat".
         fails_dic (dict): Parsing success rate data.
-        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function \
+        of the `bpfuncts.scopus_parsing` module.
     Returns:
         (tuple): The subjects data (dataframe) and sub-subjects data (dataframe) built.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Subjects and secondary subjects parsing...")
+
     # Setting useful column names
     _, cols_dic, scopus_cols_dic = cols_tup
     cols_keys = ['pub_id_col', 'subject_col', 'sub_subject_col']
@@ -183,4 +191,5 @@ def build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
     sub_subjects_df = _build_scopus_selected_subjects(corpus_df, scopus_journals_issn_cat_df, code_cat_dict,
                                                       fails_dic, sub_subject, cols_list)
 
+    print_final_text(f"{bp_gg.TAB}- Subjects and secondary subjects parsed", prev_txt_len=txt_len)
     return subjects_df, sub_subjects_df

@@ -20,6 +20,8 @@ import bpfuncts.regex_globals as bp_rg
 from bpfuncts.affil_norm_utils import build_affils_useful_dicts
 from bpfuncts.affil_norm_utils import build_norm_affiliation_list
 from bpfuncts.affil_norm_utils import set_norm_affils_cols
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
 from bpfuncts.general_utils import remove_special_symbol
 from bpfuncts.parsing_utils import rationalize_town_names
 from bpfuncts.parsing_utils import build_item_df_from_tup
@@ -90,7 +92,7 @@ def _set_droping_zipcode_pattern(country):
                                 for digits in digits_list]
             pattern = '|'.join(pattern_zip_list)
     else:
-        print('country not found:', country)
+        print(f'Country not found: {country}')
         return_status = True
     return pattern, return_status
 
@@ -199,7 +201,7 @@ def _search_dropping_suffix(params_list, verbose=False):
         if result is not None:
             flag = True
             if verbose:
-                print('Dropping word contains the suffix:', word_to_drop)
+                print(f'Dropping word contains the suffix: {word_to_drop}')
     return [flag]
 
 
@@ -227,7 +229,7 @@ def _search_dropping_town(params_list, verbose=False):
         for word_to_drop in towns_dict[country]:
             if word_to_drop==text_mod.strip():
                 if verbose:
-                    print('Dropping word is a town of ', country)
+                    print(f'Dropping word is a town of {country}')
                 flag = True
     return [flag]
 
@@ -271,7 +273,7 @@ def _search_dropping_words(params_list, verbose=False):
         if result is not None:
             flag = True
             if verbose:
-                print('Dropping word is the full word:', word_to_drop)
+                print(f'Dropping word is the full word: {word_to_drop}')
     return [flag]
 
 
@@ -307,7 +309,7 @@ def _search_keeping_prefix(params_list, verbose=False):
             result = re.search(re_keep_prefix, text.lower())
             if result is not None:
                 if verbose:
-                    print('Keeping word is the prefix:', prefix_to_keep)
+                    print(f'Keeping word is the prefix: {prefix_to_keep}')
                 flag = True
     return [flag]
 
@@ -347,7 +349,7 @@ def _search_keeping_words(params_list, verbose=False):
         result = re.search(re_keeping_word, text.lower())
         if result is not None:
             if verbose:
-                print('Keeping word is the full word:', word_to_keep)
+                print(f'Keeping word is the full word: {word_to_keep}')
             if word_to_keep in bp_ag.GEN_KEEPING_WORDS:
                 gen_flag = True
             if word_to_keep in bp_ag.BASIC_KEEPING_WORDS:
@@ -430,12 +432,14 @@ def _check_dropping_digits_flag(digits_drop_params, found_item_flags,
     """
     (affiliation, sub_check_affils_list, country,
      affils_list, affils_drop, add_affiliation_flag) = digits_drop_params
+    if verbose:
+        break_txt = 'Break identification:'
     break_status = False
     if country.lower() in ['france', 'algeria']:
         if not found_item_flags.keeping_prefix and not any(keeping_words_flags):
             affils_drop.append(('dropping_digits', sub_check_affils_list))
             if verbose:
-                print('Break identification:', 'dropping_digits', '\n')
+                print(f'{break_txt} dropping_digits\n')
             break_status = True
         if not break_status:
             if found_item_flags.gen_keeping_words:
@@ -443,7 +447,7 @@ def _check_dropping_digits_flag(digits_drop_params, found_item_flags,
                     affils_list.append(affiliation)
                     add_affiliation_flag = True
                 if verbose:
-                    print('Break identification:', 'dropping_digits aborted by gen_keeping_words', '\n')
+                    print(f'{break_txt} dropping_digits aborted by gen_keeping_words\n')
             else:
                 if not add_affiliation_flag:
                     affils_list.append(affiliation)
@@ -456,25 +460,25 @@ def _check_dropping_digits_flag(digits_drop_params, found_item_flags,
                         break_id = 'dropping_digits aborted by user_keeping_words'
                     if found_item_flags.keeping_prefix:
                         break_id = 'dropping_digits aborted by keeping_prefix'
-                    print('Break identification:', break_id, '\n')
+                    print(f'{break_txt} {break_id}\n')
     else:
         if not found_item_flags.gen_keeping_words and not found_item_flags.user_keeping_words:
             affils_drop.append(('dropping_digits', sub_check_affils_list))
             if verbose:
-                print('Break identification:', 'dropping_digits', '\n')
+                print(f'{break_txt} dropping_digits\n')
             break_status = True
 
         if found_item_flags.dropping_words and not break_status:
             affils_drop.append(('dropping_digits', sub_check_affils_list))
             if verbose:
-                print('Break identification:', 'dropping_digits', '\n')
+                print(f'{break_txt} dropping_digits\n')
             break_status = True
 
         if not add_affiliation_flag and not break_status:
             affils_list.append(affiliation)
             add_affiliation_flag = True
             if verbose:
-                print('Break identification:', 'dropping_digits aborted by user_keeping_words', '\n')
+                print(f'{break_txt} dropping_digits aborted by user_keeping_words\n')
 
     return affils_list, affils_drop, add_affiliation_flag, break_status
 
@@ -502,6 +506,8 @@ def _check_dropping_words_flag(words_drop_params, found_item_flags,
     """
     (affiliation, sub_check_affils_list, affils_list,
      affils_drop, add_affiliation_flag) = words_drop_params
+    if verbose:
+        break_txt = 'Break identification:'
     break_status = False
     # Keeping affiliation when a keeping word is found only if no dropping digit is found
     # this keeps "department bldg civil" which is wanted even if "bldg" is a dropping word
@@ -518,7 +524,7 @@ def _check_dropping_words_flag(words_drop_params, found_item_flags,
                 break_id = 'dropping_word aborted by basic_keeping_words'
             if found_item_flags.gen_keeping_words:
                 break_id = 'dropping_word aborted by gen_keeping_words'
-            print('Break identification:', break_id, '\n')
+            print(f'{break_txt} {break_id}')
     else:
         # Dropping affiliation from affiliations list
         # if already added because of a former drop abort
@@ -527,7 +533,7 @@ def _check_dropping_words_flag(words_drop_params, found_item_flags,
             add_affiliation_flag = False
         affils_drop.append(('dropping_words', sub_check_affils_list))
         if verbose:
-            print('Break identification:', 'dropping_words', '\n')
+            print(f'{break_txt} dropping_words\n')
         break_status = True
     return affils_list, affils_drop, add_affiliation_flag, break_status
 
@@ -552,6 +558,8 @@ def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags, verbose):
     """
     (affiliation, sub_check_affils_list, affils_list,
      affils_drop, add_affiliation_flag) = suffix_drop_params
+    if verbose:
+        break_txt = 'Break identification:'
     break_status = False
     if found_item_flags.gen_keeping_words or found_item_flags.user_keeping_words:
         if not add_affiliation_flag:
@@ -563,11 +571,11 @@ def _check_dropping_suffix_flag(suffix_drop_params, found_item_flags, verbose):
                 break_id = 'dropping_suffix aborted by gen_keeping_words'
             if found_item_flags.user_keeping_words:
                 break_id = 'dropping_suffix aborted by user_keeping_words'
-            print('Break identification:', break_id, '\n')
+            print(f'{break_txt} {break_id}\n')
     else:
         affils_drop.append(('dropping_suffix', sub_check_affils_list))
         if verbose:
-            print('Break identification:', 'dropping_suffix', '\n')
+            print(f'{break_txt} dropping_suffix\n')
         break_status = True
     return affils_list, affils_drop, add_affiliation_flag, break_status
 
@@ -588,17 +596,19 @@ def _check_dropping_town_flag(town_drop_params, verbose):
         (tup): Composed of the updated chunks to drop (list) and of the break status (bool).
     """
     affiliation, sub_check_affils_list, affils_drop = town_drop_params
+    if verbose:
+        break_txt = 'Break identification:'
     break_status = False
     if len(sub_check_affils_list)<=2:
         affils_drop.append(('dropping_town', sub_check_affils_list))
         if verbose:
-            print('Break identification:', 'dropping_town', '\n')
+            print(f'{break_txt} dropping_town\n')
         break_status = True
     else:
         affils_drop.append(('dropping_town', affiliation))
         if verbose:
             break_id = 'dropping_town aborted by index of town in affiliations list'
-            print('Break identification:', break_id, '\n')
+            print(f'{break_txt} {break_id}\n')
     return affils_drop, break_status
 
 
@@ -625,7 +635,7 @@ def _clean_affils(affils_drop_params, towns_dict, verbose=False):
      affils_drop) = affils_drop_params
     found_item_flags = _search_items(affiliation, country, towns_dict, verbose=verbose)
     if verbose:
-        print('found_item_flags:', found_item_flags)
+        print(f'found_item_flags: {found_item_flags}')
     dropping_word_flags = [found_item_flags.dropping_bp, found_item_flags.dropping_digits,
                            found_item_flags.dropping_suffix, found_item_flags.dropping_town,
                            found_item_flags.dropping_words]
@@ -637,13 +647,13 @@ def _clean_affils(affils_drop_params, towns_dict, verbose=False):
     if not any(dropping_word_flags):
         affils_list.append(affiliation)
         if verbose:
-            print('No dropping item found in:', affiliation, '\n')
+            print(f'No dropping item found in: {affiliation}\n')
     else:
         add_affiliation_flag = False
         if found_item_flags.dropping_bp:
             affils_drop.append(('dropping_bp', sub_check_affils_list))
             if verbose:
-                print('Break identification:', 'dropping_bp', '\n')
+                print('Break identification: dropping_bp\n')
             break_status = True
 
         if found_item_flags.dropping_digits and not break_status:
@@ -742,7 +752,7 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
             for affil_idx, affiliation in enumerate(check_affils_list[:country_pos]):
                 affiliation = affiliation.translate(bp_gg.SYMB_CHANGE)
                 if verbose:
-                    print('\naffil_idx:', affil_idx, '  affiliation:', affiliation)
+                    print(f'\naffil_idx: {affil_idx} affiliation: {affiliation}')
                 sub_check_affils_list = check_affils_list[affil_idx:country_pos]
                 affils_drop_params = [affiliation, sub_check_affils_list, country,
                                       affils_list, affils_drop]
@@ -758,13 +768,13 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
     # Removing spaces from the kept affiliations
     affils_list = [x.strip() for x in affils_list]
     if verbose:
-        print('affils_list stripped:', affils_list, "\n")
+        print(f'affils_list stripped: {affils_list}\n')
 
     # Removing country and country alias from the kept affiliations
     uk_aliases = bp_gg.COUNTRY_ALIASES["United Kingdom"]
     affils_list = [x for x in affils_list if x!=country and x not in uk_aliases]
     if verbose:
-        print('affils_list without country aliases:', affils_list, "\n")
+        print(f'affils_list without country aliases: {affils_list}\n')
 
     return country, affils_list, affils_drop
 
@@ -787,11 +797,11 @@ def _check_paris_univ(address_norm_affiliations_set, verbose):
     if paris_nb>1 and 'Paris-Cité Univ' in address_norm_affiliations_set:
         address_norm_affiliations_set = address_norm_affiliations_set - {'Paris-Cité Univ'}
     if verbose:
-        print('address_norm_affiliations_set:     ', address_norm_affiliations_set)
+        print(f'address_norm_affiliations_set:{bp_gg.TAB}{address_norm_affiliations_set}')
     return address_norm_affiliations_set
 
 
-def _reorder_address_norm_affiliations(address_norm_affiliations_set, aff_type_dict, verbose):
+def _reorder_addr_norm_affils(address_norm_affiliations_set, aff_type_dict, verbose):
     """Reorders the normalized affiliations according to the data of affiliations types.
 
     Args:
@@ -822,7 +832,7 @@ def _reorder_address_norm_affiliations(address_norm_affiliations_set, aff_type_d
             print(f'norm_aff_pos_list end: {norm_aff_pos_list}\n')
         address_norm_affiliation_dict[norm_aff_pos] = norm_aff
     if verbose:
-        print('address_norm_affiliation_dict:\t', address_norm_affiliation_dict)
+        print(f'address_norm_affiliation_dict:{bp_gg.TAB}{address_norm_affiliation_dict}')
 
     norm_aff_pos_list.sort()
     address_norm_affiliation_list = [None] * len(address_norm_affiliations_set)
@@ -833,9 +843,8 @@ def _reorder_address_norm_affiliations(address_norm_affiliations_set, aff_type_d
 
 def _get_norm_affils_list(country, affiliations_list, norm_raw_aff_dict,
                           aff_type_dict, verbose=False):
-    """Converts kept raw affiliations to normalized affiliations 
-    through the `build_norm_affiliation_list` function imported 
-    from the `bpfuncts.affil_norm_utils` module.
+    """Converts kept raw affiliations to normalized affiliations through the `build_norm_affiliation_list` 
+    function imported from the `bpfuncts.affil_norm_utils` module.
 
     Then it rationalizes the multiple occurrences of universities of Paris 
     in the list of normalized affiliations.
@@ -853,26 +862,25 @@ def _get_norm_affils_list(country, affiliations_list, norm_raw_aff_dict,
     Returns:
         (tup): Composed of the normalized affiliations (list) and of the unknown affiliations (list).
     """
-    address_norm_affiliations_list = []
-    address_unknown_affiliations_list = []
+    addr_norm_affils_list = []
+    addr_unknown_affils_list = []
     for affiliation in affiliations_list:
         if verbose:
-            print(' -', affiliation)
+            print(f' - {affiliation}')
         norm_affiliation_list = build_norm_affiliation_list(affiliation, country,
                                                             norm_raw_aff_dict, verbose)
         if not norm_affiliation_list:
-            address_unknown_affiliations_list.append(affiliation)
+            addr_unknown_affils_list.append(affiliation)
 
-        address_norm_affiliations_list = address_norm_affiliations_list + norm_affiliation_list
+        addr_norm_affils_list = addr_norm_affils_list + norm_affiliation_list
 
-    address_norm_affiliations_set = set(address_norm_affiliations_list)
+    addr_norm_affils_set = set(addr_norm_affils_list)
     if verbose:
-        print(f'address_norm_affiliations_list: {address_norm_affiliations_list}'
-              f'address_norm_affiliations_set: \t {address_norm_affiliations_set}')
-    address_norm_affiliations_set = _check_paris_univ(address_norm_affiliations_set, verbose)
-    address_norm_affiliation_list = _reorder_address_norm_affiliations(address_norm_affiliations_set,
-                                                                       aff_type_dict, verbose)
-    return address_norm_affiliation_list, address_unknown_affiliations_list
+        print(f'addr_norm_affils_list: {addr_norm_affils_list}'
+              f'\naddr_norm_affils_set: {addr_norm_affils_set}')
+    addr_norm_affils_set = _check_paris_univ(addr_norm_affils_set, verbose)
+    addr_norm_affils_list = _reorder_addr_norm_affils(addr_norm_affils_set, aff_type_dict, verbose)
+    return addr_norm_affils_list, addr_unknown_affils_list
 
 
 def _build_addr_affils_lists(std_address, affil_dicts, drop_status, verbose=False):
@@ -897,7 +905,7 @@ def _build_addr_affils_lists(std_address, affil_dicts, drop_status, verbose=Fals
         third item is the list of unknown affiliations for the analyzed address.
     """
     if verbose:
-        print('\nStandardized address:', std_address)
+        print(f'\nStandardized address: {std_address}')
     # Building the useful data for affiliations normalization
     affils_dicts_keys = ['affil_types_dict', 'norm_raw_affils_dict', 'towns_dict']
     affil_types_dict, norm_raw_affils_dict, towns_dict = [affil_dicts[key] for key in affils_dicts_keys]
@@ -918,17 +926,14 @@ def _build_addr_affils_lists(std_address, affil_dicts, drop_status, verbose=Fals
     return country, addr_norm_affils_list, addr_unknown_affils_list
 
 
-def build_addr_affils_tup(full_address, affil_params_dic, drop_status):
+def build_addr_affils_tup(full_address, affil_dicts, drop_status):
     """Builds the affiliations list of a full address using the `_build_addr_affils_lists` 
     internal function of the same module.
 
     Args:
-        full_address (str): the full address to be parsed in affiliations and country.
-        affil_params_dic (dict): Keyed by ['affil_types_file_path', 'country_affils_file_path', \
-        'country_towns_folder_path', 'country_towns_file'] and valued by the user as the full path to the data \
-        per country of raw affiliations per normalized one, the full path to the data of affiliations-types \
-        used to normalize the affiliations, the name of the file of the data of towns per country and the full \
-        path to the folder where these are available.
+        full_address (str): The full address to be parsed in affiliations and country.
+        affil_dicts (dict): The data for affiliations normalization are built through \
+        the `build_affils_useful_dicts` function imported from the `affil_norm_utils` module.
         drop_status (bool): If true, dropping items are searched to drop chunks from the address.
     Returns:
         (namedtuple): A tuple of two strings; the first is the joined list of normalized affiliations \
@@ -940,7 +945,6 @@ def build_addr_affils_tup(full_address, affil_params_dic, drop_status):
     raw_affils_full_list_str = ""
 
     # Getting useful data for affiliations normalization
-    affil_dicts = build_affils_useful_dicts(affil_params_dic)
     wrong_affil_types_dict = affil_dicts['wrong_affil_types_dict']
 
     if not wrong_affil_types_dict:
@@ -962,7 +966,37 @@ def build_addr_affils_tup(full_address, affil_params_dic, drop_status):
     return affils_full_list_tup
 
 
-def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False, progress_param=None):
+def _build_addr_norm_raw_affils(pub_id, address_idx, raw_address, affil_dicts):
+    """Builds the normalized affiliations and the remaining raw affiliations for the given address.
+
+    Args:
+        pub_id (int): The identifier of the publication.
+        address_idx (int): The index of the address among the addresses of the publication.
+        raw_address (str): The raw address from which the affiliations are extracted.
+        affil_dicts (dict): The hierarchical dict as built through the `build_affils_useful_dicts` \
+        function imported from `bpfuncts.affil_norm_utils` module.
+    Returns:
+        (tup): Composed of the country (str), of the normalized affiliations (str), \
+        of the raw affiliations (str) and of the standardized address (str).
+    """
+    std_address = standardize_address(raw_address)
+    address_country, addr_norm_affils_list, addr_raw_affils_list = "", [], []
+    try:
+        affil_list_tup = _build_addr_affils_lists(std_address, affil_dicts, drop_status=True)
+        address_country, addr_norm_affils_list, addr_raw_affils_list = affil_list_tup
+    except KeyError:
+        print(f"\n\nError Pub_id / address_idx: {pub_id} / {address_idx}")
+        print(f"\nRaw address:\n {raw_address}")
+    addr_norm_affils = bp_ag.EMPTY
+    addr_raw_affils = bp_ag.EMPTY
+    if addr_norm_affils_list:
+        addr_norm_affils = "; ".join(addr_norm_affils_list)
+    if addr_raw_affils_list:
+        addr_raw_affils = "; ".join(addr_raw_affils_list)
+    return address_country, addr_norm_affils, addr_raw_affils, std_address
+
+
+def build_norm_and_raw_affils(addresses_df, affil_params_dic=None):
     """Parses the addresses of each publication of the corpus to retrieve the country, 
     the normalized affiliations and the affiliations not yet normalized for each address.
 
@@ -975,15 +1009,10 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
         the full path to the data of affiliations-types used to normalize the affiliations, \
         the name of the file of the data of towns per country and the full path to the folder \
         where these data are available.
-        verbose (bool): If set to 'True' allows prints for code control (default: False).
-        progress_param (tup): (Function for updating ProgressBar tkinter widget status, \
-        The initial progress status (int), The final progress status (int)) \
-        (optional, default=None)
     Returns:
         (tuple): (countries data per address (dataframe), normalized affiliations per address (dataframe), \
         raw affiliations per address (dataframe), A dict of wrong type of normalized affiliations \
         for correction by the user).
-    ToDo: Reduce complexity of the function.
     """
     # Setting useful column names
     cols_lists_dic, cols_dic = set_norm_affils_cols()
@@ -998,77 +1027,42 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None, verbose=False
 
     # Setting named tuples
     country = namedtuple('country', country_cols_list)
-    norm_affiliation = namedtuple('norm_affiliation', norm_affil_cols_list)
-    raw_affiliation = namedtuple('raw_affiliation', raw_affil_cols_list)
+    norm_affil_ntup = namedtuple('norm_affiliation', norm_affil_cols_list)
+    raw_affil_ntup = namedtuple('raw_affiliation', raw_affil_cols_list)
 
     # Getting useful data for affiliations normalization
     affil_dicts = build_affils_useful_dicts(affil_params_dic)
     wrong_affil_types_dict = affil_dicts['wrong_affil_types_dict']
 
+    print(f"{bp_gg.TAB}- Building normalized affiliations and remaining raw affiliations...")
     if not wrong_affil_types_dict:
         step_nb = len(addresses_df)
         step = 0
-        if progress_param:
-            progress_callback, init_progress, final_progress = progress_param
-            progress_step = (final_progress-init_progress) / step_nb
-            progress_status = init_progress
-            progress_callback(progress_status)
-
-        countries_list = []
-        norm_affiliations_list = []
-        raw_affiliations_list = []
+        countries_list, norm_affil_list, raw_affil_list = [], [], []
         for pub_id, pub_id_addresses_dg in addresses_df.groupby(pub_id_col):
-            if verbose:
-                print("\n\nPub_id:", pub_id, "\npub_id_addresses_dg:\n", pub_id_addresses_dg)
-            for idx, row in pub_id_addresses_dg.iterrows():
+            for _, row in pub_id_addresses_dg.iterrows():
+                step += 1
+                txt_len = print_temp_text(f"{bp_gg.TAB*2}- Number of analyzed addresses: {step} / {step_nb}")
                 address_idx = row[address_id_col]
                 raw_address = row[address_col]
-                std_address = standardize_address(raw_address)
-                address_country = ""
-                addr_norm_affils_list = []
-                addr_raw_affils_list = []
-                try:
-                    affil_list_tup = _build_addr_affils_lists(std_address, affil_dicts, drop_status=True)
-                    address_country, addr_norm_affils_list, addr_raw_affils_list = affil_list_tup
-                except KeyError:
-                    print("\n\nError Pub_id / idx:", pub_id," / ", idx)
-                    print("\npub_id_addresses_dg:\n", pub_id_addresses_dg[address_col].tolist()[idx])
-                addr_norm_affils = bp_ag.EMPTY
-                addr_raw_affils = bp_ag.EMPTY
-                if addr_norm_affils_list:
-                    addr_norm_affils = "; ".join(addr_norm_affils_list)
-                if addr_raw_affils_list:
-                    addr_raw_affils = "; ".join(addr_raw_affils_list)
+                return_tup = _build_addr_norm_raw_affils(pub_id, address_idx, raw_address, affil_dicts)
+                address_country, addr_norm_affils, addr_raw_affils, std_address = return_tup
                 if address_country:
                     countries_list.append(country(pub_id, address_idx, address_country))
-                norm_affiliations_list.append(norm_affiliation(pub_id, address_idx, addr_norm_affils))
-                raw_affiliations_list.append(raw_affiliation(pub_id, address_idx, addr_raw_affils, std_address))
-                step += 1
-                if verbose:
-                    print(f'\nAddress idx: {address_idx}\nCountry: {address_country}'
-                          f'\naddress norm-affiliation list:{addr_norm_affils}'
-                          f'\naddress unknown-affiliations list: {addr_raw_affils}')
-                    print(f'\t\tNumber of addresses analyzed: {step} / {step_nb}')
-                else:
-                    print(f"\t\tNumber of addresses analyzed: {step} / {step_nb}", end="\r")
-                if progress_param:
-                    progress_status += progress_step
-                    progress_callback(progress_status)
+                norm_affil_list.append(norm_affil_ntup(pub_id, address_idx, addr_norm_affils))
+                raw_affil_list.append(raw_affil_ntup(pub_id, address_idx, addr_raw_affils, std_address))
 
         # Building clean data of countries
         country_df, _ = build_item_df_from_tup(countries_list, country_cols_list, country_col, pub_id_col)
 
         # Building clean data of normalized affiliations
-        norm_affiliation_df, _ = build_item_df_from_tup(norm_affiliations_list, norm_affil_cols_list,
-                                                        affil_col, pub_id_col)
+        norm_affil_df, _ = build_item_df_from_tup(norm_affil_list, norm_affil_cols_list, affil_col, pub_id_col)
 
         # Building clean data of raw affiliations
-        raw_affiliation_df, _ = build_item_df_from_tup(raw_affiliations_list, raw_affil_cols_list,
-                                                       affil_col, pub_id_col)
+        raw_affil_df, _ = build_item_df_from_tup(raw_affil_list, raw_affil_cols_list, affil_col, pub_id_col)
     else:
         # Returning empty dataframes
-        country_df, norm_affiliation_df, raw_affiliation_df = [pd.DataFrame()] * 3
-    if progress_param:
-        progress_callback, _, final_progress = progress_param
-        progress_callback(final_progress)
-    return country_df, norm_affiliation_df, raw_affiliation_df, wrong_affil_types_dict
+        country_df, norm_affil_df, raw_affil_df = [pd.DataFrame()] * 3
+
+    print_final_text(f"{bp_gg.TAB*2}- Normalized affiliations and remaining raw affiliations built", prev_txt_len=txt_len)
+    return country_df, norm_affil_df, raw_affil_df, wrong_affil_types_dict

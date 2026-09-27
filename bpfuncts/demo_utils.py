@@ -391,9 +391,9 @@ def set_demo_step_affil_parsing_paths(user_rep_utils, user_affil_files_dic,
 
     if verbose:
         print(f"User's affiliations-parsing files set for rawdata-parsing-step '{rawdata_parsing_step}' as:\n"
-              f"\n  - affil_types_file    : {user_affil_files_dic['affil_types_file']}"
-              f"\n  - country_affils_file : {parsing_step_norm_affil_file}"
-              f"\n  - country_towns_file  : {user_affil_files_dic['country_towns_file']}\n"
+              f"\n - affil_types_file    : {user_affil_files_dic['affil_types_file']}"
+              f"\n - country_affils_file : {parsing_step_norm_affil_file}"
+              f"\n - country_towns_file  : {user_affil_files_dic['country_towns_file']}\n"
               f"\navailable at: {user_rep_utils}\n")
     return user_affil_params_dic
 

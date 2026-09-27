@@ -9,6 +9,9 @@ __all__ = ['build_wos_subjects_and_sub_subjects',
 from collections import namedtuple
 
 # Local libray imports
+import bpfuncts.general_globals as bp_gg
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
 from bpfuncts.parsing_utils import build_item_df_from_tup
 
 
@@ -35,6 +38,8 @@ def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
     Returns:
         (dataframe): The built data.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Subjects and secondary subjects parsing...")
+
     # Setting useful column names
     cols_lists_dic, cols_dic, wos_cols_dic = cols_tup
     subject_cols_list = cols_lists_dic['subject_cols_list']
@@ -63,4 +68,6 @@ def build_wos_subjects_and_sub_subjects(corpus_df, fails_dic, cols_tup):
                                                     subject_col, pub_id_col, fails_dic)
     sub_subjects_df, fails_dic = build_item_df_from_tup(sub_subjects_list, sub_subject_cols_list,
                                                         sub_subject_col, pub_id_col, fails_dic)
+
+    print_final_text(f"{bp_gg.TAB}- Subjects and secondary subjects parsed", prev_txt_len=txt_len)
     return subjects_df, sub_subjects_df

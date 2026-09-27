@@ -7,14 +7,17 @@ __all__ = ['build_scopus_references',
 
 # Standard library imports
 import re
-from collections import namedtuple
 
 # 3rd party library imports
 import pandas as pd
 
 # Local libray imports
+import bpfuncts.general_globals as bp_gg
 import bpfuncts.parsing_globals as bp_pg
 import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
+from bpfuncts.parsing_utils import set_shared_parsing_namedtups
 from bpfuncts.parsing_utils import try_list_idx
 
 
@@ -38,7 +41,7 @@ def _find_scopus_ref_doi(ref_items_list, verbose):
         if dois_list:
             break
     if verbose:
-        print("\n\tDOI search:", item_idx, dois_list)
+        print(f"\n{bp_gg.TAB}DOI search: {item_idx} {dois_list}")
     doi_item_idx, doi = try_list_idx(item_idx, 0, dois_list)
     return doi_item_idx, doi
 
@@ -83,7 +86,7 @@ def _find_scopus_ref_year(ref_items_list, doi_item_idx, doi, ref, verbose):
                     if not all_years_list:
                         break
     if verbose:
-        print("\n\tYear search:", item_idx, years_list)
+        print(f"\n{bp_gg.TAB}Year search: {item_idx} {years_list}")
     year_item_idx, year = try_list_idx(item_idx, 0, years_list)
     return year_item_idx, year
 
@@ -110,7 +113,7 @@ def _check_author_in_next_items(init_auth_idx_max, author_step, idx_max, ref_ite
             auth_idx_max = idx
             idx += author_step
             if verbose:
-                print(f"\n\t\tidx\t: {idx}\n\t\tauth_idx_max 1: {auth_idx_max}")
+                print(f"\n{bp_gg.TAB*2}idx{bp_gg.TAB}: {idx}\n{bp_gg.TAB*2}auth_idx_max 1: {auth_idx_max}")
             if idx>idx_max:
                 break
     return auth_idx_max
@@ -132,7 +135,7 @@ def _check_authors_case_w_dot(authors_case_base, item, verbose):
     if '.' not in item:
         authors_case = authors_case_base + '_wo_dot'
     if verbose:
-        print("\t\tauthors_case:", authors_case)
+        print(f"{bp_gg.TAB*2}authors_case: {authors_case}")
     return authors_case
 
 
@@ -164,7 +167,7 @@ def _set_one_item_authors(first_item, second_item, idx_max, ref_items_list, et_a
     auth_idx_max = 0
     # Checking if multiple authors and computing max index of authors' items
     if verbose:
-        print("\n\tRE_SCOPUS_REF_AUTHOR in second item 1:",
+        print(f"\n{bp_gg.TAB}RE_SCOPUS_REF_AUTHOR in second item 1:",
               re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item))
     if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
         authors_case = _check_authors_case_w_dot('multiple_one_item', second_item, verbose)
@@ -205,7 +208,7 @@ def _set_two_item_authors(first_item, second_item, idx_max, ref_items_list, et_a
     if idx_max>next_auth_idx_max:
         fourth_item = ref_items_list[next_auth_idx_max]
         if verbose:
-            print(f"\n\tRE_SCOPUS_REF_AUTHOR in {fourth_item}:",
+            print(f"\n{bp_gg.TAB}RE_SCOPUS_REF_AUTHOR in {fourth_item}:",
                   re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, fourth_item))
         if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, fourth_item):
             authors_case = _check_authors_case_w_dot('multiple_two_items', fourth_item, verbose)
@@ -244,12 +247,12 @@ def _search_authors_in_items(ref_items_list, verbose):
     auth_idx_max = 0
     first_item = ref_items_list[0]
     if verbose:
-        print("\n\tRE_REF_AUTHOR_DROP in first item:",
+        print(f"\n{bp_gg.TAB}RE_REF_AUTHOR_DROP in first item:",
               re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item))
     if not re.findall(bp_rg.RE_REF_AUTHOR_DROP, first_item):
         second_item = ref_items_list[1]
         if verbose:
-            print("\n\tRE_SCOPUS_REF_AUTHOR in first item:",
+            print(f"\n{bp_gg.TAB}RE_SCOPUS_REF_AUTHOR in first item:",
                   re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, first_item))
 
         if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, first_item):
@@ -258,14 +261,14 @@ def _search_authors_in_items(ref_items_list, verbose):
             first_author, et_al, authors_case, auth_idx_max = return_tup
         else:
             if verbose:
-                print("\n\tRE_SCOPUS_REF_AUTHOR in second item 2:",
+                print(f"\n{bp_gg.TAB}RE_SCOPUS_REF_AUTHOR in second item 2:",
                       re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item))
             if re.findall(bp_rg.RE_SCOPUS_REF_AUTHOR, second_item):
                 return_tup = _set_two_item_authors(first_item, second_item, idx_max,
                                                ref_items_list, et_al, verbose)
                 first_author, et_al, authors_case, auth_idx_max = return_tup
     if verbose:
-        print("\n\tAuthors search in item:", first_author, et_al, authors_case, auth_idx_max)
+        print(f"\n{bp_gg.TAB}Authors search in item:", first_author, et_al, authors_case, auth_idx_max)
     return first_author, et_al, authors_case, auth_idx_max
 
 
@@ -308,7 +311,7 @@ def _build_authors_attr(ref_items_list, verbose):
                 # Searching for possible author names beginning from first item
                 first_author, et_al, authors_case, auth_idx_max = _search_authors_in_items(ref_items_list, verbose)
     if verbose:
-        print("\n    Authors search in item:", first_author, et_al, authors_case, auth_idx_max)
+        print(f"\n{bp_gg.TAB}Authors search in item: {first_author} {et_al} {authors_case} {auth_idx_max}")
     return first_author, et_al, authors_case, auth_idx_max
 
 
@@ -330,7 +333,7 @@ def _set_scopus_dotted_initials(first_author, verbose):
         new_initials = '-'.join(initials_list)
         dotted_first_author = f'{lastname} {new_initials}'
     if verbose:
-        print("\n\tDotted first author:", dotted_first_author)
+        print(f"\n{bp_gg.TAB}Dotted first author: {dotted_first_author}")
     return dotted_first_author
 
 
@@ -360,7 +363,7 @@ def _find_scopus_ref_authors(ref_items_list, verbose):
     if dotted_first_author!=bp_pg.UNKNOWN and "et al." not in dotted_first_author:
         authors = f'{dotted_first_author} {et_al}'
     if verbose:
-        print("\n    Authors search:", authors, authors_case, auth_idx_max)
+        print(f"\n{bp_gg.TAB}Authors search: {authors} {authors_case} {auth_idx_max}")
     return authors, authors_case, auth_idx_max
 
 
@@ -388,8 +391,8 @@ def _find_scopus_ref_title(ref_items_list, search_title_params, verbose):
     authors_exclude_cases = ['no_authors', 'first_item_too_long', 'partial_one_item']
     authors_test = all([authors_case not in authors_exclude_cases, auth_idx_max<idx_max])
     if verbose:
-        print(f"\t\tidx_max\t: {idx_max}\n\t\tauth_idx_max: {auth_idx_max}"
-              f"\n\t\tauthors_test: {authors_test}")
+        print(f"\n{bp_gg.TAB*2}idx_max{bp_gg.TAB}: {idx_max}\n{bp_gg.TAB*2}auth_idx_max: {auth_idx_max}"
+              f"\n{bp_gg.TAB*2}authors_test: {authors_test}")
     if authors_test:
         idx = auth_idx_max + 1
         if authors_case=='multiple_two_items_w_dot':
@@ -399,14 +402,14 @@ def _find_scopus_ref_title(ref_items_list, search_title_params, verbose):
                 if idx>idx_max:
                     break
         if verbose:
-            print(f"\n\t\tTitle idx\t: {idx}\n\t\tdoi_item_idx: {doi_item_idx}"
-                  f"\n\t\tyear_item_idx: {year_item_idx}")
+            print(f"\n{bp_gg.TAB*2}Title idx{bp_gg.TAB}: {idx}\n{bp_gg.TAB*2}doi_item_idx: {doi_item_idx}"
+                  f"\n{bp_gg.TAB*2}year_item_idx: {year_item_idx}")
         if ((idx==doi_item_idx and doi!=bp_pg.UNKNOWN)
             or (year_item_idx==0 and year!=bp_pg.UNKNOWN)):
             # Incrementing idx for conflicts with doi or year indices")
             idx += 1
         if verbose:
-            print(f"\n\t\tTitle idx\t: {idx}\n\t\tTitle: {title}")
+            print(f"\n{bp_gg.TAB*2}Title idx{bp_gg.TAB}: {idx}\n{bp_gg.TAB*2}Title: {title}")
         title_item_idx, title = try_list_idx(idx, idx, ref_items_list)
     if authors_case=='no_authors':
         title = ref_items_list[0]
@@ -418,7 +421,7 @@ def _find_scopus_ref_title(ref_items_list, search_title_params, verbose):
         # Not keeping DOI as title
         title = bp_pg.UNKNOWN
     if verbose:
-        print("\n\tRef title search:", title_item_idx, title)
+        print(f"\n{bp_gg.TAB}Ref title search: {title_item_idx} {title}")
     return title_item_idx, title
 
 
@@ -461,7 +464,7 @@ def _select_journal_part(item_txt, colon, journal, verbose):
     else:
         if " in " in item_txt:
             if verbose:
-                print("\titem_txt:", item_txt)
+                print(f"{bp_gg.TAB}item_txt: {item_txt}")
             txt = item_txt
             while txt:
                 txt_parts = txt.split(" in ")
@@ -469,15 +472,15 @@ def _select_journal_part(item_txt, colon, journal, verbose):
                 txt_start_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_start)
                 txt_end_search = re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, txt_end)
                 if verbose:
-                    print(f"\t\ttxt: {txt}\n\t\ttxt_parts: {txt_parts}"
-                          f"\n\t\ttxt_start: {txt_start}\n\t\ttxt_start_search: {txt_start_search}"
-                          f"\n\t\ttxt_end: {txt_end}\n\t\ttxt_end_search: {txt_end_search}")
+                    print(f"{bp_gg.TAB*2}txt: {txt}\n{bp_gg.TAB*2}txt_parts: {txt_parts}"
+                          f"\n{bp_gg.TAB*2}txt_start: {txt_start}\n{bp_gg.TAB*2}txt_start_search: {txt_start_search}"
+                          f"\n{bp_gg.TAB*2}txt_end: {txt_end}\n{bp_gg.TAB*2}txt_end_search: {txt_end_search}")
                 txt_search = any([txt_start_search, txt_end_search])
                 if verbose:
-                    print("\t\ttxt_search:", txt_search)
+                    print(f"{bp_gg.TAB*2}txt_search: {txt_search}")
                 if len(txt_parts)==2 and txt_search:
                     if verbose:
-                        print("\t\tlen=2 and txt_search true")
+                        print(f"{bp_gg.TAB*2}len=2 and txt_search true")
                     if txt_start_search:
                         journal, journal_item_part = txt, txt
                         txt = ''
@@ -486,14 +489,14 @@ def _select_journal_part(item_txt, colon, journal, verbose):
                         txt = ''
                 elif len(txt_parts)>2:
                     if verbose:
-                        print("\t\tlen >2")
+                        print(f"{bp_gg.TAB*2}len >2")
                     txt = " in ".join(txt_parts[0:-1])
                     if txt_end_search:
                         journal, journal_item_part = f'in {txt_end}', txt_end
                         txt = ''
                 else:
                     if verbose:
-                        print("\t\telse")
+                        print(f"{bp_gg.TAB*2}else")
                     journal, journal_item_part = '', ''
                     txt = ''
         years_list = re.findall(bp_rg.RE_SCOPUS_REF_YEAR, item_txt)
@@ -642,17 +645,17 @@ def _find_scopus_ref_journal(ref_items_list, search_journal_params, verbose):
             idx_init += 1
         search_items_list = ref_items_list[idx_init:]
         if verbose:
-            print("\n\tJournal search_items_list:", search_items_list)
+            print(f"\n{bp_gg.TAB}Journal search_items_list: {search_items_list}")
         for search_idx, search_item in enumerate(search_items_list):
             item_idx = search_idx + idx_init
             _journal_item_idx, _journal, journal_item_part = item_idx, '', ''
             check_journal = all([re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item),
                                  search_item!=doi, item_idx>=idx_init])
             if verbose:
-                print("\n\tsearch_item:", search_item)
-                print("\t\tre.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item):",
-                      re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item))
-                print("\t\tcheck_journal:", check_journal)
+                print(f"\n{bp_gg.TAB}search_item: {search_item}")
+                print(f"{bp_gg.TAB*2}re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item):"
+                      f"{re.findall(bp_rg.RE_SCOPUS_REF_JOURNAL, search_item)}")
+                print(f"{bp_gg.TAB*2}check_journal: {check_journal}")
             if check_journal:
                 colon, _journal_item_idx, _journal = False, item_idx, search_item.strip()
                 _journal, journal_item_part = _select_journal_part(search_item, colon, _journal, verbose)
@@ -660,7 +663,7 @@ def _find_scopus_ref_journal(ref_items_list, search_journal_params, verbose):
             check_dots = all([len(part)>2 and '.' in part for part in search_item.split(" ")]
                              + [search_item!=doi, item_idx>=idx_init])
             if verbose:
-                print("\t\tcheck_dots:", check_dots)
+                print(f"{bp_gg.TAB*2}check_dots: {check_dots}")
             if check_dots:
                 _journal_item_idx, _journal, journal_item_part = item_idx, search_item.strip(), search_item
 
@@ -671,22 +674,22 @@ def _find_scopus_ref_journal(ref_items_list, search_journal_params, verbose):
 
         if journals_list:
             if verbose:
-                print("\n\tjournals_list:", journals_list)
+                print(f"\n{bp_gg.TAB}journals_list: {journals_list}")
             journal_item_idx, journal = journal_item_idx_list[0], journals_list[0]
         else:
             # No results of journal search in all items
             init_item_idx = max(title_item_idx, auth_idx_max)
             if verbose:
-                print("\n\n\tinit_item_idx:", init_item_idx)
+                print(f"\n\n{bp_gg.TAB}init_item_idx: {init_item_idx}")
             if init_item_idx<idx_max:
                 journal_item_idx, journal = _try_next_items(ref_items_list, init_item_idx, doi)
                 journal_item_parts_list = [journal]
     if verbose:
-        print("\n\tJournal search:", journal, title, journal_item_parts_list)
+        print(f"\n{bp_gg.TAB}Journal search: {journal} {title} {journal_item_parts_list}")
     cleaning_params = [journal, title_item_idx, title, doi, journal_item_parts_list, ref_items_list]
     clean_journal, clean_title = _clean_journal_and_title(cleaning_params)
     if verbose:
-        print("\n\tJournal and title clean:", journal_item_idx, clean_journal, clean_title)
+        print(f"\n{bp_gg.TAB}Journal and title clean: {journal_item_idx} {clean_journal} {clean_title}")
     return journal_item_idx, clean_journal, clean_title
 
 
@@ -955,22 +958,19 @@ def _clean_ref(raw_ref):
 # * Main functions for parsing references *
 # *****************************************
 
-def _build_scopus_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, verbose_ref_id):
+def _build_scopus_pub_refs_list(pub_id, ref_field, pub_ref_ntup, pub_verbose, verbose_ref_id):
     """Builds the list of key items of the references of a publication as named-tuples.
 
     Args:
         pub_id (int): The publication ID.
         ref_field (str): The reference field giving the references of the publication.
-        ref_cols_list (list): The column names to be used for the named-tuples.
+        pub_ref_ntup (namedtuple): The named-tuple for building the data.
         pub_verbose (bool): True allows control prints.
         verbose_ref_id (int): Identifier of the reference of the above publication selected for printing \
         detailed information of parsing steps.
     Returns:
         (list): The built named-tuples.
     """
-    # Setting named tuple for keeping the reference parsing results
-    pub_ref_tup = namedtuple('pub_ref', ref_cols_list)
-
     pub_refs_list =[]
     if isinstance(ref_field, str):
         # If the reference field is not empty and not an URL
@@ -980,13 +980,13 @@ def _build_scopus_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, v
             year, authors, journal, doi, title = [bp_pg.UNKNOWN] * 5
             try:
                 if pub_verbose:
-                    print(f"\n\n\n\nREF INDEX\t: {ref_idx}\nraw_ref\t\t: {raw_ref}")
+                    print(f"\n\n\n\nREF INDEX{bp_gg.TAB}: {ref_idx}\nraw_ref{bp_gg.TAB*2}: {raw_ref}")
                     if ref_idx==verbose_ref_id:
                         ref_verbose = True
                 ref = _clean_ref(raw_ref)
                 ref_items_list = ref.split(", ")
                 if ref_verbose:
-                    print(f"ref\t\t\t: {ref}\nref_items_list : {ref_items_list}")
+                    print(f"ref{bp_gg.TAB*3}: {ref}\nref_items_list : {ref_items_list}")
 
                 doi_item_idx, doi = _find_scopus_ref_doi(ref_items_list, ref_verbose)
                 year_item_idx, year = _find_scopus_ref_year(ref_items_list, doi_item_idx, doi, ref, ref_verbose)
@@ -997,11 +997,11 @@ def _build_scopus_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, v
                 _, journal, title = _find_scopus_ref_journal(ref_items_list, search_journal_params, ref_verbose)
 
             except IndexError:
-                print(f"\n\nWARNING: Index out of range for\n\tPub_id\t\t: {pub_id}"
-                      f"\n\tReference index: {ref_idx}\n\tRaw reference: {raw_ref}")
+                print(f"\n\nWARNING: Index out of range for\n{bp_gg.TAB}Pub_id{bp_gg.TAB*2}: {pub_id}"
+                      f"\n{bp_gg.TAB}Reference index: {ref_idx}\n{bp_gg.TAB}Raw reference: {raw_ref}")
             except Exception as err:
-                print(f"\n\nWARNING: {err} for\n\tPub_id\t\t: {pub_id}"
-                      f"\n\tReference index: {ref_idx}\n\tRaw reference: {raw_ref}")
+                print(f"\n\nWARNING: {err} for\n{bp_gg.TAB}Pub_id{bp_gg.TAB*2}: {pub_id}"
+                      f"\n{bp_gg.TAB}Reference index: {ref_idx}\n{bp_gg.TAB}Raw reference: {raw_ref}")
                 raise
             finally:
                 if authors==bp_pg.UNKNOWN:
@@ -1010,9 +1010,9 @@ def _build_scopus_pub_refs_list(pub_id, ref_field, ref_cols_list, pub_verbose, v
                         title = f'{title}, {journal}'
                         journal = bp_pg.UNKNOWN
                 if ref_verbose:
-                    print(f"\n\n\traw_ref: {raw_ref}\n\tyear: {year}\n\tauthors: {authors}"
-                          f"\n\tjournal: {journal}\n\tdoi: {doi}\n\ttitle: {title}")
-                pub_refs_list.append(pub_ref_tup(pub_id, authors, year, journal, doi, title, raw_ref))
+                    print(f"\n\n{bp_gg.TAB}raw_ref: {raw_ref}\n{bp_gg.TAB}year: {year}\n{bp_gg.TAB}authors: {authors}"
+                          f"\n{bp_gg.TAB}journal: {journal}\n{bp_gg.TAB}doi: {doi}\n{bp_gg.TAB}title: {title}")
+                pub_refs_list.append(pub_ref_ntup(pub_id, authors, year, journal, doi, title, raw_ref))
     return pub_refs_list
 
 
@@ -1027,28 +1027,35 @@ def build_scopus_references(corpus_df, cols_tup, verbose_pub_id=None, verbose_re
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
-        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function \
+        of the `bpfuncts.scopus_parsing` module.
         verbose_pub_id (int): Optional publication identifier selected for printing parsing information (default: None).
         verbose_ref_id (int): Optional identifier of the reference of the above publication selected for printing \
         detailed information of parsing steps (default: None).
     Returns:
         (dataframe): The built data.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- References parsing...")
+
     # Setting useful column names
-    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
-    ref_cols_list = cols_lists_dic['ref_cols_list']
+    _, cols_dic, scopus_cols_dic = cols_tup
     pub_id_col = cols_dic['pub_id_col']
     scopus_ref_col = scopus_cols_dic['scopus_ref_col']
+
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    pub_ref_ntup, ref_cols_list = namedtups_dic['pub_ref']
 
     refs_list =[]
     for pub_id, ref_field in zip(list(corpus_df[pub_id_col]), corpus_df[scopus_ref_col]):
         pub_verbose = False
         if pub_id==verbose_pub_id:
             pub_verbose = True
-            print("\n\npub_id:", pub_id)
-        pub_refs_list = _build_scopus_pub_refs_list(pub_id, ref_field, ref_cols_list,
+            print(f"\n\npub_id: {pub_id}")
+        pub_refs_list = _build_scopus_pub_refs_list(pub_id, ref_field, pub_ref_ntup,
                                                     pub_verbose, verbose_ref_id)
         refs_list += pub_refs_list
     references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
                                             for idx, label in enumerate(ref_cols_list)})
+    print_final_text(f"{bp_gg.TAB}- References parsed", prev_txt_len=txt_len)
     return references_df

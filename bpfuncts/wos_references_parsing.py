@@ -8,14 +8,17 @@ __all__ = ['build_wos_references',
 
 # Standard library imports
 import re
-from collections import namedtuple
 
 # 3rd party library imports
 import pandas as pd
 
 # Local libray imports
+import bpfuncts.general_globals as bp_gg
 import bpfuncts.parsing_globals as bp_pg
 import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
+from bpfuncts.parsing_utils import set_shared_parsing_namedtups
 from bpfuncts.parsing_utils import try_list_idx
 
 
@@ -187,32 +190,29 @@ def _find_wos_ref_title_journal(ref_items_list, authors_case, year):
     return title, journal
 
 
-def _build_wos_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
+def _build_wos_pub_refs_list(pub_id, ref_field, pub_ref_ntup, verbose):
     """Builds the list of key items of the references of a publication as named-tuples.
 
     Args:
         pub_id (int): The publication ID.
         ref_field (str): The reference field giving the references of the publication.
-        ref_cols_list (list): The column names to be used for the named-tuples.
+        pub_ref_ntup (namedtuple): The named-tuple for building the data.
         verbose (bool): True for allowing control prints (default: False).
     Returns:
         (list): The built named-tuples.
     """
-    # Setting named-tuple for keeping the reference parsing results
-    article_ref = namedtuple('article_ref', ref_cols_list)
-
     pub_refs_list =[]
     if isinstance(ref_field, str):
         # If the reference field is not empty and not an URL
         raw_refs_list = [x for x in ref_field.split("; ") if x]
         for raw_ref in raw_refs_list:
             if verbose:
-                print("\n\nraw_ref       :", raw_ref)
+                print(f"\n\nraw_ref       : {raw_ref}")
             ref = _clean_wos_ref(raw_ref)
             ref_items_list = ref.split(", ")
             if verbose:
-                print("ref           :", ref)
-                print("ref_items_list:", ref_items_list)
+                print(f"ref           : {ref}")
+                print(f"ref_items_list: {ref_items_list}")
 
             doi = _find_wos_ref_doi(ref_items_list)
             year = _find_wos_ref_year(ref_items_list)
@@ -220,13 +220,13 @@ def _build_wos_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose):
             title, journal = _find_wos_ref_title_journal(ref_items_list, authors_case, year)
 
             if verbose:
-                print("    year          :", year)
-                print("    authors       :", authors)
-                print("    journal       :", journal)
-                print("    doi           :", doi)
-                print("    title         :", title)
+                print(f"{bp_gg.TAB}year          : {year}")
+                print(f"{bp_gg.TAB}authors       : {authors}")
+                print(f"{bp_gg.TAB}journal       : {journal}")
+                print(f"{bp_gg.TAB}doi           : {doi}")
+                print(f"{bp_gg.TAB}title         : {title}")
 
-            pub_refs_list.append(article_ref(pub_id, authors, year, journal, doi, title, raw_ref))
+            pub_refs_list.append(pub_ref_ntup(pub_id, authors, year, journal, doi, title, raw_ref))
     return pub_refs_list
 
 
@@ -249,18 +249,24 @@ def build_wos_references(corpus_df, cols_tup, verbose=False):
     Returns:
         (dataframe): The built data.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- References parsing...")
+
     # Setting useful column names
-    cols_lists_dic, cols_dic, wos_cols_dic = cols_tup
-    ref_cols_list = cols_lists_dic['ref_cols_list']
+    _, cols_dic, wos_cols_dic = cols_tup
     pub_id_col = cols_dic['pub_id_col']
     wos_ref_col = wos_cols_dic['wos_ref_col']
+
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    pub_ref_ntup, ref_cols_list = namedtups_dic['pub_ref']
 
     refs_list =[]
     for pub_id, ref_field in zip(list(corpus_df[pub_id_col]), corpus_df[wos_ref_col]):
         if verbose:
-            print("\n\npub_id:", pub_id)
-        pub_refs_list = _build_wos_pub_refs_list(pub_id, ref_field, ref_cols_list, verbose)
+            print(f"\n\npub_id: {pub_id}")
+        pub_refs_list = _build_wos_pub_refs_list(pub_id, ref_field, pub_ref_ntup, verbose)
         refs_list += pub_refs_list
     references_df = pd.DataFrame.from_dict({label:[s[idx] for s in refs_list]
                                             for idx, label in enumerate(ref_cols_list)})
+    print_final_text(f"{bp_gg.TAB}- References parsed", prev_txt_len=txt_len)
     return references_df

@@ -16,6 +16,7 @@ __all__ = ['ACCENT_CHANGE',
            'SYMB_CHANGE',
            'SYMB_DROP',
            'REP_UTILS',
+           'TAB',
            'TITLE_SYMB_CHANGE_DIC',
            'USA_STATES',
            'ZIP_CODES',]
@@ -28,6 +29,9 @@ from pathlib import Path
 # 3rd party imports
 import pandas as pd
 
+# Setting the number of spaces for indentation of prints
+# Use of "\t" in prints will set 8 spaces
+TAB = " " * 4
 
 # Conversion factor for inch to millimeter
 IN_TO_MM = 25.4

@@ -5,7 +5,6 @@ __all__ = ['scopus_parser']
 
 
 # Standard library imports
-from collections import namedtuple
 from pathlib import Path
 
 # 3rd party library imports
@@ -17,12 +16,16 @@ import bpfuncts.parsing_cols_globals as bp_pcg
 import bpfuncts.parsing_globals as bp_pg
 from bpfuncts.affil_norm_utils import extend_author_affils
 from bpfuncts.affiliations_parsing import build_addr_affils_tup
+from bpfuncts.affiliations_parsing import build_affils_useful_dicts
+from bpfuncts.general_utils import print_final_text
+from bpfuncts.general_utils import print_temp_text
 from bpfuncts.parsing_utils import build_item_df_from_tup
-from bpfuncts.parsing_utils import build_title_keywords
+from bpfuncts.parsing_utils import build_kw_lists
 from bpfuncts.parsing_utils import clean_authors_countries_affils
 from bpfuncts.parsing_utils import convert_issn
 from bpfuncts.parsing_utils import normalize_country
 from bpfuncts.parsing_utils import set_shared_parsing_cols
+from bpfuncts.parsing_utils import set_shared_parsing_namedtups
 from bpfuncts.parsing_utils import set_unknown_address
 from bpfuncts.parsing_utils import standardize_address
 from bpfuncts.parsing_utils import str_int_convertor
@@ -126,7 +129,7 @@ def _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list
     author = (','.join(author_affiliations_list[0:auth_item_nbr])).strip()
     author_counter_params = _set_author_idx(author, author_counter_params)
 
-    # Building "addr_country_affil" namedtuple for the author of the publication
+    # Building "addr_country_affil" data for the author of the publication
     author_affiliations_str = ','.join(author_affiliations_list[auth_item_nbr:])
 
     author_std_affiliations_list = []
@@ -159,15 +162,17 @@ def _build_scopus_authors(corpus_df, fails_dic, cols_tup):
     Returns:
         (dataframe): The built data.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Authors parsing...")
+
     # Setting useful column names
-    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
-    auth_cols_list = cols_lists_dic['auth_cols_list']
+    _, cols_dic, scopus_cols_dic = cols_tup
     cols_keys = ['pub_id_col', 'co_authors_col', ]
     (pub_id_col, co_authors_col) = [cols_dic[key] for key in cols_keys]
     scopus_auth_col = scopus_cols_dic['scopus_auth_col']
 
-    # Setting named tuple
-    co_author = namedtuple('co_author', auth_cols_list)
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    co_author_ntup, auth_cols_list = namedtups_dic['co_author']
 
     authors_list = []
     for pub_id, scopus_auth_str in zip(corpus_df[pub_id_col], corpus_df[scopus_auth_col]):
@@ -180,84 +185,50 @@ def _build_scopus_authors(corpus_df, fails_dic, cols_tup):
         for scopus_auth in scopus_auth_list:
             author = scopus_auth.replace('.','')
             if author not in ['Dr','Pr','Dr ','Pr ']:
-                authors_list.append(co_author(pub_id, author_idx, author))
+                authors_list.append(co_author_ntup(pub_id, author_idx, author))
                 author_idx += 1
 
     # Building a clean co-authors dataframe
     # and accordingly updating the parsing success rate dict
     co_authors_df, fails_dic = build_item_df_from_tup(authors_list, auth_cols_list,
                                                       co_authors_col, pub_id_col, fails_dic)
+    print_final_text(f"{bp_gg.TAB}- Authors parsed", prev_txt_len=txt_len)
     return co_authors_df
 
 
 def _build_scopus_keywords(corpus_df, fails_dic, cols_tup):
-    """Builds the data of keyword" per publication of the corpus 
-    and updates the parsing success rate data.
+    """Builds the data of keywords per publication of the corpus and updates the parsing success rate data.
 
-    The structure of the built data is composed of 3 columns and one row 
-    per publication and per keyword type.
-        Ex:
-           pub_id  type  keyword
-             0      AK    Biomass
-             0      IK    Gasification
-             0      TK    Solar energy
-        with:
-             type = AK for author's keywords
-             type = IK for indexed keywords
-             type = TK for title keywords
-
-    The author's keywords and the indexed keywords are directly extracted from \
-    the corpus data.
-    The title keywords are builds out of the 'TK_corpus' set of the most cited nouns 
-    (at leat N times) in the set of all the publications. The keywords of type TK of a 
-    publication, referenced by the 'pub_id' key, are the elements of the intersection 
-    between the 'TK_corpus' set and the set of the nouns of the publication title.
+    The final data are built from the lists of keywords composed of (publication ID, keyword) tuples. 
+    These lists are built through the `build_kw_lists` function imported from `bpfuncts.parsing_utils`module.
 
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
         fails_dic (dict): Parsing success rate data.
-        cols_tup (tup): Columns information as built through \
-        the `_set_scopus_parsing_cols` internal function.
+        cols_tup (tup): Columns information as built through the `_set_wos_parsing_cols` internal function.
     Returns:
-        (dataframe): The built data.
+        (tup): The 3 built data (dataframes).
+    Note:
+        ToDo: Check the use of UNKNOWN versus '"null"'
     """
-    # To Do: Check the use of UNKNOWN versus '"null"'
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Authors' keywords, indexed keywords "
+                              "and title keywords parsing...")
+
     # Setting useful column names
-    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
-    kw_cols_list = cols_lists_dic['kw_cols_list']
+    _, cols_dic, scopus_cols_dic = cols_tup
     cols_keys = ['pub_id_col', 'keyword_col', 'title_temp_col', 'kept_tokens_col']
     (pub_id_col, keyword_col, title_temp_col, kept_tokens_col) = [cols_dic[key] for key in cols_keys]
     scopus_cols_keys = ['scopus_auth_kw_col', 'scopus_idx_kw_col', 'scopus_title_kw_col']
     (scopus_auth_kw_col, scopus_idx_kw_col,
      scopus_title_kw_col )= [scopus_cols_dic[key] for key in scopus_cols_keys]
 
-    # Setting named tuple
-    key_word = namedtuple('key_word', kw_cols_list)
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    key_word_ntup, kw_cols_list = namedtups_dic['key_word']
 
-    aks_list = []
-    aks_df = corpus_df[scopus_auth_kw_col].fillna('')
-    for pub_id, pub_aks_str in zip(corpus_df[pub_id_col], aks_df):
-        pub_aks_list = pub_aks_str.split(';')
-        for pub_ak in pub_aks_list:
-            pub_ak = pub_ak.lower().strip()
-            aks_list.append(key_word(pub_id, pub_ak if pub_ak!='null' else bp_pg.UNKNOWN))
-
-    iks_list = []
-    iks_df = corpus_df[scopus_idx_kw_col].fillna('')
-    for pub_id, pub_iks_str in zip(corpus_df[pub_id_col], iks_df):
-        pub_iks_list = pub_iks_str.split(';')
-        for pub_ik in pub_iks_list:
-            pub_ik = pub_ik.lower().strip()
-            iks_list.append(key_word(pub_id, pub_ik if pub_ik!='null' else bp_pg.UNKNOWN))
-
-    tks_list = []
-    title_df = pd.DataFrame(corpus_df[scopus_title_kw_col].fillna(''))
-    title_df.columns = [title_temp_col]
-    tks_df, _ = build_title_keywords(title_df)
-    for pub_id in corpus_df[pub_id_col]:
-        for token in tks_df.loc[pub_id, kept_tokens_col]:
-            token = token.lower().strip()
-            tks_list.append(key_word(pub_id, token if token!='null' else bp_pg.UNKNOWN))
+    scopus_usecols = [pub_id_col, scopus_auth_kw_col, scopus_idx_kw_col, scopus_title_kw_col,
+                      title_temp_col, kept_tokens_col]
+    aks_list, iks_list, tks_list = build_kw_lists(corpus_df, scopus_usecols, key_word_ntup)
 
     # Building a clean author keywords dataframe and accordingly updating the parsing success rate dict
     auth_kw_df, fails_dic = build_item_df_from_tup(aks_list, kw_cols_list,
@@ -271,7 +242,83 @@ def _build_scopus_keywords(corpus_df, fails_dic, cols_tup):
     title_kw_df, fails_dic = build_item_df_from_tup(tks_list, kw_cols_list,
                                                     keyword_col, pub_id_col, fails_dic)
 
+    print_final_text(f"{bp_gg.TAB}- Authors' keywords, indexed keywords and title keywords parsed",
+                     prev_txt_len=txt_len)
     return auth_kw_df, index_kw_df, title_kw_df
+
+
+def _fullfill_authors_affiliations(init_affiliations_list, authors_affiliations_str):
+    """Checks if all authors have an affiliation and the affiliation is set to unknown 
+    address if it is missing.
+
+    The unknown address is set trhough the `set_unknown_address` function imported from 
+    the `bpfuncts.parsing_utils` module.
+
+    Args:
+        init_affiliations_list (list): The affiliations' list given by the corpus rawdata \
+        for the publication.
+        authors_affiliations_str (str): The authors-with-affiliations's field \
+        of the corpus rawdata for the publication.
+    Returns:
+        (list): The updated affiliations' list for the publication.
+    """
+    # Initializing the authors' counter and the last-author name
+    author_counter_params = [-1, '']
+
+    # Checking that all authors have affiliation
+    # It is set to unknown address for those without affiliation
+    affiliations_list = init_affiliations_list
+    authors_affiliations_list = authors_affiliations_str.split(';')
+    for raw_author_affiliations_str in authors_affiliations_list:
+        return_tup = _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
+                                                   author_counter_params)
+        author_std_affiliations_list, author_counter_params = return_tup
+        author_idx = author_counter_params[0]
+        if not author_std_affiliations_list:
+            affiliations_list.append(set_unknown_address(author_idx))
+    return affiliations_list
+
+
+def _update_pub_id_addr_countries_affils(pub_id, affiliations_list, data_lists, named_tups):
+    """Updates the lists of adresses, countries and affiliations data with the data of a given publication.
+
+    The named-tuples for building data of adresses, countries and affiliations are defined 
+    through the `set_shared_parsing_namedtups` function imported from the `bpfuncts.parsing_utils` module.
+
+    Args:
+        pub_id (int): The publication identifier.
+        affiliations_list (list): The affiliations for the publication.
+        data_lists (list): Composed of the previous adresses, countries and affiliations data.
+        named_tups (list): Composed of the useful named-tuples.
+    Returns:
+        (tup): The updated lists.
+    """
+    # Setting parameters' values from args
+    addresses_list, countries_list, affils_list = data_lists
+    address_ntup, country_ntup, affil_ntup = named_tups
+
+    if affiliations_list:
+        for address_idx, pub_address in enumerate(affiliations_list):
+            addresses_list.append(address_ntup(pub_id, address_idx, pub_address))
+
+            country_raw = pub_address.split(',')[-1].replace(';','').strip()
+            country = normalize_country(country_raw)
+            countries_list.append(country_ntup(pub_id, address_idx, country))
+
+            addresses_split = pub_address.split(',')
+            affils_nb = len(addresses_split)
+            affil_num = 0
+            main_affil = addresses_split[affil_num]
+            if not main_affil and affils_nb:
+                while not main_affil and affil_num<affils_nb:
+                    affil_num += 1
+                    main_affil = pub_address.split(',')[affil_num]
+            affils_list.append(affil_ntup(pub_id, address_idx, main_affil))
+    else:
+        addresses_list.append(address_ntup(pub_id, 0, ''))
+        countries_list.append(country_ntup(pub_id, 0, ''))
+        affils_list.append(affil_ntup(pub_id, 0, ''))
+    return addresses_list, countries_list, affils_list
 
 
 def _build_scopus_addresses_countries_affiliations(corpus_df, fails_dic, cols_tup):
@@ -313,24 +360,27 @@ def _build_scopus_addresses_countries_affiliations(corpus_df, fails_dic, cols_tu
     Args:
         corpus_df (dataframe): The selected rawdata of the corpus.
         fails_dic (dict): Parsing success rate data.
-        cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+        cols_tup (tup): Columns information as built through \
+        the `_set_scopus_parsing_cols` internal function.
     Returns:
         (tup): (The built addresses data (dataframe), tha built countries data (dataframe), \
         The built main affiliations data (dataframe)).
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Addresses, countries and affiliations parsing...")
+
     # Setting useful column names
-    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
-    cols_lists_keys = ['address_cols_list', 'country_cols_list', 'affil_cols_list']
-    address_cols_list, country_cols_list, affil_cols_list = [cols_lists_dic[key] for key in cols_lists_keys]
+    _, cols_dic, scopus_cols_dic = cols_tup
     cols_keys = ['pub_id_col', 'address_col', 'country_col', 'affil_col']
     (pub_id_col, address_col, country_col, affil_col) = [cols_dic[key] for key in cols_keys]
     scopus_cols_keys = ['scopus_aff_col', 'scopus_auth_with_aff_col']
     (scopus_aff_col, scopus_auth_with_aff_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
 
-    # Setting named tuples
-    address_tup = namedtuple('address', address_cols_list)
-    country_tup = namedtuple('country', country_cols_list)
-    affil_tup = namedtuple('affiliation', affil_cols_list)
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    address_ntup, address_cols_list = namedtups_dic['address']
+    country_ntup, country_cols_list = namedtups_dic['country']
+    affil_ntup, affil_cols_list = namedtups_dic['affiliation']
+    named_tups = [address_ntup, country_ntup, affil_ntup]
 
     # Building "addresses_list", "countries_list", "affils_list" lists
     # with one item per publication and per address identifier
@@ -339,42 +389,16 @@ def _build_scopus_addresses_countries_affiliations(corpus_df, fails_dic, cols_tu
                             corpus_df[scopus_auth_with_aff_col])
     addresses_list, countries_list, affils_list = [], [], []
     for pub_id, affiliations_str, authors_affiliations_str in corpus_series_zip:
-        affiliations_list = affiliations_str.split(';')
+        init_affiliations_list = affiliations_str.split(';')
 
-        # Initializing the authors' counter and the last-author name
-        author_counter_params = [-1, '']
+        # Checking that all authors have affiliation
+        # It is set to unknown address for those without affiliation
+        affiliations_list = _fullfill_authors_affiliations(init_affiliations_list, authors_affiliations_str)
 
-        # Checking if all authors have affiliation
-        authors_affiliations_list = authors_affiliations_str.split(';')
-        for raw_author_affiliations_str in authors_affiliations_list:
-            return_tup = _get_author_affiliations_list(raw_author_affiliations_str, affiliations_list,
-                                                       author_counter_params)
-            author_std_affiliations_list, author_counter_params = return_tup
-            author_idx = author_counter_params[0]
-            if not author_std_affiliations_list:
-                affiliations_list.append(set_unknown_address(author_idx))
-
-        if affiliations_list:
-            for address_idx, pub_address in enumerate(affiliations_list):
-                addresses_list.append(address_tup(pub_id, address_idx, pub_address))
-
-                addresses_split = pub_address.split(',')
-                affils_nb = len(addresses_split)
-                affil_num = 0
-                main_affil = addresses_split[affil_num]
-                if not main_affil and affils_nb:
-                    while not main_affil and affil_num<affils_nb:
-                        affil_num += 1
-                        main_affil = pub_address.split(',')[affil_num]
-                affils_list.append(affil_tup(pub_id, address_idx, main_affil))
-
-                country_raw = pub_address.split(',')[-1].replace(';','').strip()
-                country = normalize_country(country_raw)
-                countries_list.append(country_tup(pub_id, address_idx, country))
-        else:
-            addresses_list.append(address_tup(pub_id, 0, ''))
-            affils_list.append(affil_tup(pub_id, 0, ''))
-            countries_list.append(country_tup(pub_id, 0, ''))
+        prev_data_lists = [addresses_list, countries_list, affils_list]
+        updated_data_lists = _update_pub_id_addr_countries_affils(pub_id, affiliations_list,
+                                                                  prev_data_lists, named_tups)
+        addresses_list, countries_list, affils_list = updated_data_lists
 
     # Building a clean addresses dataframe and accordingly updating the parsing success rate dict
     addresses_df, fails_dic = build_item_df_from_tup(addresses_list, address_cols_list,
@@ -389,14 +413,14 @@ def _build_scopus_addresses_countries_affiliations(corpus_df, fails_dic, cols_tu
                                                         affil_col, pub_id_col, fails_dic)
 
     if not len(addresses_df)==len(countries_df)==len(affiliations_df):
-        warning = ('\nWARNING: Lengths of "addresses_df", "countries_df" and "affiliations_df" data are not equal '
-                   'in "_build_scopus_addresses_countries_affiliations" function of "scopus_parsing.py" module')
-        print(warning)
+        print('\nWARNING: Lengths of "addresses_df", "countries_df" and "affiliations_df" data are not equal '
+              'in "_build_scopus_addresses_countries_affiliations" function of "scopus_parsing.py" module')
+
+    print_final_text(f"{bp_gg.TAB}- Addresses, countries and affiliations parsed", prev_txt_len=txt_len)
     return addresses_df, countries_df, affiliations_df
 
 
-def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
-                                                 affil_filter_list=None, affil_params_dic=None):
+def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup, affil_params_dic, affil_filter_list=None, ):
     """Parses the fields 'Affiliations' and 'Authors with affiliations' of the corpus to build 
     the data of authors their addresses, country and normalized affiliations per publication of the corpus. 
 
@@ -458,38 +482,41 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
         corpus_df (dataframe): The selected rawdata of the corpus.
         fails_dic (dict): Parsing success rate data.
         cols_tup (tup): Columns information as built through the `_set_scopus_parsing_cols` internal function.
+        affil_params_dic (dict): Keyed by ['affil_types_file_path', 'country_affils_file_path', 'country_towns_folder_path', \
+        'country_towns_file'] and valued by the user as the full path to the data per country of raw affiliations \
+        per normalized one, the full path to the data of affiliations-types used to normalize the affiliations, \
+        the name of the file of the data of towns per country and the full path to the folder where these data are available.
         affil_filter_list (list): The affiliations-filter composed of a list of normalized affiliations (str), \
         optional (default=None).
-        affil_params_dic (dict): Optional dict (default=None) keyed by ['affil_types_file_path', \
-        'country_affils_file_path', 'country_towns_folder_path', 'country_towns_file'] and valued by the user as \
-        the full path to the data per country of raw affiliations per normalized one, the full path to the data of \
-        affiliations-types used to normalize the affiliations, the name of the file of the data of towns per country \
-        and the full path to the folder where these data are available.
     Returns:
         (dataframe): The built data.
     """
     # Setting useful column names
-    cols_lists_dic, cols_dic, scopus_cols_dic = cols_tup
-    auth_affil_cols_list = cols_lists_dic['auth_affil_cols_list']
+    _, cols_dic, scopus_cols_dic = cols_tup
     cols_keys = ['pub_id_col', 'affil_author_idx_col', 'norm_affils_col']
     (pub_id_col, author_idx_col, norm_affils_col) = [cols_dic[key] for key in cols_keys]
     scopus_cols_keys = ['scopus_aff_col', 'scopus_auth_with_aff_col']
     (scopus_aff_col, scopus_auth_with_aff_col) = [scopus_cols_dic[key] for key in scopus_cols_keys]
 
-    # Setting named tuples
-    addr_country_affil = namedtuple('address', auth_affil_cols_list[:-1])
+    # Setting useful named tuple
+    namedtups_dic = set_shared_parsing_namedtups()
+    auth_affil_ntup, auth_affil_cols_list = namedtups_dic['auth_affil']
 
-    # Building the "addr_country_affil_list" list
+    # Getting useful data for affiliations normalization
+    affil_dicts = build_affils_useful_dicts(affil_params_dic)
+
+    # Building the "auth_affil_list" list
     # with one item per publication and per author identifier
     corpus_series_zip = zip(corpus_df[pub_id_col],
                             corpus_df[scopus_aff_col],
                             corpus_df[scopus_auth_with_aff_col])
+    txt_base = f"{bp_gg.TAB}- Authors with affiliations parsing:{bp_gg.TAB}"
     pub_nb = len(corpus_df[pub_id_col])
     pub_num = 0
-    addr_country_affil_list = []
+    auth_affil_list = []
     for pub_id, affiliations_str, authors_affiliations_str in corpus_series_zip:
         pub_num += 1
-        print("    Publications number:", pub_num, f"/ {pub_nb}", end="\r")
+        txt_len = print_temp_text(f"{txt_base}{pub_num} / {pub_nb}")
         # Initializing the authors' counter and the last-author name
         author_counter_params = [-1, '']
 
@@ -508,14 +535,14 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
             for author_std_affiliation in author_std_affiliations_list:
                 author_country_raw = author_std_affiliation.split(',')[-1].strip()
                 author_country = normalize_country(author_country_raw)
-                author_affiliations_tup = build_addr_affils_tup(author_std_affiliation, affil_params_dic,
+                author_affiliations_tup = build_addr_affils_tup(author_std_affiliation, affil_dicts,
                                                                 drop_status=False)
-                addr_country_affil_list.append(addr_country_affil(pub_id, author_idx,
-                                                                  author_std_affiliation, author_country,
-                                                                  author_affiliations_tup.norm_affils_list,
-                                                                  author_affiliations_tup.raw_affils_list,))
+                auth_affil_list.append(auth_affil_ntup(pub_id, author_idx,
+                                                       author_std_affiliation, author_country,
+                                                       author_affiliations_tup.norm_affils_list,
+                                                       author_affiliations_tup.raw_affils_list,))
     # Building a clean author-country-affiliations data and accordingly updating the parsing success rate dict
-    auth_affils_df, fails_dic = build_item_df_from_tup(addr_country_affil_list, auth_affil_cols_list[:-1],
+    auth_affils_df, fails_dic = build_item_df_from_tup(auth_affil_list, auth_affil_cols_list,
                                                        norm_affils_col, pub_id_col, fails_dic)
     auth_affils_df = clean_authors_countries_affils(auth_affils_df)
 
@@ -524,6 +551,8 @@ def _build_scopus_authors_countries_affiliations(corpus_df, fails_dic, cols_tup,
 
     # Sorting the values in the dataframe returned by two columns
     auth_affils_df = auth_affils_df.sort_values(by=[pub_id_col, author_idx_col])
+
+    print_final_text(f"{bp_gg.TAB}- Authors with affiliations parsed", prev_txt_len=txt_len)
     return auth_affils_df
 
 
@@ -548,6 +577,8 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
     Returns:
         (dataframe): The built data.
     """
+    txt_len = print_temp_text(f"{bp_gg.TAB}- Publications main data parsing...")
+
     # Keeping the number of articles in fails_dic dict
     fails_dic['number of article'] = len(corpus_df)
 
@@ -576,6 +607,7 @@ def _build_scopus_articles(corpus_df, fails_dic, cols_tup):
     articles_df[issn_col] = articles_df[issn_col].apply(convert_issn)
 
     articles_df.insert(0, pub_id_col, list(corpus_df[pub_id_col]))
+    print_final_text(f"{bp_gg.TAB}- Main data of publications parsed", prev_txt_len=txt_len)
     return articles_df
 
 
@@ -613,7 +645,7 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
         The parsing success rate data (dict), The data (dataframe) of the corrected author names, \
         The data (dataframe) of the corrected addresses, The data (dataframe) of Scopus IDs of publications.
     """
-    # Setting columns for scopus parsing process
+    # Setting columns' parameters for scopus parsing process
     cols_tup = _set_scopus_parsing_cols()
 
     # Setting items list and values
@@ -640,44 +672,30 @@ def scopus_parser(rawdata_path, affil_filter_list=None, affil_params_dic=None, s
     if not corpus_df.empty:
 
         # Building the dataframe of articles
-        print("  - Publications main data parsing...", end="\r")
         articles_df = _build_scopus_articles(corpus_df, scopus_fails_dic, cols_tup)
-        print("  - Publications main data parsed    ")
 
         # Building the dataframe of authors
-        print("  - Authors parsing...", end="\r")
         authors_df = _build_scopus_authors(corpus_df, scopus_fails_dic, cols_tup)
-        print("  - Authors parsed    ")
 
         # Building the dataframe of addresses, countries and affiliations
-        print("  - Addresses, countries and affiliations parsing...", end="\r")
         addresses_tup = _build_scopus_addresses_countries_affiliations(corpus_df, scopus_fails_dic, cols_tup)
         addresses_df, countries_df, affiliations_df = addresses_tup
-        print("  - Addresses, countries and affiliations parsed    ")
 
         # Building the dataframe of authors and their affiliations
-        print("  - Authors with affiliations parsing...")
-        auth_affils_df = _build_scopus_authors_countries_affiliations(corpus_df, scopus_fails_dic, cols_tup,
-                                                                      affil_filter_list=affil_filter_list,
-                                                                      affil_params_dic=affil_params_dic)
-        print("  - Authors with affiliations parsed                     ")
+        auth_affils_df = _build_scopus_authors_countries_affiliations(corpus_df, scopus_fails_dic,
+                                                                      cols_tup, affil_params_dic,
+                                                                      affil_filter_list=affil_filter_list)
 
         # Building the dataframes of keywords
-        print("  - Authors' keywords, indexed keywords and title keywords parsing...", end="\r")
         authors_kw_df, index_kw_df, title_kw_df = _build_scopus_keywords(corpus_df, scopus_fails_dic, cols_tup)
-        print("  - Authors' keywords, indexed keywords and title keywords parsed    ")
 
         # Building the dataframe of subjects and sub-subjects
-        print("  - Subjects and secondary subjects parsing...", end="\r")
         subjects_df, sub_subjects_df = build_scopus_subjects_and_sub_subjects(corpus_df, scopus_cat_codes_path,
                                                                               scopus_journals_issn_cat_path,
                                                                               scopus_fails_dic, cols_tup)
-        print("  - Subjects and secondary subjects parsed    ")
 
         # Building the dataframe of references
-        print("  - References parsing...", end="\r")
         references_df = build_scopus_references(corpus_df, cols_tup)
-        print("  - References parsed    ")
 
         # Building the scopus data dict
         scopus_parsing_list = [articles_df, authors_df, addresses_df, countries_df, affiliations_df, auth_affils_df,

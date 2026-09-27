@@ -51,6 +51,54 @@ def _set_scopus_rawdata_cols():
     return cols_dic, scopus_cols_dic
 
 
+def _correct_pub_id_authors_with_affiliations(authors_list, affil_list, auth_affil_list):
+    """Corrects the list of affiliations and the list of authors-with-affiliations 
+    for a publication since a discrepancy between number of authors and number 
+    of authors-with-affiliations has been detected.
+
+    Args:
+        authors_list (list): The authors' list to check and correct.
+        affil_list (list): The affiliations' list to check and correct.
+        auth_affil_list (list): The authors-with-affiliations' list to check and correct.
+    Returns:
+        (tup): Composed of the status (list of int) of the correction, \
+        of the kept or corrected authors' list, of the kept or corrected affiliations' list \
+        and of the kept or corrected authors-with-affiliations' list.
+    """
+    authors_status, affil_status, auth_affil_status = 0, 0, 0
+    auth_false_sep, auth_correct_sep= ";", ""
+    correct_authors_list = authors_list
+    new_auth_affil_list = auth_affil_list
+    if any(auth_false_sep in s for s in authors_list):
+        correct_authors_list = [x.replace(auth_false_sep, auth_correct_sep) for x in authors_list]
+        new_auth_affil_list = [x.replace(auth_false_sep, auth_correct_sep) for x in auth_affil_list]
+        authors_status = 1
+
+    correct_affil_list = affil_list
+    if any(re.search(bp_rg.RE_AWA, s) for s in affil_list):
+        correct_affil_list = []
+        for affil in affil_list:
+            new_affil = ", ".join(affil.split(";, "))
+            new_affil = ", ".join(new_affil.split(";"))
+            correct_affil_list.append(new_affil)
+        affil_status = 1
+
+    correct_auth_affil_list = new_auth_affil_list
+    if any(re.search(bp_rg.RE_AWA, s) for s in new_auth_affil_list):
+        correct_auth_affil_list = []
+        for auth_affil in new_auth_affil_list:
+            new_auth_affil = ", ".join(auth_affil.split(";, "))
+            new_auth_affil = ", ".join(new_auth_affil.split(";"))
+            correct_auth_affil_list.append(new_auth_affil)
+        auth_affil_status = 1
+
+    correct_authors_str = std_sep.join(correct_authors_list)
+    correct_affil_str = std_sep.join(correct_affil_list)
+    correct_auth_affil_str = std_sep.join(correct_auth_affil_list)
+    status_list = [authors_status, affil_status, auth_affil_status]
+    return status_list, correct_authors_str, correct_affil_str, correct_auth_affil_str
+
+
 def _check_authors_with_affiliations(corpus_df, check_cols):
     """Corrects the list of affiliations and the list of authors-with-affiliations 
     when irregular sequence of separators induces a discrepancy between number 
@@ -73,64 +121,34 @@ def _check_authors_with_affiliations(corpus_df, check_cols):
         init_affil_str = row[affil_col]
         init_auth_affil_str = row[auth_affil_col]
 
-        std_sep = "; "
+        correct_authors_str = init_authors_str
+        correct_affil_str = init_affil_str
+        correct_auth_affil_str = init_auth_affil_str
+
+        std_sep, check_sep = "; ", ";"
         authors_list = init_authors_str.split(std_sep)
         affil_list = init_affil_str.split(std_sep)
         auth_affil_list = init_auth_affil_str.split(std_sep)
-
-        check_sep = ";"
         check_auth_affil_list = init_auth_affil_str.split(check_sep)
 
         authors_nb = len(authors_list)
         auth_affil_nb = len(check_auth_affil_list)
         if authors_nb!=auth_affil_nb:
-            authors_status, affil_status, auth_affil_status = 0, 0, 0
-            auth_false_sep, auth_correct_sep= ";", ""
-            if any(auth_false_sep in s for s in authors_list):
-                correct_authors_list = [x.replace(auth_false_sep, auth_correct_sep) for x in authors_list]
-                new_auth_affil_list = [x.replace(auth_false_sep, auth_correct_sep) for x in auth_affil_list]
-                authors_status = 1
-            else:
-                correct_authors_list = authors_list
-                new_auth_affil_list = auth_affil_list
-
-            if any(re.search(bp_rg.RE_AWA, s) for s in affil_list):
-                correct_affil_list = []
-                for affil in affil_list:
-                    new_affil = ", ".join(affil.split(";, "))
-                    new_affil = ", ".join(new_affil.split(";"))
-                    correct_affil_list.append(new_affil)
-                affil_status = 1
-            else:
-                correct_affil_list = affil_list
-
-            if any(re.search(bp_rg.RE_AWA, s) for s in new_auth_affil_list):
-                correct_auth_affil_list = []
-                for auth_affil in new_auth_affil_list:
-                    new_auth_affil = ", ".join(auth_affil.split(";, "))
-                    new_auth_affil = ", ".join(new_auth_affil.split(";"))
-                    correct_auth_affil_list.append(new_auth_affil)
-                auth_affil_status = 1
-            else:
-                correct_auth_affil_list = new_auth_affil_list
-
-            correct_authors_str = std_sep.join(correct_authors_list)
-            correct_affil_str = std_sep.join(correct_affil_list)
-            correct_auth_affil_str = std_sep.join(correct_auth_affil_list)
+            # Correcting authors-with-affiliations for pub_id
+            return_tup = _correct_pub_id_authors_with_affiliations(authors_list, affil_list, auth_affil_list)
+            status_list, correct_authors_str, correct_affil_str, correct_auth_affil_str = return_tup
+            authors_status, affil_status, auth_affil_status = status_list
             corrected_addresses_data.append([pub_id, authors_status, affil_status, auth_affil_status,
                                              init_authors_str, correct_authors_str,
                                              init_affil_str, correct_affil_str,
                                              init_auth_affil_str, correct_auth_affil_str])
-        else:
-            correct_authors_str = init_authors_str
-            correct_affil_str = init_affil_str
-            correct_auth_affil_str = init_auth_affil_str
 
-        # Updating corpus data
+        # Updating corpus data with kept or corrected authors-with-affiliations for pub_id
         corrected_corpus_df.loc[row_idx, authors_col] = correct_authors_str
         corrected_corpus_df.loc[row_idx, affil_col] = correct_affil_str
         corrected_corpus_df.loc[row_idx, auth_affil_col] = correct_auth_affil_str
 
+    # Building the data of corrected authors-with-affiliations data
     correction_cols = [pub_id_col, "Authors status", "Affiliations status", "Auth with affil status",
                        authors_col, "Corrected " + authors_col,
                        affil_col, "Corrected " + affil_col,
@@ -292,16 +310,20 @@ def _correct_scopus_full_rawdata(corpus_df, cols_tup):
 
 
 def _check_scopus_affiliation_column(df, scopus_aff_col):
-    """Checks the correctness of the column affiliation of data read from a csv scopus file.
+    """Checks the correctness of the affiliations' column of Scopus rawdata.
 
-    A cell of the column affiliation should read:
-    address<0>, country<0>;...; address<i>, country<i>;...
+    A cell of the  affiliations' column should read: 
+    address<0>, country<0>;...; address<i>, country<i>;...; address<n>, country<n>.
+    Some cells can be misformatted with an incorrect country field. 
+    The function eliminates, for each cell of the column, those items 
+    address<i>, country<i> incorrectly formatted. When such an item is detected
+    a warning message is displayed.
 
-    Some cells can be misformatted with an incorrect country field. The function eliminates, for each
-    cell of the column, those items address<i>, country<i> incorrectly formatted. When such an item is detected
-    a warning message is printed.
+    Args:
+        df (dataframe): The Scopus rawdata.
+        scopus_aff_col (str): The Scopus name of the affiliations' column.
     """
-    #To Do: Doc string update
+    # Local function
     def _valid_affiliation(affiliations_str):
         nonlocal idx
         idx += 1
@@ -311,13 +333,12 @@ def _check_scopus_affiliation_column(df, scopus_aff_col):
             if normalize_country(raw_country):
                 valid_affiliation_list.append(affiliation)
             else:
-                warning = ('\nWARNING in "_check_scopus_affiliation_column" function "'
-                           '"of "scopus_rawdata_utils.py" module:'
-                           f'\nAt row {idx} of the scopus corpus, the invalid affiliation "{affiliation}" '
-                           'has been dropped from the list of affiliations. '
-                           '\nTherefore, attention should be given to the resulting list of affiliations '
-                           'for each of the authors of this publication.\n' )
-                print(warning)
+                print("\nWARNING in '_check_scopus_affiliation_column' function "
+                      "of 'scopus_rawdata_utils.py' module:"
+                      f"\nAt row {idx} of the scopus corpus, the invalid affiliation '{affiliation}' "
+                      "has been dropped from the list of affiliations."
+                      "\nTherefore, attention should be given to the resulting list of affiliations "
+                      "for each of the authors of this publication.\n")
         new_affiliations_str = bp_pg.UNKNOWN
         if  valid_affiliation_list:
             new_affiliations_str = '; '.join(valid_affiliation_list)

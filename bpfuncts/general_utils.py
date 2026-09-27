@@ -1,13 +1,19 @@
 """Module of functions for general use.
 """
 
-__all__ = ['remove_special_symbol',
+__all__ = ['dict_print',
+           'print_final_text',
+           'print_temp_text',
+           'remove_special_symbol',
           ]
 
 
 # Standard library imports
 import functools
 import unicodedata
+
+# Local library imports
+import bpfuncts.general_globals as bp_gg
 
 
 def remove_special_symbol(text, only_ascii=True, strip=True):
@@ -35,3 +41,39 @@ def remove_special_symbol(text, only_ascii=True, strip=True):
     if strip:
         text = text.strip()
     return text
+
+
+def print_temp_text(txt):
+    """Prints to console the text with cleaning at next print.
+
+    Args:
+        txt (str): The text to print.
+    Returns:
+        (int): Length of the printed text.
+    """
+    print(txt, end="\r")
+    return len(txt)
+
+
+def print_final_text(step_txt, prev_txt_len=None):
+    """Prints to console the step text.
+
+    If 'prev_txt' is set, it first clean the previous printed line to console.
+
+    Args:
+        step_txt (str)= The text to print.
+        prev_txt_len (int): Optional length of the previously print text (default: None).
+    """
+    if prev_txt_len:
+        print(" " * prev_txt_len, end="\r")
+    print(step_txt)
+
+
+def dict_print(dic):
+    """Prints dict items line by line.
+
+    Args:
+        (dict): The data to print.
+    """
+    for k,v in dic.items():
+        print(f"{bp_gg.TAB}{k}: {v}")

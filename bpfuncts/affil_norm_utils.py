@@ -24,8 +24,8 @@ import bpfuncts.affiliations_globals as bp_ag
 import bpfuncts.general_globals as bp_gg
 import bpfuncts.parsing_cols_globals as bp_pcg
 import bpfuncts.regex_globals as bp_rg
+from bpfuncts.general_utils import dict_print
 from bpfuncts.general_utils import remove_special_symbol
-from bpfuncts.parsing_utils import dict_print
 from bpfuncts.parsing_utils import rationalize_town_names
 from bpfuncts.parsing_utils import set_address_uniform_words
 
@@ -88,7 +88,7 @@ def _build_words_set(raw_aff, verbose=False):
     # Dropping particular symbols
     std_raw_aff = std_raw_aff.translate(bp_gg.SYMB_DROP)
     if verbose:
-        print('       std_raw_aff:', std_raw_aff)
+        print(f"{bp_gg.TAB*2}std_raw_aff: {std_raw_aff}")
 
     # Building the corresponding set of words to std_raw_aff
     raw_aff_words_set = set(std_raw_aff.strip().split(' '))
@@ -172,9 +172,9 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
         norm_raw_aff_nb = len(norm_raw_aff_df[norm_affil_col])
 
         if verbose:
-            print('Country:', country)
-            print('Number of normalized affiliations:', norm_raw_aff_nb)
-            print('\nList of normalized affiliations:', norm_raw_aff_df[norm_affil_col], "\n")
+            print(f'Country: {country}')
+            print(f'Number of normalized affiliations: {norm_raw_aff_nb}')
+            print(f'\nList of normalized affiliations: {norm_raw_aff_df[norm_affil_col]}\n')
 
         norm_raw_aff_dict[country] = {}
         for num, norm_aff in enumerate(norm_raw_aff_df[norm_affil_col]):
@@ -183,12 +183,12 @@ def build_norm_raw_affils_dict(country_affiliations_file_path=None, verbose=Fals
 
             if verbose:
                 print(f"\n\n{str(num)}- Normalized affiliation: {norm_aff}")
-                print('   Raw affiliations list:', raw_aff_list, "\n")
+                print(f"{bp_gg.TAB}Raw affiliations list: {raw_aff_list}\n")
 
             norm_raw_aff_dict[country][norm_aff] = _build_words_sets_list(raw_aff_list, verbose)
 
             if verbose:
-                print(f"   norm_raw_aff_dict[{country}][{norm_aff}]: {norm_raw_aff_dict[country][norm_aff]}\n")
+                print(f"{bp_gg.TAB*2}norm_raw_aff_dict[{country}][{norm_aff}]: {norm_raw_aff_dict[country][norm_aff]}\n")
 
     return norm_raw_aff_dict
 
@@ -313,8 +313,7 @@ def build_affils_useful_dicts(affil_params_dic):
 
     # Building the useful data for affiliations normalization
     affil_types_dict = read_affil_types(affil_types_file_path=affil_types_file_path)
-    norm_raw_affils_dict = build_norm_raw_affils_dict(country_affiliations_file_path=country_affils_file_path,
-                                                     verbose=False)
+    norm_raw_affils_dict = build_norm_raw_affils_dict(country_affiliations_file_path=country_affils_file_path)
     towns_dict = read_towns_per_country(country_towns_file=country_towns_file,
                                         country_towns_folder_path=country_towns_folder_path)
 
@@ -322,9 +321,11 @@ def build_affils_useful_dicts(affil_params_dic):
     wrong_affil_types_dict = _check_norm_raw_affils_dict(affil_types_dict, norm_raw_affils_dict)
     if wrong_affil_types_dict:
         print("\nWARNING: Incorrect normalized-affiliation types found in the file: "
-              f"\n         {country_affils_file_path}"
-              "\n\n         Please, correct the following affiliation types:")
+              f"\n{bp_gg.TAB*2}{country_affils_file_path}"
+              f"\n\n{bp_gg.TAB*2}Please, correct the following affiliation types:")
         dict_print(wrong_affil_types_dict)
+    else:
+        print(f"{bp_gg.TAB}- Useful data for normalization of authors' affiliations built")
 
     # Building returned dict
     affil_dicts = {'affil_types_dict'      : affil_types_dict,
@@ -353,15 +354,15 @@ def build_norm_affiliation_list(affiliation, country, norm_raw_aff_dict, verbose
     aff_mod = remove_special_symbol(affiliation, only_ascii=False, strip=True)
     aff_mod = aff_mod.lower()
     if verbose:
-        print('\naff_mod:', aff_mod, "\n")
+        print(f'\naff_mod: {aff_mod}\n')
 
     # Searching for words set in affiliation
     for num, norm_aff in enumerate(norm_raw_aff_dict[country].keys()):
         if verbose:
-            print("\n", str(num) + ' norm_aff:', norm_aff, "\n")
+            print(f"\n{str(num)} norm_aff: {norm_aff}\n")
         for words_set in norm_raw_aff_dict[country][norm_aff]:
             if verbose:
-                print('\twords_set:', words_set)
+                print(f'{bp_gg.TAB}words_set: {words_set}')
             words_set_tags = []
             for word in words_set:
                 re_search_words = re.compile(bp_rg.AFFIL_WORDS_SET_TEMPLATE.substitute({"word":word}))
@@ -370,13 +371,14 @@ def build_norm_affiliation_list(affiliation, country, norm_raw_aff_dict, verbose
                 else:
                     words_set_tags.append('false')
                 if verbose:
-                    print('\t\tword:', word, '\n\t\twords_set_tags:', words_set_tags)
+                    print(f'{bp_gg.TAB*2}word: {word}\n{bp_gg.TAB*2}words_set_tags: {words_set_tags}')
             if 'false' not in words_set_tags:
                 norm_affiliation_list.append(norm_aff)
             if verbose:
-                print(f"\tfinal words_set_tags: {words_set_tags}\n\tnorm_affiliation_list: {norm_affiliation_list}\n")
+                print(f"{bp_gg.TAB}final words_set_tags: {words_set_tags}"
+                      f"\n{bp_gg.TAB}norm_affiliation_list: {norm_affiliation_list}\n")
     if verbose:
-        print('\tnorm_affiliation_list:', norm_affiliation_list)
+        print(f'{bp_gg.TAB}norm_affiliation_list: {norm_affiliation_list}')
     return norm_affiliation_list
 
 
