@@ -63,8 +63,8 @@ def biblio_parser(rawdata_path, database, affil_filter_list=None, affil_params_d
         rawdata_path (path): The full path to the corpus rawdata.
         database (str): The type of the rawdata among Scopus or WoS.
         affil_filter_list (list): The affiliations-filter composed of a list of \
-        normalized affiliations (str), optional (default=None).
-        affil_params_dic (dict): Optional dict (default=None) keyed by \
+        normalized affiliations (str), optional (default: None).
+        affil_params_dic (dict): Optional dict (default: None) keyed by \
         ['affil_types_file_path', 'country_affils_file_path', 'country_towns_folder_path', \
         'country_towns_file'] and valued by the user as the full path to the data per country \
         of raw affiliations per normalized one, the full path to the data of affiliations-types \

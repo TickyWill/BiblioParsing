@@ -423,7 +423,7 @@ def _build_wos_authors_countries_affiliations(corpus_df, fails_dic, cols_tup, af
     auth_affil_ntup, auth_affil_cols_list = namedtups_dic['auth_affil']
 
     # Setting a specific namedtuple
-    author_address_tup = namedtuple('author_address', 'author address')
+    author_address_ntup = namedtuple('author_address', ['author', 'address'])
 
     # Getting useful data for affiliations normalization
     affil_dicts = build_affils_useful_dicts(affil_params_dic)
@@ -454,7 +454,7 @@ def _build_wos_authors_countries_affiliations(corpus_df, fails_dic, cols_tup, af
             tuples_list = tuple(zip(affil_authors_list, affiliations_list))
 
             # Builds the list of tuples [(author<0>, address<0>),(author<0>, address<1>),...,(author<i>, address<j>)...]
-            author_address_tup_list = [author_address_tup(y, x[1]) for x in tuples_list for y in x[0]]
+            author_address_tup_list = [author_address_ntup(y, x[1]) for x in tuples_list for y in x[0]]
 
             for tup in author_address_tup_list:
                 if tup.author in authors_ordered_list:
@@ -476,13 +476,12 @@ def _build_wos_authors_countries_affiliations(corpus_df, fails_dic, cols_tup, af
                 for out_author in out_authors_list:
                     out_author_idx = authors_ordered_list.index(out_author)
                     out_author_address = set_unknown_address(out_author_idx, add_unknown_country=True)
-                    auth_affil_list.append(addr_country_affils(pub_id, out_author_idx,
-                                                               out_author_address, bp_pg.UNKNOWN_COUNTRY,
-                                                               bp_ag.EMPTY, bp_ag.EMPTY,))
+                    auth_affil_list.append(auth_affil_ntup(pub_id, out_author_idx, out_author_address,
+                                                           bp_pg.UNKNOWN_COUNTRY, bp_ag.EMPTY, bp_ag.EMPTY,))
         else:
             # If the field author is not present in affiliations, completing the namedtuple with the global UNKNOWN
-            auth_affil_list.append(addr_country_affils(pub_id, bp_pg.UNKNOWN, bp_pg.UNKNOWN,
-                                                       bp_pg.UNKNOWN, bp_pg.UNKNOWN, bp_pg.UNKNOWN,))
+            auth_affil_list.append(auth_affil_ntup(pub_id, bp_pg.UNKNOWN, bp_pg.UNKNOWN,
+                                                   bp_pg.UNKNOWN, bp_pg.UNKNOWN, bp_pg.UNKNOWN,))
     # Building a clean authors-countries-affiliations data and accordingly updating the parsing success rate dict
     auth_affils_df, fails_dic = build_item_df_from_tup(auth_affil_list, auth_affil_cols_list,
                                                        norm_affils_col, pub_id_col, fails_dic)

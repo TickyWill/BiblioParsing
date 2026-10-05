@@ -690,14 +690,19 @@ def set_shared_parsing_namedtups():
     (auth_cols_list, kw_cols_list, address_cols_list, country_cols_list,
      affil_cols_list, auth_affil_cols_list, ref_cols_list) = [cols_lists_dic[key] for key in cols_lists_keys]
 
-    namedtups_dic = {'co_author'  : [namedtuple('co_author', auth_cols_list), auth_cols_list],
-                     'key_word'   : [namedtuple('key_word', kw_cols_list), kw_cols_list],
-                     'address'    : [namedtuple('address', address_cols_list), address_cols_list],
-                     'country'    : [namedtuple('country', country_cols_list), country_cols_list],
-                     'affiliation': [namedtuple('affiliation', affil_cols_list), affil_cols_list],
-                     'auth_affil' : [namedtuple('auth_affil', auth_affil_cols_list), auth_affil_cols_list],# modifié
-                     'pub_ref'    : [namedtuple('pub_ref', ref_cols_list), ref_cols_list]
+    namedtups_dic = {'co_author'     : [namedtuple('co_author', auth_cols_list), auth_cols_list],
+                     'key_word'      : [namedtuple('key_word', kw_cols_list), kw_cols_list],
+                     'address'       : [namedtuple('address', address_cols_list), address_cols_list],
+                     'country'       : [namedtuple('country', country_cols_list), country_cols_list],
+                     'affiliation'   : [namedtuple('affiliation', affil_cols_list), affil_cols_list],
+                     'auth_affil'    : [namedtuple('auth_affil', auth_affil_cols_list), auth_affil_cols_list],# modifié
+                     'pub_ref'       : [namedtuple('pub_ref', ref_cols_list), ref_cols_list],
+                     'country_affils': [namedtuple('country', ref_cols_list), ref_cols_list],
                      }
+
+    addr_country_affils(pub_id, out_author_idx,
+                                                               out_author_address, bp_pg.UNKNOWN_COUNTRY,
+                                                               bp_ag.EMPTY, bp_ag.EMPTY,)
     return namedtups_dic
 
 

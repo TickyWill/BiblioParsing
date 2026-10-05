@@ -181,7 +181,7 @@ def _build_scopus_authors(corpus_df, fails_dic, cols_tup):
         if ';' in scopus_auth_str:
             # Change in scopus on 07/2023
             authors_sep = ';'
-        scopus_auth_list = scopus_auth_str.split(authors_sep)
+        scopus_auth_list = [x.strip() for x in scopus_auth_str.split(authors_sep)]
         for scopus_auth in scopus_auth_list:
             author = scopus_auth.replace('.','')
             if author not in ['Dr','Pr','Dr ','Pr ']:
