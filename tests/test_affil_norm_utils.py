@@ -1,8 +1,29 @@
 """
 
 """
+import pandas as pd
 
 import bpfuncts.affil_norm_utils as affil_norm_utils
+
+
+def test_set_norm_affils_cols():
+    assert affil_norm_utils.set_norm_affils_cols() == (
+        {
+            'country_cols_list': ['Pub_id', 'Idx_address', 'Country'],
+            'affil_cols_list': ['Pub_id', 'Idx_address', 'Institution'],
+            'auth_affil_cols_list': [
+                'Pub_id', 'Idx_author', 'Address', 'Country',
+                'Norm_institutions', 'Raw_institutions', 'Secondary_institutions'
+            ]
+        },
+        {
+            'pub_id_col': 'Pub_id',
+            'address_id_col': 'Idx_address',
+            'address_col': 'Address',
+            'country_col': 'Country',
+            'affil_col': 'Institution',
+            'norm_affils_col': 'Norm_institutions'
+        })
 
 
 def test__build_words_set_vanilla():
@@ -127,8 +148,39 @@ def test_read_towns_per_country_small_data_file():
 
 
 def test__check_norm_raw_affils_dict():
-    pass
+    assert affil_norm_utils._check_norm_raw_affils_dict(
+        {"France": "", "China": "{}"},
+        {
+            "France": {"Grenoble": ""},
+            "China": {"Beijing": ""},
+            "Vietnam": {"Hanoi": ""},
+            "Peru": {"Lima": ""}
+        }
+    ) == {'France': ['Grenoble'], 'China': ['Beijing'], 'Vietnam': ['Hanoi'], 'Peru': ['Lima']}
 
 
 def test_build_affils_useful_dicts():
-    pass
+    assert affil_norm_utils.build_norm_affiliation_list(
+        "Affiliation",
+        "China",
+        {"China": {"affiliation": ["a1", "a2", "a3"]}},
+        True) == []
+
+
+def test__build_complements_list():
+    assert affil_norm_utils._build_complements_list(
+        ["affiliation", "affi2", "affi3"],
+        ["affiliation", "affi8"]
+    ) == [1, 0, 0]
+
+
+def test_extend_author_affils():
+    _input = pd.DataFrame(columns=['Pub_id', 'Idx_author', 'Address', 'Country', 'Norm_institutions'])
+    _output = affil_norm_utils.extend_author_affils(
+        _input,
+        []
+    )
+
+    assert _output.compare(
+        pd.DataFrame(columns=['Pub_id', 'Idx_author', 'Address', 'Country', 'Norm_institutions'])
+    ).empty

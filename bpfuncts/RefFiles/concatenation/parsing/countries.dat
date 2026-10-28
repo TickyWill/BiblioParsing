@@ -1,0 +1,1063 @@
+Pub_id	Idx_address	Country
+0	0	France
+1	0	France
+1	1	France
+1	2	France
+1	3	France
+1	4	France
+2	12	United States
+2	11	United States
+2	10	United States
+2	8	United States
+2	7	United States
+2	6	United Kingdom
+2	9	United States
+2	4	United States
+2	3	France
+2	2	Belgium
+2	1	United States
+2	0	United States
+2	5	France
+3	3	France
+3	2	Italy
+3	0	Italy
+3	1	Italy
+4	0	France
+4	1	China
+4	2	Egypt
+4	3	France
+4	4	France
+4	5	France
+5	0	France
+5	1	France
+6	0	France
+7	0	Netherlands
+7	1	France
+7	2	Austria
+8	0	France
+9	0	Hong Kong
+9	1	France
+9	2	France
+9	3	France
+9	4	Hong Kong
+9	5	France
+9	6	France
+9	7	France
+9	8	France
+9	9	France
+10	1	Spain
+10	0	France
+11	0	France
+11	1	France
+12	0	France
+12	1	France
+13	0	France
+13	1	France
+14	0	France
+14	1	France
+15	0	France
+15	1	France
+16	0	France
+16	1	France
+17	1	France
+17	0	France
+18	1	United Kingdom
+18	2	France
+18	0	United Kingdom
+19	0	France
+19	1	France
+20	0	France
+20	1	France
+20	2	France
+21	0	France
+21	1	France
+22	0	France
+22	1	France
+22	2	France
+23	0	France
+23	1	France
+23	2	France
+23	3	France
+24	2	Tunisia
+24	1	France
+24	0	Tunisia
+25	0	Italy
+25	1	France
+25	2	Italy
+25	3	Italy
+25	4	France
+26	0	France
+26	1	France
+27	0	France
+27	1	France
+27	2	France
+27	3	France
+27	4	France
+27	5	France
+28	2	France
+28	1	Germany
+28	0	France
+29	0	France
+30	0	France
+30	1	France
+30	2	France
+31	0	France
+32	2	France
+32	3	France
+32	0	France
+32	1	France
+33	0	France
+33	1	France
+34	0	France
+34	1	France
+35	6	Russian Federation
+35	9	France
+35	8	Russian Federation
+35	7	Russian Federation
+35	5	Russian Federation
+35	1	France
+35	3	Russian Federation
+35	2	France
+35	0	France
+35	4	Russian Federation
+36	0	France
+36	1	Iran
+36	2	France
+37	1	France
+37	0	France
+38	1	France
+38	2	France
+38	0	France
+39	1	Tunisia
+39	2	France
+39	0	Tunisia
+40	0	Italy
+40	1	Italy
+40	2	Germany
+40	3	Germany
+40	4	Germany
+40	5	France
+40	6	Italy
+41	0	France
+42	4	France
+42	3	Spain
+42	0	France
+42	1	Netherlands
+42	2	France
+43	0	France
+43	1	France
+44	4	Saudi Arabia
+44	5	Australia
+44	3	China
+44	0	France
+44	1	Australia
+44	2	South Korea
+45	0	Belgium
+45	1	France
+46	0	France
+46	1	France
+46	2	France
+47	0	France
+47	1	Switzerland
+48	0	Italy
+48	1	France
+49	4	France
+49	5	Italy
+49	3	United States
+49	2	United States
+49	1	France
+49	0	France
+50	0	France
+50	1	France
+51	0	France
+52	0	France
+52	1	France
+53	0	France
+53	1	France
+54	0	United States
+54	1	United States
+54	2	United States
+54	3	United States
+54	4	France
+55	1	France
+55	0	France
+56	0	France
+56	1	France
+56	2	France
+57	0	France
+58	0	France
+58	1	France
+58	2	France
+59	0	France
+59	1	France
+59	2	France
+59	3	France
+60	7	Germany
+60	6	Australia
+60	9	Brazil
+60	8	Germany
+60	4	Italy
+60	2	Italy
+60	3	Italy
+60	5	France
+60	1	Germany
+60	0	Germany
+61	0	France
+61	1	France
+62	0	France
+62	1	France
+63	0	France
+63	1	France
+63	2	France
+64	0	France
+64	1	France
+65	2	France
+65	1	Australia
+65	0	France
+66	0	France
+66	1	France
+66	2	France
+66	3	France
+67	0	United States
+67	1	France
+67	2	France
+68	0	Belgium
+68	1	Spain
+68	2	France
+68	3	France
+69	0	France
+70	0	France
+71	1	France
+71	0	France
+72	0	France
+72	1	France
+72	2	France
+73	0	France
+73	1	France
+74	0	Finland
+74	1	Spain
+74	2	France
+74	3	France
+75	0	France
+75	1	France
+75	2	France
+76	0	France
+77	1	France
+77	2	France
+77	0	France
+78	0	France
+79	0	France
+80	0	France
+80	1	France
+80	2	France
+81	0	France
+81	1	France
+81	2	France
+81	3	France
+81	4	France
+81	5	France
+81	6	France
+82	1	France
+82	0	France
+82	2	France
+83	5	Russian Federation
+83	6	United States
+83	4	France
+83	2	Brazil
+83	3	France
+83	1	China
+83	0	China
+84	0	United Kingdom
+84	1	France
+84	2	Germany
+85	0	France
+85	1	France
+85	2	Italy
+86	0	France
+86	1	France
+87	0	France
+87	1	France
+88	0	France
+89	4	France
+89	3	France
+89	1	France
+89	0	France
+89	2	France
+90	0	France
+90	1	France
+90	2	France
+91	0	France
+91	1	France
+91	2	Spain
+91	3	France
+92	0	France
+92	1	France
+92	2	France
+93	1	France
+93	0	France
+94	2	France
+94	0	France
+94	1	France
+95	11	Sweden
+95	0	Sweden
+95	1	Finland
+95	2	Finland
+95	3	Greece
+95	4	France
+95	5	Spain
+95	6	Greece
+95	7	France
+95	8	France
+95	9	United Kingdom
+95	10	Belgium
+96	1	France
+96	0	France
+97	0	France
+97	1	France
+97	2	France
+97	3	France
+97	4	France
+98	0	France
+98	1	France
+99	0	France
+100	4	France
+100	3	France
+100	5	Canada
+100	1	France
+100	0	France
+100	2	France
+101	2	France
+101	3	France
+101	0	France
+101	1	France
+102	0	United States
+102	1	United States
+102	2	United States
+102	3	France
+103	0	Switzerland
+103	1	France
+103	2	Switzerland
+103	3	Italy
+103	4	France
+103	5	Italy
+104	0	France
+104	1	France
+104	2	France
+104	3	France
+105	1	France
+105	0	France
+106	0	France
+106	1	Italy
+107	0	France
+107	1	France
+107	2	France
+107	3	France
+108	4	France
+108	3	Germany
+108	1	France
+108	0	France
+108	2	France
+109	3	Japan
+109	0	France
+109	1	France
+109	2	France
+110	2	France
+110	0	France
+110	1	France
+111	0	France
+111	1	France
+112	0	France
+112	1	Tunisia
+112	2	Tunisia
+112	3	France
+113	0	France
+113	1	France
+114	0	France
+115	0	France
+115	1	France
+116	0	France
+117	2	Tunisia
+117	1	France
+117	0	France
+118	0	Spain
+118	1	United Kingdom
+118	2	Spain
+118	3	France
+119	0	France
+120	0	China
+120	1	China
+120	2	United States
+120	3	France
+120	4	United States
+120	5	United States
+120	6	United States
+121	0	France
+122	4	Greece
+122	5	Belgium
+122	3	France
+122	1	Greece
+122	2	Denmark
+122	0	United Kingdom
+123	0	Belgium
+123	1	France
+124	0	United Kingdom
+124	1	United Kingdom
+124	2	United Kingdom
+124	3	United Kingdom
+124	4	France
+124	5	United Kingdom
+124	6	United Kingdom
+124	7	United Kingdom
+124	8	United Kingdom
+125	0	France
+125	1	Denmark
+126	1	France
+126	0	France
+127	0	France
+127	1	Switzerland
+128	0	France
+129	4	France
+129	0	Spain
+129	1	Spain
+129	2	Switzerland
+129	3	Greece
+130	0	France
+130	1	France
+130	2	France
+131	0	France
+131	1	France
+132	1	France
+132	0	France
+133	4	France
+133	3	France
+133	1	France
+133	0	France
+133	2	France
+134	0	France
+134	1	France
+134	2	France
+134	3	France
+134	4	France
+135	0	France
+135	1	France
+136	0	France
+136	1	France
+137	0	France
+137	1	France
+138	1	France
+138	0	France
+139	0	United Kingdom
+139	1	United Kingdom
+139	2	France
+140	0	France
+141	0	France
+142	0	France
+142	1	France
+143	0	United States
+143	1	Armenia
+143	2	United States
+143	3	France
+144	1	France
+144	0	France
+145	5	Russian Federation
+145	6	Russian Federation
+145	7	Netherlands
+145	4	France
+145	0	Russian Federation
+145	2	Russian Federation
+145	3	Russian Federation
+145	1	Russian Federation
+146	0	France
+146	1	France
+146	2	France
+147	0	France
+148	0	France
+148	1	France
+149	0	France
+149	1	France
+149	2	France
+150	1	United States
+150	6	United States
+150	5	France
+150	4	United States
+150	0	United States
+150	2	United States
+150	3	United States
+151	0	France
+151	1	France
+152	3	Belgium
+152	0	France
+152	1	France
+152	2	France
+153	3	Poland
+153	2	Poland
+153	0	France
+153	1	France
+154	0	France
+155	0	United Kingdom
+155	1	France
+155	2	United Kingdom
+155	3	United Kingdom
+156	0	Spain
+156	1	Switzerland
+156	2	France
+157	3	France
+157	2	France
+157	4	France
+157	0	France
+157	1	France
+158	0	France
+158	1	France
+158	2	France
+158	3	France
+159	0	France
+159	1	France
+160	0	France
+160	1	France
+161	0	France
+161	1	France
+161	2	France
+161	3	France
+162	3	Morocco
+162	2	Morocco
+162	4	France
+162	0	Morocco
+162	1	Morocco
+162	5	Morocco
+163	6	France
+163	7	France
+163	4	China
+163	5	France
+163	2	Australia
+163	0	Australia
+163	3	Australia
+163	1	France
+164	0	France
+164	1	France
+165	0	France
+165	1	France
+165	2	France
+166	0	France
+166	1	France
+167	0	Italy
+167	1	Italy
+167	2	Italy
+167	3	Italy
+167	4	France
+167	5	Italy
+168	0	France
+169	2	France
+169	0	France
+169	1	France
+170	0	France
+170	1	France
+171	0	France
+171	1	France
+171	2	Israel
+171	3	Israel
+171	4	France
+171	5	Israel
+172	3	France
+172	0	France
+172	1	France
+172	2	France
+173	0	France
+174	1	France
+174	0	France
+175	0	Slovakia
+175	1	Canada
+175	2	Canada
+175	3	France
+175	4	United Kingdom
+175	5	France
+176	3	France
+176	2	France
+176	1	France
+176	0	France
+177	0	France
+177	1	France
+178	0	France
+178	1	France
+178	2	France
+179	2	France
+179	0	France
+179	1	France
+180	0	France
+181	0	France
+182	0	France
+183	0	France
+183	1	France
+184	0	France
+185	0	France
+186	0	France
+187	0	France
+188	0	France
+189	0	France
+189	1	Spain
+190	0	France
+191	0	France
+192	0	France
+193	0	France
+194	0	France
+195	0	France
+196	0	France
+196	1	France
+197	0	France
+197	1	France
+198	0	France
+198	1	France
+199	0	France
+199	1	France
+200	0	France
+201	0	France
+201	1	France
+202	0	France
+202	1	France
+203	0	France
+204	0	France
+204	1	France
+205	0	France
+205	1	Italy
+205	2	Italy
+206	0	France
+206	1	France
+207	0	France
+207	1	France
+208	0	France
+208	1	France
+208	2	France
+209	0	France
+209	1	France
+209	2	France
+210	1	France
+210	0	France
+211	0	France
+211	1	France
+212	0	France
+212	1	France
+213	0	France
+213	1	France
+213	2	France
+213	3	France
+213	4	France
+214	0	France
+214	1	France
+215	0	France
+215	1	France
+215	2	France
+216	1	France
+216	0	France
+217	0	France
+217	1	France
+218	0	France
+218	1	Denmark
+219	0	France
+219	1	France
+220	1	France
+220	0	France
+221	0	France
+221	1	France
+221	2	France
+221	3	France
+222	2	France
+222	0	France
+222	1	France
+223	2	France
+223	0	France
+223	1	France
+224	0	France
+224	1	France
+224	2	Italy
+225	0	France
+225	1	France
+225	2	France
+225	3	France
+226	0	France
+226	1	France
+226	2	France
+227	0	France
+227	1	France
+227	2	France
+227	3	France
+228	1	France
+228	2	France
+228	0	France
+229	0	France
+229	1	France
+230	0	France
+230	1	France
+231	0	France
+231	1	France
+232	0	France
+232	1	France
+233	0	France
+233	1	France
+234	0	France
+234	1	France
+235	9	Germany
+235	10	Germany
+235	8	Finland
+235	12	France
+235	11	Finland
+235	7	Spain
+235	1	France
+235	5	Sweden
+235	4	Germany
+235	3	Belgium
+235	2	Sweden
+235	0	France
+235	6	Spain
+236	0	France
+236	1	France
+236	2	France
+237	0	France
+237	1	France
+237	2	France
+237	3	Belgium
+238	4	France
+238	3	France
+238	0	France
+238	1	France
+238	2	France
+239	0	France
+239	1	France
+240	0	France
+240	1	France
+240	2	Poland
+240	3	Poland
+241	0	Belgium
+241	1	France
+242	2	France
+242	1	France
+242	0	France
+243	0	France
+243	1	France
+244	0	France
+244	1	France
+244	2	Canada
+244	3	Italy
+245	0	Finland
+245	1	Spain
+245	2	France
+245	3	France
+246	1	France
+246	2	France
+246	0	France
+247	0	France
+247	1	France
+247	2	France
+248	0	France
+248	1	Switzerland
+249	0	France
+249	1	France
+249	2	France
+249	3	France
+249	4	France
+250	0	France
+250	1	France
+251	4	France
+251	3	France
+251	2	France
+251	1	France
+251	0	France
+252	0	France
+252	1	France
+253	0	France
+253	1	France
+254	0	France
+254	1	Iran
+254	2	France
+255	0	France
+255	1	France
+255	2	France
+256	1	Tunisia
+256	2	France
+256	0	Tunisia
+257	0	France
+257	1	France
+257	2	France
+257	3	France
+258	0	France
+258	1	France
+258	2	France
+259	0	France
+259	1	France
+259	2	France
+260	2	France
+260	0	France
+260	1	France
+260	3	France
+261	4	France
+261	3	Israel
+261	5	Israel
+261	1	France
+261	0	France
+261	2	Israel
+262	2	France
+262	1	France
+262	0	France
+263	0	France
+263	1	France
+263	2	France
+263	3	France
+264	0	France
+264	1	Germany
+264	2	France
+265	0	France
+265	1	France
+266	0	United Kingdom
+266	1	France
+266	2	Germany
+267	0	France
+267	1	France
+268	2	France
+268	1	France
+268	0	Austria
+269	0	France
+269	1	France
+269	2	France
+269	3	France
+270	0	France
+270	1	France
+270	2	France
+271	0	France
+271	1	France
+271	2	Spain
+271	3	France
+272	0	France
+272	1	France
+272	2	France
+273	2	France
+273	1	Russian Federation
+273	0	France
+274	0	France
+274	1	France
+274	2	France
+275	0	France
+275	1	France
+275	2	Tunisia
+276	2	France
+276	1	United Kingdom
+276	0	United Kingdom
+277	0	France
+277	1	China
+277	2	Egypt
+277	3	France
+277	4	France
+277	5	France
+278	4	France
+278	3	France
+278	0	France
+278	1	France
+278	2	France
+279	0	France
+279	1	France
+279	2	France
+279	3	Japan
+280	0	France
+280	1	France
+280	2	France
+281	0	France
+281	1	France
+281	2	France
+282	3	France
+282	2	France
+282	0	France
+282	1	France
+283	0	France
+283	1	France
+283	2	Spain
+284	0	France
+284	1	Netherlands
+284	2	Netherlands
+284	3	France
+284	4	Spain
+284	5	France
+285	6	France
+285	5	France
+285	3	France
+285	4	France
+285	1	France
+285	0	France
+285	2	France
+286	0	France
+286	1	France
+286	2	France
+286	3	Germany
+286	4	France
+287	5	France
+287	0	France
+287	1	France
+287	2	France
+287	3	France
+287	4	France
+288	3	United Kingdom
+288	2	United Kingdom
+288	0	United Kingdom
+288	1	France
+289	0	China
+289	1	Denmark
+289	2	China
+289	3	France
+289	4	Italy
+290	0	Tunisia
+290	1	France
+290	2	Tunisia
+291	3	France
+291	0	China
+291	1	Denmark
+291	2	China
+291	4	Italy
+292	1	France
+292	0	Belgium
+293	0	Spain
+293	1	United Kingdom
+293	2	Spain
+293	3	France
+294	0	Spain
+294	1	Spain
+294	2	Switzerland
+294	3	Greece
+294	4	France
+295	3	France
+295	2	France
+295	4	France
+295	0	France
+295	1	France
+295	5	Canada
+296	3	France
+296	2	France
+296	0	Belgium
+296	1	Spain
+297	9	France
+297	7	Russian Federation
+297	6	Russian Federation
+297	5	Russian Federation
+297	8	Russian Federation
+297	3	Russian Federation
+297	2	France
+297	1	France
+297	0	France
+297	4	Russian Federation
+298	0	United States
+298	1	United States
+298	2	United States
+298	3	France
+299	5	France
+299	7	France
+299	6	France
+299	4	China
+299	1	France
+299	2	Australia
+299	0	Australia
+299	3	Australia
+300	0	Italy
+300	1	Italy
+300	2	United States
+300	3	France
+300	4	Italy
+301	6	France
+301	9	France
+301	8	France
+301	7	France
+301	4	China
+301	2	France
+301	3	France
+301	5	France
+301	1	France
+301	0	China
+302	0	Italy
+302	1	Italy
+302	2	Italy
+302	3	France
+303	4	Saudi Arabia
+303	3	China
+303	5	Australia
+303	1	Australia
+303	0	France
+303	2	South Korea
+304	6	Italy
+304	4	France
+304	3	Italy
+304	5	Italy
+304	1	France
+304	0	Switzerland
+304	2	Switzerland
+305	5	France
+305	0	Italy
+305	1	Italy
+305	2	Italy
+305	3	Italy
+305	4	France
+305	6	Italy
+306	1	Morocco
+306	5	Morocco
+306	4	France
+306	0	Morocco
+306	2	Morocco
+306	3	Morocco
+307	0	Russian Federation
+307	1	Russian Federation
+307	2	Russian Federation
+307	3	Russian Federation
+307	4	France
+307	5	Russian Federation
+307	6	Russian Federation
+307	7	Netherlands
+308	10	United Kingdom
+308	9	United Kingdom
+308	8	United Kingdom
+308	7	United Kingdom
+308	6	United Kingdom
+308	5	France
+308	4	United Kingdom
+308	3	United Kingdom
+308	2	United Kingdom
+308	1	United Kingdom
+308	0	United Kingdom
+309	0	United States
+309	1	United States
+309	2	United States
+309	3	United States
+309	4	United States
+309	5	France
+309	6	United States
+310	6	France
+310	7	Italy
+310	5	Germany
+310	4	Germany
+310	1	Italy
+310	2	Germany
+310	0	Italy
+310	3	Germany
+311	13	United States
+311	12	United States
+311	11	United States
+311	9	United States
+311	8	United States
+311	7	United States
+311	10	United States
+311	5	France
+311	4	United States
+311	3	France
+311	2	Belgium
+311	1	United States
+311	0	United States
+311	6	United Kingdom
+312	7	Germany
+312	6	Australia
+312	5	France
+312	4	Italy
+312	1	Germany
+312	2	Italy
+312	0	Germany
+312	8	Germany
+312	3	Italy
+312	9	Brazil
+313	4	United States
+313	3	France
+313	5	United States
+313	1	China
+313	0	China
+313	2	United States
+313	6	United States
