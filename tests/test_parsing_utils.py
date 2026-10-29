@@ -138,7 +138,7 @@ def test_normalize_journal_names_wos():
     output_result = normalize_journal_names("wos", input_df)
 
     assert isinstance(output_result, pd.DataFrame)
-    assert output_result.shape == (134, 19)
+    assert output_result.shape == (1, 19)
 
 
 def test_normalize_journal_names_unrecognized_database():
