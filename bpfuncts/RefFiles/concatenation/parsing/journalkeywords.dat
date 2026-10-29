@@ -1,0 +1,4199 @@
+Pub_id	Keyword
+0	bias voltage
+0	iii-v semiconductors
+0	power
+0	nitride surface
+0	n-doped
+0	inductively coupled plasma source
+0	inductively coupled plasma etching
+0	gases mixture
+0	fixed source
+0	etch rates
+0	dc bias
+0	x ray photoelectron spectroscopy
+0	n-polar
+0	semiconducting films
+0	surface chemistry
+0	chlorine compounds
+0	deposition
+0	etching
+0	flow of gases
+0	electromagnetic induction
+0	gas mixtures
+0	inductively coupled plasma
+0	luminescence
+0	photoelectrons
+0	gallium nitride
+1	organ-on-a-chip
+1	devices
+1	pancreatic islet
+1	perifusion bioreactor
+1	single-islet analyze
+1	automation
+1	cytology
+1	drug effect
+1	multicellular spheroid
+1	insulin release
+1	lab on a chip
+1	metabolism
+1	microfluidics
+1	pancreas islet
+1	automation
+1	glucose
+1	microfluidic platforms
+1	human
+1	micro pump
+1	glucose
+1	glucose-stimulated insulin secretions
+1	automation
+1	in-vitro models
+1	humans
+1	insulin
+1	insulin secretion
+1	islets of langerhans
+1	lab-on-a-chip devices
+1	microfluidics
+1	glucose
+1	insulin
+1	microfluidics
+1	physiology
+1	pumps
+1	insulin
+1	diabetes research
+1	global health
+1	spheroids, cellular
+2	state-dependent
+2	absorption
+2	article
+2	conductor
+2	controlled study
+2	ionization
+2	radiation scattering
+2	pharmaceutics
+2	polymerization
+2	simulation
+2	x ray diffraction
+2	x ray scattering
+2	polymer structure
+2	molecular dynamics
+2	polymer backbones
+2	ion
+2	mixed ionic-electronic conductors
+2	organics
+2	condensation
+2	ions
+2	state of charge
+2	counterion
+2	polymer
+2	x ray diffraction
+2	charge state
+2	counterions
+2	diverse applications
+2	ion condensation
+2	ion structures
+2	solvent
+3	electric transformers
+3	edge inference
+3	transformer
+3	semantic communication
+3	joint source/channel coding
+3	goal-oriented communication
+3	goal-oriented
+3	deep joint source channel coding
+3	token communication
+3	adaptive framework
+3	channel coding
+3	goal programming
+3	object detection
+3	coding architectures
+3	object recognition
+3	semantics
+3	stochastic systems
+3	object oriented programming
+4	spin properties
+4	iii-v semiconductors
+4	gallium nitride
+4	circular polarization
+4	waferbonding technology
+4	wafer bonding techniques
+4	tunable device
+4	spin-injection
+4	wafer bonding
+4	si substrates
+4	optoelectronics property
+4	gan based
+4	color-tunable
+4	spin polarization
+4	silicon wafers
+4	light emitting diodes
+4	electroluminescence
+4	dichroism
+4	spin light emitting diode
+5	micro particles
+5	microdisks
+5	particle motions
+5	mechanical stimulation
+5	viscoelastics
+5	vortex flow
+5	two dimensional model
+5	magnetic-field
+5	magnetic bubbles
+5	complex environments
+5	cellulars
+5	viscoelasticity
+5	magnetic fields
+5	magnetic vortices
+5	elasticity
+5	biological systems
+6	solid state reactions
+6	system evolution
+6	surface preparation
+6	rich phase
+6	remote plasmas
+6	process-based
+6	physical process
+6	native oxides
+6	ge-content
+6	binary alloys
+6	chemical process
+6	substrates
+6	silicon compounds
+6	silicon
+6	nickel
+6	morphology
+6	germanium compounds
+6	direct plasma
+7	direct wafer bonding
+7	on-product
+7	overlay
+7	device wafers
+7	wafer to wafer bonding
+7	wafer-to-wafer variation
+7	wafer bonding
+7	power delivery network
+7	center pin
+7	edge
+7	silicon wafers
+7	backside power delivery network
+7	bonding
+7	chucks
+7	electric power systems
+7	chip scale packages
+7	field effect transistors
+7	logic devices
+7	silicon on insulator technology
+7	electron beam lithography
+8	photodetectors
+8	matrix
+8	pixel areas
+8	organics
+8	multifunctional displays
+8	microled
+8	interactive display
+8	organic photodetector
+8	devices under tests
+8	biosensing
+8	light sources
+8	electronic equipment testing
+8	design for testability
+8	adaptive optics
+8	embedded sensors
+9	wurtzite
+9	zinc blende phasis
+9	ab initio calculation
+9	article
+9	cation exchange
+9	controlled study
+9	cubic crystal
+9	hyperbaric pressure
+9	luminescence
+9	light emitting diode
+9	phase transition
+9	optical properties
+9	pressure
+9	temperature
+9	nanorods
+9	spherical morphologies
+9	infrared radiation
+9	pressure-induced phase transition
+9	light emitting diodes
+9	mercury telluride
+9	metastables
+9	electroluminescence
+9	infrared devices
+9	infrared radiation
+9	optical lattices
+9	tellurium compounds
+9	topology
+9	zinc
+9	mercury compounds
+9	nanocrystal
+9	nanorod
+9	zinc sulfide
+9	cation exchanges
+9	dirac 3d semimetal
+9	infrared light emitting diodes
+9	infrared light-emitting diodes
+9	mercury
+10	metastables
+10	process-based
+10	property
+10	bonding
+10	wide band-gap material
+10	ion implantation
+10	layer transfer process
+10	smart-cut
+10	large-format
+10	point defects
+10	bonding
+10	advanced technology
+10	substrates
+10	energy dissipation
+10	electron energy levels
+10	cost effectiveness
+10	chemical bonds
+10	budget control
+10	ions implantation
+11	event-related synchronizations
+11	features extraction
+11	filter length
+11	fir
+11	feature extraction
+11	high frequency hf
+11	highly accurate
+11	brain computer interface
+11	event-related desynchronization
+11	frequency-dependent
+11	electrocorticography
+11	decoding
+11	wavelet transforms
+11	bandpass filters
+11	brain
+11	continuous wavelet transform
+11	electrophysiology
+11	biomedical engineering
+11	image processing
+11	interfaces (computer)
+11	synchronization
+11	extraction
+12	multi-scales
+12	schottky barrier diodes
+12	photoluminescence
+12	voltage dispersion
+12	schottky diodes
+12	schottky barriers
+12	nitrogen compensation
+12	high breakdown voltage
+12	dislocation
+12	diamond schottky barrier diode
+12	barrier diodes
+12	power semiconductor diodes
+12	electric breakdown
+12	dispersions
+12	defects
+12	drift layer resistance
+13	pab
+13	economic and social effects
+13	contacts (fluid mechanics)
+13	stochastics
+13	stochastic effects
+13	peb temperature
+13	mean values
+13	peb
+13	immersion lithography
+13	duv lithography
+13	contact
+13	stochastic systems
+13	photoresists
+13	nanotechnology
+13	local variability
+14	economic and social effects
+14	waveforms
+14	semantic communication
+14	rf transceivers
+14	paradigm shifts
+14	orthogonal frequency-division multiplexing
+14	modulation schemes
+14	goal-oriented communication
+14	bit level
+14	co-designs
+14	waveform analysis
+14	systems analysis
+14	software design
+14	semantics
+14	regulatory compliance
+14	radio transceivers
+14	quantization (signal)
+14	orthogonal frequency division multiplexing
+14	computer hardware
+14	6g
+15	article
+15	bandwidth
+15	controlled study
+15	grating
+15	silicon photonics
+15	photonics
+15	simulation
+15	bandwidth
+15	wavelength division
+15	microtechnology
+15	vertical coupling
+15	silicon on insulator technology
+15	photonic chips
+15	silicon photonics
+15	photonic devices
+15	silicon
+15	architecture-based
+15	computer architecture
+15	conventional grating
+15	grating couplers
+15	limited bandwidth
+15	metalens
+15	chip coupling
+16	unknown
+17	anisotropy
+17	laser-annealing
+17	surface oxide
+17	surface nanostructure
+17	si surfaces
+17	molten region
+17	melting threshold
+17	local molten region
+17	exposed to
+17	silicon surfaces
+17	surface measurement
+17	silicon compounds
+17	phase interfaces
+17	nanostructures
+17	monocrystalline silicon
+17	metal melting
+17	budget control
+17	annealing
+17	contact formation
+18	inasp/inp
+18	inp qds
+18	on-axis
+18	quantum dot lasers
+18	quantum-dot lasers
+18	ridge-waveguide lasers
+18	silicon photonics
+18	qd lasers
+18	inas/inp
+18	cmos compatible
+18	silicon photonics
+18	silicon
+18	semiconductor quantum dots
+18	photonic devices
+18	indium phosphide
+18	indium arsenide
+18	iii-v semiconductors
+18	electrically injected
+19	injection locked
+19	ultra-fast
+19	phase detection
+19	signal detection
+19	low power
+19	high sensitivity
+19	chip based
+19	frequency generation
+19	fast scan
+19	coherent frequency
+19	paramagnetic resonance
+19	locks (fasteners)
+19	frequency sensing
+20	ground-plane ground-plane
+20	mesa-isolated
+20	multi-gate soi mosfet
+20	random telegraph noise
+20	source follower source follower
+20	soi-mosfets
+20	cmos image sensor cmos image sensor
+20	source followers
+20	cmos integrated circuits
+20	random telegraph noise random telegraph noise
+20	cmos image sensor
+20	ground planes
+20	strain measurement
+20	time domain analysis
+20	computer aided design
+20	drain current
+20	image sensors
+20	mos devices
+20	carrier telegraph
+20	silicon on insulator technology
+20	silicon wafers
+20	solid-state sensors
+20	mosfet devices
+21	electron microscopy images
+21	wafer bonding
+21	twist angles
+21	nanometrics
+21	nano-structuring
+21	images processing
+21	image calculations
+21	hydrophobic bonding
+21	high resolution electron microscopy moire
+21	high resolution
+21	dislocation networks
+21	edge dislocations
+21	microstructure
+21	microelectronics
+21	interfaces (computer)
+21	hydrophobicity
+21	high resolution transmission electron microscopy
+21	grain boundaries
+21	geometry
+21	bonding
+21	atoms
+21	silicon wafers
+22	semiconductor quantum dots
+22	cointegration
+22	fabrication process
+22	industrial fabrication
+22	industrialisation
+22	spin qubit
+22	quantum circuit
+22	quantum computing
+22	quantum dot arrays
+22	classical-quantum
+22	large-scales
+22	three dimensional integrated circuits
+22	qubits
+22	silicon on insulator technology
+22	silicon wafers
+22	computer aided design
+22	electronics packaging
+22	finite difference method
+22	carbon quantum dots
+22	logic gates
+22	microelectronics
+22	mosfet devices
+22	quantum optics
+22	integrated circuit design
+23	integrated photonics
+23	supercontinuum sources
+23	super continuum
+23	silicon photonics
+23	pulsed laser sources
+23	optical-
+23	kerr effects
+23	imaging spectroscopy
+23	silicon photonics
+23	fully integrated
+23	optical communication
+23	optical kerr effect
+23	photonic devices
+23	high power
+23	photonic integration technology
+23	pulsed lasers
+23	supercontinuum generation
+23	photonic integrated circuits
+24	energy  savings
+24	v2x
+24	power
+24	micro-mobility
+24	localization services
+24	localisation
+24	knn
+24	energy-savings
+24	intelligent systems
+24	dynamic environments
+24	traffic control
+24	power management
+24	nearest neighbor search
+24	machine learning
+24	learning systems
+24	learning algorithms
+24	energy efficiency
+24	electric power measurement
+24	accuracy
+25	unknown
+26	data-rate
+26	low propagation loss
+26	photonic circuits
+26	c-bands
+26	thermal
+26	silicon nitride
+26	silicon nitride waveguides
+26	building blockes
+26	low-loss
+26	1550 nm
+26	silicon photonics
+26	refractive index
+26	beol integration
+26	optical waveguides
+26	low power electronics
+26	integration
+26	green computing
+27	insulin release
+27	insulin dependent diabetes mellitus
+27	inflammation
+27	human cell
+27	human
+27	glycemic control
+27	glucose blood level
+27	enzyme linked immunosorbent assay
+27	flow cytometry
+27	fasting blood glucose level
+27	low level laser therapy
+27	energy metabolism
+27	diabetes mellitus
+27	controlled study
+27	confocal microscopy
+27	gene expression
+27	mitochondrial membrane potential
+27	oxygen consumption
+27	mouse
+27	radiation response
+27	procedures
+27	physiological stress
+27	pancreas islet beta cell
+27	metabolism
+27	drug effect
+27	cell line
+27	mitochondrial respiration
+27	animal
+27	rat
+27	post hoc analysis
+27	physiological stress
+27	pancreas islet beta cell
+27	pancreas islet
+27	clinical article
+27	nonhuman
+27	temperature
+27	cell viability
+27	male
+27	cell culture
+27	artificial beta cell
+27	antimycin a1
+27	stress, physiological
+27	rats
+27	mice
+27	membrane potential, mitochondrial
+27	male
+27	cytochrome c oxidase
+27	low-level light therapy
+27	insulin-secreting cells
+27	insulin
+27	cytokines
+27	cell survival
+27	cell line
+27	animals
+27	cell survival
+27	islets of langerhans
+27	cytokine
+27	carbonyl cyanide chlorophenylhydrazone
+27	adult
+27	animal tissue
+27	animal model
+27	animal experiment
+27	animal cell
+27	analysis of variance
+27	gamma interferon
+27	tumor necrosis factor
+27	streptomycin
+27	reactive oxygen metabolite
+27	penicillin g
+27	mitosox red
+27	mercaptoethanol
+27	interleukin 1beta
+27	interferon
+27	insulin
+27	glucose
+27	article
+28	spin qubit
+28	tight-binding calculations
+28	landforms
+28	valley splitting
+28	si/sige heterostructures
+28	two bands
+28	p-model
+28	alloy disorder
+28	dipole matrix elements
+28	atomistics
+28	qubits
+28	phonons
+28	heterojunctions
+28	low-costs
+29	unified framework
+29	article
+29	back propagation
+29	human
+29	noninvasive brain-computer interface
+29	nerve cell network
+29	signal processing
+29	velocity
+29	backpropagation
+29	machine learning
+29	processing machines
+29	symmetric positive definite matrices
+29	neural network learning
+29	neural-networks
+29	matrix algebra
+29	neural networks
+29	signal processing
+29	convergence of numerical methods
+29	matrix
+29	matrix derivative
+29	matrix functions
+29	modern signal processing
+29	machine-learning
+30	metal-gate
+30	reliability
+30	trapping dynamics
+30	time-dependent dielectric breakdown
+30	stress frequency
+30	modeling approach
+30	model-based opc
+30	frequency-dependent
+30	dielectric breakdown model
+30	cmos
+30	gates (transistor)
+30	gate dielectrics
+30	electric breakdown
+30	dynamics
+30	dielectric materials
+30	cmos integrated circuits
+31	metal-gate
+31	plasma etching process
+31	process tailoring
+31	sidewall morphology
+31	plasma etching
+31	microstructure
+31	metal gate stack
+31	polysilicon
+31	soi cmos
+31	gate stacks
+31	high-k metal gate
+31	fd-soi
+31	gate profile
+31	finite difference method
+31	high resolution transmission electron microscopy
+31	logic gates
+31	morphology
+31	cmos integrated circuits
+31	nanostructures
+31	polycrystalline materials
+31	titanium compounds
+31	nanostructured materials
+32	industrial control system
+32	industrial research
+32	operational technologies
+32	mitre att&ck
+32	intrusion-detection
+32	intrusion response
+32	intrusion recovery
+32	intrusion detection systems
+32	intrusion detection system
+32	industrial control systems
+32	hardware in the loops
+32	control systems
+32	open systems
+32	network security
+32	intrusion detection
+32	intelligent control
+32	integrated circuits
+32	industrial management
+32	engineering education
+32	controllers
+32	computer system recovery
+32	programmable logic controllers
+33	characterization
+33	lithium niobate
+33	piezoelectric converter
+33	piezoelectric resonators
+33	iii-v semiconductors
+33	power-electronics
+33	semiconductor technology
+33	temperature characteristic
+33	'current
+33	power densities
+33	switching frequency
+33	wide band gap semiconductors
+33	gallium nitride
+33	semiconductor device manufacture
+33	resonators
+33	praseodymium compounds
+33	power electronics
+33	piezoelectricity
+33	piezoelectric devices
+33	niobium compounds
+33	lithium
+33	semiconductor devices
+33	energy conversion
+34	rsa
+34	side-channel attacks
+34	pre-processing
+34	unsupervised deep learning
+34	side channel attack
+34	non-profiling attack
+34	single trace attack
+34	horizontal collision side-channel attack
+34	collision attack
+34	correlation analysis
+34	unsupervised learning
+34	trace analysis
+34	network security
+34	deep learning
+34	correlation methods
+34	exponentiations
+35	quantum-wells
+35	strong-coupling
+35	tera hertz
+35	two-dimensional
+35	article
+35	controlled study
+35	cyclotron
+35	nonlinear optics
+35	fermion
+35	intravenous drug administration
+35	laser
+35	luminescence
+35	photons
+35	pulsed electrical injection
+35	diagnosis
+35	polaritons
+35	electromagnetic wave polarization
+35	optical cavities
+35	dirac fermions
+35	cavity mode
+35	terahertz spectroscopy
+35	tellurium compounds
+35	semiconductor quantum wells
+35	polariton
+35	phonons
+35	particle optics
+35	mercury compounds
+35	lasers
+35	electroluminescence
+35	cyclotrons
+35	out of equilibrium
+36	optical and thermal properties
+36	optomechanical
+36	multi-physics
+36	thermal
+36	thermo-optical effects
+36	refractive index
+36	micron scale
+36	property
+36	fluid-structure interaction
+36	at rests
+36	thermal modeling
+36	thermal conductivity
+36	optomechanics
+36	fluids
+36	microdisk resonators
+37	charging systems
+37	dc chargers
+37	dc-dc charger
+37	fast charging
+37	silicon carbide mosfets
+37	performances evaluation
+37	charging infrastructures
+37	topology
+37	performance
+37	voltage regulators
+37	ac-dc charger
+37	charging stations
+37	silicon carbide
+37	mosfet devices
+37	fast charging (batteries)
+37	electric vehicles
+37	electric power system control
+37	electric machine control
+37	electric inverters
+37	dc-dc converters
+37	vehicle performance
+38	mosfets
+38	p-mosfets
+38	partially depleted
+38	fully depleted
+38	soi
+38	tcad
+38	semiconductor doping
+38	pmosfet
+38	floating body effect
+38	carrier lifetime
+38	drain bias
+38	transient analysis
+38	silicon on insulator technology
+38	silicon
+38	power quality
+38	mosfet devices
+38	mos devices
+38	electron beam lithography
+38	floating bodies
+39	edge computing
+39	intelligent transportation systems
+39	load-balancing
+39	memory algorithms
+39	resource allocation
+39	software-defined vehicular network
+39	traffic management
+39	decentralized environmental notification message
+39	short term memory
+39	decentralised
+39	vehicular networks
+39	traffic congestion
+39	vehicles
+39	decision making
+39	edge computing
+39	forecasting
+39	data flow analysis
+39	intelligent vehicle highway systems
+39	long short-term memory
+39	motor transportation
+39	quality of service
+39	highway traffic control
+40	low-costs
+40	quantum cascade lasers
+40	region-based
+40	quantum cascades
+40	point of care
+40	photonics devices
+40	photoacoustic detection
+40	midinfrared
+40	mid-infrared regions
+40	cascade lasers
+40	wearable computers
+40	biomarkers
+40	photonics
+40	photonic devices
+40	medical applications
+40	infrared spectroscopy
+40	infrared devices
+40	health care
+40	environmental technology
+40	costs
+40	benefit and challenges
+41	reliability
+41	mos selector
+41	oxide-based resistive random access memory
+41	memory bits
+41	resistive memory (reram)
+41	scalings
+41	cryogenics
+41	random access memory
+41	cryogenic temperatures
+41	static random access storage
+41	% reductions
+41	hafnium oxides
+41	mosfet devices
+41	nonvolatile storage
+41	bit cell
+41	rhenium compounds
+41	rram
+41	resistors
+42	iii-v semiconductors
+42	double quantum dots
+42	spin qubit
+42	quantum information processing
+42	quantum electrodynamics
+42	photon qubits
+42	microwave photon
+42	hole spin
+42	electric-dipole moment
+42	spin-orbit interaction
+42	coherence properties
+42	semiconductor quantum dots
+42	qubits
+42	quantum optics
+42	quantum entanglement
+42	niobium compounds
+42	microwave resonators
+42	electrodynamics
+42	electric dipole moments
+42	timing circuits
+43	side-channel attacks
+43	vector oblivious linear evaluation in the head
+43	syndrome decoding in the head
+43	syndrome decoding
+43	soft analytical side-channel attack
+43	side channel attack
+43	post-quantum cryptography
+43	belief propagation
+43	non-supervised attack
+43	faest
+43	quantum cryptography
+43	network security
+43	electronic document identification systems
+43	authentication
+43	post quantum cryptography
+44	absorption edges
+44	anomalous scattering
+44	diffraction intensity
+44	organics
+44	resonant diffraction
+44	selenophene
+44	π-π- stacking
+44	sulfur k-edge
+44	x- ray diffractions
+44	selenium
+44	chemical structure
+44	chemistry
+44	x ray diffraction
+44	selenophenes
+44	polymer
+44	conjugated polymers
+44	thiophene
+44	molecular structure
+44	polymers
+44	x-ray diffraction
+44	crystalline materials
+44	macromolecules
+44	naphthalene
+44	selenium
+44	selenium compounds
+44	semiconducting selenium
+44	semiconductor devices
+44	sulfur
+44	thin films
+44	organic semiconductor materials
+44	x ray diffraction
+45	passive structures
+45	coplanar waveguides
+45	substrate loss
+45	si-technology
+45	si substrates
+45	powerloss
+45	power-added-efficiency
+45	power
+45	performance
+45	coplanar waveguide lines
+45	wide band gap semiconductors
+45	active devices
+45	efficiency
+45	electric losses
+45	heterojunction bipolar transistors
+45	chip scale packages
+45	semiconducting silicon
+45	silicon compounds
+45	substrates
+45	power amplifiers
+46	breathing
+46	polycrystalline germanium
+46	time-resolved optical spectroscopy
+46	ultra-fast
+46	article
+46	benchmarking
+46	controlled study
+46	phonon
+46	phase change memory
+46	longitudinal study
+46	optics
+46	photonics
+46	thickness
+46	velocity
+46	optical probing
+46	human
+46	nanoscale thin films
+46	polycrystalline materials
+46	multi-functional materials
+46	nano scale
+46	acoustic wave velocity
+46	acoustic waves
+46	acoustics
+46	nonvolatile storage
+46	phonons
+46	selenium compounds
+46	germanium compounds
+46	thermoelectricity
+46	thin films
+46	germanium
+46	acoustic dynamics
+46	american chemical society
+46	germanium telluride
+46	tellurium compounds
+47	integrated photonics
+47	thin films
+47	thin-films
+47	low-loss
+47	low propagation loss
+47	lithium niobate
+47	insulator wafer
+47	lithium niobate thin films
+47	acousto-optics
+47	6 inch wafers
+47	surface roughness
+47	nonlinear optics
+47	niobium compounds
+47	lithium
+47	electro-optics
+48	reliability
+48	property
+48	phase-change memory technologies
+48	phase-change memory
+48	phase change
+48	performance and reliabilities
+48	performance
+48	crystalline phasis
+48	chalcogenide alloy
+48	amorphous phasis
+48	phase change memory
+48	phase change materials
+48	crystalline materials
+48	chromium compounds
+48	amorphous materials
+48	amorphous-to-crystalline transition
+49	photoacid generators
+49	semiconductor materials
+49	semiconductor device manufacture
+49	semiconductor manufacturing
+49	semiconductor industry
+49	polyfluoroalkyl substances
+49	non-polyfluoroalkyl substance
+49	photoresists
+49	immersion
+49	barrier layers
+49	arf immersions
+49	193nm
+49	nanostructured materials
+49	non-fluorine
+49	fluorine compounds
+49	fluorine
+50	controlled study
+50	conductor
+50	conductance
+50	atomic layer deposition
+50	article
+50	lithium phosphorus oxynitride
+50	structural effect
+50	solid-state electrolyte
+50	electric potential
+50	li +
+50	thin-films
+50	electrode
+50	ionization
+50	fourier transform infrared spectroscopy
+50	ion transport
+50	electrolyte thin film
+50	pharmaceutics
+50	physical vapor deposition
+50	secondary ion mass spectrometry
+50	solid state
+50	thickness
+50	water
+50	x ray photoemission spectroscopy
+50	atomic layer deposition
+50	x ray photoelectron spectroscopy
+50	fourier transform infrared spectrometer
+50	electrochemical effects
+50	divalents
+50	lithium compounds
+50	aluminum coatings
+50	aluminum oxide
+50	amorphous films
+50	atoms
+50	data storage equipment
+50	electrochemical electrodes
+50	film growth
+50	ionic conductivity
+50	lithium alloys
+50	bridging oxygen
+50	nitrogen
+50	oxide films
+50	physical vapor deposition
+50	oxygen
+50	lithium
+50	solid electrolytes
+50	solid state devices
+50	thin films
+50	aluminum
+50	aluminum oxide
+50	carbon
+50	electrolyte
+50	semiconductor doping
+50	nitrogen
+50	oxygen
+50	phosphorus
+50	atomic-layer deposition
+51	low temperature growth
+51	low-temperature epitaxy
+51	ge-content
+51	precursor flow
+51	gaseous mixture
+51	si/sige
+51	silicon wafers
+51	temperature
+51	si and sige growth kinetics
+51	field-effect transistor
+51	film growth
+51	chamber pressure
+51	chlorine compounds
+51	germanium
+51	germanium compounds
+51	growth kinetics
+51	disilanes
+51	partial pressure
+51	screening
+51	silicon compounds
+51	growth rate
+52	neural-networks
+52	network layers
+52	ultra-low power
+52	replay method
+52	quantisation
+52	performance
+52	incremental learning
+52	experience replay
+52	continual learning
+52	class-incremental learning
+52	binary neural networks
+52	semi-supervised learning
+52	neural networks
+52	learning systems
+52	computer aided instruction
+53	material loss
+53	optical-
+53	payne and lacey modeling
+53	pecvd sin waveguide
+53	sin waveguides
+53	silicon photonics
+53	silicon photonics
+53	low-loss
+53	telecom wavelengths
+53	roughness parameters
+53	correlation lengths
+53	electric losses
+53	surface roughness
+53	surface scattering
+53	budget control
+53	materials properties
+53	nanoclusters
+53	annealing
+53	optical losses
+53	optical waveguides
+53	photonic devices
+53	silicon oxides
+53	nitrogen compounds
+54	poly-methyl methacrylates
+54	quartz crystal microbalances
+54	zno
+54	vapour-phase
+54	vapor phasis
+54	vapor phase
+54	trimethylaluminum
+54	poly(methyl methacrylate)
+54	x ray absorption
+54	diethylzinc
+54	carbonyl groups
+54	infrared reflection absorption spectroscopy
+54	transmission electron microscopy
+54	infiltration
+54	hybrid materials
+54	density functional theory
+54	alumina
+55	gan power devices
+55	localised
+55	localized epitaxy
+55	p-n diode
+55	gallium nitride
+55	pseudo-vertical p-n-diode
+55	selective area growth
+55	avalanche capability
+55	iii-v semiconductors
+55	pn-diode
+55	avalanche breakdown
+55	silicon substrates
+55	stresses
+55	avalanche diodes
+55	substrates
+55	epitaxial growth
+55	failure (mechanical)
+55	impact ionization
+55	electric fields
+55	power semiconductor diodes
+55	semiconductor junctions
+55	silicon
+55	silicon compounds
+55	outages
+56	thermodynamic stability
+56	phase change materials
+56	thermal
+56	phase change
+56	pcram
+56	non-volatile memory
+56	highest temperature
+56	ga-sb
+56	data-retention
+56	amorphous phasis
+56	carbon doping
+56	phase change memory
+56	mechanical stability
+56	high temperature applications
+56	gallium alloys
+56	crystallization kinetics
+56	antimony alloys
+56	activation energy
+56	crystallization mechanisms
+57	reliability
+57	inain/gan
+57	mis-hemt
+57	edx analysis
+57	thermal
+57	thermal storage
+57	thermal storage test
+57	storage tests
+57	cmos compatible
+57	gan-on-si
+57	silicon compounds
+57	activation energy
+57	degradation
+57	failure (mechanical)
+57	au free
+57	high electron mobility transistors
+57	iii-v semiconductors
+57	indium compounds
+57	gold compounds
+58	line-of-responses
+58	quantum entanglement
+58	positron emission tomography
+58	compton scattering
+58	scattered photons
+58	receiver operating characteristic curves
+58	positron emission
+58	pet imaging
+58	emission tomography
+58	lines of response
+58	compton
+58	annihilation photons
+58	quantum efficiency
+58	photons
+58	medical imaging
+58	kinematics
+58	electrons
+58	discriminators
+58	binary alloys
+58	compton kinematics
+59	heart rate
+59	human
+59	machine learning
+59	male
+59	middle aged
+59	pathophysiology
+59	psychology
+59	pilot study
+59	wearable electronic device
+59	prodromal symptom
+59	recurrent disease
+59	female
+59	physiology
+59	diagnosis
+59	heart rate
+59	adult
+59	adult
+59	bipolar disorder
+59	female
+59	humans
+59	machine learning
+59	bipolar disorder
+59	middle aged
+59	pilot projects
+59	prodromal symptoms
+59	recurrence
+59	wearable electronic devices
+59	male
+60	density-functional theory calculations
+60	thermoelectric properties
+60	thermoelectric
+60	property
+60	organics
+60	organic thermoelectric
+60	electrical conductivity
+60	comonomers
+60	electric conductivity
+60	backbone curvature
+60	thermoelectricity
+60	thermoelectric equipment
+60	morphology
+60	density functional theory
+60	conformations
+60	chlorine compounds
+60	benzodifuranone
+61	gate oxide
+61	hot carrier injection
+61	interface trap generation
+61	interface traps
+61	takedum model
+61	nitrided sio2gate oxide
+61	silicon on insulator
+61	channel dopings
+61	impact ionization
+61	nitrided
+61	threshold voltage
+61	sio 2
+61	silicon on insulator technology
+61	aluminum nitride
+61	computer aided design
+61	silicon oxides
+61	electric field effects
+61	gate dielectrics
+61	drain current
+61	hot carriers
+61	mos devices
+61	semiconductor doping
+61	silicon nitride
+61	gates (transistor)
+62	learning systems
+62	system calls
+62	state-of-the-art methods
+62	machine-learning
+62	language processing
+62	intrusion detection system
+62	intrusion detection systems
+62	host-based intrusion detection system
+62	empirical evaluations
+62	detection performance
+62	intrusion detection
+62	artificial intelligence
+62	intrusion detection approaches
+63	mitochondrial respiration
+63	nonhuman
+63	pancreas islet
+63	pancreas islet beta cell
+63	physiological stress
+63	reperfusion
+63	cohort analysis
+63	b lymphocyte
+63	human
+63	hypoxia
+63	physiological stress
+63	reperfusion
+63	min6 cell line
+63	article
+63	metabolic stress
+63	signal transduction
+63	insulin release
+63	cytochrome c oxidase
+63	glucose
+63	article
+63	cell activity
+63	cell function
+63	cell hypoxia
+63	low level laser therapy
+63	reactive oxygen metabolite
+63	cell viability
+63	clinical effectiveness
+63	diabetes mellitus
+63	disorders of mitochondrial functions
+63	enzyme activity
+63	hypoxia
+63	cell stress
+64	angle-resolved x-ray photoelectron spectroscopy
+64	arsenic diffusion
+64	chemical compositions
+64	gaas
+64	precise locations
+64	inp
+64	major elements
+64	time of flight secondary ion mass spectrometry
+64	+gaassb
+64	hard x-ray photoelectron spectroscopy
+64	x ray photoelectron spectroscopy
+64	photons
+64	semiconducting indium phosphide
+64	sulfur compounds
+64	antimony
+64	antimony compounds
+64	gallium alloys
+64	gallium compounds
+64	diffusion in solids
+64	iii-v semiconductors
+64	indium phosphide
+64	photoelectrons
+64	segregation (metallography)
+64	heterojunctions
+65	mid-infrared range
+65	broadband light sources
+65	effective approaches
+65	integrated waveguides
+65	midinfrared
+65	phase change materials
+65	photonic circuits
+65	super continuum
+65	supercontinuum sources
+65	tunable properties
+65	phase change
+65	sulfur compounds
+65	supercontinuum generation
+65	photonics
+65	silicon compounds
+65	antimony compounds
+65	dispersions
+65	hybrid materials
+65	infrared devices
+65	germanium compounds
+65	optical waveguides
+65	photonic devices
+65	photonic integrated circuits
+65	photonic integration technology
+65	light sources
+66	performance
+66	van der waals forces
+66	cmos compatible
+66	growth strategy
+66	large-scales
+66	poled ferroelectrics
+66	spintronics
+66	spintronics device
+66	thin-films
+66	ultra-low power
+66	van der waals epitaxy
+66	thin films
+66	spin orbits
+66	tellurium compounds
+66	semiconductor devices
+66	silicon wafers
+66	structural metals
+66	crystallography
+66	ferroelectric films
+66	ferroelectricity
+66	germanium compounds
+66	high resolution transmission electron microscopy
+66	ferroelectric devices
+66	molecular beam epitaxy
+66	molecular beams
+66	scanning probe microscopy
+66	selenium compounds
+66	semiconductor growth
+66	microelectronics
+67	design for manufacturing
+67	silicon photonics
+67	economic and social effects
+67	silicon photonics
+67	photonic circuits
+67	pattern fidelity
+67	optical proximity corrections
+67	manhattans
+67	edge placement errors
+67	curvilinear optical proximity correction
+67	metasurface
+67	photonic integration technology
+67	design for manufacturability
+67	contour optimization
+67	errors
+67	optical design
+67	design for testability
+67	photomasks
+67	photonic devices
+67	photonic integrated circuits
+67	optical waveguides
+68	phase change materials
+68	molecular dynamics
+68	property
+68	phase change
+68	non-volatile memory technology
+68	dynamics simulation
+68	bond orders
+68	amorphous phasis
+68	amorphous and crystalline phasis
+68	alloy structures
+68	ab initio molecular dynamics
+68	tellurium compounds
+68	phase change memory
+68	amorphous alloys
+68	alloying
+68	amorphous chalcogenide
+69	hot carrier degradation
+69	trapping effects
+69	trap dynamic
+69	map analysis
+69	low-k spacer
+69	hot carrier stress
+69	hcd
+69	low-k dielectric
+69	charge-trapping
+69	bulk traps
+69	solid-state sensors
+69	silicon compounds
+69	hot carriers
+69	failure analysis
+69	charge trapping
+69	degradation dynamics
+70	stochastic systems
+70	variational inequality problems
+70	variational inequalities
+70	social influence
+70	market model
+70	generalized nash equilibrium
+70	generalized fisher market
+70	extended model
+70	resources allocation
+70	competitive equilibrium
+70	variational techniques
+70	nash equilibrium
+70	learning systems
+70	learning algorithms
+70	commerce
+70	approximation theory
+70	approximation algorithms
+70	decentralized learning
+71	controlled study
+71	drug analysis
+71	fourier transform infrared spectrometer
+71	fourier transform infrared spectroscopy
+71	fourier transform infrared spectroscopy
+71	infrared radiation
+71	interferometer
+71	thermography
+71	laser
+71	nonhuman
+71	quantitative phase imaging
+71	thickness
+71	vibrational spectroscopy
+71	water absorption
+71	chemical composition
+71	interferometry
+71	article
+71	multispectral infrared
+71	reference technique
+71	transform infrared spectroscopy
+71	hydration
+71	infrared devices
+71	interferometry
+71	spectrum analysis
+71	microplastic
+71	water
+71	photoresists
+71	cascade lasers
+71	fourier transform infrared
+71	midinfrared
+71	phase imaging
+71	quantitative phase imaging
+71	quantum cascades
+71	aqueous media
+72	unknown
+73	microstrip antennas
+73	dielectric stack
+73	experimental characterization
+73	gas sensing
+73	mid-wave infrared
+73	short wave infrared
+73	design models
+73	simulation
+73	spectral selectivity
+73	tetraethyl orthosilicates
+73	amorphous silicon
+73	fourier transform infrared spectroscopy
+73	short-wave infrared
+73	silicon alloys
+73	error detection
+73	optoelectronic devices
+73	metamaterials
+73	metamaterial antennas
+73	infrared radiation
+73	finite element method
+73	dielectric materials
+73	copper alloys
+73	chemical sensors
+73	chemical detection
+73	antenna reflectors
+73	antenna arrays
+73	absorption spectroscopy
+73	reflection
+74	noise
+74	latent period
+74	decoding
+74	bicycle
+74	cassava
+74	article
+74	controlled study
+75	local control
+75	raman spectroscopy
+75	ultra-thin
+75	thin materials
+75	silicon germaniums (sige)
+75	raman amplification
+75	microelectronic applications
+75	mechanical strain
+75	mechanical compositions
+75	interference
+75	wave interference
+75	wsi circuits
+75	in-line metrology
+75	epitaxial growth
+75	microelectronic processing
+75	microelectronics
+75	germanium
+75	raman scattering
+75	semiconductor device manufacture
+75	silicon wafers
+75	nondestructive examination
+76	chemistry
+76	label free
+76	performance
+76	quartz crystal microbalance with dissipation monitoring
+76	environmental surveillance
+76	raw water
+76	comparative study
+76	procedures
+76	escherichia coli o157
+76	immunology
+76	isolation and purification
+76	quartz crystal microbalance
+76	surface property
+76	quartz
+76	e. coli
+76	escherichia coli
+76	comparative assessment
+76	reliable detection
+76	american chemical society
+76	biological complexity
+76	antibodies, bacterial
+76	antibodies, immobilized
+76	escherichia coli o157
+76	quartz crystal microbalance techniques
+76	surface properties
+76	antibodies
+76	antigens
+76	escherichia coli
+76	chemical detection
+76	escherichia coli
+76	quartz crystal microbalances
+76	strain
+76	viscoelasticity
+76	bacterium antibody
+76	biosensors
+76	immobilized antibody
+77	unknown
+78	unknown
+79	hard x-ray photoelectron spectroscopy
+79	hgcdte
+79	metal-semiconductor contacts
+79	metal: p
+79	transfer lines
+79	schottky-barrier heights
+79	time of flight secondary ion mass spectrometry
+79	transfer line model
+79	x ray photoelectron spectroscopy
+79	contact resistance
+79	schottky contacts
+79	semiconductor metal boundaries
+79	line models
+79	point contacts
+79	schottky barrier diodes
+79	cadmium alloys
+79	cadmium telluride
+79	fermi level
+79	focal plane arrays
+79	binary alloys
+79	interface states
+79	mercury amalgams
+79	mercury compounds
+79	metal analysis
+79	photoelectrons
+79	infrared detectors
+80	ge-rich gesbte
+80	thin films
+80	crystallization kinetics
+80	thin-films
+80	stringents
+80	phase-change memory
+80	phase change
+80	non-volatile memory technology
+80	material engineering
+80	doping strategies
+80	semiconductor doping
+80	amorphous phasis
+80	automotive applications
+80	amorphous films
+80	germanium
+80	metastable phases
+80	amorphous alloys
+80	phase change materials
+80	phase change memory
+80	thermodynamic stability
+80	nonvolatile storage
+81	mobile communications systems
+81	systems under development
+81	system deployment
+81	railroads
+81	safe communications
+81	railway
+81	radio channel modeling
+81	future railway mobile communication system
+81	radio broadcasting
+81	channel modelling
+81	5g
+81	scheduling algorithms
+81	railroad transportation
+81	radio
+81	mobile radio systems
+81	channel sounding
+82	probes
+82	v-dot
+82	switching speed
+82	switching characterization
+82	rogowski coil
+82	rogowski
+82	power devices
+82	power
+82	loss reduction
+82	contactless sensors
+82	cmti
+82	power transistors
+82	electric coils
+83	wireless communication system
+83	weakly non-linear
+83	iii-v semiconductors
+83	power intensity
+83	non-linear modelling
+83	multi channel
+83	millimeter-wave systems
+83	user demands
+83	intermodulations
+83	high power
+83	nonlinear simulations
+83	millimeter waves
+83	microwave amplifiers
+83	gallium nitride
+83	millimeter wave signals
+84	semiconductor materials
+84	electric fields
+84	silicon p-n junctions
+84	scanning transmission electron microscopy
+84	operando
+84	nanoscale device
+84	localised
+84	in situ biasing
+84	ebic
+84	electronics devices
+84	4d-stem
+84	transmission electron microscopy
+84	silicon
+84	semiconductor junctions
+84	scanning electron microscopy
+84	nanotechnology
+84	electronic properties
+84	electric field measurement
+84	charge carrier behaviors
+85	design support
+85	fd-soi
+85	hardware accelerators
+85	application specific integrated circuits
+85	post quantum
+85	post quantum cryptography
+85	security level
+85	ml-kem
+85	crystals-kyber
+85	asic technologies
+85	static random access storage
+85	quantum cryptography
+85	logic design
+85	integrated circuit design
+85	finite difference method
+85	computer aided design
+85	buffer storage
+85	compact hardware accelerators
+86	drug effect
+86	human
+86	lab on a chip
+86	metabolism
+86	procedures
+86	organoid
+86	pancreas islet
+86	drug delivery system
+86	mouse
+86	cytology
+86	vascularization
+86	animal
+86	hydrogel
+86	organoids
+86	mice
+86	lab-on-a-chip devices
+86	islets of langerhans
+86	hydrogels
+86	humans
+86	drug delivery systems
+86	animals
+86	chemistry
+87	ge/sige
+87	hole gas
+87	hole spin
+87	mechanical polishing
+87	quantum electronics
+87	spin qubit
+87	strained-ge
+87	virtual substrates
+87	ge layers
+87	si (001) substrate
+87	cross-hatch
+87	silicon
+87	solvents
+87	chemical mechanical polishing
+87	substrates
+87	germanium
+87	germanium compounds
+87	density of gases
+87	quantum chemistry
+87	quantum computers
+87	semiconductor quantum wells
+87	silicon compounds
+87	phase interfaces
+88	hardware security
+88	total ionizing dose
+88	single event effects
+88	power-off laser characterization
+88	power
+88	laser fault injections
+88	laser illumination
+88	bulk build-in current sensor
+88	built-in current sensors
+88	attack vector
+88	induced currents
+88	electric network analysis
+88	laser characterization
+89	erratum
+90	threshold voltage
+90	voltage scalings
+90	siliconon-insulator technology (soi)
+90	post-quantum cryptography
+90	post quantum cryptography
+90	learning parity with physical noise
+90	fully depleted silicon-on-insulator
+90	error generation
+90	backgate voltage
+90	approximate computing
+90	voltage scaling
+90	digital communication systems
+90	dynamic frequency scaling
+90	finite difference method
+90	cost effectiveness
+90	network security
+90	quantum cryptography
+90	sampling
+90	internet of things
+91	manufacturing technologies
+91	silicon compounds
+91	spin-orbit couplings
+91	spin qubit
+91	silicon quantum dots
+91	quantum processors
+91	optimal operation
+91	large spin
+91	nanocrystals
+91	germanium quantum dots
+91	charge noise
+91	spin orbit coupling
+91	qubits
+91	quantum optics
+91	electric fields
+91	hole spin
+92	active layer
+92	aln
+92	aln films
+92	bulk acoustic wave resonator
+92	filter-based
+92	sputtered films
+92	rf filters
+92	silicon-based
+92	aluminum nitride
+92	iii-v semiconductors
+92	textures
+92	nucleation layers
+92	substrates
+92	c-axis
+92	silicon
+92	acoustic waves
+92	chromium compounds
+92	crystallinity
+92	doping (additives)
+92	electrodes
+92	epitaxial growth
+92	sputtering
+92	heat treatment
+92	molybdenum
+92	molybdenum compounds
+92	nucleation
+92	films
+93	link drivers
+93	optical links
+93	set-up time
+93	routings
+93	optical-
+93	optical routers
+93	nearest-neighbor communication
+93	electro-optical
+93	global interconnects
+93	flexible-link
+93	routers
+93	photonics
+93	optical communication
+93	link capacities
+94	large models
+94	model adaptation
+94	low-rank adaptation
+94	lifespans
+94	learning paradigms
+94	risk assessment
+94	is-enabled
+94	distributed learning
+94	backdoors
+94	backdoor attack
+94	network security
+94	learning to rank
+94	fine tuning
+95	signal processing
+95	signal-processing
+95	sensing signals
+95	integrated sensing and communication use case
+95	integrated sensing and communication signal processing
+95	integrated sensing and communication foundation
+95	integrated sensing and communication architecture
+95	integrated sensing and communication hardware
+95	integrated sensing
+95	communication signals
+95	communication hardware
+95	communication architectures
+95	network security
+95	industrial research
+95	computer architecture
+95	integrated sensing and communication
+96	mid-infrared devices
+96	optical confinement
+96	optically active
+96	silicon-on-insulator process
+96	transfer
+96	thin films
+96	tin content
+96	tensile strain
+96	gesn alloys
+96	sn contents
+96	band-gap semiconductors
+96	thin-films
+96	tin alloys
+96	titanium nitride
+96	germanium
+96	grading
+96	high resolution transmission electron microscopy
+96	atomic force microscopy
+96	photoluminescence spectroscopy
+96	semiconductor quantum wells
+96	si-ge alloys
+96	tin
+96	infrared devices
+97	multi-spectral
+97	reflection
+97	support vector machines algorithms
+97	short wave infrared
+97	section analysis
+97	proof of concept
+97	multispectral imaging
+97	healthy tissues
+97	ex-vivo
+97	frozen sections
+97	tumors
+97	surgery
+97	statistical tests
+97	machine learning
+97	learning algorithms
+97	diagnosis
+97	head-and-neck squamous cell carcinoma
+98	silicon layer
+98	silicon on insulator technology
+98	ultra-thin
+98	tensile strained silicon
+98	strained silicon-on-insulator
+98	silicon on insulator wafers
+98	si1-xgex
+98	graded buffer
+98	fully depleted silicon-on-insulator cmos
+98	fully depleted silicon-on-insulator
+98	buried oxides
+98	silicon wafers
+98	silicon compounds
+98	high resolution transmission electron microscopy
+98	germanium compounds
+98	finite difference method
+99	unknown
+100	gallium nitride
+100	various substrates
+100	stresses analysis
+100	stress effects
+100	phonon mode
+100	n-doped
+100	micro-raman mapping
+100	micro raman spectroscopy
+100	linear relation
+100	substrates
+100	doping analysis
+100	raman spectroscopy
+100	phonons
+100	mapping
+100	iii-v semiconductors
+100	doping (additives)
+100	carrier concentration
+100	gan layers
+101	ion implantation
+101	hydrogen implantation
+101	ions implantation
+101	large-scales
+101	facture
+101	smart cut™
+101	smart-cut
+101	bonding
+101	post-fracture
+101	diamonds films
+101	microcracks
+101	bonding
+101	atomic force microscopy
+101	diamond films
+101	high resolution transmission electron microscopy
+101	hydrogen
+101	diamond layers
+101	single crystals
+101	substrates
+101	thin films
+101	hydrogen bonds
+102	grazing incidence small-angle x-ray scattering
+102	thin films
+102	thin films morphology
+102	shapley
+102	property
+102	microscopy images
+102	machine-learning
+102	learning frameworks
+102	interpretability
+102	atomic-force-microscopy
+102	block copolymer thin films
+102	prediction models
+102	morphology
+102	machine learning
+102	learning systems
+102	image processing
+102	grain size and shape
+102	convolutional neural networks
+102	block copolymers
+102	additives
+102	throughput
+103	electrocorticography
+103	female
+103	human
+103	imagination
+103	male
+103	quadriplegia
+103	movement (physiology)
+103	pathophysiology
+103	physiology
+103	procedures
+103	motor cortex
+103	brain computer interface
+103	adult
+103	adult
+103	brain
+103	brain
+103	electrocorticography
+103	female
+103	humans
+103	brain-computer interfaces
+103	male
+103	motor cortex
+103	movement
+103	quadriplegia
+103	imagination
+104	radiated energies
+104	computational electromagnetics
+104	whole-body
+104	uplink
+104	tx power
+104	radiated energy per bit transmitted
+104	power
+104	global exposure
+104	field strengths
+104	energy-per-bit
+104	mobile telecommunication systems
+104	green computing
+104	energy efficiency
+104	electromagnetic field effects
+104	long-term evolution
+105	avalanche photodiodes
+105	monte carlo methods
+105	photodiode gain
+105	performance
+105	multiplication gain
+105	monte carlo model
+105	monte carlo
+105	ionization probabilities
+105	hgcdte
+105	cadmium alloys
+105	excess noise factor
+105	energy
+105	mercury amalgams
+105	infrared devices
+105	impact ionization
+105	electron energy levels
+105	electric fields
+105	fast and accurate simulations
+106	next-generation networks
+106	or channels
+106	public network operators
+106	network coverage
+106	wireless coverage
+106	semantics
+106	ray-tracing technique
+106	key performance indicators
+106	energy utilization
+106	coverage map
+106	channel measurements
+106	wireless networks
+106	next generation networks
+106	green computing
+106	decision making
+106	data privacy
+106	goal-oriented
+107	sub-cellular
+107	devices
+107	subcellular imaging
+107	arabidopsis
+107	chemistry
+107	molecular imaging
+107	time of flight secondary ion mass spectrometry
+107	procedures
+107	secondary ion mass spectrometry
+107	ultrastructure
+107	secondary ion mass spectrometry
+107	sample preparation
+107	plant seed
+107	gas cluster ion beams
+107	mass-spectrometry imaging
+107	cryo-time-of-flight secondary ion mass spectrometry
+107	cryo-transfer
+107	molecular imaging
+107	seeds
+107	biological materials
+107	etching
+107	free flight
+107	ion beams
+107	spectrometry, mass, secondary ion
+107	molecular imaging
+107	tissue engineering
+107	analytes
+107	arabidopsis seeds
+107	arabidopsis
+107	ions
+108	astronomy
+108	experimental characterization
+108	tunables
+108	submillimetre astronomy
+108	submillimeter-wave detectors
+108	polarimetric imaging
+108	on-chip integration
+108	interferometer designs
+108	fabry-perot
+108	bragg mirrors
+108	fabry-perot spectrometer
+108	spectrometers
+108	submillimeter waves
+108	cryogenics
+108	data mining
+108	fabry-perot interferometers
+108	bragg cells
+108	mirrors
+108	optical data processing
+108	silicon
+108	spectral resolution
+108	millimeter waves
+109	effective magnetic anisotropy
+109	thermoanalysis
+109	voltage assisted
+109	switching probability
+109	switching performance
+109	switching behaviors
+109	magnetic tunnel junction
+109	joule heating effect
+109	co based
+109	optical multilayers
+109	tunnel junctions
+109	photonic devices
+109	optical switches
+109	multilayers
+109	magnetos
+109	magnetic polarity
+109	magnetic anisotropy
+109	bias voltage
+109	all-optical switching
+110	characterization protocol
+110	equivalent thickness
+110	scale method
+110	surface coverages
+110	mos 2
+110	wafer scale
+110	x-ray photoelectrons
+110	raman spectroscopy
+110	x ray photoelectron spectroscopy
+110	atomic-layer deposition
+110	transition metal dichalcogenides (tmd)
+110	wsi circuits
+110	2 layer
+110	atomic layer deposition
+110	sulfur compounds
+110	silicon wafers
+110	scanning electron microscopy
+110	photoelectrons
+110	morphology
+110	monolayers
+110	molybdenum compounds
+110	layered semiconductors
+110	high resolution transmission electron microscopy
+110	atomic force microscopy
+110	wavelength dispersive spectroscopy
+111	cellular compartments
+111	glioblastoma cells
+111	mechanical stimulation
+111	vibrational stress
+111	statics and dynamics
+111	stiffness
+111	cell lines
+111	mechanical stress
+111	cell behaviours
+111	microdisks
+111	vortex flow
+111	vibrations (mechanical)
+111	substrates
+111	stresses
+111	physiology
+111	cancer therapy
+111	cell death
+111	cell culture
+111	biomimetics
+112	emerging technologies
+112	energy
+112	geofencing
+112	vehicular adhoc networks (vanets)
+112	its-g5
+112	micro-mobility
+112	cooperative intelligent transportation system
+112	energy efficiency
+112	intelligent transportation systems
+112	advanced technology
+112	vehicle to vehicle communications
+112	vehicular ad hoc networks
+112	vehicles
+112	sustainable development
+112	motor transportation
+112	integration
+112	highway traffic control
+112	electronic data interchange
+112	data communication systems
+112	advanced traffic management systems
+112	5g
+113	incremental analog to digital converter
+113	delta-sigma
+113	learning models
+113	compter-aided design
+113	optimizers
+113	recurrent neural networks
+113	neural-networks
+113	auto encoders
+113	and filters
+113	degrees of freedom (mechanics)
+113	aided designs
+113	voltage regulators
+113	topology
+113	quantization (signal)
+113	network architecture
+113	modulators
+113	digital to analog conversion
+113	analog to digital converters
+114	human
+114	gait
+114	exoskeleton
+114	complex wavelet transform
+114	e-learning
+114	controlled study
+114	kernel method
+114	electrocorticography
+114	learning algorithm
+114	partial least squares regression
+114	multiclass classification
+114	paraplegia
+114	cervical spinal cord injury
+114	proprioceptive feedback
+114	quadriplegia
+114	recursive exponentially weighted n way partial least squares
+114	signal processing
+114	brain computer interface
+114	mental task
+114	article
+114	real- time
+114	interfaces (computer)
+114	biomedical signal processing
+114	brain
+114	classification (of information)
+114	decoding
+114	e-learning
+114	electrophysiology
+114	tetraplegic
+114	learning algorithms
+114	learning systems
+114	class imbalance
+114	electrocorticography
+114	interface system
+114	online learning
+114	paraplegic
+114	partial least square algorithms
+114	partial least-squares
+114	performance
+114	least squares approximations
+115	very low frequency
+115	very-low-frequency wireless power transfer
+115	power transfers
+115	electrodynamics
+115	wireless power
+115	oscillating modes
+115	energy transfer
+115	electrodynamic wireless power transfer
+115	dual modes
+115	signal receivers
+115	orbital transfer
+115	inductive power transmission
+115	nonlinear orbit-jump
+116	embedded-system
+116	hardware performance counters
+116	embedded device
+116	host intrusion detection system
+116	malware
+116	industrial control systems
+116	intrusion detection systems
+116	machine-learning
+116	embedded systems
+116	cyber security
+116	hpc
+116	anomaly detection
+116	intrusion detection
+116	network security
+116	anomaly detection
+116	computer circuits
+116	cybersecurity
+116	intelligent control
+116	control systems
+116	programmable logic controllers
+116	learning systems
+116	machine learning
+116	network intrusion
+116	internet of things
+117	article
+117	cross linking
+117	continuous glucose monitoring
+117	chemical reaction
+117	bioelectrocatalytic activity
+117	artificial interstitial fluid
+117	wearable biosensor
+117	electrochemicals
+117	interstitial fluids
+117	hydrogel membrane
+117	glucose dehydrogenase
+117	flavin-dependent
+117	electric conductivity
+117	continuous glucose monitoring
+117	bioelectrodes
+117	storage stability
+117	electrocatalysis
+117	methacrylation
+117	electrochemical oxygen  reduction  reaction
+117	medical problems
+117	electrochemical sensors
+117	procedures
+117	light
+117	isolation and purification
+117	human
+117	glucose blood level
+117	genetic procedures
+117	continuous glucose monitoring
+117	chemistry
+117	scanning electron microscopy
+117	photocrosslinking
+117	immobilized enzyme
+117	limit of detection
+117	interstitial fluid
+117	electrochemical analysis
+117	glucose
+117	operational stability
+117	cross linking reagent
+117	crosslinking
+117	catalyst activity
+117	biological fuel cells
+117	methacrylates
+117	light
+117	hydrogels
+117	humans
+117	dextran
+117	glucose 1-dehydrogenase
+117	flavin-adenine dinucleotide
+117	enzymes, immobilized
+117	dextrans
+117	flavine adenine nucleotide
+117	continuous glucose monitoring
+117	blood glucose
+117	biosensing techniques
+117	glucose
+117	glucose
+117	cross-linking reagents
+117	glucose sensors
+117	glucose oxidase
+117	unclassified drug
+117	quercetin
+117	polysaccharide
+117	methacrylic acid
+117	glucose dehydrogenase
+117	glucose
+117	flavin dependent glucose dehydrogenase
+117	hydrogel
+117	dextran
+117	carbon
+117	biofuel
+117	wearable sensors
+117	stabilization
+117	plastic coatings
+117	hydrogels
+118	dislocation
+118	thin-films
+118	semiconductors thin films
+118	semiconductor industry
+118	iii/v semiconductors
+118	extended defect
+118	electron channelling contrast imaging
+118	thin films
+118	diffraction conditions
+118	silicon compounds
+118	characterization
+118	silicon wafers
+118	semiconductor device manufacture
+118	nondestructive examination
+118	electrons
+118	electron diffraction
+118	electron beam lithography
+118	defects
+118	device performance
+119	speckle size
+119	article
+119	controlled study
+119	experimental study
+119	human
+119	prediction
+119	microscope
+119	particle size
+119	simulation
+119	size scale
+119	maxwell equations
+119	observation angle
+119	imaging system
+119	mathematical derivation
+119	numerical and experimental study
+119	grain size and shape
+119	inverse problems
+119	optical radar
+119	speckle
+119	frequency modulation
+119	angular dependence
+119	coherent detection
+119	flash lidar
+119	grainsize
+119	image plane
+119	three dimensional displays
+120	radiation scattering
+120	x ray absorption near edge structure spectroscopy
+120	x ray spectroscopy
+120	absorption
+120	electronics
+120	controlled study
+120	evolution
+120	nonhuman
+120	organic photovoltaics
+120	article
+120	crystal structure
+120	photovoltaics
+120	article
+120	polymer
+120	electronic equipment
+120	film
+120	optical property
+120	performance assessment
+120	conjugation
+120	plastic deformation
+120	polymer
+120	shear strain
+120	torsion
+120	photovoltaic system
+121	fdsoi
+121	phase sequence
+121	phosphorus concentration
+121	silicidation
+121	thin film reaction
+121	x- ray diffractions
+121	titania
+121	phosphorus
+121	silicides
+121	dopant-diffusion
+121	x ray diffraction
+121	thin-films
+121	titanium
+121	titanium sheet
+121	titanium nitride
+121	dopant concentrations
+121	iodine compounds
+121	phosphorus compounds
+121	rapid thermal annealing
+121	segregation (metallography)
+121	crystalline materials
+121	silicon
+121	solid state reactions
+121	surface segregation
+121	thin films
+121	tin
+121	semiconductor doping
+122	intensity modulation direct-detection
+122	chromatic dispersion
+122	light transmission
+122	transmission signals
+122	spectra's
+122	silicon photonics
+122	optical-
+122	optical signal-processing
+122	intensity modulations
+122	high speed transmission
+122	optical fiber communication
+122	direct-detection
+122	equalizers
+122	optical fibers
+122	optical signal processing
+122	equalisation
+122	photonic devices
+122	photonic integration technology
+122	silicon photonics
+122	optical systems
+123	mm-wave application
+123	power amplifiers
+123	silicon on insulator
+123	rf
+123	radiofrequencies
+123	radio-frequency silicon-on-insulator
+123	power amplifier
+123	power
+123	fully-depleted soi
+123	high-resistivity substrate
+123	substrates
+123	silicon on insulator technology
+123	millimeter waves
+123	high frequency amplifiers
+123	finite difference method
+123	differential amplifiers
+123	chip scale packages
+123	broadband amplifiers
+123	fully depleted soi
+124	inas/inalgaas
+124	indium flush
+124	inp
+124	inp substrates
+124	molecular-beam epitaxy
+124	molecular beam epitaxy
+124	quantum dot
+124	quantum-dot lasers
+124	si substrates
+124	semiconductor quantum dots
+124	performance
+124	dot-height
+124	aluminum compounds
+124	semiconducting indium
+124	quantum dot lasers
+124	pumping (laser)
+124	photonics
+124	narrow band gap semiconductors
+124	nanocrystals
+124	indium phosphide
+124	indium arsenide
+124	iii-v semiconductors
+124	high temperature operations
+124	carbon quantum dots
+124	semiconducting indium phosphide
+125	health assessments
+125	degradation data
+125	electric vehicle
+125	lower frequencies
+125	dc-link capacitor
+125	physic-informed machine learning
+125	traction inverter
+125	condition monitoring
+125	machine-learning
+125	dc-link
+125	learning systems
+125	failure analysis
+125	electric vehicles
+125	electric traction
+125	electric inverters
+125	electric discharges
+125	degradation
+125	capacitors
+125	balancing
+125	condition
+126	water quality assessments
+126	microbiological control
+126	multispectral infrared
+126	phenotyping
+126	bacterium
+126	phenotype
+126	high throughput screening
+126	infrared radiation
+126	microbiology
+126	microbial identification
+126	microfiltration
+126	classification
+126	label free
+126	microbiological water quality
+126	discrete frequencies
+126	high-throughput
+126	bacteria
+126	high-throughput screening assays
+126	infrared rays
+126	phenotype
+126	biotic
+126	water microbiology
+126	deep learning
+126	infrared radiation
+126	nondestructive examination
+126	photonics
+126	culture-based methods
+126	bolometers
+127	multiprocessor system-on-chip designs
+127	design
+127	processing units
+127	performances evaluation
+127	multiprocessor systems-on-chips
+127	multiprocessor system on chips
+127	microprocessor chips
+127	evaluation approach
+127	system-on-chip
+127	programmable logic controllers
+127	program processors
+127	multiprocessing systems
+127	evaluation methods
+128	motor imagery
+128	inter-session
+128	second order statistics
+128	distributional analyze
+128	variability
+128	brain computer interface
+128	first-order statistics
+128	time-periods
+128	exploratory analysis
+128	brain-computer interface
+128	decoder performance
+128	statistics
+128	signal processing
+128	neural networks
+128	interfaces (computer)
+128	electrophysiology
+128	decoding
+129	gate arrays
+129	high power consumption
+129	high speed
+129	integrated photonics
+129	scalings
+129	optical domains
+129	programmable photonics
+129	field programmables
+129	barium titanate
+129	nonvolatile
+129	silicon photonics
+129	programmable gate array
+129	photonic devices
+129	silicon compounds
+129	electric power utilization
+129	energy efficiency
+129	ferroelectric materials
+129	digital storage
+129	green computing
+129	linear transformations
+129	logic gates
+129	optical waveguides
+129	ferroelectricity
+130	embedded systems
+130	botnets
+130	sequential analysis
+130	restoration strategies
+130	response
+130	large-scales
+130	iot
+130	embedded-system
+130	cyber security
+130	autonomous system
+130	internet of things
+130	restoration
+130	recovery
+130	network security
+130	image reconstruction
+130	denial-of-service attack
+130	cybersecurity
+130	computer system recovery
+130	botnet
+130	analysis strategies
+131	fast methods
+131	frequency combs
+131	frequency-shifting
+131	ring resonator
+131	optical resonators
+131	coupling regime
+131	photonics integrated circuits
+131	coherent characterization
+131	optical rings
+131	acousto-optic frequency-shifting loop
+131	transfer functions
+131	silicon compounds
+131	photonic integration technology
+131	photonic integrated circuits
+131	acousto-optics
+131	photonic devices
+131	nitrogen compounds
+131	acoustooptical effects
+132	silicon on insulator technology
+132	stress time
+132	stress condition
+132	silicon on insulator
+132	pbti reliability
+132	nt
+132	nitrided
+132	nitrided gate oxide
+132	low-frequency noise
+132	gate oxide
+132	titanium nitride
+132	spurious signal noise
+132	mos devices
+132	gates (transistor)
+132	low-frequency noise measurements
+133	bioresorbable polymer conductive ink
+133	bioresorbable polymers
+133	conductive ink
+133	conductive polymer
+133	electrode arrays
+133	vitro and in vivo
+133	in-vitro
+133	in-vivo
+133	biotechnology
+133	implantable bioresorbable device
+133	bioresorbable
+133	conducting polymers
+133	polymeric implants
+133	tissue
+133	biocompatibility
+133	bioelectric potentials
+133	brain
+133	biochemistry
+133	electron devices
+133	electrophysiology
+133	medical applications
+133	neurophysiology
+133	electrochemical electrodes
+134	'current
+134	type ii
+134	sofradir
+134	second generation
+134	sb-based type-ii superlattice
+134	imaging detector
+134	mercury amalgams
+134	hgcdte
+134	focal plane array technologies
+134	detector development
+134	thermography (imaging)
+134	high operating temperature
+134	semiconducting indium
+134	antimony compounds
+134	space applications
+134	focal plane arrays
+134	gallium alloys
+134	gallium compounds
+134	cadmium alloys
+134	indium alloys
+134	indium antimonides
+134	infrared devices
+134	infrared radiation
+134	iii-v semiconductors
+135	principal component analysis
+135	real- time
+135	prognostic health managements
+135	principal-component analysis
+135	predictive maintenance
+135	online principal component analyze
+135	memory efficient
+135	machine health monitoring
+135	health monitoring
+135	features fusions
+135	time domain analysis
+135	predictive maintenance
+135	pattern recognition
+135	embedded systems
+135	bearings (machine parts)
+135	incremental approach
+136	blockchain
+136	weight tampering
+136	neural-networks
+136	multi agent
+136	intrusion detection systems
+136	embedded neural networks
+136	embedded artificial intelligence
+136	block-chain
+136	bit-flips
+136	stochastic systems
+136	agent context
+136	smart contract
+136	network security
+136	multi agent systems
+136	intrusion detection
+136	intelligent agents
+136	hardware security
+136	distributed computer systems
+136	bit-flip attack
+137	residual model
+137	scanning electron microscopy image
+137	scanning electrons
+137	microelectronics
+137	wavelets transform
+137	deep learning
+137	model-based opc
+137	wavelet transforms
+137	variational autoencoder
+137	layout
+137	variational techniques
+137	deep learning
+137	auto encoders
+137	textures
+137	robotics
+137	medical imaging
+137	learning systems
+137	image compression
+137	computer vision
+137	binary images
+137	image generations
+138	saline solutions
+138	on demands
+138	stirring-on-demand
+138	nonuniform magnetic fields
+138	microchannels
+138	microfluidics
+138	magnetohydrodynamics
+138	molecular transport
+138	microfluidics systems
+138	micro fluidic applications
+138	low reynolds number
+138	electroosmotic
+138	electro=osmotic flows
+138	reynolds number
+138	permanent magnets
+138	magnetos
+138	electroosmosis
+139	quantum-dot lasers
+139	si (001) substrate
+139	si photonics
+139	si(0 0 1)
+139	semiconductor quantum dots
+139	nanocrystals
+139	quantum dot lasers
+139	monolithics
+139	iii-v semiconductors
+139	molecular-beam epitaxy
+139	molecular beam epitaxy
+139	inas quantum dots
+139	carbon quantum dots
+139	cost effectiveness
+139	indium arsenide
+139	molecular beams
+139	high temperature operations
+139	silicon
+139	cost effective
+139	high-temperature operation
+139	photonics
+139	inas-gaas quantum dots
+140	strain
+140	fd/soi devices
+140	ssti
+140	sadp
+140	roadmap
+140	mm-wave application
+140	low power
+140	energy efficient
+140	device specification
+140	back biasing
+140	specifications
+140	microwave integrated circuits
+140	finite difference method
+140	computational electromagnetics
+140	fd-soi
+141	critical dimension small-angle x-ray scattering
+141	spectral density
+141	small angle x-ray scattering
+141	roughness metrology
+141	power spectral
+141	line edge roughness
+141	dual-track simulation
+141	dual track
+141	critical dimension
+141	x ray scattering
+141	stochastic systems
+141	computerized tomography
+141	edge detection
+141	monte carlo methods
+141	cd-sem
+141	pipelines
+141	roughness measurement
+141	semiconductor device manufacture
+141	optical variables measurement
+142	neurodegeneration
+142	neurodegenerative diseases
+142	self-protective
+142	self repair
+142	photobiomodulation
+142	parkinson's disease
+142	neurodegenerative
+142	near-infrared range
+142	cellular activities
+142	clinical trial
+142	patient treatment
+142	neurons
+142	medical imaging
+142	medical applications
+142	infrared devices
+142	implants (surgical)
+142	intracranial device
+143	segmentation
+143	voltage drop
+143	test-structure
+143	electromigration
+143	segmentation scheme
+143	segment lengths
+143	stressmigration
+143	power grids
+143	grid structures
+143	blech effect
+143	electric power transmission networks
+143	drops
+143	resistive loads
+144	fused silica
+144	transmission phase
+144	sub-thz
+144	reflection phasis
+144	reflectarrays
+144	polarization rotator
+144	metasurface
+144	metalens
+144	fused silica lithography
+144	multiband antennas
+144	transfer matrix method
+144	photolithography
+144	optical systems
+144	optical materials
+144	optical design
+144	metamaterials
+144	interlocking signals
+144	equivalent circuits
+144	antenna arrays
+144	dual band
+145	nano scale
+145	plasmonics
+145	quantum-wells
+145	single mode
+145	ultra-narrow linewidths
+145	iii-v semiconductors
+145	dispersion
+145	semiconductor
+145	velocity
+145	semiconductor quantum wells
+145	nano lasers
+145	article
+145	ingan quantum wells
+145	gan nanowires
+145	linewidth
+145	gain medium
+145	nanowire
+145	surface plasmon resonance
+145	semiconductor alloys
+145	plasmonics
+145	particle optics
+145	nanowires
+145	light sources
+145	indium alloys
+145	electromagnetic wave polarization
+145	aluminum compounds
+145	high optical gain
+146	polarization
+146	stoichiometry
+146	phonon
+146	raman spectrometry
+146	controlled study
+146	anisotropy
+146	article
+146	silicon
+146	molybdenum
+146	disulfide
+146	atomic layer deposition
+147	portable energy
+147	x ray photoelectron spectroscopy
+147	ultrathin films
+147	x-ray photoelectrons
+147	wafer scale
+147	ultra-thin
+147	thermal
+147	solid-state electrolyte
+147	miniaturization of devices
+147	lithium alloys
+147	atomic-layer deposition
+147	american chemical society
+147	solid electrolytes
+147	lithium compounds
+147	lithium
+147	film thickness
+147	atoms
+147	atomic layer deposition
+147	energy solutions
+148	6g
+148	cmos compatible
+148	si-cmos
+148	si substrates
+148	thermal
+148	contact performance
+148	transfer length methods
+148	wireless communications
+148	heterojunction bipolar transistors
+148	ohmic contacts
+148	semiconducting indium gallium arsenide
+148	tungsten alloys
+148	thermal-annealing
+148	terahertz waves
+148	back end of lines
+148	silicon compounds
+148	submillimeter waves
+148	budget control
+148	electric contactors
+148	gallium alloys
+148	heterojunctions
+148	indium alloys
+148	cmos integrated circuits
+148	numerical methods
+148	passivation
+148	rapid thermal annealing
+148	rapid thermal processing
+148	semiconducting indium
+148	millimeter waves
+149	light soaking
+149	light soaking recovery
+149	passivation loss
+149	photovoltaics
+149	uv-induced degradation
+149	uv induced
+149	amorphous silicon
+149	fourier transform infrared spectroscopy
+149	hydrogen bonds
+149	induced degradation
+149	shj solar cell
+149	amorphous silicon layers
+149	photovoltaic reliability
+149	solar cells
+149	silicon compounds
+149	photovoltaics
+149	photodegradation
+149	passivation
+149	irradiation
+149	hydrogen
+149	heterojunctions
+149	durability
+149	doping (additives)
+149	carrier lifetime
+149	solar power generation
+150	functionalized
+150	functionalized polymers
+150	high electrical conductivity
+150	oligoethers
+150	semiconductor doping
+150	polar side chains
+150	side-chains
+150	solution processability
+150	ethylenedioxythiophenes
+150	organic electronics
+150	american chemical society
+150	electrochemical electrodes
+150	transport properties
+150	transparent electrodes
+150	homopolymerization
+150	electrochromic devices
+150	electric conductivity
+150	conducting polymers
+150	charge transfer
+150	chains
+150	carrier transport
+150	x ray scattering
+151	magnetometer
+151	magnetic intensity
+151	satellite data
+151	geomagnetism
+151	calibration
+151	magnetic field
+152	polycrystalline silicon
+152	photo-induced current transient spectroscopies
+152	photo-induced current transient spectroscopy
+152	polycrystalline
+152	radio-frequency
+152	second-harmonic power
+152	trap-rich
+152	budget control
+152	substrates
+152	low-pressure chemical vapor deposition
+152	second harmonic power (h2)
+152	low pressure chemical vapor deposition
+152	radiofrequencies
+152	effective resistivity
+152	chemical vapor deposition
+152	electric currents
+152	interfaces (materials)
+152	polycrystalline materials
+152	polysilicon
+152	effective resistivity (ρeff)
+152	power quality
+152	radio waves
+152	silicon compounds
+152	thin films
+152	transients
+152	boron contamination
+153	secondary ion-mass spectrometry
+153	secondary-ion mass spectrometry calibration
+153	silicon doping
+153	article
+153	calibration
+153	controlled study
+153	diffusion
+153	diode
+153	human
+153	genetic recombination
+153	power-electronics
+153	human cell
+153	male
+153	secondary ion mass spectrometry
+153	simulation
+153	secondary ion mass spectrometry
+153	epitaxy
+153	line-width
+153	electronics
+153	gan epitaxial layers
+153	high resolution analysis
+153	calibration
+153	carrier concentration
+153	cathodoluminescence
+153	gallium nitride
+153	mapping
+153	power electronics
+153	secondary emission
+153	iii-v semiconductors
+153	semiconductor doping
+153	silicon
+153	silicon compounds
+153	doping uniformity
+153	voltage measurement
+153	silicon
+153	carrier concentration mapping
+153	cathodoluminescence mapping
+154	unknown
+155	nanocrystals
+155	spin relaxation
+155	spin blockade
+155	pauli spin blockade
+155	reflectometry
+155	quantum information processing
+155	quantum dot
+155	semiconductor quantum dots
+155	metal-oxide semiconductor
+155	reflectometers
+155	cryogenic temperatures
+155	charge sensing
+155	temperature
+155	silicon
+155	reflection
+155	qubits
+155	quantum optics
+155	metal oxide semiconductor
+156	scanning probe lithography
+156	fabrication
+156	thermal scanning probe lithography
+156	thermal
+156	spm lithography
+156	simos
+156	semiconductor quantum device
+156	quantum device
+156	nanostructures
+156	nanofrazor
+156	fdsoi
+156	surface analysis
+156	semiconductor devices
+156	overlay
+156	lithography
+156	computer aided design
+157	reliability
+157	switching phenomenon
+157	resistive switching
+157	resistive random access memory (reram)
+157	resistive memory
+157	research and development
+157	ideal solutions
+157	edge computing
+157	oxram
+157	beol memory
+157	rram
+157	rhenium compounds
+157	nonvolatile storage
+157	marketing
+157	edge computing
+157	design
+157	brain
+157	device reliability
+158	free spectral range
+158	frequency combs
+158	group-velocity dispersions
+158	high resolution
+158	micro resonators
+158	precise method
+158	optical microresonators
+158	plug-and-play
+158	simple++
+158	broadband characterization
+158	silicon nitride
+158	terahertz waves
+158	light velocity
+158	photonic integration technology
+158	photonic devices
+158	optical resonators
+158	optical kerr effect
+158	nonlinear optics
+158	microresonators
+158	laser optics
+158	group velocity dispersion
+158	dispersions
+158	bandwidth
+158	photonics
+159	etching reactors
+159	inductively-coupled plasma
+159	microelectronic manufacturing
+159	plasma cleaning
+159	etching mechanism
+159	process-based
+159	reproducibilities
+159	chemical stability
+159	plasma process
+159	etch rates
+159	inductively coupled plasma
+159	quality control
+159	cleaning process
+159	blending
+159	cleaning
+159	etching
+159	electromagnetic induction
+159	gases
+159	partial pressure
+159	microelectronic processing
+159	microelectronics
+160	hafnium oxides
+160	si wafer
+160	number of layers
+160	high- k
+160	high voltage applications
+160	high breakdown
+160	hfo 2
+160	dielectric layer
+160	breakdown strengths
+160	electrical performance
+160	silicon compounds
+160	2 layer
+160	capacitors
+160	dielectric losses
+160	electric breakdown
+160	capacitance
+160	low-k dielectric
+160	multilayers
+160	high-k dielectric
+161	many-to-many matching game
+161	energy efficiency
+161	user-centric clustering
+161	user-centric
+161	sociality regime
+161	quality-of-service
+161	matching game
+161	many to many
+161	social aspects
+161	clusterings
+161	cell-free network
+161	cell-free
+161	user centered design
+161	quality of service
+161	network architecture
+161	economic and social effects
+161	energy
+162	zinc oxide
+162	dft calculation
+162	doped zno
+162	low-costs
+162	optical-
+162	photovoltaic applications
+162	ii-vi semiconductors
+162	xrd
+162	electrodeposition
+162	nanorods
+162	optical properties
+162	ce-doped zno nanorods
+162	property
+162	ce-doped zno
+162	solar power generation
+162	structural properties
+162	ce-doped
+162	cerium compounds
+162	crystallite size
+162	defects
+162	density functional theory
+162	cerium
+162	electronic structure
+162	energy gap
+162	optical data processing
+162	photovoltaic effects
+162	solar energy
+162	electronic density of states
+163	film coatings
+163	integrated optical devices
+163	integrated photonics
+163	mos 2
+163	self-phase
+163	performance
+163	silicon nitride waveguides
+163	spectral broadening
+163	nonlinear optics
+163	on-chip integration
+163	sulfur compounds
+163	2d material
+163	self phase modulation
+163	silicon nitride
+163	coatings
+163	layered semiconductors
+163	molybdenum compounds
+163	optical films
+163	integrated optics
+163	optical waveguides
+163	photonic devices
+163	photonic integration technology
+163	photonics
+163	optical signal processing
+164	rf hci
+164	economic and social effects
+164	time to failure
+164	soi
+164	rf stress
+164	rf reliability
+164	rf aging
+164	reliability
+164	power amplifier designs
+164	power
+164	novel methodology
+164	power amplifiers
+164	design
+164	reliability contour
+165	photonics integrated circuits
+165	near-eye display
+165	huygens-fresnel principle
+165	physical constraints
+165	stringents
+165	diffraction
+165	fourier
+165	sparse aperture imaging
+165	fast-marching
+165	lens free optic
+165	random processes
+165	photonics
+165	augmented reality applications
+165	optical waveguides
+165	integrated circuit design
+165	fourier optics
+165	electrodes
+165	display devices
+165	augmented reality
+166	germanium
+166	spin-orbit couplings
+166	spin qubit
+166	spin properties
+166	intrinsic spin-orbit couplings
+166	hole spin
+166	epitaxial interfaces
+166	germaniums (ge)
+166	clean environment
+166	charge properties
+166	spin orbit coupling
+166	qubits
+166	quantum optics
+166	germanium compounds
+166	electrical control
+167	electro-optics
+167	high speed
+167	lithium niobate
+167	quantum state
+167	quantum technologies
+167	thin-films
+167	states of light
+167	technology application
+167	quantum communication
+167	quantum-key- distribution protocol
+167	chip-scale devices
+167	cost effectiveness
+167	quantum entanglement
+167	quantum cryptography
+167	quantum computers
+167	photons
+167	particle beams
+167	optical fiber communication
+167	network architecture
+167	lithium
+167	quantum optics
+167	bins
+167	bandwidth
+168	sampling receivers
+168	sensing and communication
+168	receiver circuits
+168	walsh processing
+168	wideband receivers
+168	sub-sampling
+168	massively parallelized sub-sampling receiver
+168	optical variables measurement
+168	analog processing
+168	ai-enabled receiver
+168	timing circuits
+168	signal processing
+168	radio receivers
+168	millimeter waves
+168	digital sequence
+169	iii-v semiconductors
+169	volterrum pruning
+169	volterra model
+169	volterra
+169	post-distortion
+169	optical-
+169	micro-light-emitting diode
+169	memory effects
+169	generalized memory polynomials
+169	lightemitting diode
+169	digital postdistortion
+169	polynomials
+169	optical waveguides
+169	optical links
+169	optical fiber communication
+169	light emitting diodes
+169	gallium nitride
+169	energy efficiency
+169	digital predistortion
+170	low noiseamplifier
+170	noise figure
+170	satcom
+170	satellite communications system
+170	economic and social effects
+170	sige technology
+170	stmicroelectronics
+170	user terminals
+170	sige bicmos
+170	low earth orbit satellites
+170	satellite communication systems
+170	earth orbits
+170	orbits
+170	millimeter waves
+170	low noise amplifiers
+170	communication satellites
+170	bismuth compounds
+170	bismuth alloys
+170	bicmos technology
+170	k bands
+171	young adult
+171	performance indicator
+171	montgomery asberg depression rating scale
+171	hemodynamics
+171	information processing
+171	human
+171	young mania rating scale
+171	global assessment of functioning
+171	male
+171	bipolar disorder
+171	emotion
+171	diagnosis
+171	diagnostic imaging
+171	frontal lobe
+171	middle aged
+171	near infrared spectroscopy
+171	pathophysiology
+171	physiology
+171	procedures
+171	functional near-infrared spectroscopy
+171	classification
+171	frontal cortex
+171	reference electrode
+171	event related potential
+171	female
+171	adult
+171	bipolar disorder
+171	electroencephalography
+171	emotions
+171	female
+171	humans
+171	male
+171	middle aged
+171	spectroscopy, near-infrared
+171	frontal lobe
+171	adult
+171	young adult
+171	electroencephalogram
+171	controlled study
+171	cohort analysis
+171	electroencephalography
+171	bipolar disorder
+171	article
+171	aged
+171	cognition
+172	convective self-assembly
+172	light absorption
+172	sub-pixels
+172	quantum nanoplatelet
+172	pixelation
+172	nanoplatelet
+172	microleds
+172	microdisplays
+172	full color
+172	color convert nano-object
+172	nano-objects
+172	semiconductor quantum dots
+172	self assembly
+172	pixels
+172	optical materials
+172	luminance
+172	integration
+172	indium compounds
+172	fabrication
+172	color image processing
+172	color
+172	sols
+173	local oscillators
+173	speckle size
+173	theoretical modeling
+173	article
+173	controlled study
+173	theoretical model
+173	oscillator
+173	polarization
+173	signal noise ratio
+173	simulation
+173	efficiency
+173	diagnosis
+173	imaging plane
+173	heterodyne efficiency
+173	flash lidar
+173	frequency modulation
+173	image plane
+173	optical radar
+173	signal to noise ratio
+173	speckle
+173	heterodyning
+173	wavefronts
+173	coherent detection
+173	efficiency optimization
+173	field of views
+173	three dimensional displays
+174	near-limit
+174	electrodynamics
+174	wireless power
+174	transfer devices
+174	power transfers
+174	power bounds
+174	optimal trajectories
+174	electrodynamic wireless power transfer receiver
+174	electromagnetic field effects
+174	radio receivers
+174	energy transfer
+174	inductive power transmission
+174	closed form
+174	kinetics
+174	radio
+174	kinetic energy
+175	silicon nitride
+175	metamaterials
+175	ultra-fast
+175	textile fibers
+175	sub-wave length grating
+175	silicon on insulator
+175	quantum information processing
+175	optical-
+175	optical interfaces
+175	integrated photonics
+175	input/output interface
+175	high speed
+175	single mode fibers
+175	surface grating couplers
+175	quantum optics
+175	silicon photonics
+175	diffraction gratings
+175	infrared devices
+175	infrared radiation
+175	integrated circuit interconnects
+175	budget control
+175	optical fiber communication
+175	optical waveguides
+175	photonic devices
+175	photonic integrated circuits
+175	photonic integration technology
+175	integrated optics
+176	cryogenic temperatures
+176	table lookup
+176	transistor characterizations
+176	radiofrequencies
+176	quanta computers
+176	low noiseamplifier
+176	low noise amplifier designs
+176	lookup tables (luts)
+176	fano factor
+176	cryo-cmos
+176	qubits
+176	silicon on insulator technology
+176	quantum optics
+176	network components
+176	low noise amplifiers
+176	integrated circuit design
+176	field effect transistors
+176	energy efficiency
+176	cryogenics
+176	characterization measurement
+177	p-n diode
+177	performance
+177	pn-diode
+177	on/off current ratio
+177	selective epitaxy
+177	specific-on-resistance
+177	selective area growth
+177	economic and social effects
+177	localised
+177	electrical performance
+177	silicon compounds
+177	silicon
+177	semiconductor junctions
+177	iii-v semiconductors
+177	geometry
+177	epitaxial growth
+177	cost effectiveness
+177	high current densities
+178	american chemical society
+178	internal quantum efficiency
+178	quantum-wells
+178	ultra-thin
+178	semiconductor quantum wells
+178	ultraviolet light sources
+178	aluminum gallium nitride
+178	iii-v semiconductors
+178	aln
+178	ultraviolet
+178	algan
+178	polarization
+178	active media
+178	aluminum alloys
+178	binary alloys
+178	gallium alloys
+178	light sources
+178	medical applications
+178	active medium
+178	molecular beams
+178	monolayers
+178	quantum efficiency
+178	semiconductor quantum dots
+178	molecular beam epitaxy
+179	atom probe
+179	tomographic atom probes
+179	spatial in-homogeneity
+179	separate confinement heterostructures
+179	quantum-wells
+179	property
+179	photonic atom
+179	optical-
+179	deep uv
+179	iii-v semiconductors
+179	vanadium alloys
+179	tomography
+179	algan quantum wells
+179	atoms
+179	binary alloys
+179	heterojunctions
+179	aluminum alloys
+179	photoluminescence
+179	probes
+179	semiconductor quantum wells
+179	optical properties
+180	unknown
+181	phase
+182	gas
+182	chemical-vapor-deposition
+182	epitaxy
+182	silicon
+183	gasb
+183	base
+183	xps
+183	matrix
+183	mocvd
+183	emitter
+183	elements
+183	performance
+183	tof-sims
+184	wave-optics simulation
+185	transistors
+185	endurance
+186	o157h7
+186	o157-h7
+186	bacteria
+186	biofilms
+186	online
+186	mechanism
+186	biosensor
+186	long-term
+186	qcm-d
+186	surfaces
+187	multi-resource-allocation
+187	framework
+187	existence
+188	unknown
+189	ge
+189	fabrication
+189	transformation
+189	graphitization
+189	growth
+189	damage
+189	ion-implantation
+189	films
+190	nickel silicides
+190	kinetics
+190	oxide
+190	nisi phase
+190	phase-formation
+190	angle-resolved xps
+190	sige wave-guides
+190	solid-state reaction
+190	siconi(r) cleaning sequences
+190	thermal-stability
+191	array
+191	size
+192	unknown
+193	unknown
+194	fusion
+194	enthalpy
+194	melting-point
+194	energy-storage
+194	batteries
+194	thin-films
+194	ionic-conductivity
+194	lithium phosphorus oxynitride
+194	organic-compounds
+195	unknown
+196	dynamics
+196	reflectivity measurements
+196	liquid silicon
+196	germanium
+196	devices
+196	semiconductors
+196	instabilities
+196	crystalline
+196	morphology
+196	interface
+197	propagation loss
+197	fabrication
+197	silicon-nitride
+198	band
+198	metamaterial absorbers
+199	temperature growth-kinetics
+199	strained si layers
+199	structural-properties
+199	reduced pressure
+199	ge
+199	impact
+199	films
+200	inductively-coupled cl-2/ar
+200	plasma
+200	surface
+200	fabrication
+200	films
+201	culture
+201	spectroscopy
+201	bacteria
+201	identification
+201	microorganisms
+201	mass-spectrometry
+202	optimization
+203	pls
+203	smote
+204	passivation
+204	technology
+205	unknown
+206	unknown
+207	unknown
+208	photoluminescence
+208	monolayer
+208	films
+209	ald
+209	bulk
+209	phonon
+209	spectroscopy
+209	crystallographic orientation
+209	scattering
+209	transition-metal dichalcogenides
+209	monolayer
+210	grating coupler
+210	micro-mirror
+210	wave-guides
+210	fabrication
+210	fiber
+210	optimization
+210	technologies
+210	db
+211	films
+212	lasers
+212	photodetectors
+212	energy
+212	raman-scattering
+213	impedance spectroscopy
+213	pedotpss
+213	devices
+213	rats
+214	near-infrared light
+214	670 nm
+215	unknown
+216	quantum processor
+217	storage
+217	hybrid
+217	glasses
+217	surface
+217	conductivity
+217	nitrogen
+217	interface
+217	lithium
+218	aluminum electrolytic-capacitor
+218	power electronic converters
+218	online estimation
+218	systems
+218	ac
+219	terahertz
+219	antenna
+219	gain
+220	cm(-1)
+220	microscopy
+220	range
+220	raman-spectroscopy
+220	infrared-spectroscopy
+220	ftir
+221	free massive mimo
+221	user association
+221	optimization
+222	unknown
+223	layers
+223	spectra
+223	spectroscopy
+223	strain
+223	scattering
+223	si1-xgex
+224	unknown
+225	gete
+225	diffraction
+226	unknown
+227	quality
+227	stress
+227	films
+227	luminescence
+227	energy ion-implantation
+227	defects
+227	high-voltage
+227	single-crystal diamond
+227	growth
+228	memory polynomial model
+228	digital predistortion
+229	detector
+229	transport
+229	model
+229	impact ionization
+229	band-structure
+230	power
+230	schottky
+230	bfom
+231	tissue
+231	piezo2
+231	geometry
+231	stress fibers
+231	cancer-cells
+231	magnetic particles
+231	vimentin
+232	cancer-cells
+232	mechanical-properties
+232	particles
+232	stiffness
+232	filaments
+232	matrices
+233	si
+233	reliability
+233	power
+234	unknown
+235	unknown
+236	thin-films
+236	piezoelectric response
+236	electroacoustic properties
+236	residual-stress
+236	temperature
+236	mg
+236	enhancement
+236	orientation
+236	resonators
+236	electrodes
+237	cpw lines
+237	grain-boundaries
+237	si
+237	level transient spectroscopy
+237	interface states
+238	hgcdte
+238	temperature
+238	improvement
+238	rts
+239	unknown
+240	recombination
+240	photoluminescence
+240	doped gan
+240	gaas nanowires
+240	n-type
+240	dopant distribution
+240	optical-properties
+240	luminescence
+240	si incorporation
+240	exciton
+241	unknown
+242	electron
+242	technology
+242	scattering
+243	defects
+243	boron
+244	2 mu-m
+244	photodetectors
+245	unknown
+246	breakdown
+247	ge2sb2te5
+247	films
+247	program
+248	unknown
+249	unknown
+250	unknown
+251	pdms
+251	system
+251	drug development
+251	chip
+251	flow
+252	unknown
+253	midinfrared supercontinuum
+253	spectroscopy
+253	coherent
+253	chi((2))
+254	water
+254	disk resonators
+254	viscosity
+254	microfluidics
+254	density
+255	diffusion
+255	states
+255	defect-pool model
+255	metastability
+256	unknown
+257	unknown
+258	breakdown
+258	voltage
+259	temperature
+259	shift
+259	emission
+259	dots
+260	technology
+260	layers
+261	reliability
+261	abnormalities
+261	connectivity
+261	prefrontal activation
+261	near-infrared spectroscopy
+261	rating-scale
+262	thin-films
+262	energy
+262	crystallization
+262	mechanisms
+263	health
+263	phones
+263	whole-body
+263	electromagnetic-fields
+263	mobile telephones
+263	output power levels
+263	user equipment
+264	mobility
+264	strain
+264	nemo 3-d
+264	silicon
+264	conduction-band
+264	quantum-dot
+264	atomistic simulation
+265	unknown
+266	microscopy
+266	resolution
+267	absolute scalar
+267	geomagnetic-field
+267	constellation
+268	spin qubit
+268	silicon
+268	approximation
+268	polarization
+268	diamond
+268	strain
+269	scale
+269	stress
+269	symptoms
+269	heart-rate-variability
+270	total-energy calculations
+270	initio
+270	pseudopotentials
+271	unknown
+272	transmission electron-microscopy
+272	semiconductors
+272	tomography
+273	state
+273	cyclotron-resonance
+273	dirac fermions
+273	spectroscopy
+273	polarization
+273	conduction
+273	insulator
+274	unknown
+275	electrode
+275	membranes
+276	dependence
+276	hydrogen
+277	room-temperature
+277	injection
+278	cells
+278	distributions
+278	resolution
+278	mass-spectrometry
+278	cluster
+279	random-access memory
+280	unknown
+281	protection
+281	ectodomain
+281	mice
+281	epitope
+281	vaccines
+281	drug-delivery
+281	matrix protein-2
+281	monoclonal-antibodies
+281	extracellular domain
+281	influenza
+282	frequency combs
+282	cherenkov radiation
+282	generation
+282	spectroscopy
+282	spectra
+283	electron
+284	unknown
+285	unknown
+286	unknown
+287	light
+287	energy
+287	transplantation
+288	unknown
+289	unknown
+290	navigation
+290	filter
+291	unknown
+292	unknown
+293	diffraction
+293	patterns
+293	defects
+294	unknown
+295	phonon deformation potentials
+295	strain
+296	model
+296	motifs
+296	charges
+296	configurations
+296	long-range
+296	range order
+296	glasses
+297	bose-einstein condensation
+297	cyclotron-resonance
+297	semiconductor microcavity
+297	thermal emission
+297	electric-field
+297	photoluminescence
+297	transition
+297	inversion
+297	germanium
+297	silicon
+298	design
+298	thickness
+298	morphology
+298	separation
+298	polymer
+299	optical modulators
+299	pulse-compression
+299	layer
+299	nonlinearity
+299	gain
+300	unknown
+301	exchange
+301	nanoplatelets
+301	nanocrystals
+301	state
+301	cinnabar phase
+301	crystal-structure
+301	electronic-structure
+301	quantum dots
+302	unknown
+303	disorder
+303	selenophene
+303	spectroscopy
+303	enhancement
+303	charge-transport
+303	naphthalene diimide
+303	scattering
+304	cortical activity
+304	imagery
+304	potentials
+304	movement
+304	dynamics
+305	state
+305	entanglement
+305	generation
+305	key distribution
+305	cryptography
+306	thin-films
+306	zinc-oxide
+306	growth
+306	nanocrystalline
+306	crystal
+307	unknown
+308	gaas
+308	impact
+308	amplifiers
+308	performance
+308	density
+308	wavelength
+308	threshold
+308	gain
+308	transmission
+309	thermoelectric properties
+309	charge-transport
+309	polymers
+309	poly(3,4-ethylenedioxythiophene)
+309	polymerization
+309	films
+310	spectroscopy
+310	semiconductor
+310	design
+311	water-intake
+312	performance
+312	conjugated polymers
+312	copolymers
+312	field-effect transistors
+312	organic semiconductors
+312	design
+313	scattering
+313	orientation
+313	reveals
+313	mechanically robust
+313	x-ray-diffraction
+313	semiconductors
+313	films
