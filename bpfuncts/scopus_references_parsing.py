@@ -583,7 +583,10 @@ def _clean_journal_and_title(cleaning_params):
     if journal==doi and doi!=bp_pg.UNKNOWN:
         journal = bp_pg.UNKNOWN
     if journal!=bp_pg.UNKNOWN:
+        # The following 4 lines are actually reacheable
+        # when the string found for the journal is in the string found for the title
         if journal in title:
+            # The journal's string is removed from the title's one
             title = title.replace(journal, "")
             if not title:
                 title = bp_pg.UNKNOWN

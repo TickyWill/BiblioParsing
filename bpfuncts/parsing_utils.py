@@ -31,6 +31,7 @@ __all__ = ['build_item_df_from_tup',
 
 
 # Standard library imports
+import itertools
 import operator
 import os
 import re
@@ -239,8 +240,6 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database):
         are extracted used to set the file name of database identifiers to drop.
     Returns:
         (dataframe): The modified full rawdata.
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     full_rawdata_df = init_full_rawdata_df.copy()
     id_col, init_id_col = ids_cols_list
@@ -255,7 +254,7 @@ def drop_rawdata(rawdata_path, init_full_rawdata_df, ids_cols_list, database):
     else:
         # Creating empty file for collecting identifiers set by the user
         data_row = [""]
-        data = sum([], [data_row]*10)
+        data = list(itertools.chain.from_iterable([data_row]*10))
         ids_todrop_df = pd.DataFrame(data, columns=[id_col])
         ids_todrop_df.to_excel(ids_todrop_path, index=False)
     return full_rawdata_df
@@ -699,10 +698,6 @@ def set_shared_parsing_namedtups():
                      'pub_ref'       : [namedtuple('pub_ref', ref_cols_list), ref_cols_list],
                      'country_affils': [namedtuple('country', ref_cols_list), ref_cols_list],
                      }
-
-    addr_country_affils(pub_id, out_author_idx,
-                                                               out_author_address, bp_pg.UNKNOWN_COUNTRY,
-                                                               bp_ag.EMPTY, bp_ag.EMPTY,)
     return namedtups_dic
 
 
@@ -807,8 +802,6 @@ def standardize_address(raw_address, add_unknown_country=True):
         to the standardized address.
     Returns:
         (str): The full standardized address.
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Removing particular characters
     standard_address = standardize_str(raw_address)
@@ -824,7 +817,8 @@ def standardize_address(raw_address, add_unknown_country=True):
     country_pos = -1
     first_raw_affiliations_list = standard_address.split(',')
     # This split below is just for country finding even if affiliation may be separated by dashes
-    raw_affiliations_list = sum([x.split(' - ') for x in first_raw_affiliations_list], [])
+    raw_affiliations_list = list(itertools.chain.from_iterable([x.split(' - ')
+                                                                for x in first_raw_affiliations_list]))
     country = normalize_country(raw_affiliations_list[country_pos].strip())
     country_chunck = " " + country
     if country==bp_pg.UNKNOWN_COUNTRY:
@@ -878,8 +872,6 @@ def _build_title_keywords(df):
        where 'title_tokens_alias' contains the list of tokens of the title \
        and 'kept_tokens_alias' the list of tokens with an occurrence frequency, \
        and of the list of tuples where tuple i is (word_i, # occurrence_i).
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     title_alias = bp_pcg.COL_NAMES['temp_col'][2]
     title_tokens_alias = bp_pcg.COL_NAMES['temp_col'][3]

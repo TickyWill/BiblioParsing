@@ -5,6 +5,7 @@ __all__ = ['wos_parser',]
 
 
 # Standard library imports
+import itertools
 from collections import namedtuple
 
 # 3rd party library imports
@@ -97,8 +98,6 @@ def _check_authors_list(authors_str, affiliations_str):
         (tup): Composed of the authors (list) retrieved from the authors' field, \
         of the authors (list) retrieved from the authors-with-affiliations' field \
         and of authors (list) not found in the authors-with-affiliations' field.
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Building the full list of ordered authors full names
     authors_ordered_list = authors_str.split("; ")
@@ -107,7 +106,7 @@ def _check_authors_list(authors_str, affiliations_str):
     # Building the list of authors full names in authors-with-affiliation
     affil_authors_list = [[x.strip() for x in authors.split(';')]
                           for authors in bp_rg.RE_AUTHOR.findall(affiliations_str)]
-    flat_authors_set  = set(sum(affil_authors_list, []))
+    flat_authors_set = set(itertools.chain.from_iterable(affil_authors_list))
 
     # Building the list of authors out of authors-with-affiliation
     out_authors_list = list(set(authors_ordered_list) - flat_authors_set)

@@ -7,6 +7,7 @@ __all__ = ['build_addr_affils_tup',
 
 
 # Standard library imports
+import itertools
 import re
 from collections import namedtuple
 
@@ -387,8 +388,6 @@ def _search_items(affiliation, country, towns_dict, verbose=False):
     Returns:
         (namedtuple): A namedtuple which values are booleans returned by the internal functions \
         that returns a list of booleans that are True if the corresponding searched item is found.
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     funct_list = [_search_dropping_bp, _search_dropping_digits, _search_dropping_suffix, _search_dropping_town,
                   _search_dropping_words, _search_keeping_prefix, _search_keeping_words]
@@ -403,7 +402,7 @@ def _search_items(affiliation, country, towns_dict, verbose=False):
     flag_list = [funct(params_list, verbose) for funct in funct_list]
 
     # Flattening flag_list
-    flag_list = sum(flag_list, [])
+    flag_list = list(itertools.chain.from_iterable(flag_list))
     found_item_flags = found_item_tup(*flag_list)
     return found_item_flags
 
@@ -704,8 +703,6 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
         verbose (bool): True for allowing control prints (default: False).
     Returns:
         (tuple): A tuple composed of 3 items (list of kept chunks, country and list of dropped chunks).
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     # Splitting by coma the standard address in chunks listed in an initial-affiliations list
     init_raw_affils_list = std_address.split(',')
@@ -725,8 +722,8 @@ def _get_affils_list(std_address, towns_dict, drop_status=True, verbose=False):
     country = dedup_raw_affils_list[country_pos].strip()
 
     # Splitting by special characters the deduplicated chunks and putting them in a raw-affiliations list
-    raw_affils_list = sum([x.split(' - ') for x in dedup_raw_affils_list], [])
-    raw_affils_list = sum([x.split(' | ') for x in raw_affils_list], [])
+    raw_affils_list = list(itertools.chain.from_iterable([x.split(' - ') for x in dedup_raw_affils_list]))
+    raw_affils_list = list(itertools.chain.from_iterable([x.split(' | ') for x in raw_affils_list]))
 
     if drop_status:
         # Initializing the affiliations list by keeping systematically the first chunk of the full address

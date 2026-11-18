@@ -5,6 +5,7 @@ __all__ = ['read_scopus_rawdata']
 
 
 # Standard library imports
+import itertools
 import re
 
 # 3rd party library imports
@@ -164,8 +165,6 @@ def _correct_firstname_initials(fullname_init):
         fullname_init (str): The author's fullname as given by the publication's rawdata.
     Returns:
         (str): The normalized author's name.
-    Note:
-        ToDo: Investigate use of itertools.chain.from_iterable() rather than sum().
     """
     fullname = fullname_init
     # Remove author digital identifier
@@ -185,7 +184,7 @@ def _correct_firstname_initials(fullname_init):
 
     # Building firstname initials
     firstname = firstname.replace('-',' ').strip(' ')
-    firstname_list = sum([x.split('.') for x in firstname.split(' ')], [])
+    firstname_list = list(itertools.chain.from_iterable([x.split('.') for x in firstname.split(' ')]))
     initials_list = [x[0] + "." for x in firstname_list if x]
     initials = ''.join(initials_list)
 
