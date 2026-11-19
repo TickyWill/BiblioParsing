@@ -1,0 +1,685 @@
+Pub_id	Sub_subject
+0	Surfaces, Coatings and Films
+0	Surfaces and Interfaces
+0	Condensed Matter Physics
+1	Biomedical Engineering
+1	General Medicine
+1	Biomaterials
+1	Biochemistry
+1	Bioengineering
+1	Biotechnology
+2	General Materials Science
+2	Mechanics of Materials
+2	Electrical and Electronic Engineering
+2	Process Chemistry and Technology
+4	Condensed Matter Physics
+4	General Materials Science
+6	General Physics and Astronomy
+7	Condensed Matter Physics
+7	Electronic, Optical and Magnetic Materials
+7	Electrical and Electronic Engineering
+7	Applied Mathematics
+7	Computer Science Applications
+8	Computer Science Applications
+8	Applied Mathematics
+8	Condensed Matter Physics
+8	Electronic, Optical and Magnetic Materials
+8	Electrical and Electronic Engineering
+9	General Physics and Astronomy
+9	General Engineering
+9	General Materials Science
+10	Electronic, Optical and Magnetic Materials
+10	Surfaces and Interfaces
+10	Condensed Matter Physics
+10	Electrical and Electronic Engineering
+10	Materials Chemistry
+10	Surfaces, Coatings and Films
+12	Electrical and Electronic Engineering
+12	Materials Chemistry
+12	General Physics and Astronomy
+12	Mechanical Engineering
+12	General Chemistry
+12	Electronic, Optical and Magnetic Materials
+13	Computer Science Applications
+13	Applied Mathematics
+13	Electronic, Optical and Magnetic Materials
+13	Condensed Matter Physics
+13	Electrical and Electronic Engineering
+15	Atomic and Molecular Physics, and Optics
+16	Materials Chemistry
+16	Electrical and Electronic Engineering
+16	Condensed Matter Physics
+16	Electronic, Optical and Magnetic Materials
+17	Condensed Matter Physics
+17	General Materials Science
+17	Mechanics of Materials
+17	Mechanical Engineering
+18	Ceramics and Composites
+18	Electronic, Optical and Magnetic Materials
+18	Electrical and Electronic Engineering
+19	Electronic, Optical and Magnetic Materials
+19	Electrical and Electronic Engineering
+20	General Engineering
+21	General Materials Science
+21	Condensed Matter Physics
+21	Mechanics of Materials
+21	Mechanical Engineering
+22	General Mathematics
+22	General Computer Science
+23	Ceramics and Composites
+23	Electronic, Optical and Magnetic Materials
+23	Electrical and Electronic Engineering
+24	Applied Mathematics
+24	Computer Science (miscellaneous)
+26	Computer Science Applications
+26	Applied Mathematics
+26	Condensed Matter Physics
+26	Electronic, Optical and Magnetic Materials
+26	Electrical and Electronic Engineering
+27	Internal Medicine
+27	Endocrinology
+27	General Medicine
+27	Endocrinology, Diabetes and Metabolism
+29	Computer Science Applications
+29	Software
+29	Artificial Intelligence
+29	Computer Networks and Communications
+30	Electronic, Optical and Magnetic Materials
+30	Electrical and Electronic Engineering
+31	Condensed Matter Physics
+31	Electronic, Optical and Magnetic Materials
+31	Electrical and Electronic Engineering
+31	Applied Mathematics
+31	Computer Science Applications
+32	General Computer Science
+32	Theoretical Computer Science
+33	Electrical and Electronic Engineering
+35	General Physics and Astronomy
+37	Electronic, Optical and Magnetic Materials
+37	Condensed Matter Physics
+37	Electrical and Electronic Engineering
+37	Materials Chemistry
+38	Electrical and Electronic Engineering
+38	Electronic, Optical and Magnetic Materials
+39	Strategy and Management
+39	Computer Networks and Communications
+39	Hardware and Architecture
+39	Information Systems
+40	Electronic, Optical and Magnetic Materials
+41	Electronic, Optical and Magnetic Materials
+41	Electrical and Electronic Engineering
+42	General Physics and Astronomy
+44	Materials Chemistry
+44	Polymers and Plastics
+44	Organic Chemistry
+45	Electrical and Electronic Engineering
+45	Electronic, Optical and Magnetic Materials
+45	Biotechnology
+46	General Materials Science
+47	Electronic, Optical and Magnetic Materials
+49	Computer Science Applications
+49	Applied Mathematics
+49	Condensed Matter Physics
+49	Electronic, Optical and Magnetic Materials
+49	Electrical and Electronic Engineering
+50	Inorganic Chemistry
+51	General Materials Science
+51	Mechanical Engineering
+51	Mechanics of Materials
+51	Condensed Matter Physics
+52	Software
+52	Hardware and Architecture
+53	Atomic and Molecular Physics, and Optics
+54	Materials Chemistry
+54	General Chemical Engineering
+54	General Chemistry
+55	Mechanical Engineering
+55	Mechanics of Materials
+55	Condensed Matter Physics
+55	General Materials Science
+56	Condensed Matter Physics
+56	General Materials Science
+57	General Engineering
+59	Psychiatry and Mental health
+59	Clinical Psychology
+60	Electronic, Optical and Magnetic Materials
+61	General Engineering
+62	General Computer Science
+62	Theoretical Computer Science
+63	Dermatology
+63	Surgery
+64	General Physics and Astronomy
+65	Computer Science Applications
+65	Applied Mathematics
+65	Condensed Matter Physics
+65	Electronic, Optical and Magnetic Materials
+65	Electrical and Electronic Engineering
+66	General Physics and Astronomy
+66	General Engineering
+66	Biochemistry, Genetics and Molecular Biology (miscellaneous)
+66	General Materials Science
+66	General Chemical Engineering
+66	Medicine (miscellaneous)
+67	Computer Science Applications
+67	Applied Mathematics
+67	Condensed Matter Physics
+67	Electronic, Optical and Magnetic Materials
+67	Electrical and Electronic Engineering
+68	Condensed Matter Physics
+68	General Materials Science
+68	General Chemistry
+69	General Engineering
+70	Computer Networks and Communications
+71	Atomic and Molecular Physics, and Optics
+74	General Physics and Astronomy
+74	General Biochemistry, Genetics and Molecular Biology
+74	General Chemistry
+75	Materials Chemistry
+75	Electrical and Electronic Engineering
+75	Surfaces, Coatings and Films
+75	Surfaces and Interfaces
+75	Condensed Matter Physics
+75	Electronic, Optical and Magnetic Materials
+76	General Materials Science
+76	Condensed Matter Physics
+76	Electrochemistry
+76	Spectroscopy
+76	Surfaces and Interfaces
+78	Electronic, Optical and Magnetic Materials
+78	Materials Chemistry
+78	Electrical and Electronic Engineering
+78	Condensed Matter Physics
+79	Electronic, Optical and Magnetic Materials
+79	Condensed Matter Physics
+79	Materials Chemistry
+79	Electrical and Electronic Engineering
+80	Condensed Matter Physics
+80	General Materials Science
+82	Electrical and Electronic Engineering
+83	Electronic, Optical and Magnetic Materials
+84	Electronic, Optical and Magnetic Materials
+85	Information Systems
+85	Signal Processing
+85	Computer Science Applications
+85	Computer Networks and Communications
+85	Hardware and Architecture
+86	Cell Biology
+87	General Materials Science
+87	Mechanical Engineering
+87	Mechanics of Materials
+87	Condensed Matter Physics
+88	Electrical and Electronic Engineering
+88	Hardware and Architecture
+88	Safety, Risk, Reliability and Quality
+89	General Chemistry
+89	General Biochemistry, Genetics and Molecular Biology
+89	General Physics and Astronomy
+90	Electrical and Electronic Engineering
+90	Hardware and Architecture
+90	Software
+91	General Physics and Astronomy
+93	Electronic, Optical and Magnetic Materials
+93	Electrical and Electronic Engineering
+94	General Computer Science
+94	Theoretical Computer Science
+96	Surfaces, Coatings and Films
+97	Biotechnology
+97	Atomic and Molecular Physics, and Optics
+98	Materials Chemistry
+98	Electrical and Electronic Engineering
+98	Condensed Matter Physics
+98	Electronic, Optical and Magnetic Materials
+99	Electrical and Electronic Engineering
+100	Physics and Astronomy (miscellaneous)
+101	Electronic, Optical and Magnetic Materials
+101	General Chemistry
+101	Mechanical Engineering
+101	General Physics and Astronomy
+101	Materials Chemistry
+101	Electrical and Electronic Engineering
+102	Materials Chemistry
+102	Inorganic Chemistry
+102	Polymers and Plastics
+102	Organic Chemistry
+103	General Physics and Astronomy
+103	General Biochemistry, Genetics and Molecular Biology
+103	General Chemistry
+104	Electrical and Electronic Engineering
+105	Materials Chemistry
+105	Electrical and Electronic Engineering
+105	Condensed Matter Physics
+105	Electronic, Optical and Magnetic Materials
+106	Electrical and Electronic Engineering
+106	Computer Networks and Communications
+106	Computer Science Applications
+107	Spectroscopy
+107	Structural Biology
+108	Atomic and Molecular Physics, and Optics
+109	General Materials Science
+109	General Engineering
+110	Surfaces, Coatings and Films
+113	Electrical and Electronic Engineering
+113	Computer Graphics and Computer-Aided Design
+113	Software
+114	Health Informatics
+114	Signal Processing
+116	General Computer Science
+116	Theoretical Computer Science
+117	Biotechnology
+117	Biophysics
+117	Biomedical Engineering
+117	Electrochemistry
+117	General Medicine
+118	Materials Chemistry
+118	Electrical and Electronic Engineering
+118	Surfaces, Coatings and Films
+118	Surfaces and Interfaces
+118	Condensed Matter Physics
+118	Electronic, Optical and Magnetic Materials
+119	Atomic and Molecular Physics, and Optics
+120	General Chemistry
+120	General Physics and Astronomy
+120	General Biochemistry, Genetics and Molecular Biology
+121	Electrical and Electronic Engineering
+121	Surfaces, Coatings and Films
+121	Condensed Matter Physics
+121	Atomic and Molecular Physics, and Optics
+121	Electronic, Optical and Magnetic Materials
+122	Applied Mathematics
+122	Condensed Matter Physics
+122	Electronic, Optical and Magnetic Materials
+122	Electrical and Electronic Engineering
+122	Computer Science Applications
+124	Electrical and Electronic Engineering
+124	Atomic and Molecular Physics, and Optics
+125	Electrical and Electronic Engineering
+126	General Materials Science
+126	General Biochemistry, Genetics and Molecular Biology
+126	General Chemistry
+126	General Physics and Astronomy
+126	General Engineering
+129	Electronic, Optical and Magnetic Materials
+129	Atomic and Molecular Physics, and Optics
+130	General Computer Science
+130	Theoretical Computer Science
+131	Atomic and Molecular Physics, and Optics
+132	General Engineering
+133	General Materials Science
+134	Condensed Matter Physics
+134	Electronic, Optical and Magnetic Materials
+134	Materials Chemistry
+134	Electrical and Electronic Engineering
+135	General Mathematics
+135	General Computer Science
+137	Condensed Matter Physics
+137	Electronic, Optical and Magnetic Materials
+137	Electrical and Electronic Engineering
+137	Applied Mathematics
+137	Computer Science Applications
+138	Electronic, Optical and Magnetic Materials
+138	Condensed Matter Physics
+138	Biotechnology
+138	Electrical and Electronic Engineering
+138	Surfaces, Coatings and Films
+139	Materials Chemistry
+139	Electrical and Electronic Engineering
+139	Surfaces, Coatings and Films
+139	Surfaces and Interfaces
+139	Condensed Matter Physics
+139	Electronic, Optical and Magnetic Materials
+140	Condensed Matter Physics
+140	Electronic, Optical and Magnetic Materials
+140	Materials Chemistry
+140	Electrical and Electronic Engineering
+141	Computer Science Applications
+141	Condensed Matter Physics
+141	Electronic, Optical and Magnetic Materials
+141	Electrical and Electronic Engineering
+141	Applied Mathematics
+143	General Engineering
+144	Electronic, Optical and Magnetic Materials
+144	Atomic and Molecular Physics, and Optics
+146	Multidisciplinary
+148	Electronic, Optical and Magnetic Materials
+148	Atomic and Molecular Physics, and Optics
+148	Electrical and Electronic Engineering
+148	Surfaces, Coatings and Films
+148	Condensed Matter Physics
+149	Electrical and Electronic Engineering
+149	Condensed Matter Physics
+149	Renewable Energy, Sustainability and the Environment
+149	Electronic, Optical and Magnetic Materials
+151	Space and Planetary Science
+151	Geology
+152	Condensed Matter Physics
+152	Electronic, Optical and Magnetic Materials
+152	Materials Chemistry
+152	Electrical and Electronic Engineering
+153	Mechanical Engineering
+153	Condensed Matter Physics
+153	General Materials Science
+153	General Chemistry
+153	Bioengineering
+155	Electrical and Electronic Engineering
+155	Electronic, Optical and Magnetic Materials
+156	Computer Science Applications
+156	Electrical and Electronic Engineering
+156	Applied Mathematics
+156	Condensed Matter Physics
+156	Electronic, Optical and Magnetic Materials
+158	Physics and Astronomy (miscellaneous)
+159	Condensed Matter Physics
+159	Electronic, Optical and Magnetic Materials
+159	Electrical and Electronic Engineering
+159	Applied Mathematics
+159	Computer Science Applications
+160	Condensed Matter Physics
+160	Electronic, Optical and Magnetic Materials
+160	Electrical and Electronic Engineering
+160	Materials Chemistry
+161	Applied Mathematics
+161	Electrical and Electronic Engineering
+161	Computer Science Applications
+162	Mechanical Engineering
+162	Mechanics of Materials
+162	Condensed Matter Physics
+162	General Materials Science
+164	General Engineering
+165	Electronic, Optical and Magnetic Materials
+165	Atomic and Molecular Physics, and Optics
+165	Electrical and Electronic Engineering
+165	Physical and Theoretical Chemistry
+166	General Physics and Astronomy
+167	Atomic and Molecular Physics, and Optics
+167	Electronic, Optical and Magnetic Materials
+169	Atomic and Molecular Physics, and Optics
+171	Biological Psychiatry
+171	Cellular and Molecular Neuroscience
+171	Psychiatry and Mental health
+172	Electronic, Optical and Magnetic Materials
+172	Atomic and Molecular Physics, and Optics
+173	Atomic and Molecular Physics, and Optics
+174	Mechanical Engineering
+174	General Materials Science
+175	Condensed Matter Physics
+175	Electronic, Optical and Magnetic Materials
+175	Electrical and Electronic Engineering
+175	Applied Mathematics
+175	Computer Science Applications
+176	Electrical and Electronic Engineering
+177	General Physics and Astronomy
+178	Electrical and Electronic Engineering
+178	Atomic and Molecular Physics, and Optics
+178	Biotechnology
+178	Electronic, Optical and Magnetic Materials
+179	Physics and Astronomy (miscellaneous)
+180	Materials Science
+180	Physics
+180	Engineering
+181	Physics
+182	Engineering
+182	Materials Science
+182	Physics
+183	Physics
+184	Optics
+185	Engineering
+185	Physics
+186	Chemistry
+186	Materials Science
+187	Telecommunications
+187	Mathematics
+187	Computer Science
+188	Engineering
+188	Physics
+189	Materials Science
+189	Physics
+190	Physics
+191	Optics
+192	Engineering
+192	Computer Science
+193	Engineering
+193	Materials Science
+193	Physics
+194	Engineering
+194	Materials Science
+195	Engineering
+196	Physics
+196	Engineering
+196	Materials Science
+197	Telecommunications
+197	Optics
+197	Engineering
+198	Engineering
+199	Engineering
+199	Materials Science
+199	Physics
+200	Materials Science
+200	Physics
+201	Biophysics
+201	Optics
+201	Biochemistry & Molecular Biology
+202	Computer Science
+202	Engineering
+203	Engineering
+204	Engineering
+204	Science & Technology - Other Topics
+204	Optics
+204	Physics
+205	Telecommunications
+205	Engineering
+206	Engineering
+206	Telecommunications
+206	Computer Science
+207	Engineering
+207	Materials Science
+207	Physics
+208	Chemistry
+208	Materials Science
+208	Physics
+209	Science & Technology - Other Topics
+210	Optics
+211	Physics
+211	Engineering
+212	Chemistry
+212	Materials Science
+212	Physics
+213	Science & Technology - Other Topics
+213	Materials Science
+214	Engineering
+214	Optics
+215	Telecommunications
+215	Remote Sensing
+215	Computer Science
+215	Physics
+216	Physics
+217	Chemistry
+218	Engineering
+219	Materials Science
+219	Optics
+220	Optics
+221	Engineering
+221	Telecommunications
+222	Engineering
+222	Computer Science
+223	Materials Science
+223	Physics
+224	Computer Science
+224	Engineering
+224	Telecommunications
+225	Science & Technology - Other Topics
+225	Materials Science
+225	Chemistry
+226	Optics
+227	Physics
+227	Materials Science
+228	Telecommunications
+228	Engineering
+228	Optics
+229	Engineering
+229	Materials Science
+229	Physics
+230	Physics
+231	Chemistry
+231	Science & Technology - Other Topics
+231	Materials Science
+232	Materials Science
+232	Science & Technology - Other Topics
+232	Chemistry
+233	Engineering
+233	Materials Science
+233	Physics
+234	Thermodynamics
+234	Energy & Fuels
+234	Mechanics
+235	Engineering
+235	Telecommunications
+236	Physics
+236	Materials Science
+236	Science & Technology - Other Topics
+237	Engineering
+237	Physics
+238	Engineering
+238	Materials Science
+238	Physics
+239	Materials Science
+239	Physics
+240	Physics
+240	Materials Science
+240	Science & Technology - Other Topics
+240	Chemistry
+241	Engineering
+241	Telecommunications
+242	Engineering
+242	Materials Science
+242	Physics
+243	Materials Science
+243	Physics
+244	Physics
+244	Optics
+244	Materials Science
+244	Science & Technology - Other Topics
+245	Science & Technology - Other Topics
+246	Engineering
+246	Physics
+247	Materials Science
+247	Physics
+248	Materials Science
+248	Optics
+249	Science & Technology - Other Topics
+250	Materials Science
+251	Engineering
+251	Materials Science
+252	Engineering
+252	Optics
+252	Telecommunications
+253	Optics
+254	Science & Technology - Other Topics
+254	Instruments & Instrumentation
+255	Physics
+255	Energy & Fuels
+255	Materials Science
+256	Computer Science
+256	Telecommunications
+257	Engineering
+258	Engineering
+258	Physics
+259	Optics
+259	Science & Technology - Other Topics
+259	Materials Science
+259	Physics
+260	Materials Science
+260	Optics
+261	Psychiatry
+262	Materials Science
+262	Physics
+262	Chemistry
+262	Science & Technology - Other Topics
+263	Telecommunications
+264	Physics
+264	Materials Science
+265	Engineering
+266	Physics
+266	Science & Technology - Other Topics
+266	Materials Science
+267	Geology
+268	Materials Science
+268	Physics
+269	Neurosciences & Neurology
+269	Psychiatry
+270	Physics
+271	Physics
+272	Physics
+273	Materials Science
+273	Physics
+274	Engineering
+274	Surgery
+275	Biophysics
+275	Biotechnology & Applied Microbiology
+275	Chemistry
+275	Electrochemistry
+275	Science & Technology - Other Topics
+276	Physics
+276	Materials Science
+277	Materials Science
+277	Physics
+278	Biochemistry & Molecular Biology
+278	Chemistry
+278	Spectroscopy
+279	Physics
+279	Science & Technology - Other Topics
+279	Materials Science
+280	Optics
+281	Engineering
+281	Science & Technology - Other Topics
+281	Materials Science
+282	Physics
+283	Materials Science
+283	Physics
+284	Physics
+285	Transportation
+286	Optics
+287	Endocrinology & Metabolism
+288	Engineering
+289	Engineering
+289	Telecommunications
+290	Computer Science
+290	Telecommunications
+291	Engineering
+291	Telecommunications
+292	Engineering
+293	Materials Science
+293	Physics
+294	Physics
+294	Optics
+295	Physics
+296	Chemistry
+296	Physics
+297	Physics
+298	Polymer Science
+299	Materials Science
+300	Telecommunications
+301	Materials Science
+301	Chemistry
+301	Science & Technology - Other Topics
+302	Computer Science
+302	Telecommunications
+303	Polymer Science
+304	Science & Technology - Other Topics
+305	Optics
+306	Materials Science
+306	Physics
+307	Chemistry
+307	Science & Technology - Other Topics
+307	Materials Science
+308	Engineering
+308	Physics
+308	Optics
+309	Materials Science
+310	Materials Science
+310	Optics
+311	Materials Science
+311	Chemistry
+312	Materials Science
+312	Physics
+312	Science & Technology - Other Topics
+313	Science & Technology - Other Topics
