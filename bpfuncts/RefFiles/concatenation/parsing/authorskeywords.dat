@@ -1,0 +1,1404 @@
+Pub_id	Keyword
+0	unknown
+1	in vitro models
+1	micro-pump
+1	organ-on-a-chip
+1	pancreatic islet
+1	perifusion bioreactor
+1	single-islet analysis
+2	unknown
+3	transformers
+3	token communications
+3	semantic communications
+3	edge inference
+3	deep joint source channel coding
+3	goal-oriented communications
+4	spin-led
+4	circular polarization
+4	gan
+4	spin injection
+4	wafer bonding
+5	unknown
+6	unknown
+7	bs-pdn
+7	center pin
+7	direct wafer bonding
+7	edge
+7	on-product
+7	overlay
+7	wafer-to-wafer variation
+8	opd
+8	multifunctional display
+8	microled
+8	bio-sensing
+9	dirac 3d semimetal
+9	hgte
+9	infrared light-emitting diode
+9	nanocrystals
+9	pressure-induced phase transition
+9	wurtzite
+10	smart cut
+10	graphitization
+10	ion implantation
+10	diamond
+10	bonding
+10	fracture
+11	fir
+11	feature extraction
+11	event-related synchronization
+11	filter length
+11	electrocorticography
+11	continuous wavelet transform
+11	brain-computer interface
+11	event-related desynchronization
+12	breakdown voltage
+12	diamond schottky barrier diodes
+12	dislocations
+12	drift layer resistance
+12	nitrogen compensation
+12	photoluminescence
+13	stochastic effects
+13	pab
+13	peb
+13	duv lithography
+13	contacts
+13	local variability
+14	6g
+14	semantic communication
+14	waveform
+15	unknown
+16	process-induced defects
+16	infrared devices
+16	residual defects
+16	fib-sem nanotomography
+16	hgcdte
+17	anisotropy
+17	laser annealing
+17	local molten regions
+17	melting threshold
+17	surface nanostructures
+18	epitaxy
+18	quantum dot lasers
+18	silicon photonics
+19	unknown
+20	random telegraph noise rtn
+20	source follower sf
+20	multi-gate soi mosfets
+20	mesa-isolated
+20	ground-plane gp
+20	cmos image sensors cis
+21	dislocation network
+21	hrem moiré
+21	image calculation
+21	image processing
+21	interface
+21	nanostructuring
+21	wafer bonding
+22	spin qubit
+22	semiconductor
+22	industrialization
+23	kerr effect
+23	silicon photonics
+23	supercontinuum
+24	accuracy
+24	energy saving
+24	knn
+24	localization
+24	micromobility
+24	v2x
+25	unknown
+26	low losses
+26	reactive sputtering
+26	silicon nitride
+26	waveguide
+27	beta cells
+27	diabetes
+27	functionality
+27	insulinosecretion
+27	photobiomodulation
+27	viability
+28	unknown
+29	backpropagation
+29	matrix derivative
+29	neural network learning
+29	symmetric positive definite (spd) matrix
+30	cmos
+30	reliability
+30	time-dependent dielectric breakdown (tddb)
+30	transistor
+31	sidewall morphology
+31	polysilicon
+31	plasma etching
+31	fd-soi
+31	high-k metal gate
+31	gate profiles
+31	microstructure
+32	industrial control systems (ics)
+32	intrusion detection systems (ids)
+32	mitre att&ck
+32	testbed
+33	piezoelectric converter
+33	piezoelectric resonator
+33	characterization
+33	lithium niobate (ln)
+34	exponentiation
+34	horizontal collision side-channel attacks
+34	non-profiling attacks
+34	rsa
+34	single trace attacks
+34	unsupervised deep learning
+35	unknown
+36	unknown
+37	performance
+37	topology
+37	electric vehicles
+37	ac-dc charger
+37	control
+37	dc-dc charger
+38	floating body
+38	p-mosfet
+38	soi
+38	tcad
+38	transient
+39	denm
+39	its
+39	load balancing
+39	lstm
+39	mec
+39	sdvn
+40	unknown
+41	resistive memory (reram)
+41	reliability
+41	scaling
+41	mos selector
+41	oxide-based resistive random access memories (oxram)
+41	cryogenic
+42	unknown
+43	belief propagation (bp)
+43	faest
+43	non-supervised attack
+43	post-quantum cryptography (pqc)
+43	soft analytical side-channel attack (sasca)
+43	syndrome decoding in the head (sdith)
+43	vector oblivious linear evaluation in the head (voleith)
+44	selenium
+44	resonant diffraction
+44	conjugated polymers
+44	anomalous scattering
+44	organic semiconductors
+45	iii-v semiconductor materials
+45	millimeter wave integrated circuits
+45	millimeter waver measurements
+45	semiconductor device modeling
+46	unknown
+47	unknown
+48	reliability
+48	performances
+48	phase-change memory
+49	193nm
+49	arfi
+49	immersion
+49	lithography
+49	non-fluorine
+49	non-pfas
+49	semiconductor
+50	unknown
+51	unknown
+52	binary neural network
+52	class-incremental learning
+52	continual learning
+52	quantization
+52	replay methods
+53	pecvd sin waveguides
+53	photoluminescence
+53	optical losses
+53	payne and lacey modeling
+53	silicon photonics
+54	unknown
+55	avalanche capability
+55	gallium nitride
+55	localized epitaxy
+55	pseudo-vertical p-n-diodes
+56	phase change materials
+56	pcram
+56	thermal stability
+56	crystallization mechanisms
+56	carbon-doping
+56	ga-sb
+57	gan-on-si
+57	inain/gan
+57	mis-hemts
+57	reliability
+57	thermal storage test
+58	compton scattering
+58	positron emission tomography
+58	quantum entanglement
+59	smartwatches
+59	relapse
+59	prediction
+59	digital phenotyping
+59	bipolar disorder
+60	backbone curvature
+60	benzodifuranone
+60	conjugated polymers
+60	electrical conductivity
+60	microstructure
+60	organic thermoelectrics
+61	takeda model
+61	silicon-on-insulator
+61	nitrided sio<sub>2</sub>gate oxide
+61	impact ionization
+61	hot carrier injection
+61	channel doping
+61	interface traps
+62	intrusion detection systems (ids)
+62	machine learning
+62	system calls
+63	photobiomodulation
+63	stress
+63	viability
+63	insulinosecretion
+63	diabetes
+63	functionnality, hypoxia
+63	beta cells
+64	unknown
+65	mid-infrared
+65	phase-change material
+65	sb<sub>2</sub>s<sub>3</sub>
+65	sige
+65	supercontinuum
+66	van der waals epitaxy
+66	sputtering
+66	spintronics
+66	ferroelectrics
+66	chalcogenides
+66	gete
+67	contour optimization
+67	curvilinear opc
+67	dfm
+67	edge placement error
+67	metasurface
+67	silicon photonics
+68	phase change materials
+68	amorphous chalcogenide
+68	ab initio molecular dynamics
+68	bond order
+69	bulk traps
+69	dielectric
+69	hcd
+69	low-k spacer
+69	trap dynamics
+70	generalized nash equilibrium
+70	variational inequality problem
+70	generalized fisher market
+70	decentralized learning
+70	competitive equilibrium
+71	unknown
+72	click chemistry
+72	influenza
+72	matrix 2 ectodomain
+72	nanoparticles
+72	nanostructured lipid carriers
+72	vaccine
+73	simulation
+73	spectral selectivity
+73	patch antenna
+73	mid-wave infrared (mwir)
+73	short-wave infrared (swir)
+74	unknown
+75	in-line metrology
+75	interference
+75	raman spectroscopy
+75	silicon-germanium
+76	unknown
+77	skin cancer
+77	rose bengal
+77	ros
+77	reactive oxygen species
+77	melanoma
+77	photodynamic therapy
+77	immunogenic cell death
+77	photosensitizer
+78	unknown
+79	transfer line model
+79	time-of-flight secondary ion mass spectrometry
+79	metal/semiconductor contact
+79	schottky contact
+79	hard x-ray photoelectron spectroscopy
+79	contact resistance
+79	hgcdte
+80	crystallization kinetics
+80	doping
+80	ge-rich gesbte
+80	phase-change material
+80	thin films
+81	safe communications
+81	railways
+81	frmcs
+81	channel sounding
+81	5g
+81	channel models
+82	cmti
+82	monitoring
+82	rogowski
+82	sensor
+82	v-dot
+83	unknown
+84	scanning transmission electron microscopy
+84	in situ biasing
+84	semiconductors
+84	ebic
+84	electric field
+84	4d-stem
+85	asic
+85	crystals-kyber
+85	fully depleted silicon on insulator (fd-soi)
+85	module-lattice key encapsulation mechanism (ml-kem)
+85	post-quantum cryptography (pqc)
+86	organoids-on-chip
+86	pancreatic islet spheroids
+86	vascularization
+87	unknown
+88	total ionizing dose
+88	single event effects
+88	power-off laser characterization
+88	hardware security
+88	bulk built-in current sensors
+88	laser fault injection
+89	unknown
+90	approximate computing
+90	fully depleted silicon-on-insulator (fd-soi)
+90	learning parity with physical noise (lppn)
+90	post-quantum cryptography (pqc)
+91	unknown
+92	sputtering
+92	aln
+92	c-axis
+93	unknown
+94	backdoor attack
+94	federated learning
+94	low-rank adaptation
+95	isac use cases
+95	isac hardware
+95	isac signal processing
+95	isac architecture
+95	integrated sensing and communication (isac)
+95	isac foundations
+96	gesn
+96	thin film
+96	transfer
+97	unknown
+98	ssoi
+98	fd-soi
+98	si<sub>1-x</sub>ge<sub>x</sub>
+99	time-domain
+99	pulsewidth modulation
+99	ultra-low voltage
+99	low power
+99	analog feature extraction (fex)
+99	injection-locked oscillators
+99	bandpass filter (bpf)
+99	keyword spotting (kws)
+99	classifier
+100	unknown
+101	bonding
+101	diamond
+101	facture
+101	ion implantation
+101	smart cut™
+102	unknown
+103	unknown
+104	global exposure
+104	radiated energy per bit transmitted
+104	tx power
+104	uplink
+105	numerical simulation
+105	monte carlo
+105	multiplication gain
+105	hgcdte
+105	avalanche photodiode
+105	excess noise factor
+106	unknown
+107	cryo-tof-sims
+107	sample preparation
+107	subcellular imaging
+108	unknown
+109	unknown
+110	x-ray photoelectron spectroscopy
+110	wafer-scale
+110	raman spectroscopy
+110	characterization protocol
+110	mos2
+110	photoluminescence
+111	unknown
+112	micromobility
+112	vanet
+112	its-g5
+112	geofencing
+112	energy efficiency
+112	c-its
+112	5g
+113	computer-aided design
+113	delta-sigma (δς)
+113	incremental analog-to-digital converter (adc)
+113	recurrent neural networks (rnns)
+114	tetraplegic
+114	paraplegic
+114	online learning
+114	electrocorticography
+114	class imbalance
+114	brain-computer interface
+115	dual mode
+115	electrodynamic wireless power transfer
+115	nonlinear orbit-jump
+115	very-low-frequency wireless power transfer
+116	intrusion detection system
+116	hpcs
+116	machine learning
+116	cybersecurity
+116	embedded systems
+117	biopolymers
+117	continuous glucose monitoring
+117	diabetes
+117	electrochemical sensors
+117	wearable biosensors
+118	characterization
+118	dislocations
+118	electron channeling contrast imaging
+118	iii–v semiconductors
+119	unknown
+120	unknown
+121	dopant diffusion
+121	fdsoi
+121	phosphorus
+121	rta
+121	silicides
+121	thin film reactions
+121	titanium
+121	x-ray diffraction
+122	silicon photonics
+122	optical transmission
+122	optical signal processing
+122	intensity modulation direct-detection
+122	chromatic dispersion
+123	fully-depleted soi (fd-soi)
+123	high-resistivity (hr) substrate
+123	mmwave applications
+123	power amplifier (pa)
+123	radio-frequency silicon-on-insulator (rfsoi)
+123	rf
+124	semiconductor lasers
+124	quantum dots
+124	molecular beam epitaxy
+124	indium flush
+124	inas/inalgaas
+125	condition monitoring
+125	dc-link capacitor
+125	electric vehicle
+125	physics-informed machine learning
+125	traction inverter
+126	unknown
+127	unknown
+128	variability
+128	inter-session
+128	distributional analysis
+128	brain-computer interface (bci)
+129	unknown
+130	autonomous system
+130	cybersecurity
+130	embedded systems
+130	iot
+130	recovery
+130	response
+130	restoration
+131	photonic integrated circuits
+131	optical ring resonator
+131	coherent characterization
+131	acousto-optic frequency-shifting loop
+131	coupling regime
+132	low frequency noise
+132	n<sub>t</sub>
+132	nitrided gate oxides
+132	pbti reliability
+132	soi
+133	in vitro
+133	in vivo
+133	implantable bioresorbable device
+133	bioresorbable polymer conductive ink
+133	biotechnology
+134	hgcdte
+134	inassb
+134	ingaas
+134	ir imaging
+134	sb-based t2sl
+135	prognostic health management
+135	predictive maintenance
+135	feature fusion
+135	online pca
+136	bit-flip attack
+136	blockchain
+136	embedded ai
+136	intrusion detection system
+136	smart contract
+136	weight tampering
+137	variational autoencoder
+137	wavelet transform
+137	microelectronics
+137	scanning electron microscopy
+137	image generation
+137	deep learning
+137	layout
+138	electroosmotic flow
+138	magnetohydrodynamics
+138	microchannel
+138	microfluidics
+138	saline solution
+138	stirring-on-demand
+139	molecular beam epitaxy
+139	si photonics
+139	si (001) substrates
+139	inas quantum dots
+139	quantum dot lasers
+140	ssti
+140	back biasing
+140	fd-soi
+140	sadp
+140	strain
+141	power spectral density
+141	small-angle x-ray scattering
+141	line-edge roughness
+141	roughness metrology
+141	cd-sem
+141	cd-saxs
+141	dual-track simulation
+142	clinical trial
+142	intracranial device
+142	neurodegenerative diseases
+142	parkinson disease
+142	photobiomodulation
+143	power grid
+143	stress migration
+143	blech effect
+143	electromigration
+143	segmentation
+144	fused silica lithography
+144	metalens
+144	metasurface
+144	multi-band antennas
+144	polarization rotator
+144	reflectarray
+144	sub-thz
+145	unknown
+146	vibrational modes
+146	xps
+146	polarized raman spectroscopy
+146	molybdenum disulfide
+146	polarization anisotropy
+147	ald
+147	lipon
+147	solid-state electrolyte
+147	ultrathin film
+147	wafer-scale
+147	xps
+148	ingaas
+148	ohmic contact
+148	6g
+148	cmos-compatible
+149	amorphous silicon layer
+149	hydrogen bonding
+149	light soaking recovery
+149	passivation loss
+149	photovoltaic reliability
+149	shj solar cells
+149	uv-induced degradation
+150	unknown
+151	magnetic field modeling
+151	swarm mission
+151	igrf
+151	absolute vector magnetometers
+151	calibration
+151	geomagnetism
+152	boron contamination
+152	second harmonic power (h2)
+152	radio-frequency (rf)
+152	polycrystalline silicon (polysi)
+152	trap-rich (tr)
+152	low pressure chemical vapor deposition (lpcvd)
+152	effective resistivity (ρ<sub>eff</sub>)
+152	photo-induced current transient spectroscopy (picts)
+153	silicon doping
+153	cathodoluminescence mapping
+153	doping uniformity
+153	gan epitaxial layers
+153	high-resolution analysis
+153	power electronics
+153	secondary-ion mass spectrometry calibration
+153	carrier concentration mapping
+154	microstructured surfaces
+154	heat flux
+154	atmospheric condensation
+154	biphilic surface
+155	charge sensing
+155	cryogenic temperature
+155	metal-oxide semiconductor (mos)
+155	pauli spin blockade (psb)
+155	quantum dot (qd)
+155	quantum information processing (qip)
+155	reflectometry
+155	spin relaxation
+156	t-spl
+156	spm lithography
+156	simos
+156	semiconductor quantum devices
+156	fdsoi
+156	nanofrazor
+156	nanofabrication
+156	overlay
+157	resistive memories
+157	reram
+157	oxram
+157	reliability
+157	design
+157	device
+157	beol memories
+158	unknown
+159	icp
+159	plasma
+159	sustainability
+160	unknown
+161	quality of service
+161	user-centric clustering
+161	sociality regime
+161	many-to-many matching game
+161	energy efficiency
+161	cell-free network
+162	ce-doped zno
+162	dft calculations
+162	electrodeposition
+162	nanorods
+162	optical properties
+162	photovoltaic applications
+163	nonlinear optics
+163	integrated photonics
+163	2d materials
+164	reliability contours
+164	rf aging
+164	rf hci
+164	soi
+164	ttf
+165	sparse aperture imaging
+165	near-eye display
+165	lens free optics
+165	fourier optics
+165	diffraction
+166	unknown
+167	unknown
+168	ai-enabled receiver
+168	massively parallelized sub-sampling receiver
+168	sensing and communication
+168	walsh processing
+169	volterra model
+169	optical communication
+169	volterra pruning
+169	ofdm
+169	memory effects
+169	micro-led
+169	generalized memory polynomial
+169	digital predistortion
+169	digital postdistortion
+170	k-band
+170	lna
+170	satcom
+170	sige bicmos
+171	unknown
+172	augmented reality
+172	color convert nano-object
+172	convective self-assembly
+172	microdisplays
+172	microleds
+172	quantum nanoplatelets
+173	unknown
+174	wireless power transfer
+174	optimal trajectory
+174	power bound
+174	ewpt receivers
+174	electrodynamics
+174	near-limit
+175	integrated photonics
+175	metamaterials
+175	optical interfaces
+175	silicon nitride
+175	silicon-on-insulator
+175	subwavelength gratings
+175	surface grating couplers
+176	qubit
+176	look-up table
+176	fano factor
+176	cryo-cmos
+176	lna
+177	unknown
+178	ultraviolet
+178	algan
+178	efficiency
+178	mbe
+178	polarization
+178	quantum wells
+179	unknown
+180	unknown
+181	cryogenic memory
+181	ferroelectric
+181	hafnium zirconium oxide (hzo)
+182	unknown
+183	unknown
+184	unknown
+185	resistive memory (reram)
+185	reliability
+185	oxide-based resistive random access memories (oxram)
+185	mos selector
+185	cryogenic
+185	electrical resistance measurement
+185	substrates
+185	scaling
+185	electric potential
+185	performance evaluation
+185	logic gates
+185	programming
+185	resistance
+185	transistors
+185	cryogenics
+185	temperature distribution
+186	unknown
+187	generalized fisher market
+187	competitive equilibrium
+187	generalized nash equilibrium
+187	variational inequality problem
+187	decentralized learning
+188	back biasing
+188	strain
+188	fd-soi
+188	sadp
+188	ssti
+189	bonding
+189	diamond
+189	fracture
+189	graphitization
+189	ion implantation
+189	smart cut
+190	unknown
+191	unknown
+192	symmetric positive definite (spd) matrix
+192	matrix derivative
+192	backpropagation
+192	neural network learning
+193	hgcdte
+193	metal/semiconductor contact
+193	contact resistance
+193	schottky contact
+193	hard x-ray photoelectron spectroscopy
+193	transfer line model
+193	time-of-flight secondary ion mass spectrometry
+194	wafer-scale
+194	solid-state electrolyte
+194	xps
+194	ultrathin film
+194	lipon
+194	ald
+195	bandpass filter (bpf)
+195	ultra-low voltage
+195	time-domain
+195	pulsewidth modulation
+195	low power
+195	keyword spotting (kws)
+195	injection-locked oscillators
+195	classifier
+195	analog feature extraction (fex)
+195	circuits and systems
+195	feeds
+195	active filters
+195	antennas
+195	injection-locked oscillators
+195	band-pass filters
+195	filtering
+195	integrated circuits
+195	oscillators
+195	circuits
+196	laser annealing
+196	local molten regions
+196	melting threshold
+196	surface nanostructures
+196	anisotropy
+197	optical losses
+197	pecvd sin waveguides
+197	silicon photonics
+197	optical losses
+197	photoluminescence
+197	annealing
+197	payne and lacey modeling
+197	correlation
+197	silicon compounds
+197	photonics
+197	plasmas
+197	optical device fabrication
+197	propagation losses
+197	optical waveguides
+197	hydrogen
+198	spectral selectivity
+198	mid-wave infrared (mwir)
+198	short-wave infrared (swir)
+198	patch antenna
+198	simulation
+199	unknown
+200	unknown
+201	unknown
+202	optimization
+202	recurrent neural networks (rnns)
+202	incremental analog-to-digital converter (adc)
+202	delta-sigma (delta sigma)
+202	computer-aided design
+202	computer architecture
+202	deep learning
+202	modulation
+202	training
+202	quantization (signal)
+202	topology
+202	decoding
+202	hardware
+202	design automation
+203	tetraplegic
+203	electrocorticography
+203	paraplegic
+203	class imbalance
+203	brain-computer interface
+203	online learning
+204	ingaas
+204	cmos-compatible
+204	ohmic contact
+204	6g
+205	unknown
+206	blockchain
+206	smart contract
+206	bit-flip attack
+206	embedded ai
+206	weight tampering
+206	intrusion detection system
+207	hgcdte
+207	residual defects
+207	fib-sem nanotomography
+207	process-induced defects
+207	infrared devices
+208	wafer-scale
+208	x-ray photoelectron spectroscopy
+208	photoluminescence
+208	characterization protocol
+208	mos2
+208	raman spectroscopy
+209	molybdenum disulfide
+209	polarized raman spectroscopy
+209	vibrational modes
+209	polarization anisotropy
+209	xps
+210	unknown
+211	unknown
+212	transfer
+212	gesn
+212	thin film
+213	implantable bioresorbable device
+213	bioresorbable polymerconductive ink
+213	biotechnology
+213	in vitro
+213	in vivo
+214	intracranial device
+214	photobiomodulation
+214	parkinson disease
+214	neurodegenerative diseases
+214	clinical trial
+215	industrialization
+215	spin qubit
+215	semiconductor
+216	unknown
+217	unknown
+218	rotors
+218	dc-link capacitor
+218	sensors
+218	physics-informed machine learning
+218	traction inverter
+218	electric vehicle
+218	condition monitoring
+218	discharges (electric)
+218	monitoring
+218	capacitance
+218	inverters
+218	degradation
+218	motors
+218	capacitors
+219	sub-thz
+219	reflectarray
+219	multi-band antennas
+219	polarization rotator
+219	metalens
+219	fused silica lithography
+219	metasurface
+220	unknown
+221	wireless networks
+221	energy efficiency
+221	sociality regime
+221	many-to-many matching game
+221	user-centric clustering
+221	quality of service
+221	cell-free network
+221	data communication
+221	scalability
+221	central processing unit
+221	clustering algorithms
+221	resource management
+221	games
+221	energy efficiency
+221	quality of service
+221	linear antenna arrays
+222	sensitivity
+222	post-quantum cryptography (pqc)
+222	learning parity with physical noise (lppn)
+222	fully depleted silicon-on-insulator (fd-soi)
+222	approximate computing
+222	semiconductor device measurement
+222	voltage measurement
+222	logic gates
+222	circuits
+222	clocks
+222	voltage control
+222	germanium
+222	error probability
+222	noise
+223	silicon-germanium
+223	raman spectroscopy
+223	in-line metrology
+223	interference
+224	quantum computing
+224	post-quantum cryptography (pqc)
+224	module-lattice key encapsulation mechanism (ml-kem)
+224	fully depleted silicon on insulator (fd-soi)
+224	crystals-kyber
+224	asic
+224	silicon
+224	random access memory
+224	transforms
+224	hardware acceleration
+224	polynomials
+224	vectors
+224	cryptography
+224	public key
+224	internet of things
+225	gete
+225	van der waals epitaxy
+225	sputtering
+225	ferroelectrics
+225	chalcogenides
+225	spintronics
+226	diffraction
+226	near-eye display
+226	sparse aperture imaging
+226	fourier optics
+226	lens free optics
+227	facture
+227	ion implantation
+227	bonding
+227	diamond
+227	smart cuttm
+228	volterra model
+228	optical communication
+228	ofdm
+228	micro-led
+228	memory effects
+228	generalized memory polynomial
+228	digital postdistortion
+228	digital predistortion
+228	polynomials
+228	volterra pruning
+228	light emitting diodes
+228	vectors
+228	prevention and mitigation
+228	throughput
+228	energy efficiency
+228	predistortion
+228	nonlinear distortion
+228	adaptation models
+228	computational modeling
+229	multiplication gain
+229	monte carlo
+229	excess noise factor
+229	avalanche photodiode
+229	hgcdte
+229	numerical simulation
+230	unknown
+231	unknown
+232	unknown
+233	avalanche capability
+233	localized epitaxy
+233	gallium nitride
+233	pseudo-vertical p -n-diodes
+234	electrodynamic wireless power transfer
+234	very-low-frequency wireless power transfer
+234	dual mode
+234	nonlinear orbit-jump
+235	unknown
+236	sputtering
+236	aln
+236	<italic>c</italic>-axis
+237	effective resistivity (rho eff)
+237	trap-rich (tr)
+237	low pressure chemical vapor deposition (lpcvd)
+237	photo-induced current transient spectroscopy (picts)
+237	polycrystalline silicon (polysi)
+237	boron contamination
+237	second harmonic power (h2)
+237	radio-frequency (rf)
+238	sb-based t2sl
+238	inassb
+238	ingaas
+238	ir imaging
+238	hgcdte
+239	wafer bonding
+239	elasticity
+239	defect
+239	flat punch
+239	adhesion
+239	surface energy
+240	secondary-ionmass spectrometrycalibration
+240	doping uniformity
+240	carrier concentration mapping
+240	power electronics
+240	gan epitaxial layers
+240	silicon doping
+240	cathodoluminescence mapping
+240	high-resolutionanalysis
+241	radio-frequency silicon-on-insulator (rfsoi)
+241	power amplifier (pa)
+241	high-resistivity (hr) substrate
+241	fully-depleted soi (fd-soi)
+241	rf and mmwave applications
+242	image calculation
+242	image processing
+242	wafer bonding
+242	hrem moire
+242	dislocation network
+242	interface
+242	nanostructuring
+243	diamond schottky barrier diodes
+243	breakdown voltage
+243	drift layer resistance
+243	photoluminescence
+243	nitrogen compensation
+243	dislocations
+244	group-iv materials
+244	photodiodes
+244	photodetectors
+244	midinfrared
+244	germanium-tin
+245	unknown
+246	transistor
+246	time-dependent dielectric breakdown (tddb)
+246	reliability
+246	cmos
+246	numerical models
+246	silicon-on-insulator
+246	transistors
+246	dielectrics
+246	semiconductor device modeling
+246	electrons
+246	logic gates
+246	time-frequency analysis
+246	electric breakdown
+246	stress
+247	thermal stability
+247	pcram
+247	phase change materials
+247	crystallization mechanisms
+247	carbon-doping
+247	ga-sb
+248	unknown
+249	unknown
+250	electrodynamics
+250	ewpt receivers
+250	near-limit
+250	optimal trajectory
+250	power bound
+250	wireless power transfer
+251	perifusion bioreactor
+251	single-islet analysis
+251	<italic>in vitro</italic> models
+251	organ-on-a-chip
+251	pancreatic islet
+251	micro-pump
+252	circuits and systems
+252	photonic integrated circuits
+252	optical ring resonator
+252	coupling regime
+252	coherent characterization
+252	acousto-optic frequency-shifting loop
+252	active filters
+252	system-on-chip
+252	band-pass filters
+252	propagation losses
+252	electromagnetic propagation
+252	filtering
+252	oscillators
+252	filters
+252	photonic integrated circuits
+253	unknown
+254	unknown
+255	shj solar cells
+255	amorphous silicon layer
+255	hydrogen bonding
+255	light soaking recovery
+255	passivation loss
+255	photovoltaic reliability
+255	uv-induced degradation
+256	mec
+256	lstm
+256	denm
+256	sdvn
+256	its
+256	load balancing
+257	fano factor
+257	look-up table
+257	cryo-cmos
+257	lna
+257	qubit
+258	floating body
+258	p-mosfet
+258	soi
+258	tcad
+258	transient
+259	algan
+259	quantum wells
+259	ultraviolet
+259	mbe
+259	efficiency
+259	polarization
+260	microdisplays
+260	microleds
+260	quantum nanoplatelets
+260	convective self-assembly
+260	augmented reality
+260	color convert nano-object
+261	unknown
+262	unknown
+263	uplink
+263	tx power
+263	radiated energy per bit transmitted
+263	global exposure
+264	unknown
+265	microfluidics
+265	microchannel
+265	electroosmotic flow
+265	magnetohydrodynamics
+265	saline solution
+265	stirring-on-demand
+266	semiconductors
+266	in situ biasing
+266	scanning transmission electron microscopy
+266	ebic
+266	4d-stem
+266	electric field
+267	geomagnetism
+267	magnetic field modeling
+267	igrf
+267	swarm mission
+267	absolute vector magnetometers
+267	calibration
+268	unknown
+269	digital phenotyping
+269	smartwatches
+269	bipolar disorder
+269	relapse
+269	prediction
+270	unknown
+271	unknown
+272	unknown
+273	unknown
+274	viability
+274	functionnality, hypoxia
+274	insulinosecretion
+274	stress
+274	photobiomodulation
+274	diabetes
+274	beta cells
+275	biopolymers
+275	continuous glucose monitoring
+275	electrochemical sensors
+275	wearable biosensors
+275	diabetes
+276	si photonics
+276	si (001) substrates
+276	molecular beam epitaxy
+276	inas quantum dots
+276	quantum dot lasers
+277	wafer bonding
+277	circular polarization
+277	gan
+277	spin injection
+277	spin-led
+278	sample preparation
+278	subcellularimaging
+278	cryo-tof-sims
+279	unknown
+280	unknown
+281	click chemistry
+281	influenza
+281	matrix 2 ectodomain
+281	nanoparticles
+281	nanostructured lipid carriers
+281	vaccine
+282	unknown
+283	unknown
+284	unknown
+285	5g
+285	frmcs
+285	safe communications
+285	channel models
+285	channel sounding
+285	railways
+286	unknown
+287	viability
+287	functionality
+287	insulinosecretion
+287	beta cells
+287	photobiomodulation
+287	diabetes
+288	quantum information processing (qip)
+288	spin relaxation
+288	pauli spin blockade (psb)
+288	charge sensing
+288	reflectometry
+288	cryogenic temperature
+288	quantum dot (qd)
+288	metal-oxide semiconductor (mos)
+288	spin relaxation
+288	pauli spin blockade (psb)
+288	charge sensing
+288	reflectometry
+288	cryogenic temperature
+288	quantum dot (qd)
+288	metal-oxide semiconductor (mos)
+288	quantum information processing (qip)
+289	unknown
+290	accuracy
+290	energy saving
+290	knn
+290	localization
+290	micromobility
+290	v2x
+291	integrated communication and sensing
+291	distributed antenna system
+291	advanced antennas for distributed antenna systems
+291	metasurfaces and electromagnetic surfaces
+291	near-field applications
+291	enhanced coverage
+291	spatial multiplexing technique
+291	sensing and localization
+291	massive mimo and cell-free architecture
+291	emf exposure analyses
+292	semiconductor process modeling
+292	millimeter waver measurements
+292	frequency measurement
+292	semiconductor device modeling
+292	iii-v semiconductor materials
+292	loss measurement
+292	millimeter wave integrated circuits
+292	silicon
+292	conductivity
+292	coplanar waveguides
+292	hemts
+292	modfets
+292	substrates
+292	transmission line measurements
+293	characterization
+293	dislocations
+293	electron channeling contrast imaging
+293	iii-v semiconductors
+294	unknown
+295	unknown
+296	bond order
+296	ab initio molecular dynamics
+296	amorphous chalcogenide
+296	phase change materials
+297	unknown
+298	unknown
+299	2d materials
+299	integrated photonics
+299	nonlinear optics
+300	frames
+300	lyapunov stochastic optimization
+300	latent space alignment
+300	semantic communications
+300	transmitters
+300	atoms
+300	encoding
+300	vectors
+300	semantic communication
+300	equalizers
+300	training
+300	optimization
+300	semantics
+300	noise
+301	infrared light-emitting diode
+301	pressure-induced phase transition
+301	dirac3d semimetal
+301	wurtzite
+301	hgte
+301	nanocrystals
+302	artificial neural networks
+302	edge inference
+302	token communications
+302	deep joint source channel coding
+302	transformers
+302	goal-oriented communications
+302	semantic communications
+302	heuristic algorithms
+302	feature extraction
+302	servers
+302	computational modeling
+302	computer architecture
+302	semantic communication
+302	adaptation models
+302	transformers
+302	optimization
+303	selenium
+303	resonant diffraction
+303	organic semiconductors
+303	conjugated polymers
+303	anomalous scattering
+304	unknown
+305	unknown
+306	ce-doped zno
+306	electrodeposition
+306	nanorods
+306	optical properties
+306	dft calculations
+306	photovoltaic applications
+307	unknown
+308	indium
+308	molecular beam epitaxy
+308	inas/inalgaas
+308	indium flush
+308	semiconductor lasers
+308	quantum dots
+308	photonics
+308	chemical lasers
+308	laser excitation
+308	lasers
+308	iii-v semiconductor materials
+308	indium phosphide
+308	substrates
+308	silicon
+308	pump lasers
+309	unknown
+310	unknown
+311	unknown
+312	microstructure
+312	electrical conductivity
+312	organic thermoelectrics
+312	benzodifuranone
+312	backbone curvature
+312	conjugated polymers
+313	unknown
