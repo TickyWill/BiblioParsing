@@ -86,6 +86,6 @@ bp.save_demo_parsing_dict(dedup_parsing_dict, dedup_parsing_path, item_filename_
 3.1.0 Upgrade of python version to 3.14
 
 # Meta
-	- authors: BiblioAbnalysis team
+	- authors: BiblioAnalysis team
 
 Distributed under the [MIT license](https://mit-license.org/)
