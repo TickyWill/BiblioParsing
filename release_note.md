@@ -14,8 +14,7 @@
   - 2: Reduction of complexity of several functions.
   - 3: Completion of all docstrings.
 * **Bug Fixes**:
-  - Bug 1: Inversion of file paths when calling "add_if" function of "bmfuncts.add_ifs" module in the "bmgui.update_if_page" module.
-  - Bug 2: Partial update of IFs database with data of missing ISSNs and missing IFs set by the user fixed by creation of "\_clean_journals_data" and "\_clean_and_save_if_db" internal functions to "bmfuncts.update_impact_factors" module.
+  - None
 * **Known Issues**:
   - None.
 * **API Changes**:
