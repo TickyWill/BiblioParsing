@@ -1,7 +1,11 @@
+"""Module for building package"""
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+# Standard library imports
 from os import path
+
+# 3rd party imports
+from setuptools import setup, find_packages
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
@@ -14,7 +18,7 @@ with open(path.join(this_directory, 'requirements.txt'), encoding='utf-8') as f:
 # This setup is suitable for "python setup.py develop".
 
 setup(name='BiblioParsing',
-      version='2.0.0',
+      version='3.1.0',
       description='A toolbox for parsing a bibliography',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -23,7 +27,7 @@ setup(name='BiblioParsing',
       classifiers = [
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.14',
         'Topic :: Scientific/Engineering :: Information Analysis :: Visualization',
         'Operating System :: OS Independent',
         'Intended Audience :: Science/Research'
@@ -33,5 +37,5 @@ setup(name='BiblioParsing',
       author= 'BiblioAnalysis team',
       author_email= 'francois.bertin7@wanadoo.fr, amal.chabli@orange.fr',
       url= 'https://github.com/TickyWill/BiblioParsing',
-      packages=find_packages(),
+      packages=find_packages(include=['bpfuncts']),
       )
