@@ -7,7 +7,7 @@ import pandas as pd
 import bpfuncts.scopus_references_parsing as scopus_references_parsing
 
 def test__find_scopus_ref_doi():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     input_list = list(input_df['DOI'])
     output_result =  scopus_references_parsing._find_scopus_ref_doi(input_list, True)
 
@@ -16,7 +16,7 @@ def test__find_scopus_ref_doi():
 
 
 def test__find_scopus_ref_year_case1():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     input_df['ref_items'] = input_df['DOI'] + ' - .2038.'
     output_result = scopus_references_parsing._find_scopus_ref_year(
         list(input_df['ref_items']), 0, '10.1116/6.0005192', '', True
@@ -27,7 +27,7 @@ def test__find_scopus_ref_year_case1():
 
 
 def test__find_scopus_ref_year_case2():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     input_df['ref_items'] = input_df['DOI'] + ' - .2038.'
     output_result = scopus_references_parsing._find_scopus_ref_year(
         list(input_df['ref_items']), 0, 'unknown', '', True
@@ -58,7 +58,7 @@ def test__find_scopus_ref_year_case4():
 
 
 def test__check_author_in_next_items():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     assert scopus_references_parsing._check_author_in_next_items(
         0, 1, 10, list(input_df["Authors"]), True
     ) == 10
@@ -71,7 +71,7 @@ def test__check_authors_case_w_dot():
 
 
 def test__set_one_item_authors():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result =  scopus_references_parsing._set_one_item_authors(
         'item1', 'item A', 3, list(input_df["Authors"]), 'Ph.D', True
     )
@@ -81,7 +81,7 @@ def test__set_one_item_authors():
 
 
 def test__set_two_item_authors():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result = scopus_references_parsing._set_two_item_authors(
         'item1', 'item A', 1e6, list(input_df["Authors"]), 'Ph.D', True
     )
@@ -91,7 +91,7 @@ def test__set_two_item_authors():
 
 
 def test__search_authors_in_items_case1():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result = scopus_references_parsing._search_authors_in_items(input_df["Authors"], True)
 
     assert isinstance(output_result, tuple)
@@ -337,7 +337,7 @@ def test__clean_ref():
 
 
 def test_build_scopus_references():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df.csv')
     cols_tup = (
         {
             'articles_cols_list': [

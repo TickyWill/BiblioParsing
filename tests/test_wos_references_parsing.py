@@ -79,7 +79,7 @@ def test__find_wos_ref_title_journal_case5():
 
 
 def test_build_wos_references():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
                  'address_cols_list': ['Pub_id', 'Idx_address', 'Address'],

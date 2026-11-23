@@ -54,7 +54,7 @@ def test_build_norm_raw_affils_dict_vanilla():
 
 
 def test_build_norm_raw_affils_dict_small_data_file():
-    result = affil_norm_utils.build_norm_raw_affils_dict('./bpfuncts/RefFiles/Country_affiliations_small.xlsx')
+    result = affil_norm_utils.build_norm_raw_affils_dict('./tests/TestFiles/Country_affiliations_small.xlsx')
     assert result == {
         'Algeria':
             {'EMP Gsch': [

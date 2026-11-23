@@ -92,7 +92,7 @@ def test__set_upper_initials():
 
 
 def test__build_wos_authors():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     fails_dic = {}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -124,7 +124,7 @@ def test__build_wos_authors():
     assert output_df.shape == (11, 3)
 
 def test__build_wos_keywords():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     fails_dic = {}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -163,7 +163,7 @@ def test__build_wos_keywords():
 
 
 def test__build_wos_addresses_countries_affiliations():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     fails_dic = {}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -202,7 +202,7 @@ def test__build_wos_addresses_countries_affiliations():
 
 
 def test__build_wos_authors_countries_affiliations():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     fails_dic = {}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -235,7 +235,7 @@ def test__build_wos_authors_countries_affiliations():
 
 
 def test__build_wos_articles():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/wos_corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/wos_corpus_df.csv')
     fails_dic = {}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -268,7 +268,7 @@ def test__build_wos_articles():
 
 
 def test_wos_parser():
-    output = wos_parsing.wos_parser('./bpfuncts/RefFiles/wos')
+    output = wos_parsing.wos_parser('./tests/TestFiles/wos')
 
     assert isinstance(output, tuple)
     assert len(output) == 3

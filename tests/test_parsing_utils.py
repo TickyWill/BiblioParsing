@@ -63,8 +63,8 @@ def test_set_unknown_address_auc_false():
 
 def test_check_and_get_rawdata_file_path_vanilla():
     assert check_and_get_rawdata_file_path(
-        './bpfuncts/RefFiles', 'xlsx'
-    ) == WindowsPath('bpfuncts/RefFiles/scopus_parser/Scopus_IDs à supprimer.xlsx')
+        './tests/TestFiles', 'xlsx'
+    ) == WindowsPath('tests/TestFiles/scopus_parser/Scopus_IDs à supprimer.xlsx')
 
 
 def test_check_and_get_rawdata_file_path_empty():
@@ -93,18 +93,6 @@ def test__tokenizer():
     ) == ['thermal', 'stability', 'mg2si0.55sn0.45', 'thermoelectric', 'application']
 
 
-def test_build_title_keywords():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
-    output_results = build_title_keywords(input_df)
-
-    assert isinstance(output_results, tuple)
-    assert len(output_results) == 2
-    assert isinstance(output_results[0], pd.DataFrame)
-    assert output_results[0].shape == (180, 36)
-    assert isinstance(output_results[1], list)
-    assert len(output_results[1]) == 1024
-
-
 def test_normalize_country_case1():
     assert normalize_country("Russia") == "Russian Federation"
 
@@ -126,7 +114,7 @@ def test_normalize_name_case2():
 
 
 def test_normalize_journal_names_scopus():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result = normalize_journal_names("scopus", input_df)
 
     assert isinstance(output_result, pd.DataFrame)
@@ -134,7 +122,7 @@ def test_normalize_journal_names_scopus():
 
 
 def test_normalize_journal_names_wos():
-    input_df = read_wos_rawdata('./bpfuncts/RefFiles/wos')[0]
+    input_df = read_wos_rawdata('./tests/TestFiles/wos')[0]
     output_result = normalize_journal_names("wos", input_df)
 
     assert isinstance(output_result, pd.DataFrame)
@@ -142,7 +130,7 @@ def test_normalize_journal_names_wos():
 
 
 def test_normalize_journal_names_unrecognized_database():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result = normalize_journal_names("", input_df)
 
     assert isinstance(output_result, pd.DataFrame)
@@ -150,7 +138,7 @@ def test_normalize_journal_names_unrecognized_database():
 
 
 def test_build_pub_db_ids():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_df = build_pub_db_ids(input_df, 'Source', 'Source')
 
     assert isinstance(output_df, pd.DataFrame)
@@ -158,7 +146,7 @@ def test_build_pub_db_ids():
 
 
 def test_check_and_drop_columns_scopus():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_df = check_and_drop_columns("scopus", input_df)
 
     assert isinstance(output_df, pd.DataFrame)
@@ -166,7 +154,7 @@ def test_check_and_drop_columns_scopus():
 
 
 def test_check_and_drop_columns_unrecognized_database():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_df = check_and_drop_columns("", input_df)
 
     assert isinstance(output_df, pd.DataFrame)

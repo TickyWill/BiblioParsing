@@ -22,7 +22,7 @@ def test__set_scopus_rawdata_cols():
 
 
 def test__check_authors_with_affiliations():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df.csv')
     cols_list = ['Pub_id', 'Authors', 'Affiliations', 'Authors with affiliations']
     output = scopus_rawdata_utils._check_authors_with_affiliations(input_df, cols_list)
 
@@ -49,7 +49,7 @@ def test__correct_auth_data():
 
 
 def test__check_authors():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df.csv')
     check_cols = ['Pub_id', 'Authors', 'Author full names', 'Affiliations', 'Authors with affiliations']
     output = scopus_rawdata_utils._check_authors(input_df, check_cols)
 
@@ -62,7 +62,7 @@ def test__check_authors():
 
 
 def test__correct_scopus_full_rawdata():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_copy.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_copy.csv')
     cols_tup = ({'scopus_id_col': 'Scopus_id', 'pub_id_col': 'Pub_id'},
                 {'scopus_auth_col': 'Authors', 'scopus_aff_col': 'Affiliations',
                  'scopus_auth_with_aff_col': 'Authors with affiliations', 'scopus_fullnames_col': 'Author full names',
@@ -81,7 +81,7 @@ def test__correct_scopus_full_rawdata():
 
 def test_read_scopus_rawdata():
     output = scopus_rawdata_utils.read_scopus_rawdata(
-        './bpfuncts/RefFiles/read_scopus_rawdata', True, False
+        './tests/TestFiles/read_scopus_rawdata', True, False
     )
 
     assert isinstance(output, tuple)

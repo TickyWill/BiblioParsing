@@ -147,7 +147,7 @@ def test__get_author_affiliations_list():
 
 
 def test__build_scopus_authors():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_parser.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_parser.csv')
     fails_dic = {'number of article': 180}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -181,7 +181,7 @@ def test__build_scopus_authors():
 
 
 def test__build_scopus_keywords():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_parser.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_parser.csv')
     fails_dic = {'number of article': 180}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -221,7 +221,7 @@ def test__build_scopus_keywords():
 
 
 def test__build_scopus_addresses_countries_affiliations():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_parser.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_parser.csv')
     fails_dic = {'number of article': 180}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -261,7 +261,7 @@ def test__build_scopus_addresses_countries_affiliations():
 
 
 def test__build_scopus_authors_countries_affiliations():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_parser_small.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_parser_small.csv')
     fails_dic = {'number of article': 180}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -294,7 +294,7 @@ def test__build_scopus_authors_countries_affiliations():
 
 
 def test__build_scopus_articles():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/corpus_data/corpus_df_parser.csv')
+    input_df = pd.read_csv('./tests/TestFiles/corpus_data/corpus_df_parser.csv')
     fails_dic = {'number of article': 180}
     cols_tup = ({'articles_cols_list': ['Pub_id', 'Authors', 'Year', 'Journal', 'Volume', 'Page', 'DOI',
                                         'Document_type', 'Language', 'Title', 'ISSN'],
@@ -328,7 +328,7 @@ def test__build_scopus_articles():
 
 
 def test_scopus_parser():
-    output = scopus_parsing.scopus_parser('./bpfuncts/RefFiles/scopus_parser')
+    output = scopus_parsing.scopus_parser('./tests/TestFiles/scopus_parser')
 
     assert isinstance(output, tuple)
     assert len(output) == 5

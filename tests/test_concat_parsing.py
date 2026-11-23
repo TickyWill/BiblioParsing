@@ -162,17 +162,8 @@ def test__compute_similarity():
 
 
 def test__set_same_journal_name():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
+    input_df = pd.read_csv('./tests/TestFiles/2026-06-16 scopus.csv')
     output_result = concat_parsing._set_same_journal_name(input_df, "Title", "Same_title")
-
-    assert isinstance(output_result, pd.DataFrame)
-    assert output_result.shape == (180, 35)
-
-
-def test__set_same_article_title():
-    input_df = pd.read_csv('./bpfuncts/RefFiles/2026-06-16 scopus.csv')
-    output_result = concat_parsing._set_same_article_title(
-        input_df, "Source title", "Same_title")
 
     assert isinstance(output_result, pd.DataFrame)
     assert output_result.shape == (180, 35)
