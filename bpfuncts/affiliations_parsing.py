@@ -1031,8 +1031,8 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None):
     affil_dicts = build_affils_useful_dicts(affil_params_dic)
     wrong_affil_types_dict = affil_dicts['wrong_affil_types_dict']
 
-    print(f"{bp_gg.TAB}- Building normalized affiliations and remaining raw affiliations...")
     if not wrong_affil_types_dict:
+        print(f"{bp_gg.TAB}- Building normalized affiliations and remaining raw affiliations...")
         step_nb = len(addresses_df)
         step = 0
         countries_list, norm_affil_list, raw_affil_list = [], [], []
@@ -1057,9 +1057,9 @@ def build_norm_and_raw_affils(addresses_df, affil_params_dic=None):
 
         # Building clean data of raw affiliations
         raw_affil_df, _ = build_item_df_from_tup(raw_affil_list, raw_affil_cols_list, affil_col, pub_id_col)
+        print_final_text(f"{bp_gg.TAB*2}- Normalized affiliations and remaining raw affiliations built",
+                         prev_txt_len=txt_len)
     else:
         # Returning empty dataframes
         country_df, norm_affil_df, raw_affil_df = [pd.DataFrame()] * 3
-
-    print_final_text(f"{bp_gg.TAB*2}- Normalized affiliations and remaining raw affiliations built", prev_txt_len=txt_len)
     return country_df, norm_affil_df, raw_affil_df, wrong_affil_types_dict
